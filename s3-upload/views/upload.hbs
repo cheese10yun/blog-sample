@@ -1,0 +1,25 @@
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <!-- login section -->
+        <form  action="/api/v1/upload" enctype="multipart/form-data"  method="post">
+
+            <fieldset class="form-group">
+                <label for="image">Image</label>
+                <input class="form-control" type="file" id="file" name="img_files[]" accept="image/*">
+            </fieldset>
+
+            <fieldset class="form-group">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submit_event_upload">Add</button>
+                </div>
+            </fieldset>
+        </form>
+        <!-- // login section -->
+    </div>
+    <!-- /.container-fluid -->
+</div>
+<!-- /#page-wrapper -->
+
+<script src="jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="js/login.js"></script>

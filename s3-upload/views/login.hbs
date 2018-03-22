@@ -1,0 +1,37 @@
+<div id="page-wrapper">
+    <div class="container-fluid">
+        <!-- login section -->
+        <form action="/login" method="post" name="frm_login" id="frm_login">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="text-center">Node JS Passport Login</h1>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="text" id="username" name="user_id" class="form-control input-lg" placeholder="ID" required="required" autocomplete="off" />
+                        </div>
+
+                        <div class="errorTxt"></div>
+                        <div class="form-group">
+                            <input type="password" id="password" name="password" class="form-control input-lg" placeholder="Password" required="required" autocomplete="off" />
+                        </div>
+                        <div class="errorTxt"></div>
+                        <div class="form-group">
+                            <input type="submit" class="btn btn-block btn-lg btn-default btn_login" value="Login" />
+                            <a href="/auth/login/facebook" class="btn btn-block btn-lg btn-primary btn_login">FaceBook</a>
+                            <a href="/auth/login/kakao" class="btn btn-block btn-lg btn-warning btn_login">KaKao</a>
+                            <a href="/auth/login/naver" class="btn btn-block btn-lg btn-success btn_login">Naver</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- // login section -->
+    </div>
+    <!-- /.container-fluid -->
+</div>
+<!-- /#page-wrapper -->
+
+<script src="jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="js/login.js"></script>

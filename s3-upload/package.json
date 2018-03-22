@@ -1,0 +1,33 @@
+{
+  "name": "node-yun",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "nodemon ./bin/www nodemon -e hbs"
+  },
+  "dependencies": {
+    "async": "^2.1.4",
+    "aws-sdk": "^2.9.0",
+    "bcrypt": "^1.0.2",
+    "body-parser": "~1.15.2",
+    "bootstrap": "^3.3.7",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "~1.4.3",
+    "cookie-session": "^2.0.0-alpha.2",
+    "debug": "~2.2.0",
+    "express": "~4.14.0",
+    "formidable": "^1.1.1",
+    "hbs": "~4.0.1",
+    "jquery": "^3.1.1",
+    "jquery-validation": "^1.16.0",
+    "morgan": "~1.7.0",
+    "mysql": "^2.12.0",
+    "passport": "^0.3.2",
+    "passport-facebook": "^2.1.1",
+    "passport-kakao": "0.0.4",
+    "passport-local": "^1.0.0",
+    "passport-naver": "^1.0.4",
+    "request": "^2.79.0",
+    "serve-favicon": "~2.3.0"
+  }
+}
