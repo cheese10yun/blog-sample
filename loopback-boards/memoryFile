@@ -1,0 +1,26 @@
+{
+  "ids": {
+    "User": 2,
+    "AccessToken": 4,
+    "ACL": 1,
+    "RoleMapping": 1,
+    "Role": 1,
+    "board": 45
+  },
+  "models": {
+    "User": {
+      "1": "{\"realm\":\"string\",\"username\":\"string\",\"password\":\"$2a$10$FrvnL0hqH6CzOZ.qrlDW2.y7FZWZgpKvuW02ONRQ85YvSEywSENd2\",\"email\":\"string@test.com\",\"emailVerified\":false,\"id\":1}"
+    },
+    "AccessToken": {
+      "wNyOtVihVc0XmksFYRX0W79u2cwPL1aUSBQLNZa0G0DJJgWjxpXkhAryVtYzVY2X": "{\"id\":\"wNyOtVihVc0XmksFYRX0W79u2cwPL1aUSBQLNZa0G0DJJgWjxpXkhAryVtYzVY2X\",\"ttl\":1209600,\"created\":\"2017-05-10T16:25:37.611Z\",\"userId\":1}",
+      "ycbbx6RHIugE0krBbahSQOHCzF56Nzr0itLsgSumsgAexSz8ttbBZrgfNtA592KD": "{\"id\":\"ycbbx6RHIugE0krBbahSQOHCzF56Nzr0itLsgSumsgAexSz8ttbBZrgfNtA592KD\",\"ttl\":1209600,\"created\":\"2017-05-10T16:49:12.285Z\",\"userId\":1}",
+      "AZFLoL4yTcwvWWT9FXGnHHGtJapXfDJFVCVBU2cQpXHCe4SeDZO5StNH8CifvfEi": "{\"id\":\"AZFLoL4yTcwvWWT9FXGnHHGtJapXfDJFVCVBU2cQpXHCe4SeDZO5StNH8CifvfEi\",\"ttl\":1209600,\"created\":\"2017-05-10T16:52:44.584Z\",\"userId\":1}"
+    },
+    "ACL": {},
+    "RoleMapping": {},
+    "Role": {},
+    "board": {
+      "44": "{\"title\":\"22222222222222\",\"content\":\"2222\",\"createdDt\":\"2017-05-10T16:49:28.805Z\",\"userId\":1,\"id\":44}"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "ids": {
+    "User": 2,
+    "AccessToken": 2,
+    "ACL": 1,
+    "RoleMapping": 1,
+    "Role": 1,
+    "board": 2
+  },
+  "models": {
+    "User": {
+      "1": "{\"username\":\"yun\",\"password\":\"$2a$10$nJdOkqU2dSQA0KUaGLcNYOl9UA8s7TybH93x8kCnQ7GwDuguEcB6O\",\"email\":\"yun@test.com\",\"id\":1}"
+    },
+    "AccessToken": {
+      "UYdl86DXkH2IBa0YFNqBG5K5oSDDwqHoW3Ab0wQ2nJwgY8mMr2QhbLAxQKrT29Cs": "{\"id\":\"UYdl86DXkH2IBa0YFNqBG5K5oSDDwqHoW3Ab0wQ2nJwgY8mMr2QhbLAxQKrT29Cs\",\"ttl\":1209600,\"created\":\"2017-05-25T13:57:31.787Z\",\"userId\":1}"
+    },
+    "ACL": {},
+    "RoleMapping": {},
+    "Role": {},
+    "board": {
+      "1": "{\"title\":\"게시글\",\"content\":\"내용 블라...\",\"createdDt\":\"2017-05-25T13:57:58.738Z\",\"id\":1}"
+    }
+  }
+}
