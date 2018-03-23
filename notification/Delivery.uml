@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>com.cheese.notification.delivery.Delivery</OriginalElement>
+  <nodes>
+    <node x="514.6500000000001" y="179.0">com.cheese.notification.notificaion.delivery.DeliveryEmailNotificationSender</node>
+    <node x="909.9573593073593" y="0.0">com.cheese.notification.sms.SmsNotificationSender</node>
+    <node x="290.6436147186148" y="313.0">com.cheese.notification.notificaion.delivery.DeliveryNotificationSenderFactory</node>
+    <node x="777.6500000000001" y="157.0">com.cheese.notification.notificaion.delivery.DeliverySmsNotificationSender</node>
+    <node x="445.1436147186148" y="481.0">com.cheese.notification.notificaion.delivery.DeliveryNotificationSenderManager</node>
+    <node x="538.2660173160174" y="22.5">com.cheese.notification.notificaion.delivery.DeliveryNotificationSender</node>
+    <node x="140.5" y="146.0">com.cheese.notification.notificaion.delivery.DeliveryKakaoNotificationSender</node>
+    <node x="0.0" y="11.0">com.cheese.notification.kakao.KakaoNotificaionSender</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.cheese.notification.notificaion.delivery.DeliveryKakaoNotificationSender" target="com.cheese.notification.notificaion.delivery.DeliveryNotificationSender">
+      <point x="117.33333333333331" y="-58.5" />
+      <point x="433.8333333333333" y="116.0" />
+      <point x="559.3660173160174" y="116.0" />
+      <point x="-84.39999999999998" y="25.5" />
+    </edge>
+    <edge source="com.cheese.notification.notificaion.delivery.DeliverySmsNotificationSender" target="com.cheese.notification.notificaion.delivery.DeliveryNotificationSender">
+      <point x="-106.66666666666674" y="-47.5" />
+      <point x="830.9833333333333" y="126.0" />
+      <point x="685.9660173160173" y="126.0" />
+      <point x="42.19999999999993" y="25.5" />
+    </edge>
+    <edge source="com.cheese.notification.notificaion.delivery.DeliveryEmailNotificationSender" target="com.cheese.notification.notificaion.delivery.DeliveryNotificationSender">
+      <point x="0.0" y="-25.5" />
+      <point x="636.1500000000001" y="126.0" />
+      <point x="643.7660173160174" y="126.0" />
+      <point x="0.0" y="25.5" />
+    </edge>
+    <edge source="com.cheese.notification.notificaion.delivery.DeliveryKakaoNotificationSender" target="com.cheese.notification.kakao.KakaoNotificaionSender">
+      <point x="-117.33333333333331" y="-58.5" />
+      <point x="199.16666666666663" y="126.0" />
+      <point x="105.5" y="126.0" />
+      <point x="-105.5" y="37.0" />
+    </edge>
+    <edge source="com.cheese.notification.notificaion.delivery.DeliverySmsNotificationSender" target="com.cheese.notification.sms.SmsNotificationSender">
+      <point x="106.66666666666674" y="-47.5" />
+      <point x="1044.3166666666668" y="126.0" />
+      <point x="1086.2073593073592" y="126.0" />
+      <point x="58.75" y="48.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="572.5" y="299.5" />
+  <SelectedNodes>
+    <node>com.cheese.notification.notificaion.delivery.DeliveryEmailNotificationSender</node>
+    <node>com.cheese.notification.sms.SmsNotificationSender</node>
+    <node>com.cheese.notification.notificaion.delivery.DeliveryNotificationSenderFactory</node>
+    <node>com.cheese.notification.notificaion.delivery.DeliverySmsNotificationSender</node>
+    <node>com.cheese.notification.notificaion.delivery.DeliveryNotificationSenderManager</node>
+    <node>com.cheese.notification.notificaion.delivery.DeliveryNotificationSender</node>
+    <node>com.cheese.notification.notificaion.delivery.DeliveryKakaoNotificationSender</node>
+    <node>com.cheese.notification.kakao.KakaoNotificaionSender</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Properties</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
