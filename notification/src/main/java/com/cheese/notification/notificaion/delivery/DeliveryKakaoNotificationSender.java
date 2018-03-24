@@ -2,19 +2,21 @@ package com.cheese.notification.notificaion.delivery;
 
 import com.cheese.notification.kakao.KakaoNotificaionSender;
 import com.cheese.notification.kakao.KakaoNotificationDto;
-import com.cheese.notification.kakao.KakaoNotificationRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DeliveryKakaoNotificationSender extends KakaoNotificaionSender implements DeliveryNotificationSender {
+public class DeliveryKakaoNotificationSender  implements DeliveryNotificationSender {
 
-    public DeliveryKakaoNotificationSender(KakaoNotificationRepository kakaoNotificationRepository) {
-        super(kakaoNotificationRepository);
+
+    private final KakaoNotificaionSender kakaoNotificaionSender;
+
+    public DeliveryKakaoNotificationSender(KakaoNotificaionSender kakaoNotificaionSender) {
+        this.kakaoNotificaionSender = kakaoNotificaionSender;
     }
 
     @Override
     public void send(DeliveryMessageDto.Message dto) {
-        create(buildKaKaoNotificationDto(dto));
+        kakaoNotificaionSender.create(buildKaKaoNotificationDto(dto));
     }
 
 

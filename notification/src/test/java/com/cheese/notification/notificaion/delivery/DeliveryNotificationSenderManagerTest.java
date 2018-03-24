@@ -3,9 +3,12 @@ package com.cheese.notification.notificaion.delivery;
 import com.cheese.notification.delivery.Delivery;
 import com.cheese.notification.delivery.DeliveryNotificationType;
 import com.cheese.notification.delivery.DeliveryNotificationTypeEnum;
+import com.cheese.notification.email.EmailNotificationSender;
+import com.cheese.notification.kakao.KakaoNotificaionSender;
 import com.cheese.notification.kakao.KakaoNotificationRepository;
 import com.cheese.notification.receiver.Receiver;
 import com.cheese.notification.sender.Sender;
+import com.cheese.notification.sms.SmsNotificationSender;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +19,11 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+
 @RunWith(MockitoJUnitRunner.class)
 public class DeliveryNotificationSenderManagerTest {
 
@@ -23,15 +31,14 @@ public class DeliveryNotificationSenderManagerTest {
     private DeliveryNotificationSenderManager deliveryNotificationSenderManager;
     private DeliveryNotificationSenderFactory deliveryNotificationSenderFactory;
 
+    @Mock
     private DeliveryKakaoNotificationSender deliveryKakaoNotificationSender;
+
+    @Mock
     private DeliverySmsNotificationSender deliverySmsNotificationSender;
+
+    @Mock
     private DeliveryEmailNotificationSender deliveryEmailNotificationSender;
-
-    @Mock
-    private KakaoNotificationRepository kakaoNotificationRepository;
-
-    @Mock
-    private RestTemplate restTemplate;
 
 
     private Delivery delivery;
@@ -39,16 +46,27 @@ public class DeliveryNotificationSenderManagerTest {
     @Before
     public void setUp() throws Exception {
         delivery = buildDelivery();
-        deliverySmsNotificationSender = new DeliverySmsNotificationSender(restTemplate);
-        deliveryKakaoNotificationSender = new DeliveryKakaoNotificationSender(kakaoNotificationRepository);
+
         deliveryNotificationSenderFactory = new DeliveryNotificationSenderFactory(deliveryKakaoNotificationSender, deliverySmsNotificationSender, deliveryEmailNotificationSender);
+
         deliveryNotificationSenderManager = new DeliveryNotificationSenderManager(deliveryNotificationSenderFactory);
+
     }
 
     @Test
-    public void name() {
+    public void sendMessage() {
 
+        //given
+
+        //when
         deliveryNotificationSenderManager.sendMessage(delivery);
+
+        //then
+        verify(deliveryKakaoNotificationSender, atLeastOnce()).send(any(DeliveryMessageDto.Message.class));
+        verify(deliverySmsNotificationSender, atLeastOnce()).send(any(DeliveryMessageDto.Message.class));
+
+
+
 
     }
 

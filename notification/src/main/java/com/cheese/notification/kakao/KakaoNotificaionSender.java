@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public abstract class KakaoNotificaionSender {
+public class KakaoNotificaionSender {
 
     private KakaoNotificationRepository kakaoNotificationRepository;
 
@@ -15,7 +15,7 @@ public abstract class KakaoNotificaionSender {
         this.kakaoNotificationRepository = kakaoNotificationRepository;
     }
 
-    public KakaoNotification create(KakaoNotificationDto.Creation dto) {
+    public final KakaoNotification create(KakaoNotificationDto.Creation dto) {
         System.out.println("kakao message insert...");
         return kakaoNotificationRepository.save(dto.toEntity());
     }

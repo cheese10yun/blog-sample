@@ -7,13 +7,17 @@ header-img: https://i.imgur.com/avC1Xor.jpg
 thumbnail: https://i.imgur.com/PI6g3ku.png
 date:
 tags:
-  -
+  - Spring
+  - OOP
+  - SOLID
 ---
 
 ![](https://i.imgur.com/PI6g3ku.png)
 
 **해당 요구사항에 맞는 객체지향 프로그래밍을 진행하고 해당 코드를 SOLD 원칙에 맞게 제 나름대로 해석 해보았습니다. 아직 배우는 단계라 너무 부족합니다. 지적 사항을 댓글로 남겨주시면 정말로 감사하겠습니다.** 위사진은 해당 셈플코드의 간략한 클래스 다이어그램 입니다.
 
+## 예제 코드
+![blog-sample ](https://github.com/cheese10yun/blog-sample/tree/master/notification)
 
 ## 요구사항
 
@@ -59,18 +63,18 @@ public interface DeliveryNotificationSender {
 ## DeliveryKakaoNotificationSender 구현 클래스
 ```java
 @Component
-public class DeliveryKakaoNotificationSender extends KakaoNotificaionSender implements DeliveryNotificationSender {
+public class DeliveryKakaoNotificationSender implements DeliveryNotificationSender {
     ...
     @Override
     public void send(DeliveryMessageDto.Message dto) {
-        create(buildKaKaoNotificationDto(dto));
+        kakaoNotificaionSender.create(buildKaKaoNotificationDto(dto));
     }
     ...
 }
 ```
 * 배송 관련 카카오 메시지를 담당하는 클래스
 * `DeliveryNotificationSender` 인터페이스를 `implements` 해서 자신이 `send` 메서드를 구현 해야하는 책임을 명확하게 알 수 있다.
-* `KakaoNotificaionSender` 클래스를 상속 받고 있어 실제 구체적으로 어떻게 보내지는지 모르더라도 상관 없다.
+* `KakaoNotificaionSender` 클래스를 이용해서 실제 구체적으로 어떻게 보내지는지 모르더라도 상관 없다.
 * 테이블에 insert 되고 그 데이터 기반으로 카카오에서 메시지를 전송해 준다.
 
 
@@ -78,11 +82,11 @@ public class DeliveryKakaoNotificationSender extends KakaoNotificaionSender impl
 
 ```java
 @Component
-public class DeliverySmsNotificationSender extends SmsNotificationSender implements DeliveryNotificationSender {
+public class DeliverySmsNotificationSender implements DeliveryNotificationSender {
     ...
     @Override
     public void send(DeliveryMessageDto.Message dto) {
-        sendSMS(buildSmsMessageDto(dto));
+        smsNotificationSender.sendSMS(buildSmsMessageDto(dto));
     }
     ...
 }
@@ -90,7 +94,7 @@ public class DeliverySmsNotificationSender extends SmsNotificationSender impleme
 ```
 * 배송 관련 카카오 메시지를 담당하는 클래스이다.
 * `DeliveryNotificationSender` 인터페이스를 `implements` 해서 자신이 `send` 메서드를 구현 해야하는 책임을 명확하게 알 수 있다.
-* `SmsNotificationSender` 클래스를 상속 받고 있어 실제 구체적으로 어떻게 보내지는지 모르더라도 상관 없다.
+* `SmsNotificationSender` 클래스를 이용해서 메시지를 보내고 있어 실제 구체적으로 어떻게 보내지는지 모르더라도 상관 없다.
 * 해당 업체 API 호출을 통해서 문자전송이 진행된다. 카카오 메시지 전송과는 다르다. 하지만 `DeliveryNotificationSender` 인터페이스를 통해서  `send`라는 동일한 책임을 갖게 된다.
 
 ## DeliveryNotificationSenderManager
@@ -139,11 +143,11 @@ public class DeliveryNotificationSenderManager {
 
 ### LSP : 리스코프 치환 원칙
 * 서브 타입은 언제나 슈퍼타입을 교체 할 수 있어야 한다.
-* `DeliveryKakaoNotificationSender` 서브 클래스는 `KakaoNotificaionSender`  슈퍼 클래스를 대체 합니다. 카카오 알림 중에서 배송 관련 알림을 교체해서 보내줍니다. **Is a 관계가 성립됩니다.**
+* 구현 클래스들은 모두 `DeliveryNotificationSender`인터페이스의 `send` 메서드를 구현 하고 있어 교체가 가능합니다.
 
 
 ### ISP : 인터페이스 분리 원칙
-* 서브 타입에서 상위 타입의 메소드들의 사용하지 않는 경우가 없
+* 하위 클래스들에서 사용하지 않은 의존성을 가지고 있지 않고 있습니다.
 
 ### DIP : 의존성 역전 원칙
 * `DeliveryNotificationSenderManager` 클래스에서 팩토리 메소드를 통해서  `DeliveryNotificationSender`의 새부 인스턴스를 각 타입에 맞게 변경 해주고 있습니다.

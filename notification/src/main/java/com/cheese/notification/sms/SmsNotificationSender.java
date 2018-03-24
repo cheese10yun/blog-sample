@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Component
-public abstract class SmsNotificationSender {
+public class SmsNotificationSender {
     private final RestTemplate restTemplate;
 
     @Autowired
@@ -16,7 +16,7 @@ public abstract class SmsNotificationSender {
         this.restTemplate = restTemplate;
     }
 
-    protected void sendSMS(SmsMessageDto.Creation dto) {
+    public void sendSMS(SmsMessageDto.Creation dto) {
         System.out.println("SMS API Call..");
         HttpEntity<SmsMessageDto.Creation> request = new HttpEntity<>(dto, getHeader());
         restTemplate.exchange("url...", HttpMethod.POST, request, String.class);
