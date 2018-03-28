@@ -5,9 +5,10 @@ subtitle: JPA-Tip
 catalog: true
 header-img: https://i.imgur.com/avC1Xor.jpg
 thumbnail:
-date:
+date: 2018-03-29
 tags:
-  -
+  - JPA
+  - Embedded
 ---
 
 ## Embedded Type
