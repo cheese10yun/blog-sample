@@ -1,0 +1,6 @@
+## receivers 조회
+
+GET http://localhost:8080/receivers/1
+Content-Type: application/json
+
+###

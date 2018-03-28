@@ -1,0 +1,20 @@
+## 테스트..
+
+POST http://localhost:8080/receivers
+Content-Type: application/json
+
+{
+	"name": {
+		"first":"yun",
+		"last": "kim"
+	},
+	"address": {
+		"city": "서울",
+		"street": "강남...",
+		"zipCode": "022-2203"
+	},
+	"phoneNumber": "010XXXXXXXX"
+}
+
+###
+
