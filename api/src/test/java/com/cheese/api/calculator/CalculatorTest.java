@@ -56,7 +56,6 @@ public class CalculatorTest {
     private ApiCommonDto.ExchangeRate buildExchangeRate() {
         return ApiCommonDto.ExchangeRate.builder()
                 .rate(1059.999963)
-                .fee(0.020)
                 .corridor("US_TO_KOR")
                 .company("BANK_OF_AMERICA")
                 .build();

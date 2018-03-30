@@ -11,7 +11,6 @@ public class CalculatorDto {
 
     @Getter
     public static class Transaction {
-
         private Remittance remittance;
         private Deposit deposit;
 
@@ -26,28 +25,25 @@ public class CalculatorDto {
     public static class Res {
         private Remittance remittance;
         private Deposit deposit;
-        private PaymentInformation paymentInformation;
+        private ExchangeRate exchangeRate;
 
         @Builder
-        public Res(Remittance remittance, Deposit deposit, PaymentInformation paymentInformation) {
+        public Res(Remittance remittance, Deposit deposit, ExchangeRate exchangeRate) {
             this.remittance = remittance;
             this.deposit = deposit;
-            this.paymentInformation = paymentInformation;
+            this.exchangeRate = exchangeRate;
         }
     }
 
     @Getter
-    public static class PaymentInformation {
-        private double fee;
-        private double rate;
+    public static class ExchangeRate {
+        private double value;
 
         @Builder
-        public PaymentInformation(double fee, double rate) {
-            this.fee = fee;
-            this.rate = rate;
+        public ExchangeRate(double value) {
+            this.value = value;
         }
     }
-
 
     @Getter
     public static class Remittance {
@@ -72,24 +68,25 @@ public class CalculatorDto {
 
     @Getter
     public static class Money {
-
         private double amount;
         private Currency currency;
         private Locale locale;
-        private String currencyFormat;
+        private String amountCurrencyFormat;
 
         @Builder
         public Money(double amount, Currency currency, Locale locale) {
             this.amount = amount;
             this.currency = currency;
             this.locale = locale;
+            this.amountCurrencyFormat = formattingCurrency();
         }
 
         public void updateAmount(double amount) {
             this.amount = amount;
+            this.amountCurrencyFormat = formattingCurrency();
         }
 
-        public String getCurrencyFormat() {
+        private String formattingCurrency() {
             return NumberFormat.getCurrencyInstance(locale).format(this.amount);
         }
     }

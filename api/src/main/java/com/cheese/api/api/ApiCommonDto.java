@@ -11,15 +11,13 @@ public class ApiCommonDto {
     public static class ExchangeRate {
 
         private double rate;
-        private double fee;
         private String corridor;
         private String company;
         private Date date;
 
         @Builder
-        public ExchangeRate(double rate, double fee, String corridor, String company) {
+        public ExchangeRate(double rate, String corridor, String company) {
             this.rate = rate;
-            this.fee = fee;
             this.corridor = corridor;
             this.company = company;
             this.date = new Date(System.currentTimeMillis());

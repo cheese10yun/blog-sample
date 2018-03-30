@@ -21,15 +21,18 @@ public class CalculatorController {
 
     @RequestMapping(method = RequestMethod.GET)
     public CalculatorDto.Res calculate(
-            @RequestParam("remittanceAmount") double remittanceAmount,
-            @RequestParam("depositAmount") double depositAmount
+            @RequestParam(value = "remittanceAmount", required = false) double remittanceAmount,
+            @RequestParam(value = "remittanceCurrency") CurrencyEnum remittanceCurrency,
+            @RequestParam(value = "remittanceLocal") LocalEnum remittanceLocal,
+            @RequestParam(value = "depositAmount", required = false) double depositAmount,
+            @RequestParam(value = "depositCurrency") CurrencyEnum depositCurrency,
+            @RequestParam(value = "depositLocal") LocalEnum depositLocal
     ) {
-
 
         return calculator.calculate(
                 CalculatorDto.Transaction.builder()
-                        .remittance(buildRemittance(remittanceAmount, Locale.US, Currency.getInstance(Locale.US)))
-                        .deposit(buildDeposit(depositAmount, Locale.KOREA, Currency.getInstance(Locale.KOREA)))
+                        .remittance(buildRemittance(remittanceAmount, remittanceLocal.getLocale(), remittanceCurrency.getCurrency()))
+                        .deposit(buildDeposit(depositAmount, depositLocal.getLocale(), depositCurrency.getCurrency()))
                         .build()
         );
     }
