@@ -19,3 +19,4 @@
 * [Spring OOP 프로그래밍 예제](https://github.com/cheese10yun/blog-sample/tree/master/notification)
 * [JPA-Embedded](https://github.com/cheese10yun/blog-sample/tree/master/embedded)
 * [Spring OOP 프로그래밍 예제(2)](https://github.com/cheese10yun/blog-sample/tree/master/bankapi)
+* [Spring-Jpa Best Practices](https://github.com/cheese10yun/spring-jpa)
