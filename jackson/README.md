@@ -1,6 +1,7 @@
 # Jackson 어노테이션 사용법
 
 * [Jackson Annotation Examples](http://www.baeldung.com/jackson-annotations) 예제를 적용전, 적용후로 나누어서 정리 해봤습니다.
+* 2. Jackson Serialization Annotations 정리 (추후 계속 추가될 예정)
 * 테스트코드도 참고하시면 좋습니다.
 
 ## 2 Jackson Serialization Annotations
