@@ -6,14 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+
 public class ShinhanExchangeRate implements ExchangeRate {
 
-    private final ShinhanApi shinhanApi;
-
     @Autowired
-    public ShinhanExchangeRate(ShinhanApi shinhanApi) {
-        this.shinhanApi = shinhanApi;
-    }
+    private ShinhanApi shinhanApi;
 
 
     @Override

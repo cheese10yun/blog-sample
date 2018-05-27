@@ -2,19 +2,14 @@ package com.cheese.api.calculator;
 
 import com.cheese.api.api.ApiCommonDto;
 import com.cheese.api.api.BankOfAmericaApi;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@AllArgsConstructor
 public class BankOfAmericaExchangeRate implements ExchangeRate {
 
-    private final BankOfAmericaApi bankOfAmericaApi;
-
-    @Autowired
-    public BankOfAmericaExchangeRate(BankOfAmericaApi bankOfAmericaApi) {
-        this.bankOfAmericaApi = bankOfAmericaApi;
-    }
-
+    private BankOfAmericaApi bankOfAmericaApi;
 
     @Override
     public ApiCommonDto.ExchangeRate getExchangeRate(CalculatorDto.Transaction transaction) {

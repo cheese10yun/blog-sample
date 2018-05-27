@@ -1,21 +1,16 @@
 package com.cheese.api.calculator;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
 @Component
+@AllArgsConstructor
 public class ExchangeRateFactory {
 
     private final BankOfAmericaExchangeRate bankOfAmericaExchangeRate;
     private final ShinhanExchangeRate shinhanExchangeRate;
-
-    @Autowired
-    public ExchangeRateFactory(BankOfAmericaExchangeRate bankOfAmericaExchangeRate, ShinhanExchangeRate shinhanExchangeRate) {
-        this.bankOfAmericaExchangeRate = bankOfAmericaExchangeRate;
-        this.shinhanExchangeRate = shinhanExchangeRate;
-    }
 
     public ExchangeRate getInstanceByLocale(Locale locale) {
 

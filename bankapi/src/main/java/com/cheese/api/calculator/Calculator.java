@@ -1,19 +1,15 @@
 package com.cheese.api.calculator;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
 @Component
+@AllArgsConstructor
 public class Calculator {
 
     private final ExchangeRateFactory exchangeRateFactory;
-
-    @Autowired
-    public Calculator(ExchangeRateFactory exchangeRateFactory) {
-        this.exchangeRateFactory = exchangeRateFactory;
-    }
 
     public CalculatorDto.Res calculate(CalculatorDto.Transaction transaction) {
         final ExchangeRate exchangeRate = getInstanceByLocale(transaction); //의존성 주입

@@ -17,7 +17,7 @@ public class CalculatorTransactionTest {
     private final double REMITTANCE_AMOUNT = 500;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
     }
 
 
@@ -36,14 +36,14 @@ public class CalculatorTransactionTest {
 
     private CalculatorDto.Deposit getReceiveMoney() {
         return CalculatorDto.Deposit.builder()
-                    .money(buildMoney(0, Locale.KOREA, Currency.getInstance(Locale.KOREA)))
-                    .build();
+                .money(buildMoney(0, Locale.KOREA, Currency.getInstance(Locale.KOREA)))
+                .build();
     }
 
     private CalculatorDto.Remittance getSendMoney() {
         return CalculatorDto.Remittance.builder()
-                    .money(buildMoney(REMITTANCE_AMOUNT, Locale.US, Currency.getInstance(Locale.US)))
-                    .build();
+                .money(buildMoney(REMITTANCE_AMOUNT, Locale.US, Currency.getInstance(Locale.US)))
+                .build();
     }
 
     private CalculatorDto.Money buildMoney(double amount, Locale locale, Currency currency) {
