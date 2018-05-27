@@ -16,7 +16,7 @@
 
 ## Spring
 * [Spring 으로 초간단 Slack Message 보내기](https://github.com/cheese10yun/slackbot)
-* [Spring OOP 프로그래밍 예제](https://github.com/cheese10yun/blog-sample/tree/master/notification)
-* [JPA-Embedded](https://github.com/cheese10yun/blog-sample/tree/master/embedded)
+* [Spring OOP 프로그래밍 예제(1)](https://github.com/cheese10yun/blog-sample/tree/master/notification)
 * [Spring OOP 프로그래밍 예제(2)](https://github.com/cheese10yun/blog-sample/tree/master/bankapi)
+* [JPA-Embedded](https://github.com/cheese10yun/blog-sample/tree/master/embedded)
 * [Spring-Jpa Best Practices](https://github.com/cheese10yun/spring-jpa-best-practices)
