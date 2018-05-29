@@ -2,7 +2,7 @@ package com.yun.partnerapi;
 
 import com.yun.partnerapi.model.Currency;
 import com.yun.partnerapi.partner.PartnerFactory;
-import com.yun.partnerapi.partner.PartnerManager;
+import com.yun.partnerapi.partner.PartnerExchangeRate;
 import com.yun.partnerapi.partner.PartnerManagerDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,8 +19,8 @@ public class TestController {
     @ResponseStatus(value = HttpStatus.OK)
     public PartnerManagerDto.ExchangeRate test(@RequestBody PartnerManagerDto.ExchangeCurrency dto) {
         final Currency dstCurrency = dto.getDstCurrency();
-        PartnerManager partnerManager = partnerFactory.getInstance(dstCurrency);
-        return partnerManager.getExchangeRate(dto);
+        PartnerExchangeRate partnerExchangeRate = partnerFactory.getInstance(dstCurrency);
+        return partnerExchangeRate.get(dto);
 
     }
 

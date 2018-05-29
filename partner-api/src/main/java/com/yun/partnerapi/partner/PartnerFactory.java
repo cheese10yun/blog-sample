@@ -1,8 +1,8 @@
 package com.yun.partnerapi.partner;
 
 import com.yun.partnerapi.model.Currency;
-import com.yun.partnerapi.partner.shinhan.ShinhanManager;
-import com.yun.partnerapi.partner.woori.WooriManager;
+import com.yun.partnerapi.partner.shinhan.ShinhanExchangeRate;
+import com.yun.partnerapi.partner.woori.WooriExchangeRate;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -10,23 +10,23 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class PartnerFactory {
 
-    private final ShinhanManager shinhanManager;
-    private final WooriManager wooriManager;
+    private final ShinhanExchangeRate shinhanExchangeRate;
+    private final WooriExchangeRate wooriExchangeRate;
 
-    public PartnerManager getInstance(final Currency dstCurrency) {
-        final PartnerManager partnerManager;
+    public PartnerExchangeRate getInstance(final Currency dstCurrency) {
+        final PartnerExchangeRate partnerExchangeRate;
 
         switch (dstCurrency) {
             case KRW:
             case VND:
-                partnerManager = shinhanManager;
+                partnerExchangeRate = shinhanExchangeRate;
                 break;
             case USD:
-                partnerManager = wooriManager;
+                partnerExchangeRate = wooriExchangeRate;
                 break;
             default:
                 throw new IllegalArgumentException(dstCurrency.name() + " is not Found");
         }
-        return partnerManager;
+        return partnerExchangeRate;
     }
 }
