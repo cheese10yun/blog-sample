@@ -3,58 +3,45 @@
   <ID>JAVA</ID>
   <OriginalElement>com.yun.partnerapi.partner.shinhan.ShinhanApi</OriginalElement>
   <nodes>
-    <node x="816.0" y="213.0">com.yun.partnerapi.partner.shinhan.ShinhanManager</node>
-    <node x="128.0" y="213.0">com.yun.partnerapi.partner.woori.WooriManager</node>
-    <node x="884.0" y="0.0">com.yun.partnerapi.partner.shinhan.ShinhanApi</node>
-    <node x="472.0" y="56.0">com.yun.partnerapi.partner.PartnerManager</node>
-    <node x="481.5" y="360.0">com.yun.partnerapi.partner.PartnerFactory</node>
+    <node x="234.625" y="213.0">com.yun.partnerapi.partner.woori.WooriExchangeRate</node>
+    <node x="472.0" y="56.0">com.yun.partnerapi.partner.PartnerExchangeRate</node>
+    <node x="709.375" y="213.0">com.yun.partnerapi.partner.shinhan.ShinhanExchangeRate</node>
+    <node x="797.0" y="0.0">com.yun.partnerapi.partner.shinhan.ShinhanApi</node>
     <node x="0.0" y="0.0">com.yun.partnerapi.partner.woori.WooriApi</node>
   </nodes>
   <notes />
   <edges>
-    <edge source="com.yun.partnerapi.partner.woori.WooriManager" target="com.yun.partnerapi.partner.PartnerManager">
-      <point x="98.0" y="-48.5" />
-      <point x="422.0" y="188.0" />
-      <point x="537.3333333333334" y="188.0" />
-      <point x="-130.66666666666663" y="25.5" />
-    </edge>
-    <edge source="com.yun.partnerapi.partner.shinhan.ShinhanManager" target="com.yun.partnerapi.partner.PartnerManager">
-      <point x="-98.0" y="-48.5" />
-      <point x="914.0" y="188.0" />
-      <point x="798.6666666666665" y="188.0" />
-      <point x="130.66666666666652" y="25.5" />
-    </edge>
-    <edge source="com.yun.partnerapi.partner.PartnerFactory" target="com.yun.partnerapi.partner.shinhan.ShinhanManager">
-      <point x="124.33333333333331" y="-59.5" />
-      <point x="792.3333333333333" y="335.0" />
-      <point x="1012.0" y="335.0" />
-      <point x="0.0" y="48.5" />
-    </edge>
-    <edge source="com.yun.partnerapi.partner.woori.WooriManager" target="com.yun.partnerapi.partner.woori.WooriApi">
-      <point x="-98.0" y="-48.5" />
+    <edge source="com.yun.partnerapi.partner.shinhan.ShinhanExchangeRate" target="com.yun.partnerapi.partner.shinhan.ShinhanApi">
+      <point x="76.25" y="-48.5" />
+      <point x="938.125" y="188.0" />
+      <point x="1023.0" y="188.0" />
       <point x="0.0" y="81.5" />
     </edge>
-    <edge source="com.yun.partnerapi.partner.PartnerFactory" target="com.yun.partnerapi.partner.woori.WooriManager">
-      <point x="-124.33333333333331" y="-59.5" />
-      <point x="543.6666666666667" y="335.0" />
-      <point x="324.0" y="335.0" />
-      <point x="0.0" y="48.5" />
+    <edge source="com.yun.partnerapi.partner.woori.WooriExchangeRate" target="com.yun.partnerapi.partner.PartnerExchangeRate">
+      <point x="76.25" y="-48.5" />
+      <point x="463.375" y="188.0" />
+      <point x="548.25" y="188.0" />
+      <point x="-76.25" y="25.5" />
     </edge>
-    <edge source="com.yun.partnerapi.partner.PartnerFactory" target="com.yun.partnerapi.partner.PartnerManager">
-      <point x="0.0" y="-59.5" />
-      <point x="0.0" y="25.5" />
+    <edge source="com.yun.partnerapi.partner.shinhan.ShinhanExchangeRate" target="com.yun.partnerapi.partner.PartnerExchangeRate">
+      <point x="-76.25" y="-48.5" />
+      <point x="785.625" y="188.0" />
+      <point x="700.75" y="188.0" />
+      <point x="76.25" y="25.5" />
     </edge>
-    <edge source="com.yun.partnerapi.partner.shinhan.ShinhanManager" target="com.yun.partnerapi.partner.shinhan.ShinhanApi">
-      <point x="98.0" y="-48.5" />
+    <edge source="com.yun.partnerapi.partner.woori.WooriExchangeRate" target="com.yun.partnerapi.partner.woori.WooriApi">
+      <point x="-76.25" y="-48.5" />
+      <point x="310.875" y="188.0" />
+      <point x="226.0" y="188.0" />
       <point x="0.0" y="81.5" />
     </edge>
   </edges>
-  <settings layout="Hierarchic Group" zoom="1.0" x="668.0" y="239.5" />
+  <settings layout="Hierarchic Group" zoom="1.0" x="624.5" y="155.0" />
   <SelectedNodes />
   <Categories>
     <Category>Fields</Category>
-    <Category>Constructors</Category>
     <Category>Methods</Category>
+    <Category>Constructors</Category>
     <Category>Properties</Category>
   </Categories>
   <SCOPE>All</SCOPE>
