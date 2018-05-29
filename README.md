@@ -2,6 +2,8 @@
 
 [Yun Blog](https://cheese10yun.github.io) 예제 코드
 
+지속해서 해당 프로젝트를 이어 나아갈 예정이라 깃허브 Start, Watching 버튼을 누르시면 구독 신청받으실 수 있습니다.
+
 ## Node
 * [Loopback 게시판 만들기 (1)](https://github.com/cheese10yun/blog-sample/tree/master/loopback-boards)
 * [AWS S3 업로드시 이미지 최적화](https://github.com/cheese10yun/blog-sample/tree/master/AWS_S3_Image_Optimization_)
