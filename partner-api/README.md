@@ -46,7 +46,38 @@ ShinhanApi, WooriApi의 책임은 각각의 은행과 API 통신을 담당하는
 
 
 #### API 추가 시 문제
-만약 전북은행 API가 추가되었고 계좌 이체할 수 있는 은행 리스트를 가져오는 API가 우리은행, 전북은행에만 추가되었을 경우에 문제가 다음과 같은 문제가 생깁니다. PartnerApi 인터페이스에 getBanks 메소드가 추가되면 이 기능이 없는 우리은행도 해당 기능을 반드시 구현해야 하고 이렇게 되면 LSP 위반이 발생하게 됩니다. **우리은행에 getBanks 메서드를 대충 null 정도 리턴하는 코드로 비워 놓지 마세요. 조금만 노력하면 더 좋은 설계가 할 수 있습니다.**
+전북은행 API가 추가되었고 계좌 이체할 수 있는 은행 리스트를 가져오는 API가 우리은행, 전북은행에만 추가되었다고 가정했을 경우 아래와 같은 코드가 작성됩니다.
+
+```java
+public interface PartnerApi {
+    PartnerManagerDto.ExchangeRate getExchangeRate(PartnerManagerDto.ExchangeCurrency dstCurrency);
+    PartnerManagerDto.Banks getBanks(PartnerManagerDto.ExchangeCurrency dto);
+}
+
+public class JbApi implements  PartnerApi{
+    @Override
+    public PartnerManagerDto.Banks getBanks(PartnerManagerDto.ExchangeCurrency dto) {
+        return 은행 리스트 가져오는 로직;
+    }
+}
+
+public class WooriApi implements PartnerApi {
+    @Override
+    public PartnerManagerDto.Banks getBanks(PartnerManagerDto.ExchangeCurrency dto) {
+        return 은행 리스트 가져오는 로직;
+    }
+}
+
+public class ShinhanAPi implements PartnerApi  {
+    @Override
+    public PartnerManagerDto.Banks getBanks(PartnerManagerDto.ExchangeCurrency dto) {
+        // PartnerApi 인터페이스에 getBanks 메소드가 정의되있으니 반드시 구현해야한다.
+        // 하지만 신한은행은 은행리스트 조회 기능이 없다.
+        return null;
+    }
+}
+```
+위처럼 신한 API에서 getBanks를 반드시 구현해야하고 이렇게되면 LSP 위반이 발생합니다.  **우리은행에 getBanks 메서드를 대충 null 정도 리턴하는 코드로 비워 놓지 마세요. 조금만 노력하면 더 좋은 설계가 할 수 있습니다.**
 
 
 ### Manager
@@ -103,7 +134,7 @@ public class ShinhanManager implements PartnerApi {
  }
  ```
 
-구현 API 객체는 API 통신만의 책임을 갖게 했습니다. 이것은 매니저에 서도 해결한 문제이니 넘어가겠습니다. 중요한 문제는 ***API 추가 시 문제*** 입니다. 위의 문제들은 한 인터페이스에서 너무 많은 책임을 갖게 되어 추상화가 안 된다는 것으로 생각합니다. 다시 말해 **PartnerApi 인터페이스를 통해서 모든 파트너 API를 규약 시키려 했던 것이 문제라고 생각합니다.** 인터페이스를 Pa rtnerExchangeRate로 두고 환율 정보가 져오는 것에 대해서만 규약 시켰습니다. 그 결과 그 기능이 있는 파트너만 해당 구현체를 갖게 되어 문제를 해결했습니다. 또 ShinhanExchangeRate 객체의 책임은 ShinhanAPi를 통해서 얻은 response 값을 통일감 있는 response 값으로 변경만 시켜주는 책임을 갖습니다.
+구현 API 객체는 API 통신만의 책임을 갖게 했습니다. 이것은 매니저에 서도 해결한 문제이니 넘어가겠습니다. 중요한 문제는 ***API 추가 시 문제*** 입니다. 위의 문제들은 한 인터페이스에서 너무 많은 책임을 갖게 되어 추상화가 안 된다는 것으로 생각합니다. 다시 말해 **PartnerApi 인터페이스를 통해서 모든 파트너 API를 규약 시키려 했던 것이 문제라고 생각합니다.** 인터페이스를 PartnerExchangeRate로 두고 환율 정보가 져오는 것에 대해서만 규약 시켰습니다. 그 결과 그 기능이 있는 파트너만 해당 구현체를 갖게 되어 문제를 해결했습니다. 또 ShinhanExchangeRate 객체의 책임은 ShinhanAPi를 통해서 얻은 response 값을 통일감 있는 response 값으로 변경만 시켜주는 책임을 갖습니다.
 
 ## 최종 클래스다이어그램
 ![](https://i.imgur.com/6KxeWmL.png)

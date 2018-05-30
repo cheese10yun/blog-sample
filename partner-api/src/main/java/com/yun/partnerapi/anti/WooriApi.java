@@ -4,7 +4,12 @@ import com.yun.partnerapi.partner.PartnerManagerDto;
 
 public class WooriApi implements PartnerApi {
     @Override
-    public PartnerManagerDto.ExchangeRate get(PartnerManagerDto.ExchangeCurrency dstCurrency) {
+    public PartnerManagerDto.ExchangeRate getExchangeRate(PartnerManagerDto.ExchangeCurrency dstCurrency) {
+        return null;
+    }
+
+    @Override
+    public PartnerManagerDto.Banks getBanks(PartnerManagerDto.ExchangeCurrency dto) {
         return null;
     }
 }
