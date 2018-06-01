@@ -6,7 +6,7 @@ import lombok.Getter;
 
 import java.util.Map;
 
-public class Jackson {
+public class SerializationAnnotations {
 
     @Builder
     public static class ExtendableBean {

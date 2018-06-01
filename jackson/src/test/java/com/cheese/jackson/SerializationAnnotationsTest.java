@@ -2,16 +2,13 @@ package com.cheese.jackson;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import lombok.Builder;
 import org.junit.Test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
-public class JacksonTest {
+public class SerializationAnnotationsTest {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -22,7 +19,7 @@ public class JacksonTest {
         map.put("key1", "value1");
         map.put("key2", "value2");
 
-        final Jackson.ExtendableBean object = Jackson.ExtendableBean.builder()
+        final SerializationAnnotations.ExtendableBean object = SerializationAnnotations.ExtendableBean.builder()
                 .name("yun")
                 .properties(map)
                 .build();
@@ -32,7 +29,7 @@ public class JacksonTest {
 
     @Test
     public void JsonGetter() {
-        final Jackson.MyBean object = Jackson.MyBean.builder()
+        final SerializationAnnotations.MyBean object = SerializationAnnotations.MyBean.builder()
                 .id(1)
                 .name("yun")
                 .build();
@@ -42,7 +39,7 @@ public class JacksonTest {
 
     @Test
     public void PropertyOrder() {
-        final Jackson.PropertyOrder object = Jackson.PropertyOrder.builder()
+        final SerializationAnnotations.PropertyOrder object = SerializationAnnotations.PropertyOrder.builder()
                 .id(1)
                 .name("name")
                 .build();
@@ -57,7 +54,7 @@ public class JacksonTest {
                 "  \"attr\":false\n" +
                 "}";
 
-        final Jackson.RawBean object = Jackson.RawBean.builder()
+        final SerializationAnnotations.RawBean object = SerializationAnnotations.RawBean.builder()
                 .name("yun")
                 .json(json)
                 .build();
@@ -68,7 +65,7 @@ public class JacksonTest {
 
     @Test
     public void JsonValue() {
-        final Jackson.TypeEnumWithValue object = Jackson.TypeEnumWithValue.TYPE1;
+        final SerializationAnnotations.TypeEnumWithValue object = SerializationAnnotations.TypeEnumWithValue.TYPE1;
 
         toJson(object);
 
@@ -77,7 +74,7 @@ public class JacksonTest {
     @Test
     public void JsonRootName() {
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
-        final Jackson.UserWithRoot object = Jackson.UserWithRoot.builder()
+        final SerializationAnnotations.UserWithRoot object = SerializationAnnotations.UserWithRoot.builder()
                 .id(1)
                 .name("yun")
                 .build();

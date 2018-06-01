@@ -170,3 +170,109 @@ public static class UserWithRoot {
   }
 }
 ```
+
+## 3. Jackson Deserialization Annotations
+
+### @JsonCreator
+
+* JSON key 와 멤버 필드의 이름이 일치하지 않을 경우 사용합니다.
+```json
+{
+  "id":1,
+  "theName":"My bean"
+}
+```
+
+```java
+public static class BeanWithCreator {
+    public int id;
+    public String name;
+
+    @JsonCreator
+    public BeanWithCreator(
+            @JsonProperty("id") int id,
+            @JsonProperty("theName") String name
+    ) {
+        this.id = id;
+        this.name = name;
+    }
+}
+```
+
+### @JacksonInject
+* @JacksonInject 는 JSON 데이터가 아닌 값을 주입하는데 사용됩니다.
+```json
+{
+  "name": "My bean"
+}
+```
+
+```java
+public static class BeanWithInject {
+    @JacksonInject
+    public int id;
+
+    public String name;
+}
+```
+
+###  @JsonAnySetter
+* @JsonAnySetter 는 Map을 이용해서 유연성있게 Deserialization 합니다.
+```json
+{
+  "name": "My bean",
+  "attr2": "val2",
+  "attr1": "val1"
+}
+```
+
+```java
+public static class ExtendableBean {
+    public String name;
+    private Map<String, String> properties = new HashMap<>();
+
+
+    @JsonAnySetter
+    public void setProperties(String key, String value) {
+        properties.put(key, value);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+}
+```
+
+### @JsonSetter
+* @JsonSetter는 객체와 맴버필드와 일치하지 않을 경우 유용하게 사용할 수 있습니다.
+
+```json
+{
+  "id": 1,
+  "name": "My bean"
+}
+```
+```java
+public static class MyBean {
+    public int id;
+    private String name;
+
+    @JsonSetter("name")
+    public void setTheName(String name) {
+        this.name = name;
+    }
+
+    public String getTheName() {
+        return this.name;
+    }
+}
+```
