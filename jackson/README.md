@@ -1,13 +1,24 @@
 # Jackson 어노테이션 사용법
 
 * [Jackson Annotation Examples](http://www.baeldung.com/jackson-annotations) 예제를 적용전, 적용후로 나누어서 정리 해봤습니다.
-* 2.Jackson Serialization Annotations 정리 (3,4... 추후 계속 추가될 예정)
 * 테스트코드도 참고하시면 좋습니다.
 
-## 2 Jackson Serialization Annotations
+## 목차
+* 2. Jackson Serialization Annotations
+* 3. Jackson Deserialization Annotations
+* 4. Jackson Property Inclusion Annotations (추가예정)
+* 5. Jackson Polymorphic Type Handling Annotations (추가예정)
+* 6. Jackson General Annotations (추가예정)
+* 7. Custom Jackson Annotation (추가예정)
+* 8. Jackson MixIn Annotations (추가예정)
+* 9. Disable Jackson Annotation (추가예정)
 
-## 2.1. @JsonAnyGetter
-* 이 엔티티의 인스턴스를 직렬화 할 때 Map의 모든 키 - 값 을 표준 일반 속성으로 가져옵니다
+
+
+
+## 2. Jackson Serialization Annotations
+
+## 2.1. @JsonAnyGetter 직렬화 할 때 Map의 모든 키 - 값 을 표준 일반 속성으로 가져옵니다
 ```java
 @Getter
 @Builder
@@ -39,8 +50,7 @@ public static class ExtendableBean {
 }
 ```
 
-## 2.2. @JsonGetter
-* getter 이름 기반으로 키값이 정해지는것을 어노테이션을 제어
+## 2.2. @JsonGetter getter 이름 기반으로 키값이 정해지는것을 어노테이션을 제어
 ```java
 @Builder
 public static class MyBean {
@@ -66,8 +76,7 @@ public static class MyBean {
 }
 ```
 
-## 2.3. @JsonPropertyOrder
-* Json 직렬화 순서를 제어
+## 2.3. @JsonPropertyOrder 직렬화 순서를 제어
 ```java
 @JsonPropertyOrder({"name", "id"})
 @Builder
@@ -90,8 +99,7 @@ public static class PropertyOrder {
 }
 ```
 
-## 2.4. @JsonRawValue
-* @JsonRawValue 는 Jackson이 속성을 그대로 직렬화하여 JSON으로 변경
+## 2.4. @JsonRawValue Jackson이 속성을 그대로 직렬화하여 JSON으로 변경
 ```java
 @Builder
     public static class RawBean {
@@ -116,8 +124,7 @@ public static class PropertyOrder {
 }
 ```
 
-## 2.5. @JsonValue
-*  getName 에 @JsonValue 해당 멤버필드가 이름을 통해 직렬화 시킴
+## 2.5. @JsonValue getName 에 @JsonValue 해당 멤버필드가 이름을 통해 직렬화 시킴
 ```java
 public enum TypeEnumWithValue {
     TYPE1(1, "Type A"),
@@ -144,8 +151,7 @@ public enum TypeEnumWithValue {
 "Type A"
 ```
 
-## 2.6. @JsonRootName
-* Root 이름 지정
+## 2.6. @JsonRootName Root 이름 지정
 ```java
 @Builder
 @JsonRootName(value = "user")
@@ -173,9 +179,7 @@ public static class UserWithRoot {
 
 ## 3. Jackson Deserialization Annotations
 
-### @JsonCreator
-
-* JSON key 와 멤버 필드의 이름이 일치하지 않을 경우 사용합니다.
+### @JsonCreator JSON key 와 멤버 필드의 이름이 일치하지 않을 경우 사용합니다.
 ```json
 {
   "id":1,
@@ -199,8 +203,7 @@ public static class BeanWithCreator {
 }
 ```
 
-### @JacksonInject
-* @JacksonInject 는 JSON 데이터가 아닌 값을 주입하는데 사용됩니다.
+### @JacksonInject JSON 데이터가 아닌 값을 주입하는데 사용됩니다.
 ```json
 {
   "name": "My bean"
@@ -216,8 +219,7 @@ public static class BeanWithInject {
 }
 ```
 
-###  @JsonAnySetter
-* @JsonAnySetter 는 Map을 이용해서 유연성있게 Deserialization 합니다.
+###  @JsonAnySetter Map을 이용해서 유연성있게 Deserialization 합니다.
 ```json
 {
   "name": "My bean",
@@ -252,8 +254,7 @@ public static class ExtendableBean {
 }
 ```
 
-### @JsonSetter
-* @JsonSetter는 객체와 맴버필드와 일치하지 않을 경우 유용하게 사용할 수 있습니다.
+### @JsonSetter 객체와 맴버필드와 일치하지 않을 경우 유용하게 사용할 수 있습니다.
 
 ```json
 {
