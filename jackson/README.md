@@ -4,14 +4,14 @@
 * 테스트코드도 참고하시면 좋습니다.
 
 ## 목차
-* 2. Jackson Serialization Annotations
-* 3. Jackson Deserialization Annotations
-* 4. Jackson Property Inclusion Annotations (추가예정)
-* 5. Jackson Polymorphic Type Handling Annotations (추가예정)
-* 6. Jackson General Annotations (추가예정)
-* 7. Custom Jackson Annotation (추가예정)
-* 8. Jackson MixIn Annotations (추가예정)
-* 9. Disable Jackson Annotation (추가예정)
+* Jackson Serialization Annotations
+* Jackson Deserialization Annotations
+* Jackson Property Inclusion Annotations (추가예정)
+* Jackson Polymorphic Type Handling Annotations (추가예정)
+* Jackson General Annotations (추가예정)
+* Custom Jackson Annotation (추가예정)
+* Jackson MixIn Annotations (추가예정)
+* Disable Jackson Annotation (추가예정)
 
 
 
