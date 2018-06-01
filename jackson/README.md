@@ -14,11 +14,9 @@
 * Disable Jackson Annotation (추가예정)
 
 
+## Jackson Serialization Annotations
 
-
-## 2. Jackson Serialization Annotations
-
-## 2.1. @JsonAnyGetter 직렬화 할 때 Map의 모든 키 - 값 을 표준 일반 속성으로 가져옵니다
+###  @JsonAnyGetter 직렬화 할 때 Map의 모든 키 - 값 을 표준 일반 속성으로 가져옵니다
 ```java
 @Getter
 @Builder
@@ -50,7 +48,7 @@ public static class ExtendableBean {
 }
 ```
 
-## 2.2. @JsonGetter getter 이름 기반으로 키값이 정해지는것을 어노테이션을 제어
+### @JsonGetter getter 이름 기반으로 키값이 정해지는것을 어노테이션을 제어
 ```java
 @Builder
 public static class MyBean {
@@ -76,7 +74,7 @@ public static class MyBean {
 }
 ```
 
-## 2.3. @JsonPropertyOrder 직렬화 순서를 제어
+###  @JsonPropertyOrder 직렬화 순서를 제어
 ```java
 @JsonPropertyOrder({"name", "id"})
 @Builder
@@ -99,7 +97,7 @@ public static class PropertyOrder {
 }
 ```
 
-## 2.4. @JsonRawValue Jackson이 속성을 그대로 직렬화하여 JSON으로 변경
+###  @JsonRawValue Jackson이 속성을 그대로 직렬화하여 JSON으로 변경
 ```java
 @Builder
     public static class RawBean {
@@ -124,7 +122,7 @@ public static class PropertyOrder {
 }
 ```
 
-## 2.5. @JsonValue getName 에 @JsonValue 해당 멤버필드가 이름을 통해 직렬화 시킴
+###  @JsonValue getName 에 @JsonValue 해당 멤버필드가 이름을 통해 직렬화 시킴
 ```java
 public enum TypeEnumWithValue {
     TYPE1(1, "Type A"),
@@ -151,7 +149,7 @@ public enum TypeEnumWithValue {
 "Type A"
 ```
 
-## 2.6. @JsonRootName Root 이름 지정
+###  @JsonRootName Root 이름 지정
 ```java
 @Builder
 @JsonRootName(value = "user")
