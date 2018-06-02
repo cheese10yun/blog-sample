@@ -7,9 +7,4 @@ public class ShinhanManager implements PartnerApi {
     public PartnerManagerDto.ExchangeRate getExchangeRate(PartnerManagerDto.ExchangeCurrency dstCurrency) {
         return null;
     }
-
-    @Override
-    public PartnerManagerDto.Banks getBanks(PartnerManagerDto.ExchangeCurrency dto) {
-        return null;
-    }
 }
