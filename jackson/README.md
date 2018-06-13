@@ -351,7 +351,7 @@ public Name name;
     }
 }
 ```
-```
+```json
 {
   "id": 1
 }
@@ -368,7 +368,7 @@ public static class MyBean {
     public String name;
 }
 ```
-```
+```json
 //NON_NULL 사용시 name이 null인 경우에 제외 됩니다.
 {
   "id": 1
