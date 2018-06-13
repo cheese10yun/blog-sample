@@ -7,7 +7,6 @@
 <!-- TOC -->
 
 - [Jackson 어노테이션 사용법](#jackson-어노테이션-사용법)
-    - [목차](#목차)
     - [2. Jackson Serialization Annotations](#2-jackson-serialization-annotations)
         - [@JsonAnyGetter](#jsonanygetter)
         - [@JsonGetter getter](#jsongetter-getter)
