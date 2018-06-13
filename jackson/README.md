@@ -3,18 +3,34 @@
 * [Jackson Annotation Examples](http://www.baeldung.com/jackson-annotations) 예제를 적용전, 적용후로 나누어서 정리 해봤습니다.
 * 테스트코드도 참고하시면 좋습니다.
 
-## 목차
-* Jackson Serialization Annotations
-* Jackson Deserialization Annotations
-* Jackson Property Inclusion Annotations (추가예정)
-* Jackson Polymorphic Type Handling Annotations (추가예정)
-* Jackson General Annotations (추가예정)
-* Custom Jackson Annotation (추가예정)
-* Jackson MixIn Annotations (추가예정)
-* Disable Jackson Annotation (추가예정)
+
+<!-- TOC -->
+
+- [Jackson 어노테이션 사용법](#jackson-어노테이션-사용법)
+    - [목차](#목차)
+    - [2. Jackson Serialization Annotations](#2-jackson-serialization-annotations)
+        - [@JsonAnyGetter](#jsonanygetter)
+        - [@JsonGetter getter](#jsongetter-getter)
+        - [@JsonPropertyOrder](#jsonpropertyorder)
+        - [@JsonRawValue Jackson](#jsonrawvalue-jackson)
+        - [@JsonValue](#jsonvalue)
+        - [@JsonRootName](#jsonrootname)
+    - [3. Jackson Deserialization Annotations](#3-jackson-deserialization-annotations)
+        - [@JsonCreator](#jsoncreator)
+        - [@JacksonInject](#jacksoninject)
+        - [@JsonAnySetter](#jsonanysetter)
+        - [@JsonSetter](#jsonsetter)
+    - [4. Jackson Property Inclusion Annotations](#4-jackson-property-inclusion-annotations)
+        - [@JsonIgnoreProperties](#jsonignoreproperties)
+        - [@JsonIgnore](#jsonignore)
+        - [@JsonIgnoreType](#jsonignoretype)
+        - [@JsonInclude](#jsoninclude)
+        - [@JsonAutoDetect](#jsonautodetect)
+
+<!-- /TOC -->
 
 
-## Jackson Serialization Annotations
+## 2. Jackson Serialization Annotations
 
 ###  @JsonAnyGetter
 * 직렬화 할 때 Map의 모든 키 - 값 을 표준 일반 속성으로 가져옵니다
@@ -100,7 +116,7 @@ public static class PropertyOrder {
 }
 ```
 
-###  @JsonRawValue Jackson
+### @JsonRawValue Jackson
 * 속성을 그대로 직렬화하여 JSON으로 변경
 ```java
 @Builder
@@ -126,7 +142,7 @@ public static class PropertyOrder {
 }
 ```
 
-###  @JsonValue
+### @JsonValue
 * getName  @JsonValue 해당 멤버필드가 이름을 통해 직렬화 시킴
 ```java
 public enum TypeEnumWithValue {
@@ -154,7 +170,7 @@ public enum TypeEnumWithValue {
 "Type A"
 ```
 
-###  @JsonRootName
+### @JsonRootName
 * Root 이름 지정
 ```java
 @Builder
@@ -283,5 +299,97 @@ public static class MyBean {
     public String getTheName() {
         return this.name;
     }
+}
+```
+
+## 4. Jackson Property Inclusion Annotations
+
+### @JsonIgnoreProperties
+
+* 무시할 속성이나 속성 목록을 표시하는 데 사용됩니다
+```java
+@JsonIgnoreProperties({"id"})
+public static class BeanWithIgnore {
+    public int id;
+    public String name;
+}
+```
+
+```json
+{
+  "name": "yun"
+}
+```
+
+### @JsonIgnore
+
+* 필드 레벨에서 무시 될 수있는 속성을 표시하는 데 사용됩니다.
+```java
+public static class BeanWithIgnore {
+    @JsonIgnore
+    public int id;
+    public String name;
+}
+```
+
+```json
+{
+  "name": "yun"
+}
+```
+
+### @JsonIgnoreType
+* 주석이 달린 형식의 모든 속성을 무시하도록 지정하는 데 사용됩니다 
+```java
+public static class User {
+public int id;
+public Name name;
+
+    @JsonIgnoreType
+    public static class Name {
+        public String firstName;
+        public String lastName;
+    }
+}
+```
+```
+{
+  "id": 1
+}
+```
+
+### @JsonInclude
+* 어노테이션 속성을 제외 하는 데 사용 됩니다 
+
+```java
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@AllArgsConstructor
+public static class MyBean {
+    public int id;
+    public String name;
+}
+```
+```
+//NON_NULL 사용시 name이 null인 경우에 제외 됩니다.
+{
+  "id": 1
+}
+```
+
+### @JsonAutoDetect
+
+```java
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+public static class PrivateBean {
+    private int id;
+    private String name;
+}
+```
+
+```json
+// Visibility.ANY 경우 표시
+{
+  "id": 1,
+  "name": "yun"
 }
 ```

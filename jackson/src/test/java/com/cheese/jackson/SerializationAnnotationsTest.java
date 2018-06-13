@@ -86,7 +86,6 @@ public class SerializationAnnotationsTest {
     private String toJson(Object object) {
         try {
             final String json = objectMapper.writeValueAsString(object);
-
             print(json);
             return json;
         } catch (JsonProcessingException e) {
