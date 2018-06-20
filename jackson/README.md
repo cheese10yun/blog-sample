@@ -595,7 +595,36 @@ public static class Item {
 ### @JsonManagedReference, @JsonBackReference
 * 객체의  상위 / 하위 관계를 처리 명시하고 무한 순함참조에러를 해결합니다.
 ```java
+public static class ItemWithRef {
+    public int id;
+    public String itemName;
 
+    @JsonManagedReference
+    public UserWithRef owner;
+
+    public ItemWithRef(int id, String itemName, UserWithRef owner) {
+        this.id = id;
+        this.itemName = itemName;
+        this.owner = owner;
+    }
+}
+
+public static class UserWithRef {
+    public int id;
+    public String name;
+
+    @JsonBackReference
+    public List<ItemWithRef> itemWithRefs = new ArrayList<>();
+
+    public UserWithRef(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public void addItem(ItemWithRef item) {
+        itemWithRefs.add(item);
+    }
+}
 ```
 ```json
 //적용전
