@@ -35,7 +35,6 @@
         - [@JsonFilter](#jsonfilter)
 
 <!-- /TOC -->
-1. 
 
 ## 2. Jackson Serialization Annotations
 
