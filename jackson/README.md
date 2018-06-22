@@ -33,6 +33,8 @@
         - [@JsonView](#jsonview)
         - [@JsonManagedReference, @JsonBackReference](#jsonmanagedreference-jsonbackreference)
         - [@JsonFilter](#jsonfilter)
+    - [Custom Jackson Annotation](#custom-jackson-annotation)
+    - [Disable Jackson Annotation](#disable-jackson-annotation)
 
 <!-- /TOC -->
 
@@ -664,3 +666,73 @@ public static class BeanWithFilter {
   "name":"My bean"
 }
 ```
+
+## Custom Jackson Annotation
+
+* Annotation 직접 정리 할 수 있습니다.
+
+```java
+@CustomAnnotation
+public static class BeanWithCustomAnnotation {
+    public int id;
+    public String name;
+    public Date dateCreated;
+
+    public BeanWithCustomAnnotation(int id, String name, Date dateCreated) {
+        this.id = id;
+        this.name = name;
+        this.dateCreated = dateCreated;
+    }
+}
+
+@Retention(RetentionPolicy.RUNTIME)
+@JacksonAnnotationsInside
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({"name", "id", "dateCreated"})
+@interface CustomAnnotation {
+}
+```
+```json
+// 적용전
+{
+  "id": 1,
+  "name": "My bean",
+  "dateCreated": null
+}
+// 적용후, property order 변경, null 값 비 직렬화
+{
+  "name": "My bean",
+  "id": 1
+}
+```
+
+## Disable Jackson Annotation
+
+* 모든 Jackson annotation 비활성화 하는 방법
+
+ ```java
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({"name", "id"})
+ public static class MyBean {
+     public int id;
+     public String name;
+
+     public MyBean(int id, String name) {
+         this.id = id;
+         this.name = name;
+     }
+ }
+mapper.disable(MapperFeature.USE_ANNOTATIONS); // 모든 Jackson annotation 비활성화
+ ```
+ ```json
+ // MapperFeature.USE_ANNOTATIONS 적용전
+ {
+     "id":1,
+     "name":null
+ }
+
+ // MapperFeature.USE_ANNOTATIONS 적용후
+ {
+   "id": 1
+ }
+ ```
