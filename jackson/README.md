@@ -1,7 +1,7 @@
 # Jackson 어노테이션 사용법
 
 * [Jackson Annotation Examples](http://www.baeldung.com/jackson-annotations) 예제를 적용전, 적용후로 나누어서 정리 해봤습니다.
-* **지속해서 해당 프로젝트를 이어 나아갈 예정이라 깃허브 Start, Watching 버튼을 누르시면 구독 신청받으실 수 있습니다.**
+* **지속해서 해당 프로젝트를 이어 나아갈 예정이라 깃허브 Star, Watching 버튼을 누르시면 구독 신청받으실 수 있습니다.**
 * 테스트코드도 참고하시면 좋습니다.
 
 
