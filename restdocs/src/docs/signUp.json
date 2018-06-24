@@ -1,0 +1,10 @@
+{
+  "email": {
+    "value": "test@test.com"
+  },
+  "address": {
+    "city": "test",
+    "street": "test",
+    "zipCode": "test"
+  }
+}

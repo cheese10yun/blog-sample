@@ -58,18 +58,22 @@ use of HTTP status codes.
 | The requested resource did not exist
 |===
 
-== 사용자 리스트 조회
+= Member
 
-=== 테스트 1
+== Member 회원가입
 
-include::{snippets}/sample-controller-test/get-sample/curl-request.adoc[]
-include::{snippets}/sample-controller-test/get-sample/http-request.adoc[]
-include::{snippets}/sample-controller-test/get-sample/http-response.adoc[]
-include::{snippets}/sample-controller-test/get-sample/httpie-request.adoc[]
+=== 성공
 
+==== Request
+include::{snippets}/member-controller-test/sign-up/http-request.adoc[]
 
-== 테스트2
+==== Response
+include::{snippets}/member-controller-test/sign-up/http-response.adoc[]
 
-= 테스트1
+=== 실패
 
-=== 테스트3
+==== Request
+include::{snippets}/member-controller-test/sign-up-failed/http-request.adoc[]
+
+==== Response
+include::{snippets}/member-controller-test/sign-up-failed/http-response.adoc[]
