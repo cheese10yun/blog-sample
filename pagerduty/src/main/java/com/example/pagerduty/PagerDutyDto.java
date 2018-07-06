@@ -53,24 +53,24 @@ public class PagerDutyDto {
     }
 
 
-@Getter
-public static class Payload {
-    private final String summary;
-    private final String timestamp = ZonedDateTime.now().toOffsetDateTime().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-    private final Severity severity;
-    private final Group group;
-    private final Source source;
-    @JsonProperty("custom_details")
-    private final Object customDetails;
+    @Getter
+    public static class Payload {
+        private final String summary;
+        private final String timestamp = ZonedDateTime.now().toOffsetDateTime().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        private final Severity severity;
+        private final Group group;
+        private final Source source;
+        @JsonProperty("custom_details")
+        private final Object customDetails;
 
-    @Builder
-    public Payload(final String summary, final Severity severity, final Group group, final Source source, final Object customDetails) {
-        this.summary = summary;
-        this.severity = severity;
-        this.group = group;
-        this.source = source;
-        this.customDetails = customDetails;
+        @Builder
+        public Payload(final String summary, final Severity severity, final Group group, final Source source, final Object customDetails) {
+            this.summary = summary;
+            this.severity = severity;
+            this.group = group;
+            this.source = source;
+            this.customDetails = customDetails;
+        }
     }
-}
 }
 
