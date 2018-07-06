@@ -66,9 +66,7 @@ public static class Payload {
     }
 }
 
-
 @Getter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public static class Response {
     private String status;
     private String message;
