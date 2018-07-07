@@ -161,6 +161,7 @@ private PagerDutyDto.Response send(final PagerDutyDto.Request request) {
 ```
 
 >클린 코드 출처
+>
 >**작게 만들어라!**
 >함수를 만드는 첫 번째 규칙은 '작게!'다. 함수를 만드는 둘째 규칙은 '더 작게!'다. ...중략
 >
