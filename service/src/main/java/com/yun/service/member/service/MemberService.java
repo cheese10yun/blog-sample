@@ -12,7 +12,10 @@ public interface MemberService {
 
     Member findByEmail(Email email);
 
+    Member create(Member member);
+
     void changePassword(PasswordDto.ChangeRequest dto);
 
     Member updateName(MemberId id, Name name);
+
 }
