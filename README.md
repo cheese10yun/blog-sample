@@ -18,7 +18,7 @@
 
 ## Spring
 * [Spring 으로 초간단 Slack Message 보내기](https://github.com/cheese10yun/slackbot)
-* [Spring OOP 프로그래밍 예제(1)](https://github.com/cheese10yun/blog-sample/tree/master/notification)
+* [Spring OOP 프로그래밍 예제(1) - 내가 해석한 SOLID](https://github.com/cheese10yun/blog-sample/tree/master/notification)
 * [Spring OOP 프로그래밍 예제(2)](https://github.com/cheese10yun/blog-sample/tree/master/bankapi)
 * [Spring OOP 프로그래밍 예제(3) - 추상화, 다형성](https://github.com/cheese10yun/blog-sample/tree/master/partner-api)
 * [Spring OOP 프로그래밍 예제(4) - Service, ServiceImpl 구조](https://github.com/cheese10yun/blog-sample/tree/master/service)
