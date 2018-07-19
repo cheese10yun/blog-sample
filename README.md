@@ -26,3 +26,7 @@
 * [JPA-Embedded](https://github.com/cheese10yun/blog-sample/tree/master/embedded)
 * [Spring-Jpa Best Practices [step-01~07]](https://github.com/cheese10yun/spring-jpa-best-practices)
 * [Jackson 어노테이션 사용법](https://github.com/cheese10yun/blog-sample/tree/master/jackson)
+
+## 기타
+* [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
+* [IntelliJ 사용법](https://github.com/cheese10yun/IntelliJ)
