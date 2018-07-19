@@ -1,3 +1,5 @@
+[![HitCount](http://hits.dwyl.io/cheese10yun/github-project-management.svg)](https://github.com/cheese10yun/blog-sample)
+
 # Yun Blog Sample Code
 
 [Yun Blog](https://cheese10yun.github.io) 예제 코드
