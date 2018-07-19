@@ -1,4 +1,4 @@
-[![HitCount](http://hits.dwyl.io/cheese10yun/github-project-management.svg)](https://github.com/cheese10yun/blog-sample)
+[![HitCount](http://hits.dwyl.io/cheese10yun/blog-sample.svg)](http://hits.dwyl.io/cheese10yun/blog-sample)
 
 # Yun Blog Sample Code
 
