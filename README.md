@@ -1,4 +1,4 @@
-[![HitCount](http://hits.dwyl.io/cheese10yun/github-project-management.svg)](https://github.com/cheese10yun/blog-sample)
+[![HitCount](http://hits.dwyl.io/cheese10yun/github-project-management.svg)](https://github.com/cheese10yun/spring-jpa-best-practices/edit/master/READMasd)
 
 # Yun Blog Sample Code
 
