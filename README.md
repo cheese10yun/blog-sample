@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 [![HitCount](http://hits.dwyl.io/cheese10yun/github-project-management.svg)](https://github.com/cheese10yun/spring-jpa-best-practices/edit/master/READMasd)
+=======
+[![HitCount](http://hits.dwyl.io/cheese10yun/blog-sample.svg)](http://hits.dwyl.io/cheese10yun/blog-sample)
+>>>>>>> 4fa38cb134b815a5c6e800809412f213a3968c4a
 
 # Yun Blog Sample Code
 
