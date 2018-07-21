@@ -30,3 +30,4 @@
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
 * [IntelliJ 사용법](https://github.com/cheese10yun/IntelliJ)
+* [좋은 학습 자료 및 GitHub 정리](https://github.com/cheese10yun/dev-info)
