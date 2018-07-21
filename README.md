@@ -24,7 +24,7 @@
 * [Spring OOP 프로그래밍 예제(4) - Service, ServiceImpl 구조](https://github.com/cheese10yun/blog-sample/tree/master/service)
 * [Spring OOP 프로그래밍 예제(5) - 외부 API(PagerDuty) 호출](https://github.com/cheese10yun/blog-sample/tree/master/pagerduty)
 * [JPA-Embedded](https://github.com/cheese10yun/blog-sample/tree/master/embedded)
-* [Spring-Jpa Best Practices [step-01~07]](https://github.com/cheese10yun/spring-jpa-best-practices)
+* [Spring-Jpa Best Practices](https://github.com/cheese10yun/spring-jpa-best-practices)
 * [Jackson 어노테이션 사용법](https://github.com/cheese10yun/blog-sample/tree/master/jackson)
 
 ## 기타
