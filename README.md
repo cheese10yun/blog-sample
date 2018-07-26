@@ -21,7 +21,7 @@
 * [Spring OOP 프로그래밍 예제(1) - 내가 해석한 SOLID](https://github.com/cheese10yun/blog-sample/tree/master/notification)
 * [Spring OOP 프로그래밍 예제(2) - Value 클래스로 응집력 높이기](https://github.com/cheese10yun/blog-sample/tree/master/bankapi)
 * [Spring OOP 프로그래밍 예제(3) - 추상화, 다형성](https://github.com/cheese10yun/blog-sample/tree/master/partner-api)
-* [Spring OOP 프로그래밍 예제(4) - Service, ServiceImpl 구조](https://github.com/cheese10yun/blog-sample/tree/master/service)
+* [Spring OOP 프로그래밍 예제(4) - Service, ServiceImpl 구조에 대한 고찰](https://github.com/cheese10yun/blog-sample/tree/master/service)
 * [Spring OOP 프로그래밍 예제(5) - 외부 API(PagerDuty) 호출](https://github.com/cheese10yun/blog-sample/tree/master/pagerduty)
 * [Spring 예제로 보는 SOLID](https://github.com/cheese10yun/spring-SOLID)
 * [JPA-Embedded](https://github.com/cheese10yun/blog-sample/tree/master/embedded)
