@@ -1,0 +1,5 @@
+sample:
+  email: "yun@test.com"
+  name : "yun"
+  age: 27
+  auth: true
