@@ -1,0 +1,25 @@
+spring:
+  profiles:
+    active: local
+
+# Local env
+---
+spring:
+  profiles: local
+
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/security?useSSL=false
+    username: root
+    password:
+
+
+logging:
+  level:
+    ROOT: info
