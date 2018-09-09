@@ -28,6 +28,7 @@
 * [Spring-Jpa Best Practices](https://github.com/cheese10yun/spring-jpa-best-practices)
 * [Jackson 어노테이션 사용법](https://github.com/cheese10yun/blog-sample/tree/master/jackson)
 * [Assistant Properties 적용 방법](https://github.com/cheese10yun/blog-sample/tree/master/properties)
+* [Spring Boot Https 적용하기](https://github.com/cheese10yun/blog-sample/tree/master/spring-https)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)

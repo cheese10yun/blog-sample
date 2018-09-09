@@ -53,7 +53,14 @@ public class MainController {
     public User findUserById(@PathVariable("id") long id){
         final Optional<User> user = userRepository.findById(id);
         return user.get();
+    }
 
+
+    @PreAuthorize("isOwner(#id)")
+    @RequestMapping(method = RequestMethod.GET, value = "users/{id}/test")
+    public User findUserById2(@PathVariable("id") long id){
+        final Optional<User> user = userRepository.findById(id);
+        return user.get();
     }
 
 
