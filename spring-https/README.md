@@ -28,7 +28,6 @@ CN=test, OU=test, O=test, L=test, ST=test, C=01이(가) 맞습니까?
 ### YML
 ```yml
 server:
-  port: 8443
   ssl:
     key-store: keystore.p12
     key-store-password: cheese
