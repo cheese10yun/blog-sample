@@ -1,0 +1,40 @@
+spring:
+  jpa:
+    database: h2
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+
+facebook:
+  client:
+    clientId: <your-client-id>
+    clientSecret: <your-secret>
+    accessTokenUri: https://graph.facebook.com/oauth/access_token
+    userAuthorizationUri: https://www.facebook.com/dialog/oauth
+    tokenName: oauth_token
+    authenticationScheme: query
+    clientAuthenticationScheme: form
+  resource:
+    userInfoUri: https://graph.facebook.com/me?fields=id, name, email, picture
+
+google :
+  client :
+    clientId : <your-client-id>
+    clientSecret: <your-secret>
+    accessTokenUri: https://www.googleapis.com/oauth2/v4/token
+    userAuthorizationUri: https://accounts.google.com/o/oauth2/v2/auth
+    clientAuthenticationScheme: form
+    scope:
+    - email
+    - profile
+  resource:
+    userInfoUri: https://www.googleapis.com/oauth2/v3/userinfo
+
+server:
+  ssl:
+    key-store: keystore.p12
+    key-store-password: cheese
+    keyStoreType: PKCS12
+    keyAlias: tomcat

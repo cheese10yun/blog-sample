@@ -29,6 +29,7 @@
 * [Jackson 어노테이션 사용법](https://github.com/cheese10yun/blog-sample/tree/master/jackson)
 * [Assistant Properties 적용 방법](https://github.com/cheese10yun/blog-sample/tree/master/properties)
 * [Spring Boot Https 적용하기](https://github.com/cheese10yun/blog-sample/tree/master/spring-https)
+* [Spring OAuth2 Social-Sample](https://github.com/cheese10yun/social-sample)
 * [Spring OAuth2 Social](https://github.com/cheese10yun/spring-security-oauth2-social)
 
 ## 기타
