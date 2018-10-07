@@ -31,6 +31,7 @@
 * [Spring Boot Https 적용하기](https://github.com/cheese10yun/blog-sample/tree/master/spring-https)
 * [Spring OAuth2 Social-Sample](https://github.com/cheese10yun/blog-sample/tree/master/social-sample)
 * [Spring OAuth2 Social](https://github.com/cheese10yun/spring-security-oauth2-social)
+* [Spring Batch Sample](https://github.com/cheese10yun/blog-sample/tree/master/batch-demo)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
