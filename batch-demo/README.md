@@ -62,7 +62,7 @@
 배치 처리는 읽기 -> 처리 -> 쓰기 흐름을 갖습니다. 다음 그림은 스프링에서 이러한 배치 처리를 어떻게 구현 했는지 배치 처리와 관련된 객체의 관계를 보여줍니다.
 
 <p align="center">
-  <img src="/assets/batch-obejct-relrationship.png">
+  <img src="https://github.com/cheese10yun/TIL/raw/master/assets/batch-obejct-relrationship.png">
 </p>
 
 * Job과 Step은 1:M
@@ -158,7 +158,7 @@ public JobFlowBuilder flow(Step step){
 
 ## 휴먼회원 배치 설계
 <p align="center">
-  <img src="/assets/bach-process.png">
+  <img src="https://github.com/cheese10yun/TIL/raw/master/assets/bach-process.png">
 </p>
 
 **가입한 회원 중 1년이 지나도록 상태 변화가 없는 회원을 휴면회원으로 전환하는 배치 처리**
@@ -336,7 +336,7 @@ public class DemoApplication {
 
 ### 청크 지향 프로세싱
 <p align="center">
-  <img src="/assets/chun-process.png">
+  <img src="https://github.com/cheese10yun/TIL/raw/master/assets/chun-process.png">
 </p>
 청크 지향 프로세싱은 트랜잭션 경꼐 내에서 청크 단위로 데이터를 읽고 생성하는 프로그래밍 기법입니다. 청크란 아이템이 트랜잭션에 커밋되는 수를 말합니다. read한 데이터 수가 지정한 청크 단위와 칠치하면 write를 수행하고 트랜잭션을 커밋합니다. Step 설정에서 chunk()로 커밋 단위를 지정했던 부분입니다. 즉 기존에도 계속 사용해온 방법이 청크 지향 프로세싱입니다.
 
