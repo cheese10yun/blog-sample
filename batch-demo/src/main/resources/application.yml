@@ -1,11 +1,19 @@
 spring:
   jpa:
-    database: h2
+    database: mysql
     hibernate:
       ddl-auto: create
     show-sql: true
     properties:
       hibernate.format_sql: true
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/batch?useSSL=false&serverTimezone=UTC
+    username: root
+    password:
+    initialization-mode: always
+    platform: user
+
   batch:
     job:
       enabled: false #어플리케이션 구동시 컨텍스트 내의 모든 스프링 배치 작업 자동 실행 여부(false로 해야 구동시 무조건 실행이 안됨)
