@@ -1,0 +1,119 @@
+= RESTful Notes API Guide
+Andy Wilkinson;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+[[overview]]
+= Overview
+
+[[overview-http-verbs]]
+== HTTP verbs
+
+RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its
+use of HTTP verbs.
+
+|===
+| Verb | Usage
+
+| `GET`
+| 테스트
+
+| `POST`
+| 테스트
+
+| `PATCH`
+| 테스트
+
+| `DELETE`
+| 테스트
+|===
+
+[[overview-http-status-codes]]
+== HTTP status codes
+
+RESTful notes tries to adhere as closely as possible to standard HTTP and REST conventions in its
+use of HTTP status codes.
+
+|===
+| Status code | Usage
+
+| `200 OK`
+| The request completed successfully
+
+| `201 Created`
+| A new resource has been created successfully. The resource's URI is available from the response's
+`Location` header
+
+| `204 No Content`
+| An update to an existing resource has been applied successfully
+
+| `400 Bad Request`
+| The request was malformed. The response body will include an error providing further information
+
+| `404 Not Found`
+| The requested resource did not exist
+|===
+
+= Member
+
+== Member 회원가입
+
+
+
+=== 성공
+
+==== Request
+include::{snippets}/sign_up/curl-request.adoc[]
+include::{snippets}/sign_up/http-request.adoc[]
+include::{snippets}/sign_up/httpie-request.adoc[]
+
+
+==== Response
+include::{snippets}/sign_up/response-body.adoc[]
+include::{snippets}/sign_up/http-response.adoc[]
+include::{snippets}/sign_up/request-body.adoc[]
+
+=== 실패
+
+==== Request
+include::{snippets}/sign_up_fail/curl-request.adoc[]
+include::{snippets}/sign_up_fail/http-request.adoc[]
+include::{snippets}/sign_up_fail/httpie-request.adoc[]
+
+
+==== Response
+include::{snippets}/sign_up_fail/response-body.adoc[]
+include::{snippets}/sign_up_fail/http-response.adoc[]
+include::{snippets}/sign_up_fail/request-body.adoc[]
+
+== Member 조회
+
+==== Request
+include::{snippets}/get_member/path-parameters.adoc[]
+include::{snippets}/get_member/curl-request.adoc[]
+include::{snippets}/get_member/http-request.adoc[]
+include::{snippets}/get_member/httpie-request.adoc[]
+
+
+==== Response
+include::{snippets}/get_member/response-body.adoc[]
+include::{snippets}/get_member/http-response.adoc[]
+include::{snippets}/get_member/request-body.adoc[]
+include::{snippets}/get_member/response-fields.adoc[]
+
+== Members 조회
+
+==== Request
+include::{snippets}/get_members/curl-request.adoc[]
+include::{snippets}/get_members/http-request.adoc[]
+include::{snippets}/get_members/httpie-request.adoc[]
+
+
+==== Response
+include::{snippets}/get_members/response-body.adoc[]
+include::{snippets}/get_members/http-response.adoc[]
+include::{snippets}/get_members/request-body.adoc[]
