@@ -29,10 +29,11 @@
 * [Jackson 어노테이션 사용법](https://github.com/cheese10yun/blog-sample/tree/master/jackson)
 * [Assistant Properties 적용 방법](https://github.com/cheese10yun/blog-sample/tree/master/properties)
 * [Spring Boot Https 적용하기](https://github.com/cheese10yun/blog-sample/tree/master/spring-https)
-* [Spring OAuth2 Social-Sample](https://github.com/cheese10yun/blog-sample/tree/master/social-sample)
-* [Spring OAuth2 Social](https://github.com/cheese10yun/spring-security-oauth2-social)
-* [Spring Batch Sample](https://github.com/cheese10yun/blog-sample/tree/master/batch-demo)
+* [Spring OAuth2 Social 기초 정리](https://github.com/cheese10yun/blog-sample/tree/master/social-sample)
+* [Spring OAuth2 Social - Google, Facebook 예제](https://github.com/cheese10yun/spring-security-oauth2-social)
+* [Spring Batch - 기초 정리](https://github.com/cheese10yun/blog-sample/tree/master/batch-demo)
 * [Spring Security 학습](https://github.com/cheese10yun/security-study)
+* [Spring REST Docs - 사용법](https://github.com/cheese10yun/springboot-restdocs)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
