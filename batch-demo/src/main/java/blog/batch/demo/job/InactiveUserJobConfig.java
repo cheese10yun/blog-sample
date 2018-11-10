@@ -2,7 +2,6 @@ package blog.batch.demo.job;
 
 import blog.batch.demo.domain.User;
 import blog.batch.demo.domain.enums.UserStatus;
-import blog.batch.demo.job.readers.QueueItemReader;
 import blog.batch.demo.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -54,13 +53,11 @@ public class InactiveUserJobConfig {
     }
 
     public ItemProcessor<User, User> inactiveUserProcessor() {
-        final ItemProcessor<User, User> userUserItemProcessor = user -> user.setInactive();
-        return userUserItemProcessor;
+        return User::setInactive;
     }
 
     public ItemWriter<User> inactiveUserWriter() {
-        final ItemWriter<User> userItemWriter = (List<? extends User> users) -> userRepository.saveAll(users);
-        return userItemWriter;
+        return userRepository::saveAll;
     }
 
 }
