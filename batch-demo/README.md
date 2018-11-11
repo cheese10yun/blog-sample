@@ -39,8 +39,8 @@
     - [재시도 템플릿](#재시도-템플릿)
     - [AOP 기반 재시도](#aop-기반-재시도)
 - [Spring Batch Table](#spring-batch-table)
-- [BATCH_JOB_INSTANCE](#batch_job_instance)
-- [BATCH_JOB_EXECUTION](#batch_job_execution)
+    - [BATCH_JOB_INSTANCE](#batch_job_instance)
+    - [BATCH_JOB_EXECUTION](#batch_job_execution)
 - [참고](#참고)
 
 <!-- /TOC -->
@@ -494,7 +494,7 @@ public User batchSomething(){....}
   <img src="https://github.com/cheese10yun/TIL/raw/master/assets/meta-data-erd.png">
 </p>
 
-## BATCH_JOB_INSTANCE
+### BATCH_JOB_INSTANCE
 
 ```sql
 CREATE TABLE `BATCH_JOB_INSTANCE` (
@@ -518,7 +518,7 @@ Job Parameter는 Spring Batch가 실행될때 외부에서 받을 수 있는 파
 
 **같은 Batch Job 이라도 Job Parameter가 다르면 다른 BATCH_JOB_INSTANCE 에 기록됩니다.**
 
-## BATCH_JOB_EXECUTION
+### BATCH_JOB_EXECUTION
 ```sql
 CREATE TABLE `BATCH_STEP_EXECUTION` (
   `STEP_EXECUTION_ID` bigint(20) NOT NULL,
