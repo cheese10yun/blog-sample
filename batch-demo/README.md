@@ -1,3 +1,4 @@
+
 ## 목차
 <!-- TOC -->
 
@@ -31,6 +32,15 @@
     - [청크 지향 프로세싱](#청크-지향-프로세싱)
     - [배치 인터셉터 Listener 설정하기](#배치-인터셉터-listener-설정하기)
     - [어노테이션 기반 Listener 설정하기](#어노테이션-기반-listener-설정하기)
+    - [JobParameter 사용하기](#jobparameter-사용하기-1)
+    - [Step의 흐름을 제어하는 Flow](#step의-흐름을-제어하는-flow)
+- [재시도](#재시도)
+    - [스템 구성하기](#스템-구성하기)
+    - [재시도 템플릿](#재시도-템플릿)
+    - [AOP 기반 재시도](#aop-기반-재시도)
+- [Spring Batch Table](#spring-batch-table)
+- [BATCH_JOB_INSTANCE](#batch_job_instance)
+- [BATCH_JOB_EXECUTION](#batch_job_execution)
 - [참고](#참고)
 
 <!-- /TOC -->
@@ -50,7 +60,7 @@
 * 데이터를 직접 사용하는 편이 빈번하게 일어나므로 데이터 무결성을 우지하는데 유효성 검사 등의 방어책이 있어야합니다.
 * 배치 처리 시스템 I/O 사용을 최소화해야합니다. 잦은 I/O로 데이터베이스 컨넥션과 네트워크 비용이 커지면 성능에 영향을 줄 수 있기 때문입니다. 따라서 가능하면 한번에 데이터를 조회하여 메모리에 저장해두고 처리를 한 다음. 그결과를 한번에 데이터베이스에 저장하는것이 좋습니다.
 * 일반적으로 같은 서비스에 사용되는 웹 API, 배치, 기타 프로젝트들을 서로 영향을 줍니다. 따라서 배치 처리가 진행되는 동안 다른 프로젝트 요소에 영향을 주는 경우가 없는지 주의를 기울여야합니다.
-* 스프링 부트는 배치 스케줄러를 제공하지 않습니다. 따라서 배치 처리 기능만 제공하여 스케줄링 기능은 스프링에서 제공하는 쿼치 프레임워크 등을 이용해야합니다. **리눅스 crontab 명령은 가장 간단히 사용 할 수 있지만 이는 추천하지 않습니다.** crontab의 경우 각 서버마다 따로 스케줄리을 관리해야 하며 무엇보다 클러스터링 기능이 제공되지 않습니다. 반면에 쿼티 같은 스케줄링은ㄴ 프레임워크를 사용한다면 클러스터링뿐만 아니라 다양한 스케줄링 기능, 실행 이력 관리 등 여러 이점을 얻을 수 있습니다.
+* 스프링 부트는 배치 스케줄러를 제공하지 않습니다. 따라서 배치 처리 기능만 제공하여 스케줄링 기능은 스프링에서 제공하는 쿼치 프레임워크 등을 이용해야합니다. **리눅스 crontab 명령은 가장 간단히 사용 할 수 있지만 이는 추천하지 않습니다.** crontab의 경우 각 서버마다 따로 스케줄리을 관리해야 하며 무엇보다 클러스터링 기능이 제공되지 않습니다. 반면에 쿼티 같은 스케줄링은 프레임워크를 사용한다면 클러스터링뿐만 아니라 다양한 스케줄링 기능, 실행 이력 관리 등 여러 이점을 얻을 수 있습니다.
 
 ## 스프링 부트 배치 이해하기
 배치의 일반적인 시나리오는 다음과 같은 3단계로 이루어집니다.
@@ -114,7 +124,7 @@ public JobFlowBuilder flow(Step step){
 * JobBuilder는 직접적으로 Job을 생성하는 것이 아니라 별도의 구체적 빌더를 생성하여 변환하여 경우에 따라 Job 생성 방법이 모두 다를 수 있는 점을 유연하게 처리할 수 있습니다.
 
 ### JobInstance
-* **JobInstance는 배치 처리에서 Job이 실행될 떄 하나의 Job 실행 단위입니다.** 만약 하루에 한 번 씩 배치의 Job이 실행된다면 어제와 오늘 실행 각각 Job을 JobInstance라고 부를 수 있습니다.
+* **JobInstance는 배치 처리에서 Job이 실행될 때 하나의 Job 실행 단위입니다.** 만약 하루에 한 번 씩 배치의 Job이 실행된다면 어제와 오늘 실행 각각 Job을 JobInstance라고 부를 수 있습니다.
 * 각각의 JobInstance는 하나의 JobException을 갖는 것은아닙니다. 오늘 Job이 실행 했는데 실패했다면 다음날 동일한 JobInstance를 가지고 또 실행합니다.
 * Job 실행이 실패하면 JobInstance가 끝난것으로 간주하지 않기 때문입니다. 그렇다면 JobInstance는 어제 실패한 JobExcution과 오늘의 성공한 JobExcution 두 개를 가지게 됩니다. **즉 JobExcution 는 여러 개 가질 수 있습니다.**
 
@@ -246,7 +256,7 @@ public class QueueItemReader<T> implements ItemReader<T> {
     }
 }
 ```
-QueueItemReader는 큐를 사용해서 자장하는 ItemReader 구현체입니다. ItemReader의 기본 반환 타입은 단수형인데 그 에 따라 구현하면 User 객체 1개씩 DB에 select 요청 하므로 매우 비효율적인 방식이 될 수 있씹느다.
+QueueItemReader는 큐를 사용해서 자장하는 ItemReader 구현체입니다. ItemReader의 기본 반환 타입은 단수형인데 그 에 따라 구현하면 User 객체 1개씩 DB에 select 요청 하므로 매우 비효율적인 방식이 될 수 있습니다.
 
 * (1) QueueItemReader를 사용해서 휴면회원으로 지정될 타깃 데이터를 한번에 불러와 큐에 담아 놓습니다.
 * (2) reade() 메서드를 사용할 때 큐의 `poll()`메서드를 통해서 큐에서 데이터를 하나씩 반환합니다.
@@ -318,12 +328,9 @@ private JpaItemWriter<User> inactiveUserWriter() {
 }
 ```
 ### JobParameter 사용하기
-JobParameter를 사용해서 Step을 실행시킬 떄 동적으로 파라미터를 주입시킬 수 있습니다.
+JobParameter를 사용해서 Step을 실행시킬 때 동적으로 파라미터를 주입시킬 수 있습니다.
 
 ### 테스트 시에만 H2 데이터베이스를 사용하도록 설정
-```yml
-```
-
 ```java
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -338,9 +345,9 @@ public class DemoApplication {
 <p align="center">
   <img src="https://github.com/cheese10yun/TIL/raw/master/assets/chun-process.png">
 </p>
-청크 지향 프로세싱은 트랜잭션 경꼐 내에서 청크 단위로 데이터를 읽고 생성하는 프로그래밍 기법입니다. 청크란 아이템이 트랜잭션에 커밋되는 수를 말합니다. read한 데이터 수가 지정한 청크 단위와 칠치하면 write를 수행하고 트랜잭션을 커밋합니다. Step 설정에서 chunk()로 커밋 단위를 지정했던 부분입니다. 즉 기존에도 계속 사용해온 방법이 청크 지향 프로세싱입니다.
+청크 지향 프로세싱은 트랜잭션 경계 내에서 청크 단위로 데이터를 읽고 생성하는 프로그래밍 기법입니다. 청크란 아이템이 트랜잭션에 커밋되는 수를 말합니다. read한 데이터 수가 지정한 청크 단위와 칠치하면 write를 수행하고 트랜잭션을 커밋합니다. Step 설정에서 chunk()로 커밋 단위를 지정했던 부분입니다. 즉 기존에도 계속 사용해온 방법이 청크 지향 프로세싱입니다.
 
-청크 지향프러그래밍의 이점은 1000개 개의 데이터에 대해 배치 로직을 실행한다고 가정했을 때 청크로 나누지 않았을 떄는 하나만 실패해도 다른 성공한 999개의 데이터가 롤백됩니다. 그런데 청크 단위를 10으로 해서 배치처리를 하면 도중에 배치 처리에 실패하더라도 다른 청크는 영향을 받지 않습니다. 이러한 이유로 스프링 배치에 정크 단위로 프로그래밍을 지향합니다.
+청크 지향프러그래밍의 이점은 1000개 개의 데이터에 대해 배치 로직을 실행한다고 가정했을 때 청크로 나누지 않았을 때는 하나만 실패해도 다른 성공한 999개의 데이터가 롤백됩니다. 그런데 청크 단위를 10으로 해서 배치처리를 하면 도중에 배치 처리에 실패하더라도 다른 청크는 영향을 받지 않습니다. 이러한 이유로 스프링 배치에 정크 단위로 프로그래밍을 지향합니다.
 
 ### 배치 인터셉터 Listener 설정하기
 배치 흐름에서 전후 처리를 하는 Listener를 설정할 수 있습니다. 구체적으로 Job의 전후 처리 Step의 전후 처리 각 청크 단위의 전후 처리 등 세세한 과정 실행시 특정 로직을 할당해 제어할 수있습니다. 가장 대표적인 예로는 로깅 작업이 있습니다.
@@ -348,6 +355,209 @@ public class DemoApplication {
 ### 어노테이션 기반 Listener 설정하기
 배치 인터셉터 인터페이스를 활용해서 사용하는 방법도 있고 에노테이션을 사용해서 활용하는 방법도 있습니다. 대표적으로 `@BefroeStep, @AsfterStep` 등이 있습니다. 해당 어노테이션으로 시작 전후에 로그를 남기는 설정도 가능합니다.
 
+### JobParameter 사용하기
+JapParameter를 사용해 Step을 실행시킬 때 동적으로 파라미터를 주입시클 수 있습니다.
+
+### Step의 흐름을 제어하는 Flow
+
+Step의 가장 기본적은 흐름은 `읽기-처리-쓰기` 입니다. 여기서 세부적인 조건에 따라서 Step의 실행 여부를 정할 수 있습니다. 이런 흐름을 제어하는 `Flow` 제공 합니다.
+
+![batch-flow](/assets/batch-flow.png)
+
+<p align="center">
+  <img src="https://github.com/cheese10yun/TIL/raw/master/assets/batch-flow.png">
+</p>
+
+흐름에 조건에 해당하는 부분을 `JobExecutionDecider` 인터페이스를 사용해 구현 할 수 있습니다. `JobExecutionDecider` 인터페이스는 `decide()` 메서드 하나만 제공합니다.
+
+```java
+public interface JobExecutionDecider {
+    FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution);
+}
+
+public Class xxxJobExecutionDecider implements  JobExecutionDecider {
+
+    @Override
+    public FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution){
+        if(특정 조건...){ // (1)
+            return FlowExecutionsStatus.COMPLETED; // (2)
+        }
+        return FlowExecutionsStatus.FAILED; // (3)
+
+    }
+}
+```
+* (1) 특정 조건에 대한 로직
+* (2) 조건에 만족하고 JobStep을 실행 시킬 경우 `COMPLETED` 리턴
+* (3) 조건에 만족하지 않고 JobStep을 **실행 하지않을 경우**  `FAILED` 리턴
+
+`Flow` 조건으로 사용될 경우 InactiveJobExceutionDecider 클래스를 구현 했습니다. 이를 사용할 Flow를 구현 해야합니다. `Step` 메서드가아닌 `Flow`를 주압 받고 주입받은 `Flow`를 빈으로 등록해야합니다.
+
+```java
+@Bean
+public Flow xxxJobFlow(Step xxxJobStep){
+    FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("xxxJobFlow"); // (1)
+
+    return flowBuilder
+        .start(new xxxJobExcetuinDeicder()) // (2)
+        .on(FlowExecutionStatus.FAILED.getName()).end() // (3)
+        .on(FlowExecutionStatus.COMPLETED.getName()).to(xxxJobStep).end(); // (4)
+}
+```
+* (1) `FlowBuilder`를 시용해서 Flow 객체를 생성합니다.
+* (2) 위에서 작성한 `xxxJobExecutionDecider` 클래스를 `start()` 으로 설정해 맨 처음 시작하도록 합니다.
+* (3) `xxxJobExecutionDecider` 클래스의 decide() 메서드를 통해 리턴 값이 `FAILED` 일 경우 `end()` 메서드를 사용해서 끝나도록 설정합니다.
+* (4) `xxxJobExecutionDecider` 클래스의 decide() 메서드를 통해 리턴 값이 `COMPLETED` 일 경우 기존에 설정한 `xxxJobStep`을 실행하도록 설정합니다.
+
+
+
+
+## 재시도
+네트워크 접속이 끊어지거나 장비가 다운되는 등 실패 시나리오는 다양합니다. 시스템은 언젠가 복구 될테니 다시 한번 시도는 해볼 가치는 있습니다.
+
+### 스템 구성하기
+```java
+@Bean
+public Step step1() {
+    return steps.get("user xxxxx")
+    .<User, User>chunk(10)
+        .faulTolerant()
+            .retryLimit(3).retry(XXXXXException.class)
+    .render(something())
+    .writer(something())
+    .build();
+}
+```
+자바 구성으로 재시도를 활성화 할 경우, 첫 번째 스텝은 오류를 허용하도록 만들어야 재시도 제한 횟수 및 재시도 대상 예외를 지정할 수 있습니다. 먼저 `faulTolerant()`로 오류 허용 스탭을 얻은후, `retryLimit()` 메서드로 재시도 제한 횟수를, `retry()` 메서드로 재시도 대상 예외를 발생합니다.
+
+### 재시도 템플릿
+* 스프링 배치가 제공하는 재시도 및 복구 서비스를 코드에 활용하는 다른 방법도 있습니다. 재시도 로직을 구현된 커스텀 ItemWriter<T>를 작성하거나 아예 전체 서비스 인터페이스에 재시도 기능을 입힐 수 있습니다.
+* 스프링 배치 RetryTemplate은 바로 이런 용도로 만들어진 클래스입니다. 비니지스 로직과 재시도 로직을 분리해서 마치 재시도 없이 한 번만 시도하는 것처럼 코드를 작성할 수 있개 해줍니다.
+* 재시도 -> 실패 -> 복구 반복적인 과정을 간명한 하나의 API 메서드로 호출로 감싼 `RetryTemplate`는 여러 가지 유스 케이스를 지원합니다.
+
+```java
+public class RetryableUserRegistrationServiceItemWriter implements ItemWriter<UserRegistration> {
+    private static final Logger logger = LoggerFactory.getLogger(RetryableUserRegistrationServiceItemWriter.class);
+    private final UserRegistrationService userRegistrationService;
+    private final RetryTemplate retryTemplate;
+
+    public RetryableUserRegistrationServiceItemWriter(UserRegistrationService userRegistrationService, RetryTemplate retryTemplate) {
+        this.userRegistrationService = userRegistrationService;
+        this.retryTemplate = retryTemplate;
+    }
+
+    /**
+     * takes aggregated input from the reader and 'writes' them using a custom implementation.
+     */
+    public void write(List<?extends UserRegistration> items)
+        throws Exception {
+        for (final UserRegistration userRegistration : items) {
+            UserRegistration registeredUserRegistration = retryTemplate.execute(
+                    (RetryCallback<UserRegistration, Exception>) context -> userRegistrationService.registerUser(userRegistration));
+
+            logger.debug("Registered: {}", registeredUserRegistration);
+        }
+    }
+}
+
+  ....
+  @Bean
+    public RetryTemplate retryTemplate() {
+        RetryTemplate retryTemplate = new RetryTemplate();
+        retryTemplate.setBackOffPolicy(backOffPolicy());
+        return retryTemplate;
+    }
+
+    @Bean
+    public ExponentialBackOffPolicy backOffPolicy() {
+        ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+        backOffPolicy.setInitialInterval(1000);
+        backOffPolicy.setMaxInterval(10000);
+        backOffPolicy.setMultiplier(2);
+        return backOffPolicy;
+    }
+```
+* 재시도 시간 간격을 정하는 BackOffplicy는 RetryTemplate의 유용한 기능입니다. 실제로 실패 직후 재시도하는 시간 간격을 점점 늘려 여러 클라이언트가 같은 호출 할때 스텝이 잠기지 않도록 예방하는 수단으로 활용할 수있습니다.
+
+### AOP 기반 재시도
+스프링 배치가 제공하는 AOP 어드바이저를 이용해서 RetryTempate 처럼 사용할 수 있습니다. 프록시 전체에 재시 로직 어드바이스를 추가하면 RetryTempate이 빠진 본래 코드로 그대로 사용가능합니다.
+
+```java
+@Retryable(backoff = @Backoff(delay = 1000, maxDely = 10000, multiplier = 2))
+public User batchSomething(){....}
+```
+**구성 클래스에 반드시 @EnableRety 를추가 해야합니다.**
+
+## Spring Batch Table
+
+<p align="center">
+  <img src="https://github.com/cheese10yun/TIL/raw/master/assets/meta-data-erd.png">
+</p>
+
+## BATCH_JOB_INSTANCE
+
+```sql
+CREATE TABLE `BATCH_JOB_INSTANCE` (
+  `JOB_INSTANCE_ID` bigint(20) NOT NULL,
+  `VERSION` bigint(20) DEFAULT NULL,
+  `JOB_NAME` varchar(100) NOT NULL,
+  `JOB_KEY` varchar(32) NOT NULL,
+  PRIMARY KEY (`JOB_INSTANCE_ID`),
+  UNIQUE KEY `JOB_INST_UN` (`JOB_NAME`,`JOB_KEY`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+
+* JOB_INSTANCE_ID
+    * BATCH_JOB_INSTANCE 테이블의 PK
+* JOB_NAME
+    * 수행한 Batch Job Name
+
+**BATCH_JOB_INSTANCE 테이블은 Job Parameter에 따라 생성됩니다.**
+
+Job Parameter는 Spring Batch가 실행될때 외부에서 받을 수 있는 파라미터 입니다. 
+
+**같은 Batch Job 이라도 Job Parameter가 다르면 다른 BATCH_JOB_INSTANCE 에 기록됩니다.**
+
+## BATCH_JOB_EXECUTION
+```sql
+CREATE TABLE `BATCH_STEP_EXECUTION` (
+  `STEP_EXECUTION_ID` bigint(20) NOT NULL,
+  `VERSION` bigint(20) NOT NULL,
+  `STEP_NAME` varchar(100) NOT NULL,
+  `JOB_EXECUTION_ID` bigint(20) NOT NULL,
+  `START_TIME` datetime NOT NULL,
+  `END_TIME` datetime DEFAULT NULL,
+  `STATUS` varchar(10) DEFAULT NULL,
+  `COMMIT_COUNT` bigint(20) DEFAULT NULL,
+  `READ_COUNT` bigint(20) DEFAULT NULL,
+  `FILTER_COUNT` bigint(20) DEFAULT NULL,
+  `WRITE_COUNT` bigint(20) DEFAULT NULL,
+  `READ_SKIP_COUNT` bigint(20) DEFAULT NULL,
+  `WRITE_SKIP_COUNT` bigint(20) DEFAULT NULL,
+  `PROCESS_SKIP_COUNT` bigint(20) DEFAULT NULL,
+  `ROLLBACK_COUNT` bigint(20) DEFAULT NULL,
+  `EXIT_CODE` varchar(2500) DEFAULT NULL,
+  `EXIT_MESSAGE` varchar(2500) DEFAULT NULL,
+  `LAST_UPDATED` datetime DEFAULT NULL,
+  PRIMARY KEY (`STEP_EXECUTION_ID`),
+  KEY `JOB_EXEC_STEP_FK` (`JOB_EXECUTION_ID`),
+  CONSTRAINT `JOB_EXEC_STEP_FK` FOREIGN KEY (`JOB_EXECUTION_ID`) REFERENCES `BATCH_JOB_EXECUTION` (`JOB_EXECUTION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+
+* `JOB_EXECUTION_ID` 칼럼은 `BATCH_JOB_INSTANCE` 테이블의 PK를 참조 하고 있습니다.
+* `BATCH_STEP_EXECUTION` 와 `BATCH_JOB_INSTANCE`는 부모 자식관계입니다.
+* BATCH_STEP_EXECUTION는 자신의 부모 BATCH_JOB_INSTANCE 성공/실패 내역을 모두 갖고 있습니다.
+* 
+
+<p align="center">
+  <img src="https://github.com/cheese10yun/TIL/raw/master/assets/job-job-instance-job-execution.png">
+</p>
+
+* `Job`: 특정 잡, 2달이상 로그인안한 유저 휴먼 회원 처리 등
+* `Job Instance`: Job Parameter를 실행한 Job(Job Parameter 단위로 생성)
+* `Job Execution`: Job Parameter로 실행한 Job의 실행, 1번 째 시도 혹은 그 다음 등
 
 ## 참고
 * [처음으로 배우는 스프링 부트 2](https://kyobobook.co.kr/product/detailViewKor.laf?mallGb=KOR&ejkGb=KOR&barcode=9791162241264&orderClick=JAj)를 정리한 글입니다.
+* [기억보단 기록을 - spring-batch-in-action](https://github.com/jojoldu/spring-batch-in-action/blob/master/3_%EB%A9%94%ED%83%80%ED%85%8C%EC%9D%B4%EB%B8%94%EC%97%BF%EB%B3%B4%EA%B8%B0.md)
