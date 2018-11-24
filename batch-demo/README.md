@@ -362,8 +362,6 @@ JapParameter를 사용해 Step을 실행시킬 때 동적으로 파라미터를 
 
 Step의 가장 기본적은 흐름은 `읽기-처리-쓰기` 입니다. 여기서 세부적인 조건에 따라서 Step의 실행 여부를 정할 수 있습니다. 이런 흐름을 제어하는 `Flow` 제공 합니다.
 
-![batch-flow](/assets/batch-flow.png)
-
 <p align="center">
   <img src="https://github.com/cheese10yun/TIL/raw/master/assets/batch-flow.png">
 </p>
