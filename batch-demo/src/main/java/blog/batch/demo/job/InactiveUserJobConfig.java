@@ -4,6 +4,7 @@ import blog.batch.demo.domain.User;
 import blog.batch.demo.domain.enums.UserStatus;
 import blog.batch.demo.repository.UserRepository;
 import lombok.AllArgsConstructor;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
