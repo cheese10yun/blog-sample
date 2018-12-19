@@ -364,7 +364,7 @@ public class OrderRequest {
 
 ### Request
 
-![](assets/swagger-message-request.png)
+![](https://github.com/cheese10yun/blog-sample/blob/master/encapsulation/assets/swagger-message-request.png?raw=true)
 
 요청은 배열으로 받게 합니다. 만약 받을 메시지가 없다면 빈 배열로 넘깁니다.
 
@@ -428,7 +428,7 @@ public class OrderApiTest {
 
 ### 값 확인
 
-![](/assets/string-value.png)
+![](https://github.com/cheese10yun/blog-sample/blob/master/encapsulation/assets/string-value.png?raw=true)
 
 배열 형식의 받을 입력 받고 응답해주지만, 실제 값은 `","`으로 구분하는 문자열입니다. 
 
