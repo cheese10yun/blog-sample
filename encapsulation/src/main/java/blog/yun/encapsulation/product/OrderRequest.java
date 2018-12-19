@@ -7,7 +7,6 @@ import java.util.Set;
 
 @Getter
 public class OrderRequest {
-
     @NotNull
     private Set<MessageType> messageType;
 }

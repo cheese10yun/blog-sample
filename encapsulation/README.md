@@ -6,6 +6,34 @@
 
 저와 같은 주니어분들이 조금이라도 이해를 돕기 위해 제가 생각하는 캡슐화에 대해서 실무에서 많이 사용하는 Spring Boot, JPA 기반에서 설명해볼까 합니다.
 
+## 목차
+- [캡슐화 내가 생각하는 캡슐화란 (1)...](#%EC%BA%A1%EC%8A%90%ED%99%94-%EB%82%B4%EA%B0%80-%EC%83%9D%EA%B0%81%ED%95%98%EB%8A%94-%EC%BA%A1%EC%8A%90%ED%99%94%EB%9E%80-1)
+- [목차](#%EB%AA%A9%EC%B0%A8)
+- [캡슐화의 정의](#%EC%BA%A1%EC%8A%90%ED%99%94%EC%9D%98-%EC%A0%95%EC%9D%98)
+- [요구사항](#%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD)
+- [캡슐화가 안좋은 안티 패턴](#%EC%BA%A1%EC%8A%90%ED%99%94%EA%B0%80-%EC%95%88%EC%A2%8B%EC%9D%80-%EC%95%88%ED%8B%B0-%ED%8C%A8%ED%84%B4)
+  - [테스트 코드](#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%BD%94%EB%93%9C)
+  - [(1) Order의 getMessageTypes 메서드를 사용 할 때 불편하다](#1-order%EC%9D%98-getmessagetypes-%EB%A9%94%EC%84%9C%EB%93%9C%EB%A5%BC-%EC%82%AC%EC%9A%A9-%ED%95%A0-%EB%95%8C-%EB%B6%88%ED%8E%B8%ED%95%98%EB%8B%A4)
+  - [(2) KAKAO를 KAOKO 라고 잘못 입력했을 경우](#2-kakao%EB%A5%BC-kaoko-%EB%9D%BC%EA%B3%A0-%EC%9E%98%EB%AA%BB-%EC%9E%85%EB%A0%A5%ED%96%88%EC%9D%84-%EA%B2%BD%EC%9A%B0)
+  - [(3) 메시지에 KAKAO, EMAIL, SMS 처럼 공백이 들어 간다면 실패한다](#3-%EB%A9%94%EC%8B%9C%EC%A7%80%EC%97%90-kakao-email-sms-%EC%B2%98%EB%9F%BC-%EA%B3%B5%EB%B0%B1%EC%9D%B4-%EB%93%A4%EC%96%B4-%EA%B0%84%EB%8B%A4%EB%A9%B4-%EC%8B%A4%ED%8C%A8%ED%95%9C%EB%8B%A4)
+  - [(4) 메시지가 없을 때 빈문자열("")을 보낼 경우](#4-%EB%A9%94%EC%8B%9C%EC%A7%80%EA%B0%80-%EC%97%86%EC%9D%84-%EB%95%8C-%EB%B9%88%EB%AC%B8%EC%9E%90%EC%97%B4%22%22%EC%9D%84-%EB%B3%B4%EB%82%BC-%EA%B2%BD%EC%9A%B0)
+  - [(5) 메시지가 없을 때 null 을 보낼 경우](#5-%EB%A9%94%EC%8B%9C%EC%A7%80%EA%B0%80-%EC%97%86%EC%9D%84-%EB%95%8C-null-%EC%9D%84-%EB%B3%B4%EB%82%BC-%EA%B2%BD%EC%9A%B0)
+  - [(6) 메시지가 중복으로 올경우](#6-%EB%A9%94%EC%8B%9C%EC%A7%80%EA%B0%80-%EC%A4%91%EB%B3%B5%EC%9C%BC%EB%A1%9C-%EC%98%AC%EA%B2%BD%EC%9A%B0)
+  - [테스트 코드의 중요성](#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%BD%94%EB%93%9C%EC%9D%98-%EC%A4%91%EC%9A%94%EC%84%B1)
+- [좋은 캡슐화 패턴](#%EC%A2%8B%EC%9D%80-%EC%BA%A1%EC%8A%90%ED%99%94-%ED%8C%A8%ED%84%B4)
+  - [Message of(Set<MessageType> types)](#message-ofsetmessagetype-types)
+  - [public List<MessageType> getTypes()](#public-listmessagetype-gettypes)
+  - [테스트 코드](#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%BD%94%EB%93%9C-1)
+  - [문제 해결](#%EB%AC%B8%EC%A0%9C-%ED%95%B4%EA%B2%B0)
+  - [캡슐화를 통한 장점들](#%EC%BA%A1%EC%8A%90%ED%99%94%EB%A5%BC-%ED%86%B5%ED%95%9C-%EC%9E%A5%EC%A0%90%EB%93%A4)
+- [웹 환경](#%EC%9B%B9-%ED%99%98%EA%B2%BD)
+  - [Controller](#controller)
+  - [Request](#request)
+  - [테스트 코드](#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%BD%94%EB%93%9C-2)
+  - [정상요청](#%EC%A0%95%EC%83%81%EC%9A%94%EC%B2%AD)
+  - [요청바디가_유효하지않을경우](#%EC%9A%94%EC%B2%AD%EB%B0%94%EB%94%94%EA%B0%80%EC%9C%A0%ED%9A%A8%ED%95%98%EC%A7%80%EC%95%8A%EC%9D%84%EA%B2%BD%EC%9A%B0)
+  - [값 확인](#%EA%B0%92-%ED%99%95%EC%9D%B8)
+
 
 ## 캡슐화의 정의
 > 캡슐화는 정보은닉을 통해 높은 응집도와 낮은 결합도를 갖도록 한다. 정보 은닉이란 말 그대로 알 필요가 없는 정보는 외부에서 접근하지 못하도록 제한하는 것이다.
@@ -282,10 +310,10 @@ public class MessageTest {
     }
 }
 ```
+테스트 코드를 보시면 항상 올바른 데이터만 입력할 수 있고, 그것을 검증하는 것도 단순해졌고 이해하고 예측하기 쉬워졌습니다. 이런 것이 좋은 캡슐화라고 생각합니다.
 
 
-
-### 해결된 문제
+### 문제 해결
 
 * (1) Order의 getMessageTypes 메서드를 사용 할 때 불편하다
   * 사용하는 곳에서 리스트를 만드는 것아 이나리 getTypes()의 리턴자료형이 List이기 때문에 사용하기 편합니다.
@@ -307,3 +335,101 @@ public class MessageTest {
 * 메시지 타입이 없는 경우 컬렉션이 empty이기 때문에 보다 명확합니다.
 * 응집도가 높아졌습니다. 메시지에 대한 세부 로직들이 Order에서 분리되고 Message 객체에 응집해 있습니다.
 * 재사용성이 높아졌습니다. 만약 상품 등록이 성공했을 경우 메시지 플랫폼을 통해서 응답받고 싶다면 Product에서 Message 객체를 선언하기만 하면 됩니다.
+
+
+## 웹 환경
+웹 환경에서 추가적으로 설명드리겠습니다.
+
+### Controller
+```java
+@RestController
+@RequestMapping("/orders")
+public class OrderApi {
+
+    private final OrderRepository orderRepository;
+
+    @PostMapping
+    public Order create(@RequestBody @Valid OrderRequest request) {
+        final Order order = buildOrder(request);
+        return orderRepository.save(order);
+    }
+}
+
+@Getter
+public class OrderRequest {
+    @NotNull
+    private Set<MessageType> messageType;
+}
+```
+
+### Request
+
+![](assets/swagger-message-request.png)
+
+요청은 배열으로 받게 합니다. 만약 받을 메시지가 없다면 빈 배열로 넘깁니다.
+
+
+### 테스트 코드
+
+
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+public class OrderApiTest {
+    @Autowired
+    private ResourceLoader resourceLoader;
+
+    @Autowired
+    private MockMvc mvc;
+    
+    @Test
+    public void 정상요청() throws Exception {
+        final String json = readJson("valid-request.json");
+        mvc.perform(post("/orders")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(json))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void 요청바디가_유효하지않을경우() throws Exception {
+        final String json = readJson("invalid-request.json");
+        mvc.perform(post("/orders")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(json))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+}
+```
+
+### 정상요청
+
+```json
+{
+  "messageType": [
+    "EMAIL", "SMS"
+  ]
+}
+```
+모든 값이 유효합니다. 200을 응답 받습니다.
+
+### 요청바디가_유효하지않을경우 
+```json
+{
+  "messageType": [
+    "EMAIL", "KKA"
+  ]
+}
+```
+유효하지 않은 값일 경우 400 응답을 받게됩니다.
+
+### 값 확인
+
+![](/assets/string-value.png)
+
+배열 형식의 받을 입력 받고 응답해주지만, 실제 값은 `","`으로 구분하는 문자열입니다. 
+
+**다시 한번 강조하지만 외부 객체에서는 저 문자열을 가져올 수 없을 뿐만 아니라 실제 데이터베이스에 문자열로 저장돼있는지 관심조차 가질 필요가 없습니다. `getTypes()` 메서드로 List형으로 외부에 제공해주기만 하면 됩니다.** 이것이 캡슐화의 기본적 개념이라고 생각합니다.

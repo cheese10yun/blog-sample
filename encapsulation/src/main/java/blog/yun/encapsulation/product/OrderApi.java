@@ -16,8 +16,12 @@ public class OrderApi {
 
     @PostMapping
     public Order create(@RequestBody @Valid OrderRequest request) {
-        final Order order = Order.builder().message(Message.of(request.getMessageType())).build();
+        final Order order = buildOrder(request);
         return orderRepository.save(order);
+    }
+
+    private Order buildOrder(@RequestBody @Valid OrderRequest request) {
+        return Order.builder().message(Message.of(request.getMessageType())).build();
     }
 
     @GetMapping("/{id}")
