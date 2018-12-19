@@ -36,6 +36,8 @@
 * [Spring REST Docs - 사용법](https://github.com/cheese10yun/springboot-restdocs)
 * [Spring OAuth2 정리](https://github.com/cheese10yun/springboot-oauth2)
 * [실무에서 Lombok 사용법](https://github.com/cheese10yun/blog-sample/tree/master/lombok)
+* [Spring 예제로 보는 캡슐화](https://github.com/cheese10yun/blog-sample/tree/master/encapsulation)
+
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
