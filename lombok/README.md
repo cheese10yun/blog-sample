@@ -246,8 +246,8 @@ public class Member {
 
 ## lombok.config 설정
 
-lombok.config 설정 파일을 통해서 lombok 어노테이션을 제한 할 수 있습니다. 위에서 언급한 `@Data` 등 사용을 했을 경우 위험 부담이 있는 어노테이션들은 해당 설정에서 제한 할 수 있습니다.
 
+lombok.config 설정 파일을 통해서 lombok 어노테이션을 제한 할 수 있습니다. 위에서 언급한 `@Data` 등 사용을 했을 경우 위험 부담이 있는 어노테이션들은 해당 설정에서 제한 할 수 있습니다.
 
 ```config
 lombok.Setter.flagUsage = error
@@ -255,6 +255,8 @@ lombok.AllArgsConstructor.flagUsage = error
 lombok.ToString.flagUsage = warning
 lombok.data.flagUsage= error
 ```
+**lombok.config 파일을 작성한뒤 Proejct root path에 위치시킵니다.**
+
 `lombok.{해당어노테이션}.flagUsage = [warning or error]` 이러한 규칙으로 lombok 어노테이션들을 설정 할 수 있습니다.
 
 ![](https://github.com/cheese10yun/blog-sample/blob/master/lombok/assets/lombok-config.png?raw=true)
