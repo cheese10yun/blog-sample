@@ -255,7 +255,7 @@ lombok.AllArgsConstructor.flagUsage = error
 lombok.ToString.flagUsage = warning
 lombok.data.flagUsage= error
 ```
-**lombok.config 파일을 작성한뒤 Proejct root path에 위치시킵니다.**
+**lombok.config 파일을 작성한뒤 Proejct root path에 위치시킵니다**
 
 `lombok.{해당어노테이션}.flagUsage = [warning or error]` 이러한 규칙으로 lombok 어노테이션들을 설정 할 수 있습니다.
 
