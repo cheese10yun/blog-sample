@@ -257,7 +257,7 @@ lombok.data.flagUsage= error
 ```
 `lombok.{해당어노테이션}.flagUsage = [warning or error]` 이러한 규칙으로 lombok 어노테이션들을 설정 할 수 있습니다.
 
-![](/assets/lombok-config.png)
+![](https://github.com/cheese10yun/blog-sample/blob/master/lombok/assets/lombok-config.png?raw=true)
 
 실제 컴파일을 진행하면 위에서 설정한 `lombok.config`에서 제한한 어노테이션은 warning, error로 표시됩니다.
 이 처럼 명확한 가이드 라인이 있으면 설정 파일을 통해서 제한하는 것이 바람직하다고 생각합니다.
