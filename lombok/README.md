@@ -6,13 +6,16 @@ Lombok은 자바 컴파일 시점에서 특정 어노테이션으로 해당 코�
 
 지금 부터 제가 Lombok을 사용하는 방법에 대해서 소개해드리겠습니다. 간단한 예제를 위해서 JPA Entity 객체를 기반으로 설명드리겠습니다.
 ## 목차
-- [@Data는 지양 하자](#data%EB%8A%94-%EC%A7%80%EC%96%91-%ED%95%98%EC%9E%90)
+- [실무에서 Lombok 사용법](#%EC%8B%A4%EB%AC%B4%EC%97%90%EC%84%9C-lombok-%EC%82%AC%EC%9A%A9%EB%B2%95)
+  - [목차](#%EB%AA%A9%EC%B0%A8)
+  - [@Data는 지양 하자](#data%EB%8A%94-%EC%A7%80%EC%96%91-%ED%95%98%EC%9E%90)
     - [무분별한 Setter 남용](#%EB%AC%B4%EB%B6%84%EB%B3%84%ED%95%9C-setter-%EB%82%A8%EC%9A%A9)
     - [ToString으로 인한 양방향 연관관계시 순환 참조 문제](#tostring%EC%9C%BC%EB%A1%9C-%EC%9D%B8%ED%95%9C-%EC%96%91%EB%B0%A9%ED%96%A5-%EC%97%B0%EA%B4%80%EA%B4%80%EA%B3%84%EC%8B%9C-%EC%88%9C%ED%99%98-%EC%B0%B8%EC%A1%B0-%EB%AC%B8%EC%A0%9C)
-- [바람직한 Lombok 사용법](#%EB%B0%94%EB%9E%8C%EC%A7%81%ED%95%9C-lombok-%EC%82%AC%EC%9A%A9%EB%B2%95)
+  - [바람직한 Lombok 사용법](#%EB%B0%94%EB%9E%8C%EC%A7%81%ED%95%9C-lombok-%EC%82%AC%EC%9A%A9%EB%B2%95)
     - [@NoArgsConstructor 접근 권한을 최소화 하자](#noargsconstructor-%EC%A0%91%EA%B7%BC-%EA%B6%8C%ED%95%9C%EC%9D%84-%EC%B5%9C%EC%86%8C%ED%99%94-%ED%95%98%EC%9E%90)
     - [Builder 사용시 매개변수를 최소화 하자](#builder-%EC%82%AC%EC%9A%A9%EC%8B%9C-%EB%A7%A4%EA%B0%9C%EB%B3%80%EC%88%98%EB%A5%BC-%EC%B5%9C%EC%86%8C%ED%99%94-%ED%95%98%EC%9E%90)
-- [결론](#%EA%B2%B0%EB%A1%A0)
+  - [lombok.config 설정](#lombokconfig-%EC%84%A4%EC%A0%95)
+  - [결론](#%EA%B2%B0%EB%A1%A0)
 
 
 ## @Data는 지양 하자
@@ -240,6 +243,25 @@ public class Member {
 ![all-arg-builder-2](/assets/all-arg-builder-2.png)
 
 위 그림처럼 매개변수 name, email만 넘겨 받을 수 있게 됩니다.
+
+## lombok.config 설정
+
+lombok.config 설정 파일을 통해서 lombok 어노테이션을 제한 할 수 있습니다. 위에서 언급한 `@Data` 등 사용을 했을 경우 위험 부담이 있는 어노테이션들은 해당 설정에서 제한 할 수 있습니다.
+
+
+```config
+lombok.Setter.flagUsage = error
+lombok.AllArgsConstructor.flagUsage = error
+lombok.ToString.flagUsage = warning
+lombok.data.flagUsage= error
+```
+`lombok.{해당어노테이션}.flagUsage = [warning or error]` 이러한 규칙으로 lombok 어노테이션들을 설정 할 수 있습니다.
+
+![](/assets/lombok-config.png)
+
+실제 컴파일을 진행하면 위에서 설정한 `lombok.config`에서 제한한 어노테이션은 warning, error로 표시됩니다.
+이 처럼 명확한 가이드 라인이 있으면 설정 파일을 통해서 제한하는 것이 바람직하다고 생각합니다.
+
 
 ## 결론
 제가 생각한 것이 Best Practice 라고 생각하지 않습니다. 각자 환경과 상황에 알맞게 Lombok을 사용하는 것이 더욱 바람직하겠죠.

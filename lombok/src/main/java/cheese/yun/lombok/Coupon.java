@@ -1,13 +1,14 @@
 package cheese.yun.lombok;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "coupon")
 @Data
+@Setter
 public class Coupon {
 
     @Id
