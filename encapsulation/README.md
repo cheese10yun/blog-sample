@@ -1,4 +1,39 @@
-## 내가 생각하는 캡슐화란 (1)...
+# 목차
+- [목차](#%EB%AA%A9%EC%B0%A8)
+- [캡슐화의 정의](#%EC%BA%A1%EC%8A%90%ED%99%94%EC%9D%98-%EC%A0%95%EC%9D%98)
+- [내가 생각하는 캡슐화란 (1)...](#%EB%82%B4%EA%B0%80-%EC%83%9D%EA%B0%81%ED%95%98%EB%8A%94-%EC%BA%A1%EC%8A%90%ED%99%94%EB%9E%80-1)
+  - [요구사항](#%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD)
+  - [캡슐화가 안좋은 안티 패턴](#%EC%BA%A1%EC%8A%90%ED%99%94%EA%B0%80-%EC%95%88%EC%A2%8B%EC%9D%80-%EC%95%88%ED%8B%B0-%ED%8C%A8%ED%84%B4)
+    - [테스트 코드](#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%BD%94%EB%93%9C)
+    - [(1) Order의 getMessageTypes 메서드를 사용 할 때 불편하다](#1-order%EC%9D%98-getmessagetypes-%EB%A9%94%EC%84%9C%EB%93%9C%EB%A5%BC-%EC%82%AC%EC%9A%A9-%ED%95%A0-%EB%95%8C-%EB%B6%88%ED%8E%B8%ED%95%98%EB%8B%A4)
+    - [(2) KAKAO를 KAOKO 라고 잘못 입력했을 경우](#2-kakao%EB%A5%BC-kaoko-%EB%9D%BC%EA%B3%A0-%EC%9E%98%EB%AA%BB-%EC%9E%85%EB%A0%A5%ED%96%88%EC%9D%84-%EA%B2%BD%EC%9A%B0)
+    - [(3) 메시지에 KAKAO, EMAIL, SMS 처럼 공백이 들어 간다면 실패한다](#3-%EB%A9%94%EC%8B%9C%EC%A7%80%EC%97%90-kakao-email-sms-%EC%B2%98%EB%9F%BC-%EA%B3%B5%EB%B0%B1%EC%9D%B4-%EB%93%A4%EC%96%B4-%EA%B0%84%EB%8B%A4%EB%A9%B4-%EC%8B%A4%ED%8C%A8%ED%95%9C%EB%8B%A4)
+    - [(4) 메시지가 없을 때 빈문자열("")을 보낼 경우](#4-%EB%A9%94%EC%8B%9C%EC%A7%80%EA%B0%80-%EC%97%86%EC%9D%84-%EB%95%8C-%EB%B9%88%EB%AC%B8%EC%9E%90%EC%97%B4%22%22%EC%9D%84-%EB%B3%B4%EB%82%BC-%EA%B2%BD%EC%9A%B0)
+    - [(5) 메시지가 없을 때 null 을 보낼 경우](#5-%EB%A9%94%EC%8B%9C%EC%A7%80%EA%B0%80-%EC%97%86%EC%9D%84-%EB%95%8C-null-%EC%9D%84-%EB%B3%B4%EB%82%BC-%EA%B2%BD%EC%9A%B0)
+    - [(6) 메시지가 중복으로 올경우](#6-%EB%A9%94%EC%8B%9C%EC%A7%80%EA%B0%80-%EC%A4%91%EB%B3%B5%EC%9C%BC%EB%A1%9C-%EC%98%AC%EA%B2%BD%EC%9A%B0)
+    - [테스트 코드의 중요성](#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%BD%94%EB%93%9C%EC%9D%98-%EC%A4%91%EC%9A%94%EC%84%B1)
+  - [좋은 캡슐화 패턴](#%EC%A2%8B%EC%9D%80-%EC%BA%A1%EC%8A%90%ED%99%94-%ED%8C%A8%ED%84%B4)
+    - [Message of(Set<MessageType> types)](#message-ofsetmessagetype-types)
+    - [public List<MessageType> getTypes()](#public-listmessagetype-gettypes)
+    - [테스트 코드](#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%BD%94%EB%93%9C-1)
+    - [문제 해결](#%EB%AC%B8%EC%A0%9C-%ED%95%B4%EA%B2%B0)
+    - [캡슐화를 통한 장점들](#%EC%BA%A1%EC%8A%90%ED%99%94%EB%A5%BC-%ED%86%B5%ED%95%9C-%EC%9E%A5%EC%A0%90%EB%93%A4)
+  - [웹 환경](#%EC%9B%B9-%ED%99%98%EA%B2%BD)
+    - [Controller](#controller)
+    - [Request](#request)
+    - [테스트 코드](#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%BD%94%EB%93%9C-2)
+    - [정상요청](#%EC%A0%95%EC%83%81%EC%9A%94%EC%B2%AD)
+    - [요청바디가_유효하지않을경우](#%EC%9A%94%EC%B2%AD%EB%B0%94%EB%94%94%EA%B0%80%EC%9C%A0%ED%9A%A8%ED%95%98%EC%A7%80%EC%95%8A%EC%9D%84%EA%B2%BD%EC%9A%B0)
+    - [값 확인](#%EA%B0%92-%ED%99%95%EC%9D%B8)
+  - [참고](#%EC%B0%B8%EA%B3%A0)
+
+
+# 캡슐화의 정의
+> 캡슐화는 정보은닉을 통해 높은 응집도와 낮은 결합도를 갖도록 한다. 정보 은닉이란 말 그대로 알 필요가 없는 정보는 외부에서 접근하지 못하도록 제한하는 것이다.
+
+**여기서 중요한 키워드는 `높은 응집도`, `낮은 결합도`, `정보 은닉` 입니다.** 핵심 키워들 기반으로 설명을 진행하겠습니다.
+
+# 내가 생각하는 캡슐화란 (1)...
 
 객체지향 개념에서 캡슐화는 정말 중요한 개념이라고 생각합니다. 캡슐화를 잘 지켜야 클래스 간의 결합도를 낮추어 코드를 유지 보수하기 쉽게 합니다.
 
@@ -6,39 +41,6 @@
 
 저와 같은 주니어분들이 조금이라도 이해를 돕기 위해 제가 생각하는 캡슐화에 대해서 실무에서 많이 사용하는 Spring Boot, JPA 기반에서 설명해볼까 합니다.
 
-## 목차
-- [캡슐화 내가 생각하는 캡슐화란 (1)...](#%EC%BA%A1%EC%8A%90%ED%99%94-%EB%82%B4%EA%B0%80-%EC%83%9D%EA%B0%81%ED%95%98%EB%8A%94-%EC%BA%A1%EC%8A%90%ED%99%94%EB%9E%80-1)
-- [목차](#%EB%AA%A9%EC%B0%A8)
-- [캡슐화의 정의](#%EC%BA%A1%EC%8A%90%ED%99%94%EC%9D%98-%EC%A0%95%EC%9D%98)
-- [요구사항](#%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD)
-- [캡슐화가 안좋은 안티 패턴](#%EC%BA%A1%EC%8A%90%ED%99%94%EA%B0%80-%EC%95%88%EC%A2%8B%EC%9D%80-%EC%95%88%ED%8B%B0-%ED%8C%A8%ED%84%B4)
-  - [테스트 코드](#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%BD%94%EB%93%9C)
-  - [(1) Order의 getMessageTypes 메서드를 사용 할 때 불편하다](#1-order%EC%9D%98-getmessagetypes-%EB%A9%94%EC%84%9C%EB%93%9C%EB%A5%BC-%EC%82%AC%EC%9A%A9-%ED%95%A0-%EB%95%8C-%EB%B6%88%ED%8E%B8%ED%95%98%EB%8B%A4)
-  - [(2) KAKAO를 KAOKO 라고 잘못 입력했을 경우](#2-kakao%EB%A5%BC-kaoko-%EB%9D%BC%EA%B3%A0-%EC%9E%98%EB%AA%BB-%EC%9E%85%EB%A0%A5%ED%96%88%EC%9D%84-%EA%B2%BD%EC%9A%B0)
-  - [(3) 메시지에 KAKAO, EMAIL, SMS 처럼 공백이 들어 간다면 실패한다](#3-%EB%A9%94%EC%8B%9C%EC%A7%80%EC%97%90-kakao-email-sms-%EC%B2%98%EB%9F%BC-%EA%B3%B5%EB%B0%B1%EC%9D%B4-%EB%93%A4%EC%96%B4-%EA%B0%84%EB%8B%A4%EB%A9%B4-%EC%8B%A4%ED%8C%A8%ED%95%9C%EB%8B%A4)
-  - [(4) 메시지가 없을 때 빈문자열("")을 보낼 경우](#4-%EB%A9%94%EC%8B%9C%EC%A7%80%EA%B0%80-%EC%97%86%EC%9D%84-%EB%95%8C-%EB%B9%88%EB%AC%B8%EC%9E%90%EC%97%B4%22%22%EC%9D%84-%EB%B3%B4%EB%82%BC-%EA%B2%BD%EC%9A%B0)
-  - [(5) 메시지가 없을 때 null 을 보낼 경우](#5-%EB%A9%94%EC%8B%9C%EC%A7%80%EA%B0%80-%EC%97%86%EC%9D%84-%EB%95%8C-null-%EC%9D%84-%EB%B3%B4%EB%82%BC-%EA%B2%BD%EC%9A%B0)
-  - [(6) 메시지가 중복으로 올경우](#6-%EB%A9%94%EC%8B%9C%EC%A7%80%EA%B0%80-%EC%A4%91%EB%B3%B5%EC%9C%BC%EB%A1%9C-%EC%98%AC%EA%B2%BD%EC%9A%B0)
-  - [테스트 코드의 중요성](#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%BD%94%EB%93%9C%EC%9D%98-%EC%A4%91%EC%9A%94%EC%84%B1)
-- [좋은 캡슐화 패턴](#%EC%A2%8B%EC%9D%80-%EC%BA%A1%EC%8A%90%ED%99%94-%ED%8C%A8%ED%84%B4)
-  - [Message of(Set<MessageType> types)](#message-ofsetmessagetype-types)
-  - [public List<MessageType> getTypes()](#public-listmessagetype-gettypes)
-  - [테스트 코드](#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%BD%94%EB%93%9C-1)
-  - [문제 해결](#%EB%AC%B8%EC%A0%9C-%ED%95%B4%EA%B2%B0)
-  - [캡슐화를 통한 장점들](#%EC%BA%A1%EC%8A%90%ED%99%94%EB%A5%BC-%ED%86%B5%ED%95%9C-%EC%9E%A5%EC%A0%90%EB%93%A4)
-- [웹 환경](#%EC%9B%B9-%ED%99%98%EA%B2%BD)
-  - [Controller](#controller)
-  - [Request](#request)
-  - [테스트 코드](#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%BD%94%EB%93%9C-2)
-  - [정상요청](#%EC%A0%95%EC%83%81%EC%9A%94%EC%B2%AD)
-  - [요청바디가_유효하지않을경우](#%EC%9A%94%EC%B2%AD%EB%B0%94%EB%94%94%EA%B0%80%EC%9C%A0%ED%9A%A8%ED%95%98%EC%A7%80%EC%95%8A%EC%9D%84%EA%B2%BD%EC%9A%B0)
-  - [값 확인](#%EA%B0%92-%ED%99%95%EC%9D%B8)
-
-
-## 캡슐화의 정의
-> 캡슐화는 정보은닉을 통해 높은 응집도와 낮은 결합도를 갖도록 한다. 정보 은닉이란 말 그대로 알 필요가 없는 정보는 외부에서 접근하지 못하도록 제한하는 것이다.
-
-**여기서 중요한 키워드는 `높은 응집도`, `낮은 결합도`, `정보 은닉` 입니다.** 핵심 키워들 기반으로 설명을 진행하겠습니다.
 
 ## 요구사항 
 * 주문을 신청할 때 배송 출발시 받을 메시지 플랫폼을 N개 선택 할 수 있다.
@@ -433,3 +435,6 @@ public class OrderApiTest {
 배열 형식의 받을 입력 받고 응답해주지만, 실제 값은 `","`으로 구분하는 문자열입니다. 
 
 **다시 한번 강조하지만 외부 객체에서는 저 문자열을 가져올 수 없을 뿐만 아니라 실제 데이터베이스에 문자열로 저장돼있는지 관심조차 가질 필요가 없습니다. `getTypes()` 메서드로 List형으로 외부에 제공해주기만 하면 됩니다.** 이것이 캡슐화의 기본적 개념이라고 생각합니다.
+
+## 참고
+* [Github - Issue 정보 은닉(information hiding) 의미 오류](https://github.com/cheese10yun/blog-sample/issues/1)에 대해서 [gyuwon](https://github.com/gyuwon)님이 친절하게 코멘트 달아주신 부분도 참고하시면 좋을거 같습니다.
