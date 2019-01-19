@@ -1,7 +1,14 @@
 > 출저 [처음으로 배우는 스프링 부트 2](http://www.kyobobook.co.kr/product/detailViewKor.laf?ejkGb=KOR&mallGb=KOR&barcode=9791162241264&orderClick=LAA&Kc=)을 보고 정리한 포스팅입니다.
 
-# Spring Boot Test
+| 어노테이션           | 설명                   | Bean         |
+|-----------------|----------------------|--------------|
+| @SpringBootTest | 통합 테스트, 전체           | Bean 전체      |
+| @WebMvcTest     | 단위 테스트, Mvc 테스트      | MVC 관련된 Bean |
+| @DataJpaTest    | 단위 테스트, Jpa 테스트      | JPA 관련 Bean  |
+| @RestClientTest | 단위 테스트, Rest API 테스트 | 일부 Bean      |
+| @JsonTest       | 단위 테스트, Json 테스트     | 일부 Bean      |
 
+# Spring Boot Test
 * `@SpringBootTest`는 통합 테스트를 제공하는 기본적인 스프링 부트 테스트 어노테이션입니다.
 * * 애플리케이션이 실행 될 떄의 설정을 임의로 바꾸어 테스트를 진행할 수 있으며 **여러 단위 테스트를 하나의 통합된 테스트로 수행할 때 접합합니다.**
 * `@SpringBootTest`는 만능입니다. 실제 구동되는 애플리케이션과 똑같이 애플리케이션 컨텍스트를 도르하여 테스트하기 때문에 하고 싶은 테스트를 모두수행할 수 있습니다.
@@ -19,8 +26,6 @@
 
 
 ## Samle Code
-
-
 ```java
 @RunWith(SpringRunner.class)
 @SpringBootTest(
@@ -112,6 +117,8 @@ public class BookApiTest {
 * 기본적으로 인메모리 데이터베이스를 이용합니다.
 * `@Entity` 클래스를 스캔하여 스프링 데이터 JPA 저장소를 구성합니다.
 
+
+## Sample Code
 ```java
 @RunWith(SpringRunner.class)
 @DataJpaTest
