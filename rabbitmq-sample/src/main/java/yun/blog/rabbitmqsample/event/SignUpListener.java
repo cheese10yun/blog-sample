@@ -12,10 +12,8 @@ import yun.blog.rabbitmqsample.rabbitmq.RabbitMqEvent;
 @Slf4j
 public class SignUpListener {
 
-  private final AmqpTemplate amqpTemplate;
-
   @RabbitListener(queues = RabbitMqEvent.MEMBER_SIGNUPED_EVENT)
-  public void handleSignUpEvent(final SignUpedEvent event) throws InterruptedException {
+  public void handleSignUpEvent(final SignUpedEvent event) {
     log.error(event.toString());
     throw new IllegalArgumentException();
   }
