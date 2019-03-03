@@ -17,7 +17,7 @@ public class MemberSignUpService {
 
 
   public Member doSignUp(final SignUpRequest dto) {
-    final Member member = memberRepository.save(dto.toEnttiy());
+    final Member member = memberRepository.save(dto.toEntity());
 
     amqpTemplate.convertAndSend(RabbitMqEvent.MEMBER_SIGNUPED_EVENT, SignUpedEvent.of(member));
 

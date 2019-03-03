@@ -9,7 +9,7 @@ public class SignUpRequest {
   private String name;
   private String email;
 
-  public Member toEnttiy() {
+  public Member toEntity() {
     return Member.builder()
         .email(email)
         .name(name)
