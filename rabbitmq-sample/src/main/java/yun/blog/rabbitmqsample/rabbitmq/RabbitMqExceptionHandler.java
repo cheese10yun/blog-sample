@@ -16,9 +16,6 @@ public class RabbitMqExceptionHandler extends RejectAndDontRequeueRecoverer {
     log.debug(msg);
     log.warn("Retries exhausted for message " + message, cause);
     log.error("===================");
-//    if (log.isWarnEnabled()) {
-//      log.warn("Retries exhausted for message " + message, cause);
-//    }
   }
 
 }

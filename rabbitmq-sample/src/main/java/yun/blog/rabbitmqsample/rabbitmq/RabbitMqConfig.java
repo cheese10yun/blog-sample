@@ -51,7 +51,8 @@ public class RabbitMqConfig {
     factory.setChannelTransacted(true);
     factory.setAdviceChain(RetryInterceptorBuilder
         .stateless()
-        .maxAttempts(MAX_TRY_COUNT).recoverer(new RabbitMqExceptionHandler())
+        .maxAttempts(MAX_TRY_COUNT)
+        .recoverer(new RabbitMqExceptionHandler())
         .backOffOptions(INITIAL_INTERVAL, MULTIPLIER, MAX_INTERVAL)
         .build());
     return factory;
