@@ -9,10 +9,12 @@ import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "member")
 @Getter
+@ToString
 public class Member {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

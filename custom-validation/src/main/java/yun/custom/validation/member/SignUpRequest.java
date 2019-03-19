@@ -1,5 +1,6 @@
 package yun.custom.validation.member;
 
+import javax.validation.constraints.Email;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,8 @@ import lombok.NoArgsConstructor;
 public class SignUpRequest {
 
 
-    @EmailDuplication
+    @EmailUnique
+    @Email
     private String email;
 
     public SignUpRequest(String email) {

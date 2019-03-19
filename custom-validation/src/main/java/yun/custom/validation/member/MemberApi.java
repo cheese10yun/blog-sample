@@ -13,7 +13,6 @@ public class MemberApi {
     @PostMapping
     public Member create(@RequestBody @Valid final SignUpRequest dto) {
 
-
         return Member.builder()
                 .email(dto.getEmail())
                 .build();
