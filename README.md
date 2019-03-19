@@ -39,6 +39,7 @@
 * [Spring 예제로 보는 캡슐화](https://github.com/cheese10yun/blog-sample/tree/master/encapsulation)
 * [Spring Boot Test 정리](https://github.com/cheese10yun/blog-sample/tree/master/spring-boot-test)
 * [Spring 실전 가이드](https://github.com/cheese10yun/spring-guide)
+* [Spring Custom Valid 어노테이션 만들기](https://github.com/cheese10yun/custom-validation)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)

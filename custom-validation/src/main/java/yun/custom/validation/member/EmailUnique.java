@@ -10,11 +10,13 @@ import javax.validation.Payload;
 
 @Documented
 @Constraint(validatedBy = EmailDuplicationValidator.class)
-@Target( { ElementType.METHOD, ElementType.FIELD })
+@Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EmailUnique {
 
-    String message() default "Email is Duplication";
-    Class<?>[] groups() default {};
-    Class<? extends Payload>[] payload() default {};
+  String message() default "Email is Duplication";
+
+  Class<?>[] groups() default {};
+
+  Class<? extends Payload>[] payload() default {};
 }

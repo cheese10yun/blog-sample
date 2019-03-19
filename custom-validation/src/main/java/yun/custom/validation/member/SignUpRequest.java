@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SignUpRequest {
 
-
-    @EmailUnique
-    @Email
+    @EmailUnique @Email
     private String email;
 
     public SignUpRequest(String email) {
