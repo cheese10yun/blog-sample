@@ -18,6 +18,7 @@ HELP.md
 *.iml
 *.ipr
 /out/
+volumes
 
 ### NetBeans ###
 /nbproject/private/
