@@ -25,7 +25,9 @@ public class Book {
   @Column(name = "ea", nullable = false)
   private long ea;
 
-
+  public void increaseEa() {
+    this.ea += 1;
+  }
 
 
 }
