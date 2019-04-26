@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  rabbitmq:
+    container_name: sample.rabbitmq
+    image: rabbitmq:3.7-management
+    ports:
+    - "5670:5672"
+    - "15670:15672"
+    environment:
+        - RABBITMQ_DEFAULT_USER = guest
+        - RABBITMQ_DEFAULT_PASS = guest
+    hostname: sample
+    volumes:
+          - ./volumes/rabbitmq:/var/lib/rabbitmq

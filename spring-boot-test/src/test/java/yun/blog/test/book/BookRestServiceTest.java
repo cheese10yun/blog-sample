@@ -36,7 +36,8 @@ public class BookRestServiceTest {
 
         server.expect(requestTo("/rest/test"))
                 .andRespond(
-                        withSuccess(new ClassPathResource("/test.json", getClass()), MediaType.APPLICATION_JSON));
+                        withSuccess(new ClassPathResource("/test.json", getClass()), MediaType.APPLICATION_JSON)
+                );
 
         Book book = bookRestService.getRestBook();
 
