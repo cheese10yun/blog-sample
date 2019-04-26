@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  mysql:
+    container_name: study.transaction
+    image: mysql/mysql-server:5.7
+    environment:
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: "study_transaction"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      TZ: "Asia/Seoul"
+    ports:
+      - "9092:3306"
+    volumes:
+      - ./volumes/mysql:/var/lib/mysql
+    command:
+      - "mysqld"
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
