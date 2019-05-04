@@ -41,7 +41,7 @@ public class Refund {
   @Builder(builderClassName = "ByAccountBuilder", builderMethodName = "ByAccountBuilder")
   public Refund(Account account, Order order) {
     Assert.notNull(account, "account must not be null");
-    Assert.notNull(order, "account must not be null");
+    Assert.notNull(order, "order must not be null");
 
     this.order = order;
     this.account = account;

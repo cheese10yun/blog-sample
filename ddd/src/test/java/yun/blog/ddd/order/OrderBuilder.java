@@ -7,7 +7,7 @@ import yun.blog.ddd.product.Product;
 
 public class OrderBuilder {
 
-  public Order build() {
+  public static Order build() {
 
     final Address address = Address.builder()
         .address1("서울시 관악구 293-1")
@@ -30,7 +30,7 @@ public class OrderBuilder {
         .build();
   }
 
-  public Order build(Address address, List<Product> products) {
+  public static Order build(Address address, List<Product> products) {
 
     return Order.builder()
         .address(address)

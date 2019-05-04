@@ -19,11 +19,9 @@ public class Account {
   @Column(name = "bank_name", nullable = false)
   private String bankName;
 
-
   @NotEmpty
   @Column(name = "account_number", nullable = false)
   private String accountNumber;
-
 
   @NotEmpty
   @Column(name = "account_holder", nullable = false)
