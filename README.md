@@ -40,6 +40,7 @@
 * [Spring Boot Test 정리](https://github.com/cheese10yun/blog-sample/tree/master/spring-boot-test)
 * [Spring 실전 가이드](https://github.com/cheese10yun/spring-guide)
 * [Spring Custom Valid 어노테이션 만들기](https://github.com/cheese10yun/blog-sample/tree/master/custom-validation)
+* [Builder 기반으로 객체를 안전하게 생성하는 방법](https://github.com/cheese10yun/blog-sample/tree/master/ddd)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
