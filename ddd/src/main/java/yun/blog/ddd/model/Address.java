@@ -28,7 +28,6 @@ public class Address {
 
     @Builder
     public Address(String address1, String address2, String zip) {
-
         Assert.hasText(address1, "address1 must not be empty");
         Assert.hasText(address2, "address1 must not be empty");
         Assert.hasText(zip, "address1 must not be empty");
