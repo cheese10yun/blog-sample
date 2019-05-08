@@ -18,18 +18,15 @@ public class MoneyTest {
 
   @Test
   public void testMultiplication_02() {
-
     Dollar five = new Dollar(5);
-
     Dollar product = five.times(2);
-
-
     assertThat(product.getAmount()).isEqualTo(10);
-
-
     product = five.times(3);
     assertThat(product.getAmount()).isEqualTo(15);
+  }
 
-
+  @Test
+  public void equals_test() {
+    assertThat(new Dollar(5).equals(new Dollar(5))).isTrue();
   }
 }
