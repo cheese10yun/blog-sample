@@ -40,7 +40,7 @@ public void save(Comment comment){
 
 # RabbitMQ와 AMQP 기본
 
-> 출저 [RabbitMQ와 Spring AMQP를 이용한 간단한 작업 큐 만들기](http://blog.naver.com/PostView.nhn?blogId=tmondev&logNo=220419853534&parentCategoryNo=&categoryNo=6&viewDate=&isShowPopularPosts=false&from=postView)를 보고 정리한 내용입니다.
+> 출처 [RabbitMQ와 Spring AMQP를 이용한 간단한 작업 큐 만들기](http://blog.naver.com/PostView.nhn?blogId=tmondev&logNo=220419853534&parentCategoryNo=&categoryNo=6&viewDate=&isShowPopularPosts=false&from=postView)를 보고 정리한 내용입니다.
 
 
 ## AMQP
@@ -72,7 +72,7 @@ Exchagne Type은 메시지를 어떤 방법으로 라우팅할지 결정하는 �
 ## Rabbit MQ
 RabbitMQ는 AMQP를 구현한 오픈소스 메시지 소프트웨어 Pulisher(Producer)로부터 메시지를 받아 Cunsumer에게 라우트하는 것이 주된 역할이다.
 
-> 출저 [RabibitMQ Tutorials]([http://blog.naver.com/PostView.nhn?blogId=tmondev&logNo=220419853534&parentCategoryNo=&categoryNo=6&viewDate=&isShowPopularPosts=false&from=postView](http://www.rabbitmq.com/getstarted.htm))
+> 출처 [RabibitMQ Tutorials]([http://blog.naver.com/PostView.nhn?blogId=tmondev&logNo=220419853534&parentCategoryNo=&categoryNo=6&viewDate=&isShowPopularPosts=false&from=postView](http://www.rabbitmq.com/getstarted.htm))
 
 
 ![](/draw/rabbitmq-turorial.png)
