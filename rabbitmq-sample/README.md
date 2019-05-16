@@ -182,3 +182,7 @@ public Member doSignUp(final SignUpRequest dto) {
 
 * 3번의 재시도가 시도됨
 * 등록된 예외 핸들러 `RabbitMqExceptionHandler` 객체에서 로깅 출력
+
+## 참고
+* [스프링 부트 2.0 마이크로서비스와 리액티브 프로그래밍](http://acornpub.co.kr/book/spring-boot-2.0-2e)
+* [Rabbitmq](https://www.rabbitmq.com/)
