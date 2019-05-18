@@ -161,7 +161,7 @@ public void sendFile(String fileName){
 ### 하지만 현실은...
 하지만 우리가 일반적으로 Checked Exception 예외가 발생했을 경우 복구 전략을 갖고 그것을 복구할 수 있는 경우는 그렇게 많지 않습니다.
 
-유니크해야 하는 이메일 값이 중복돼서 SQLException이 발생하는 경우 어떻게 복구 전략을 가질 수 있을까요? 유저가 압력을 가했던 이메일 + 난수를 입력해서 insert 시키면 가능은 하겠지만 현실에서는 그냥 RuntimeException을 발생시키고 입력을 다시 유도하는 것이 현실적입니다.
+유니크해야 하는 이메일 값이 중복돼서 SQLException이 발생하는 경우 어떻게 복구 전략을 가질 수 있을까요? 유저가 입력했던 이메일 + 난수를 입력해서 insert 시키면 가능은 하겠지만 현실에서는 그냥 RuntimeException을 발생시키고 입력을 다시 유도하는 것이 현실적입니다.
 
 **여기서 중요한 것은 해당 Exception을 발생시킬 때 명확하게 어떤 예외가 발생해서 Exception이 발생했는지 정보를 전달해주는 것입니다. 위 같은 경우에는 DuplicateEmailException (Unchecked Exception)을 발생 시는 것이 바람직합니다.**
 
