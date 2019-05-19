@@ -2,41 +2,38 @@
 
 * [Jackson Annotation Examples](http://www.baeldung.com/jackson-annotations) 예제를 적용전, 적용후로 나누어서 정리 해봤습니다.
 * **지속해서 해당 프로젝트를 이어 나아갈 예정이라 깃허브 Start, Watching 버튼을 누르시면 구독 신청받으실 수 있습니다.**
-* 테스트코드도 참고하시면 좋습니다.
+* 테스트 코드도 참고하시면 좋습니다.
+
+- [Jackson 어노테이션 사용법](#jackson-%EC%96%B4%EB%85%B8%ED%85%8C%EC%9D%B4%EC%85%98-%EC%82%AC%EC%9A%A9%EB%B2%95)
+  - [2. Jackson Serialization Annotations](#2-jackson-serialization-annotations)
+    - [@JsonAnyGetter](#jsonanygetter)
+    - [@JsonGetter getter](#jsongetter-getter)
+    - [@JsonPropertyOrder](#jsonpropertyorder)
+    - [@JsonRawValue Jackson](#jsonrawvalue-jackson)
+    - [@JsonValue](#jsonvalue)
+    - [@JsonRootName](#jsonrootname)
+  - [3. Jackson Deserialization Annotations](#3-jackson-deserialization-annotations)
+    - [@JsonCreator](#jsoncreator)
+    - [@JacksonInject](#jacksoninject)
+    - [@JsonAnySetter](#jsonanysetter)
+    - [@JsonSetter](#jsonsetter)
+  - [4. Jackson Property Inclusion Annotations](#4-jackson-property-inclusion-annotations)
+    - [@JsonIgnoreProperties](#jsonignoreproperties)
+    - [@JsonIgnore](#jsonignore)
+    - [@JsonIgnoreType](#jsonignoretype)
+    - [@JsonInclude](#jsoninclude)
+    - [@JsonAutoDetect](#jsonautodetect)
+  - [5. Jackson Polymorphic Type Handling Annotations](#5-jackson-polymorphic-type-handling-annotations)
+  - [6.Jackson General Annotations](#6jackson-general-annotations)
+    - [@JsonFormat](#jsonformat)
+    - [@JsonUnwrapped](#jsonunwrapped)
+    - [@JsonView](#jsonview)
+    - [@JsonManagedReference, @JsonBackReference](#jsonmanagedreference-jsonbackreference)
+    - [@JsonFilter](#jsonfilter)
+  - [Custom Jackson Annotation](#custom-jackson-annotation)
+  - [Disable Jackson Annotation](#disable-jackson-annotation)
 
 
-<!-- TOC -->
-
-- [Jackson 어노테이션 사용법](#jackson-어노테이션-사용법)
-    - [2. Jackson Serialization Annotations](#2-jackson-serialization-annotations)
-        - [@JsonAnyGetter](#jsonanygetter)
-        - [@JsonGetter getter](#jsongetter-getter)
-        - [@JsonPropertyOrder](#jsonpropertyorder)
-        - [@JsonRawValue Jackson](#jsonrawvalue-jackson)
-        - [@JsonValue](#jsonvalue)
-        - [@JsonRootName](#jsonrootname)
-    - [3. Jackson Deserialization Annotations](#3-jackson-deserialization-annotations)
-        - [@JsonCreator](#jsoncreator)
-        - [@JacksonInject](#jacksoninject)
-        - [@JsonAnySetter](#jsonanysetter)
-        - [@JsonSetter](#jsonsetter)
-    - [4. Jackson Property Inclusion Annotations](#4-jackson-property-inclusion-annotations)
-        - [@JsonIgnoreProperties](#jsonignoreproperties)
-        - [@JsonIgnore](#jsonignore)
-        - [@JsonIgnoreType](#jsonignoretype)
-        - [@JsonInclude](#jsoninclude)
-        - [@JsonAutoDetect](#jsonautodetect)
-    - [5. Jackson Polymorphic Type Handling Annotations](#5-jackson-polymorphic-type-handling-annotations)
-    - [6.Jackson General Annotations](#6jackson-general-annotations)
-        - [@JsonFormat](#jsonformat)
-        - [@JsonUnwrapped](#jsonunwrapped)
-        - [@JsonView](#jsonview)
-        - [@JsonManagedReference, @JsonBackReference](#jsonmanagedreference-jsonbackreference)
-        - [@JsonFilter](#jsonfilter)
-    - [Custom Jackson Annotation](#custom-jackson-annotation)
-    - [Disable Jackson Annotation](#disable-jackson-annotation)
-
-<!-- /TOC -->
 
 ## 2. Jackson Serialization Annotations
 
