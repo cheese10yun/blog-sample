@@ -13,12 +13,13 @@ public class OrderFailedService {
   private final OrderRepository orderRepository;
 
 
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public Order fail() {
     final Order order = orderRepository.save(new Order(OrderStatus.FAILED));
 
-//    if (true) {
-//      throw new RuntimeException();
-//    }
+    if (true) {
+      throw new RuntimeException();
+    }
     return order;
   }
 

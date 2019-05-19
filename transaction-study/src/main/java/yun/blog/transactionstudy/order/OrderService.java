@@ -15,6 +15,7 @@ public class OrderService {
   private final OrderRepository orderRepository;
   private final OrderFailedService orderFailedService;
 
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public Order create() {
 
     Order order = save();
