@@ -1,13 +1,13 @@
-package com.blog.multimodule;
+package com.module;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MultiModuleApplication {
+public class AdminApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(MultiModuleApplication.class, args);
+    SpringApplication.run(AdminApplication.class, args);
   }
 
 }
