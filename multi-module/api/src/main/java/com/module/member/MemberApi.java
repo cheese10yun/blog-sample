@@ -2,7 +2,9 @@ package com.module.member;
 
 import com.module.core.member.Member;
 import com.module.core.member.MemberRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,5 +23,9 @@ public class MemberApi {
     return memberRepository.save(member);
   }
 
+  @GetMapping
+  public List<Member> getMembers() {
+    return memberRepository.findAll();
+  }
 
 }
