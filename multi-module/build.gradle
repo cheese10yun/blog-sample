@@ -49,9 +49,7 @@ subprojects {
 }
 
 project(':core') {
-
     dependencies {
-
         compile('com.h2database:h2')
     }
 }
@@ -59,19 +57,14 @@ project(':core') {
 project(':api') {
     dependencies {
         compile project(':core')
-
         implementation 'org.springframework.boot:spring-boot-starter-web'
-
-
     }
 }
 
 project(':admin-api') {
     dependencies {
         compile project(':core')
-
         implementation 'org.springframework.boot:spring-boot-starter-web'
-
     }
 }
 

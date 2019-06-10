@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MemberApi {
 
-
   private final MemberRepository memberRepository;
 
   @PostMapping
