@@ -1,4 +1,5 @@
 import com.example.spock.CalculateTest
+import org.hibernate.validator.internal.constraintvalidators.bv.number.sign.NegativeValidatorForNumber
 import spock.lang.Specification
 
 import java.math.RoundingMode
@@ -30,6 +31,5 @@ class SpockApplicationTest extends Specification {
         159L    | 0.15f | 0L
         2299L   | 0.15f | 3L
     }
-
 
 }
