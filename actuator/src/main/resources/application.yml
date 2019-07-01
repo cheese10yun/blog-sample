@@ -1,0 +1,12 @@
+management:
+  info:
+    git:
+      mode: full
+  endpoint:
+    health:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
