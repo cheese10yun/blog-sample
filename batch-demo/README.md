@@ -1,50 +1,47 @@
 > 출처 [처음으로 배우는 스프링 부트 2](http://www.kyobobook.co.kr/product/detailViewKor.laf?ejkGb=KOR&mallGb=KOR&barcode=9791162241264&orderClick=LAA&Kc=)을 보고 정리한 포스팅입니다. 배치 관련된 국내 서적 중에서 스프링 배치를 가장 잘 정리 한 거 같습니다.
 
 ## 목차
-<!-- TOC -->
+- [목차](#%EB%AA%A9%EC%B0%A8)
+- [스프링 부트 배치의 장점](#%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B6%80%ED%8A%B8-%EB%B0%B0%EC%B9%98%EC%9D%98-%EC%9E%A5%EC%A0%90)
+- [스프링 부트 배치 주의사항](#%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B6%80%ED%8A%B8-%EB%B0%B0%EC%B9%98-%EC%A3%BC%EC%9D%98%EC%82%AC%ED%95%AD)
+- [스프링 부트 배치 이해하기](#%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B6%80%ED%8A%B8-%EB%B0%B0%EC%B9%98-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0)
+  - [Job](#Job)
+  - [JobInstance](#JobInstance)
+  - [JobExcution](#JobExcution)
+  - [JobParameters](#JobParameters)
+  - [Step](#Step)
+    - [StepExcution](#StepExcution)
+  - [JobRepository](#JobRepository)
+  - [JobLauncher](#JobLauncher)
+  - [ItemReader](#ItemReader)
+  - [ItemProcessor](#ItemProcessor)
+  - [ItemWriter](#ItemWriter)
+- [휴먼회원 배치 설계](#%ED%9C%B4%EB%A8%BC%ED%9A%8C%EC%9B%90-%EB%B0%B0%EC%B9%98-%EC%84%A4%EA%B3%84)
+- [휴먼회원 배치 구현](#%ED%9C%B4%EB%A8%BC%ED%9A%8C%EC%9B%90-%EB%B0%B0%EC%B9%98-%EA%B5%AC%ED%98%84)
+  - [Job 설정](#Job-%EC%84%A4%EC%A0%95)
+  - [Step 설정](#Step-%EC%84%A4%EC%A0%95)
+  - [Reader설정](#Reader%EC%84%A4%EC%A0%95)
+  - [Processor 설정](#Processor-%EC%84%A4%EC%A0%95)
+  - [Writer 설정](#Writer-%EC%84%A4%EC%A0%95)
+- [배치 심화](#%EB%B0%B0%EC%B9%98-%EC%8B%AC%ED%99%94)
+  - [다양한 ItemReader 구현 클래스](#%EB%8B%A4%EC%96%91%ED%95%9C-ItemReader-%EA%B5%AC%ED%98%84-%ED%81%B4%EB%9E%98%EC%8A%A4)
+  - [다양한 ItemWriter 구현 클래스](#%EB%8B%A4%EC%96%91%ED%95%9C-ItemWriter-%EA%B5%AC%ED%98%84-%ED%81%B4%EB%9E%98%EC%8A%A4)
+  - [JobParameter 사용하기](#JobParameter-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0)
+  - [테스트 시에만 H2 데이터베이스를 사용하도록 설정](#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%8B%9C%EC%97%90%EB%A7%8C-H2-%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%98%EB%8F%84%EB%A1%9D-%EC%84%A4%EC%A0%95)
+  - [청크 지향 프로세싱](#%EC%B2%AD%ED%81%AC-%EC%A7%80%ED%96%A5-%ED%94%84%EB%A1%9C%EC%84%B8%EC%8B%B1)
+  - [배치 인터셉터 Listener 설정하기](#%EB%B0%B0%EC%B9%98-%EC%9D%B8%ED%84%B0%EC%85%89%ED%84%B0-Listener-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0)
+  - [어노테이션 기반 Listener 설정하기](#%EC%96%B4%EB%85%B8%ED%85%8C%EC%9D%B4%EC%85%98-%EA%B8%B0%EB%B0%98-Listener-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0)
+  - [JobParameter 사용하기](#JobParameter-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0-1)
+  - [Step의 흐름을 제어하는 Flow](#Step%EC%9D%98-%ED%9D%90%EB%A6%84%EC%9D%84-%EC%A0%9C%EC%96%B4%ED%95%98%EB%8A%94-Flow)
+- [재시도](#%EC%9E%AC%EC%8B%9C%EB%8F%84)
+  - [스템 구성하기](#%EC%8A%A4%ED%85%9C-%EA%B5%AC%EC%84%B1%ED%95%98%EA%B8%B0)
+  - [재시도 템플릿](#%EC%9E%AC%EC%8B%9C%EB%8F%84-%ED%85%9C%ED%94%8C%EB%A6%BF)
+  - [AOP 기반 재시도](#AOP-%EA%B8%B0%EB%B0%98-%EC%9E%AC%EC%8B%9C%EB%8F%84)
+- [Spring Batch Table](#Spring-Batch-Table)
+  - [BATCH_JOB_INSTANCE](#BATCHJOBINSTANCE)
+  - [BATCH_JOB_EXECUTION](#BATCHJOBEXECUTION)
+- [참고](#%EC%B0%B8%EA%B3%A0)
 
-- [목차](#목차)
-- [스프링 부트 배치의 장점](#스프링-부트-배치의-장점)
-- [스프링 부트 배치 주의사항](#스프링-부트-배치-주의사항)
-- [스프링 부트 배치 이해하기](#스프링-부트-배치-이해하기)
-    - [Job](#job)
-    - [JobInstance](#jobinstance)
-    - [JobExcution](#jobexcution)
-    - [JobParameters](#jobparameters)
-    - [Step](#step)
-        - [StepExcution](#stepexcution)
-    - [JobRepository](#jobrepository)
-    - [JobLauncher](#joblauncher)
-    - [ItemReader](#itemreader)
-    - [ItemProcessor](#itemprocessor)
-    - [ItemWriter](#itemwriter)
-- [휴먼회원 배치 설계](#휴먼회원-배치-설계)
-- [휴먼회원 배치 구현](#휴먼회원-배치-구현)
-    - [Job 설정](#job-설정)
-    - [Step 설정](#step-설정)
-    - [Reader설정](#reader설정)
-    - [Processor 설정](#processor-설정)
-    - [Writer 설정](#writer-설정)
-- [배치 심화](#배치-심화)
-    - [다양한 ItemReader 구현 클래스](#다양한-itemreader-구현-클래스)
-    - [다양한 ItemWriter 구현 클래스](#다양한-itemwriter-구현-클래스)
-    - [JobParameter 사용하기](#jobparameter-사용하기)
-    - [테스트 시에만 H2 데이터베이스를 사용하도록 설정](#테스트-시에만-h2-데이터베이스를-사용하도록-설정)
-    - [청크 지향 프로세싱](#청크-지향-프로세싱)
-    - [배치 인터셉터 Listener 설정하기](#배치-인터셉터-listener-설정하기)
-    - [어노테이션 기반 Listener 설정하기](#어노테이션-기반-listener-설정하기)
-    - [JobParameter 사용하기](#jobparameter-사용하기-1)
-    - [Step의 흐름을 제어하는 Flow](#step의-흐름을-제어하는-flow)
-- [재시도](#재시도)
-    - [스템 구성하기](#스템-구성하기)
-    - [재시도 템플릿](#재시도-템플릿)
-    - [AOP 기반 재시도](#aop-기반-재시도)
-- [Spring Batch Table](#spring-batch-table)
-    - [BATCH_JOB_INSTANCE](#batch_job_instance)
-    - [BATCH_JOB_EXECUTION](#batch_job_execution)
-- [참고](#참고)
-
-<!-- /TOC -->
 스프링 배치는 벡엔드의 배치처리 기능을 구현하는 데 사용하는 프레임워크입니다. 스프링 부트 배치는 스프링 배치 설정 요소들을 간편화시켜 스프링 배치를 빠르게 설정하는 데 도움을 줍니다.
 
 ## 스프링 부트 배치의 장점
@@ -61,7 +58,7 @@
 * 데이터를 직접 사용하는 편이 빈번하게 일어나므로 데이터 무결성을 우지하는데 유효성 검사 등의 방어책이 있어야합니다.
 * 배치 처리 시스템 I/O 사용을 최소화해야합니다. 잦은 I/O로 데이터베이스 컨넥션과 네트워크 비용이 커지면 성능에 영향을 줄 수 있기 때문입니다. 따라서 가능하면 한번에 데이터를 조회하여 메모리에 저장해두고 처리를 한 다음. 그결과를 한번에 데이터베이스에 저장하는것이 좋습니다.
 * 일반적으로 같은 서비스에 사용되는 웹 API, 배치, 기타 프로젝트들을 서로 영향을 줍니다. 따라서 배치 처리가 진행되는 동안 다른 프로젝트 요소에 영향을 주는 경우가 없는지 주의를 기울여야합니다.
-* 스프링 부트는 배치 스케쥴러를 제공하지 않습니다. 따라서 배치 처리 기능만 제공하여 스케쥴링 기능은 스프링에서 제공하는 쿼치 프레임워크 등을 이용해야합니다. **리눅스 crontab 명령은 가장 간단히 사용 할 수 있지만 이는 추천하지 않습니다.** crontab의 경우 각 서버마다 따로 스케쥴리을 관리해야 하며 무엇보다 클러스터링 기능이 제공되지 않습니다. 반면에 쿼티 같은 스케쥴링은 프레임워크를 사용한다면 클러스터링뿐만 아니라 다양한 스케쥴링 기능, 실행 이력 관리 등 여러 이점을 얻을 수 있습니다.
+* 스프링 부트는 배치 스케쥴러를 제공하지 않습니다. 따라서 배치 처리 기능만 제공하여 스케쥴링 기능은 스프링에서 제공하는 쿼치 프레임워크 등을 이용해야합니다. **리눅스 crontab 명령은 가장 간단히 사용 할 수 있지만 이는 추천하지 않습니다.** crontab의 경우 각 서버마다 따로 스케쥴러를 관리해야 하며 무엇보다 클러스터링 기능이 제공되지 않습니다. 반면에 쿼츠 같은 스케쥴링은 프레임워크를 사용한다면 클러스터링뿐만 아니라 다양한 스케쥴링 기능, 실행 이력 관리 등 여러 이점을 얻을 수 있습니다.
 
 ## 스프링 부트 배치 이해하기
 배치의 일반적인 시나리오는 다음과 같은 3단계로 이루어집니다.
@@ -126,7 +123,7 @@ public JobFlowBuilder flow(Step step){
 
 ### JobInstance
 * **JobInstance는 배치 처리에서 Job이 실행될 때 하나의 Job 실행 단위입니다.** 만약 하루에 한 번 씩 배치의 Job이 실행된다면 어제와 오늘 실행 각각 Job을 JobInstance라고 부를 수 있습니다.
-* 각각의 JobInstance는 하나의 JobException을 갖는 것은아닙니다. 오늘 Job이 실행 했는데 실패했다면 다음날 동일한 JobInstance를 가지고 또 실행합니다.
+* 각각의 JobInstance는 하나의 JobExcution을 갖는 것은아닙니다. 오늘 Job이 실행 했는데 실패했다면 다음날 동일한 JobInstance를 가지고 또 실행합니다.
 * Job 실행이 실패하면 JobInstance가 끝난것으로 간주하지 않기 때문입니다. 그렇다면 JobInstance는 어제 실패한 JobExcution과 오늘의 성공한 JobExcution 두 개를 가지게 됩니다. **즉 JobExcution 는 여러 개 가질 수 있습니다.**
 
 ### JobExcution
@@ -140,7 +137,7 @@ public JobFlowBuilder flow(Step step){
 * JobParameters와 JobInstance는 1:1 관계입니다.
 
 ### Step
-* Step은 실직적인 배치 처리를 정희하고 제어 하는데 필요한 모든 정보가 있는 도메인 객체입니다. Job을 처리하는 실질적인 단위로 쓰입니다.
+* Step은 실직적인 배치 처리를 정의하고 제어 하는데 필요한 모든 정보가 있는 도메인 객체입니다. Job을 처리하는 실질적인 단위로 쓰입니다.
 * 모든 Job에는 1개 이상의 Step이 있어야 합니다.
 
 #### StepExcution
@@ -158,7 +155,7 @@ public JobFlowBuilder flow(Step step){
 * ItemReader는 Step의 대상이 되는 배치 데이터를 읽어오는 인터페이스입니다. File, Xml Db등 여러 타입의 데이터를 읽어올 수 있습니다.
 
 ### ItemProcessor
-* ItemProcessor는 ItemReader로 읽어 온 배치 데이터를 변환하는 역할을 수행합니다. 이 것을 분리하는 이유는 다음과 같습니다.
+* ItemProcessor는 ItemReader로 읽어 온 배치 데이터를 변환하는 역할을 수행합니다. 이것을 분리하는 이유는 다음과 같습니다.
 * 비지니스 로직의 분리 : ItemWriter는 저장 수행하고, ItemProcessor는 로직 처리만 수행해 역할을 명확하게 분리합니다.
 * 읽어온 배치 데이터와 씌여질 데이터의 타입이 다를 경우에 대응할 수 있기 때문입니다.
 
@@ -183,8 +180,8 @@ public JobFlowBuilder flow(Step step){
 배치처리 순서는 다음과 같습니다.
 
 1. 휴면 회원 Job 설정
-2. 휴먼회원 Step 설정
-3. 휴면회원 Reader, Processor, Writer 설정
+2. 휴먼 회원 Step 설정
+3. 휴면 회원 Reader, Processor, Writer 설정
 
 
 ### Job 설정
@@ -511,11 +508,7 @@ CREATE TABLE `BATCH_JOB_INSTANCE` (
 * JOB_NAME
     * 수행한 Batch Job Name
 
-**BATCH_JOB_INSTANCE 테이블은 Job Parameter에 따라 생성됩니다.**
-
-Job Parameter는 Spring Batch가 실행될때 외부에서 받을 수 있는 파라미터 입니다. 
-
-**같은 Batch Job 이라도 Job Parameter가 다르면 다른 BATCH_JOB_INSTANCE 에 기록됩니다.**
+**BATCH_JOB_INSTANCE 테이블은 Job Parameter에 따라 생성됩니다.** Job Parameter는 Spring Batch가 실행될때 외부에서 받을 수 있는 파라미터 입니다. **같은 Batch Job 이라도 Job Parameter가 다르면 다른 BATCH_JOB_INSTANCE 에 기록됩니다.**
 
 ### BATCH_JOB_EXECUTION
 ```sql

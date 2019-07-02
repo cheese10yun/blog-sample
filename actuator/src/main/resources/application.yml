@@ -1,12 +1,34 @@
+server:
+  port: 8890
+
+spring:
+  profiles:
+    active: local
+
+  jpa:
+    database: h2
+    properties.hibernate.dialect: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+
 management:
   info:
     git:
-      mode: full
+      mode: simple
+  health:
+    db:
+      enabled: true
   endpoint:
     health:
       enabled: true
+      show-details: always
   endpoints:
     web:
       exposure:
         include: "*"
-

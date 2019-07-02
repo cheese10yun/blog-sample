@@ -1,0 +1,57 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection).
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+GET http://localhost:8890/actuator
+Accept: application/json
+
+###
+
+
+GET http://localhost:8890/actuator/info
+Accept: application/json
+
+
+
+###
+
+GET http://localhost:8890/actuator/health
+Accept: application/json
+
+
+
+###
+
+GET http://localhost:8890/actuator
+Accept: application/json
+
+
+
+###
+
+GET http://localhost:8890/actuator/env
+Accept: application/json
+
+
+###
+
+GET http://127.0.0.1:8890/members
+
+
+###
+
+GET http://localhost:8890/actuator/httptrace
+Accept: application/json
+
+
+###
+
+GET http://localhost:8890/actuator/beans
+Accept: application/vnd.spring-boot.actuator.v2+json
+
+
+###
+
