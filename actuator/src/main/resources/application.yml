@@ -16,19 +16,18 @@ spring:
         format_sql: true
         use_sql_comments: true
 
-
 management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "info"
+          - "health"
+          - "httptrace"
   info:
     git:
-      mode: simple
-  health:
-    db:
-      enabled: true
+      mode: FULL
   endpoint:
     health:
       enabled: true
       show-details: always
-  endpoints:
-    web:
-      exposure:
-        include: "*"
