@@ -42,7 +42,7 @@
 * [Spring Custom Valid 어노테이션 만들기](https://github.com/cheese10yun/blog-sample/tree/master/custom-validation)
 * [Builder 기반으로 객체를 안전하게 생성하는 방법](https://github.com/cheese10yun/blog-sample/tree/master/ddd)
 * [Gradle 기반 멀티 모듈 구성하기](https://github.com/cheese10yun/blog-sample/tree/master/multi-module)
-* [Spring Actuator](https://github.com/cheese10yun/blog-sample/tree/master/actuator)
+* [Spring Actuator 기초 설정](https://github.com/cheese10yun/blog-sample/tree/master/actuator)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
