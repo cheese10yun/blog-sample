@@ -23,7 +23,7 @@ management:
       exposure:
         include: "*"
 ```
-`application.yml` 설정을 변경하고 다시 `http://localhost:8890/actuator` 호출하면 아래 Repsonse와 같습니다.
+`application.yml` 설정을 변경하고 다시 `/actuator` 호출하면 아래 Response와 같습니다.
 
 ```json
 {
@@ -132,6 +132,39 @@ management:
           - "httptrace"
 ```
 
+`application.yml` 변경이후 다시 `/actuator`을 호출하면 `include`에 포함시킨 endpoint만 Response 받게 됩니다.
+
+```json
+{
+  "_links": {
+    "self": {
+      "href": "http://localhost:8890/actuator",
+      "templated": false
+    },
+    "health": {
+      "href": "http://localhost:8890/actuator/health",
+      "templated": false
+    },
+    "health-component": {
+      "href": "http://localhost:8890/actuator/health/{component}",
+      "templated": true
+    },
+    "health-component-instance": {
+      "href": "http://localhost:8890/actuator/health/{component}/{instance}",
+      "templated": true
+    },
+    "info": {
+      "href": "http://localhost:8890/actuator/info",
+      "templated": false
+    },
+    "httptrace": {
+      "href": "http://localhost:8890/actuator/httptrace",
+      "templated": false
+    }
+  }
+}
+```
+
 ## Info Git Info 노출하기
 기본 설정에서 `actuator/info` 호출 시애 아무 정보도 Response를 하지 않습니다. plugin을 이용하면 git에 대한 정보를 쉽게 노출할 수 있습니다.
 
@@ -152,7 +185,7 @@ management:
   ...
   info:
     git:
-      mode: SIMPLE # FULL
+      mode: SIMPLE # FULL or SIMPLE
 ```
 git 정보에 대한 mode를 SMPLE, FULL을 지정할 수 있습니다. 이후에 서버를 실행시키면 아래 그림처럼 `git.properties` 파일에 Git에 대한 정보가 담겨있습니다.
 
