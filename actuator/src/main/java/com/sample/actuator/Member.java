@@ -20,5 +20,9 @@ public class Member {
   @GeneratedValue
   private long id;
 
+  private String name;
 
+  public Member(String name) {
+    this.name = name;
+  }
 }

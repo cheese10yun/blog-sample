@@ -268,3 +268,38 @@ management:
   }
 }
 ```
+
+## Base Path 변경하기
+기본으로 제공해주는 URL 정보는 변경해서 사용하는 것이 바람직합니다. `base-path` 속성을 이용하면 endpoint base path를 변경할 수 있습니다.
+
+```yml
+management:
+  endpoints:
+    ...
+    web:
+      base-path: "/system"
+```
+`base-path`을 변경하면 아래와 같이 endpoint base path가 변경되는 것을 확인할 수 있습니다.
+
+![](images/actuator-base-path.png)
+
+## IntelliJ Endpint
+IntelliJ를 이용하면 Actuator를 더욱 잘 활용할 수 있습니다.
+
+![](images/endpoint-mapping.png)
+
+Run/Debug Tab에서 Endpoints에서는 전체 Request Mapping를 볼 수 있습니다. 실제 `Run HTTP Request`를 이용하면 요청을 보낼 수 있습니다.
+
+우 클릭 이후 Edit을 활용하면 실제 매핑된 Controller 코드로 이동되어 컨트롤러에 있는 특정 Request Mapping 정보를 쉽게 찾을 수 있습니다.
+
+![](images/endpoints-beans.png)
+
+`Beans` Tab에서는 등록돼있는 Bean들을 볼 수 있습니다. 스프링 부트에서는 특정 빈의 유무에 따라서 설정들이 변경되는 일이 많기 때문에 디버깅 시 유용하게 사용할 수 있습니다.
+
+![](images/endpoints-heath.png)
+
+`Health` Tab에서는 위에서 확인한 heath 정보도 확인할 수 있습니다. Http 요청을 보내서 확인하는 것보다는 인텔리 제이에서 확인하는 것이 개인적으로는 편리한 거 같습니다.
+
+![](images/intellij-api-call.gif)
+
+Controller에서 HTTP Call을 위 그림처럼 진행할 수 있습니다.

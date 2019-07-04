@@ -24,6 +24,7 @@ management:
           - "info"
           - "health"
           - "httptrace"
+      base-path: "/system"
   info:
     git:
       mode: FULL
