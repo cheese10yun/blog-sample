@@ -166,7 +166,7 @@ management:
 ```
 
 ## Info Git Info 노출하기
-기본 설정에서 `actuator/info` 호출 시애 아무 정보도 Response를 하지 않습니다. plugin을 이용하면 git에 대한 정보를 쉽게 노출할 수 있습니다.
+기본 설정에서 `actuator/info` 호출시 아무 정보도 Response를 하지 않습니다. plugin을 이용하면 git에 대한 정보를 쉽게 노출할 수 있습니다.
 
 ```
 buildscript {
