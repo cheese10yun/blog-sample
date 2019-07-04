@@ -540,7 +540,6 @@ CREATE TABLE `BATCH_STEP_EXECUTION` (
 * `JOB_EXECUTION_ID` 칼럼은 `BATCH_JOB_INSTANCE` 테이블의 PK를 참조 하고 있습니다.
 * `BATCH_STEP_EXECUTION` 와 `BATCH_JOB_INSTANCE`는 부모 자식관계입니다.
 * BATCH_STEP_EXECUTION는 자신의 부모 BATCH_JOB_INSTANCE 성공/실패 내역을 모두 갖고 있습니다.
-* 
 
 <p align="center">
   <img src="https://github.com/cheese10yun/TIL/raw/master/assets/job-job-instance-job-execution.png">
