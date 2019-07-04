@@ -225,7 +225,7 @@ git 정보에 대한 mode를 SMPLE, FULL을 지정할 수 있습니다. 이후�
 ```
 `mode`에 따라서 출력되는 정보가 다릅니다.
 
-## Endpoint Database
+## Health Database
 기본 설정에서 `/actuator/health`를 호출하면 아래와 같은 응답 정보를 받을 수 있습니다. (데이터베이스 정보를 표시하기 위해서 H2 의존성을 추가했습니다.)
 ```
 {
