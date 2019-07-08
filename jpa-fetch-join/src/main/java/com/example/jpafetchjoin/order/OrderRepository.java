@@ -7,11 +7,10 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-
-
   @Query(
-      value = "select  o from Order o "
-          + "left join fetch o.products ",
+      value = ""
+          + "select  o from Order o "
+          + "inner join fetch o.products ",
       countQuery = "select count(o) from Order o"
   )
   Page<Order> findByPageWithProducts(Pageable pageable);
