@@ -4,9 +4,7 @@
 ## 조건
 ![](/images/table.png)
 
-주문 1 : 제품 N 관계인 경우에서 
-
-OneToMany 관계에 대해서 Pageagle 객체를 이용한 fetch join 사용 시 문제가 발생합니다. 아래는 연관관계의 코드입니다.
+주문 1 : 제품 N OneToMany 관계에 대해서 Pageagle 객체를 이용한 fetch join 사용 시 문제가 발생합니다. 아래는 연관관계의 코드입니다.
 
 ## limit 확인
 
