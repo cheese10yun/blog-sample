@@ -33,5 +33,11 @@ public class Product {
   @JsonIgnore
   private Order order;
 
+  public Product(String name, Order order) {
+    this.name = name;
+    this.order = order;
+    this.order.addProduct(this);
+  }
+
 
 }

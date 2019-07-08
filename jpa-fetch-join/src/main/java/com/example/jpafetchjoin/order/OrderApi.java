@@ -24,9 +24,9 @@ public class OrderApi {
     return orderRepository.findByPageWithAll(pageable);
   }
 
-  @GetMapping("/coupons")
-  public Page<Order> getOrdersWithCoupon(Pageable pageable){
-    return orderRepository.findByPageWithCoupons(pageable);
+  @GetMapping("/address")
+  public Page<Order> getOrdersWithAddress(Pageable pageable){
+    return orderRepository.findByPageWithAddress(pageable);
   }
 
   @GetMapping("/products")

@@ -10,7 +10,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
   @Query(
       value = "select  o from Order o "
-          + "left join fetch o.coupons "
+          + "left join fetch o.addresses "
           + "left join fetch o.products ",
       countQuery = "select count(o) from Order o"
   )
@@ -19,10 +19,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
   @Query(
       value = "select  o from Order o "
-          + "left join fetch o.coupons ",
+          + "left join fetch o.addresses ",
       countQuery = "select count(o) from Order o"
   )
-  Page<Order> findByPageWithCoupons(Pageable pageable);
+  Page<Order> findByPageWithAddress(Pageable pageable);
 
 
   @Query(

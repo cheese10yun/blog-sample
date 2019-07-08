@@ -1,13 +1,11 @@
 package com.example.jpafetchjoin.order;
 
 
-import com.example.jpafetchjoin.coupon.Coupon;
+import com.example.jpafetchjoin.address.Address;
 import com.example.jpafetchjoin.product.Product;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,14 +27,27 @@ public class Order {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private long id;
 
-  @Column(name = "address", nullable = false)
-  private String address;
+  @Column(name = "orderer", nullable = false)
+  private String orderer;
 
-  @OneToMany(mappedBy = "order")
+  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
   private Set<Product> products = new HashSet<>();
 
-  @OneToMany(mappedBy = "order")
-  private Set<Coupon> coupons = new HashSet<>();
+  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+  private Set<Address> addresses = new HashSet<>();
+
+  public Order(String orderer) {
+    this.orderer = orderer;
+  }
+
+  public void addProduct(final Product product) {
+    products.add(product);
+  }
+
+
+  public void addAddress(final Address address){
+    addresses.add(address);
+  }
 
 
 }
