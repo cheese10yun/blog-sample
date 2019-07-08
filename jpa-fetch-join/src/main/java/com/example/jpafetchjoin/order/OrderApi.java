@@ -19,15 +19,6 @@ public class OrderApi {
     return orderRepository.findAll(pageable);
   }
 
-  @GetMapping("/all")
-  public Page<Order> getOrders(Pageable pageable){
-    return orderRepository.findByPageWithAll(pageable);
-  }
-
-  @GetMapping("/address")
-  public Page<Order> getOrdersWithAddress(Pageable pageable){
-    return orderRepository.findByPageWithAddress(pageable);
-  }
 
   @GetMapping("/products")
   public Page<Order> getOrdersWithProducts(Pageable pageable){

@@ -5,17 +5,17 @@
 # * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
 # * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
 
-GET http://127.0.0.1:8822/orders
+GET http://127.0.0.1:8822/orders?size=14&page=1
 Accept: application/json
 
 ###
 
-GET http://127.0.0.1:8822/orders/all
+GET http://127.0.0.1:8822/orders/all?page=0&size=10
 Accept: application/json
 
 ###
 
-GET http://127.0.0.1:8822/orders/coupons
+GET http://127.0.0.1:8822/orders/address
 Accept: application/json
 
 ###

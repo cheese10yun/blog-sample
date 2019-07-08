@@ -26,7 +26,6 @@ public class AppRunner implements ApplicationRunner {
 
     IntStream.range(0, 30).forEach(i -> {
       final Order order = new Order("yun");
-      order.addAddress(new Address("서울", order));
       order.addProduct(new Product("양물", order));
       orders.add(order);
 

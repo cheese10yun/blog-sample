@@ -1,7 +1,6 @@
 package com.example.jpafetchjoin.order;
 
 
-import com.example.jpafetchjoin.address.Address;
 import com.example.jpafetchjoin.product.Product;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,8 +32,6 @@ public class Order {
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
   private Set<Product> products = new HashSet<>();
 
-  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-  private Set<Address> addresses = new HashSet<>();
 
   public Order(String orderer) {
     this.orderer = orderer;
@@ -42,11 +39,6 @@ public class Order {
 
   public void addProduct(final Product product) {
     products.add(product);
-  }
-
-
-  public void addAddress(final Address address){
-    addresses.add(address);
   }
 
 
