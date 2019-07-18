@@ -1,0 +1,28 @@
+{
+  "orderer": {
+    "name": "yun",
+    "email": "yun@asd.com"
+  },
+  "product": [
+    {
+      "name": "양말",
+      "price": 123233
+    },
+    {
+      "name": "바자",
+      "price": 1000
+    },
+    {
+      "name": "치마",
+      "price": 1120
+    }
+  ],
+  "coupon": {
+    "code": "xx2sd292kd"
+  },
+  "address": {
+    "address1": "서울블라브라..."
+    "address2": "어디 동...",
+    "zip": "123-2332"
+  }
+}
