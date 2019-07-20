@@ -32,4 +32,23 @@ public class OrderTest {
     assertThat(order).isNotNull();
     assertThat(order.getProducts().size()).isEqualTo(3);
   }
+
+  @Test
+  public void setter_메서드의_유혹() {
+    //given
+    final List<Product> products = new ArrayList<>();
+    products.add(new Product("양말"));
+    products.add(new Product("모자"));
+    products.add(new Product("바지"));
+
+    final Order order = Order.order("yun", products);
+    order.setStep(OrderStep.SHIPPING);
+
+    //when
+    order.changeStepToCompleted();
+
+    //then
+    assertThat(order.getStep()).isEqualTo(OrderStep.COMPLETED);
+
+  }
 }

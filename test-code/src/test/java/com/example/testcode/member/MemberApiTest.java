@@ -1,7 +1,9 @@
 package com.example.testcode.member;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,10 +21,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
+@Transactional
 public class MemberApiTest {
 
   @Autowired
@@ -84,6 +88,26 @@ public class MemberApiTest {
     //then
     resultActions
         .andExpect(status().isOk());
+
+  }
+
+  @Test
+  public void member_page_test() throws Exception {
+    //given
+    //dataSetUp("classpath:member_page_test.sql"); 로직은 없습니다.
+
+    //when
+    final ResultActions resultActions = mvc.perform(get("/members")
+        .contentType(MediaType.APPLICATION_JSON_UTF8))
+        .andDo(print());
+
+    //then
+    resultActions
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("content").exists())
+        .andExpect(jsonPath("pageable").exists())
+        .andExpect(jsonPath("pageable").exists())
+        .andExpect(jsonPath("numberOfElements").value("4"));
 
   }
 

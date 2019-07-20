@@ -52,7 +52,7 @@ public class CouponTest {
 쿠폰 테스트 코드를 통해서 해당 쿠폰 도메인의 비지니스 요구사항을 설명해주는 도큐먼트로 볼수 있습니다.
 
 
-## Matchers는 AssertJ 가 좋다.
+## Matchers는 AssertJ가 좋다.
 
 ![](images/CoreMatchers.png)
 
@@ -268,12 +268,177 @@ settet를 추가하는 방법도 있겠지만 settet는 Request, Response 객체
 
 이런 방식은 코드량이 많기도하고 애초에 default 생성자라도 있는 것이기 때문에 그다지 설득력이 크게 있지는 않아 최근에는 그냥 public 생성자를 통해서 생성하고 있습니다.
 
+그래서 현재는 RequestBody 객체가 복잡하면 JSON 기반테스트를 진행하고 그렇지 않은 경우에는 그냥 public 생서자 or Builder를 이용해서 Given 절을 작성하고 있습니다.
+
 
 
 ## Setter의 유혹
-[step-06: Setter 사용하지 않기](https://github.com/cheese10yun/spring-jpa-best-practices/blob/master/doc/step-06.md) 및 많은 포스팅에서 setter 메서드를 지양해야 한다고 말해왔습니다. 하지만 테스트 코드 작성시 setter 메서드의 
-필요성이 절실할 경우가 많습니다.
+[step-06: Setter 사용하지 않기](https://github.com/cheese10yun/spring-jpa-best-practices/blob/master/doc/step-06.md) 및 많은 포스팅에서 setter 메서드를 지양해야 한다고 말해왔습니다. 하지만 테스트 코드 작성시 setter 메서드는 너무 달콤한 유욕이 있습니다.
 
+```java
+public enum OrderStep {
+  AWAITING_DEPOSITED, //  결지 미완료
+  PAID, // 지불 완료
+  REAMDY, // 배송 준비
+  SHIPPING, // 배송중
+  COMPLETED // 완료
+}
+
+public class Order {
+
+...
+  public void changeStepToCompleted() {
+
+      if (this.step != OrderStep.SHIPPING) {
+        throw new IllegalStateException();
+      }
+
+      this.step = OrderStep.COMPLETED;
+    }
+}
+```
+
+주문의 상태가 있고 배송 완료로 변경하기 위해서는 현재 Step이 SHIPPING 이여야한다는 로직입니다.
+
+```java
+  @Test
+  public void setter_메서드의_유혹() {
+    //given
+    final List<Product> products = new ArrayList<>();
+    products.add(new Product("양말"));
+    products.add(new Product("모자"));
+    products.add(new Product("바지"));
+
+    final Order order = Order.order("yun", products);
+    // order.setStep(OrderStep.SHIPPING); settet 메서드가 간절하다.
+
+    //when
+    order.changeStepToCompleted();
+
+    //then
+    assertThat(order.getStep()).isEqualTo(OrderStep.COMPLETED);
+
+  }
+```
+Order 객체를 테스트하기 위해서는 Order 객체를 만들어야합니다. 그리거 Order 객체는 시간에 따라서 데이터들이 달라집니다. 주문 신청 부터 주문 완료까지 Order 객체는 계속해서 변경됩니다.
+
+적절하게 단위 테스트하기 위해서는 데이터를 특정 시점 처럼 만들어야합니다. 위 테스트도 주문 완료를 테스트하기 위해서 주문생성 -> 주문 배송중 으로 변경해야합니다. 이럴 경우 settet를 쓰면 모든 비니지스 로직을 무시하고 데이터를 특정 시점으로 변경시킬 수있습니다. 
+
+위 도메인은 상당히 간단현 편이지만 주문, 환불, 주문 부분취소, 주문 전체 취소 등 다양한 도메인들을 테스하기 위해서는 특정 시점으로 변경하기 어렵습니다. 위 처럼 방어적인 로직이 있으니 모든 조건이 만족할 떄만 데이터가 변경되도록 하기 떄문입니다.
+
+그래서 나름의 **결론은 @Setter를 사용하고 test 코드 작성시에만 settet를 사용한다 정도 입니다.** 객체지향 관점에서 아무로직 없는 settet는 객체간의 협력관계에서 객체의 자율성을 심하게 훼손 하게 됩니다. 테스트 코드외 적으로는 사용하지 않은 것이 않아야 한다는 것이 지금의 결론입니다.
+
+**그래도 명확한 가이드가 없는건 사실입니다. test 디렉토리에서만 setter 메서드를 사용하지 않는다** 라는 팀차원의 공유만 있을 뿐 그것을 강제할 방법은 없습니다. 그래서 이 부분이 좋지 못합니다.
+
+## 통합 테스트의 어려움
+통합 테스트에서 어려운 점들이 Givne 작성하는 것입니다. 페이징 및 필터 관련된 API를 테스트 한다고 했을 경우 데이터를 set up 해주기가 여렵습니다.
+
+만약 주문 생성 API를 테스트하기 위해서는 
+
+- 회원
+- 상품
+- 상품 카테고리
+- 해당 상품의 입점사 정보
+- 쿠폰 (만약 쿠폰을 사용했을때 필요)
+
+아무리 간단하게 생각해도 최소한 이정도의 데이터를 set up 해야합니다. 실제 오픈 커머스라 같은 경우에는 주문 한 번을 하기 위해서 수십개의 테이블들을 set up 해야합니다.
+
+주문 생성을 위해서 위의 모든 데이터들이 set up 되어야합니다. 특히 저것을 또 객체로 만들고 JPA로 데이터를 setup 한다면 차라리 저는 테스트를 포기하겠습니다. 
+
+
+### Import를 이용한 데이터 set up
+
+스프링이 로드될때 `data.sql`을 읽어 들여 Given을 만드는 방식입니다.
+
+```sql
+# data.sql
+INSERT INTO
+    `member` (`id`, `email`, `name`)
+VALUES
+	(1, 'yun@asd.com', 'yun'),
+	(2, 'wan@asd.com', 'wan'),
+	(3, 'jin@asd.com', 'jin'),
+	(4, 'ck@asd.com', 'ck');
+```
+
+
+```java
+  @Test
+  public void member_page_test() throws Exception {
+    //given
+
+    //when
+    final ResultActions resultActions = mvc.perform(get("/members")
+        .contentType(MediaType.APPLICATION_JSON_UTF8))
+        .andDo(print());
+
+    //then
+    resultActions
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("content").exists())
+        .andExpect(jsonPath("pageable").exists())
+        .andExpect(jsonPath("pageable").exists())
+        .andExpect(jsonPath("numberOfElements").value("4"));
+
+  }
+```
+`SQL`로 given을 구성하게 되면 테스트 하고자하는 부분의 when, then 구절은 어렵지 않게 작성할 수 있습니다.
+
+하지만 단점도 있습니다. 칼럼의 변경및 확장시 테스트 코드의 지속적인 관리가 어렵다는 점이 있습니다. 또 누군가의 `member` insert를 추가적으로 하면 `.andExpect(jsonPath("numberOfElements").value("4"))` 테스트코드는 실패하게 됩니다. **모든 작업자들이 `data.sql`을 추가 및 변경하다 보면 문제가 계속 생기게 됩니다.**
+
+
+### 나름의 해결 방법
+위에서도 말했듯이 `data.sql`을 모든 작업자가 공동으로 사용하게되니 문제가 발생한다면 테스트 단위로 `data-{xxx-test}.sql`을 관리하면 좋을거 같습니다.
+
+```java
+  @Test
+  public void member_page_test() throws Exception {
+    //given
+    dataSetUp("classpath:member_page_test.sql"); // 로직은 구현하지 않았습니다.
+
+    //when
+    final ResultActions resultActions = mvc.perform(get("/members")
+        .contentType(MediaType.APPLICATION_JSON_UTF8))
+        .andDo(print());
+
+    //then
+    resultActions
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("content").exists())
+        .andExpect(jsonPath("pageable").exists())
+        .andExpect(jsonPath("pageable").exists())
+        .andExpect(jsonPath("numberOfElements").value("4"));
+
+  }
+```
+
+JSON 기반으로 테스트 처럼 객체로 생성하기 어려운 Given을 JSON에서는 json 파일로 했고 여기에서는 SQL 파일로 진행합니다. 이 방식으로는 실제 실무에서 사용해본 경험은 없었습니다.
+
+
+## 외부 인프라스트럭처 테스트
+
+
+
+
+
+
+
+
+
+## 나름의 테스팅 규칙
+
+### POJO 기반 단위 테스트를 지향한다
+대부분 테스트는 단위 테스트를 지향하고 있습니다. 특히 도메인(엔티티) 객체 테스팅을 가장 우선순위를 높게 테스트를 진행하고 있습니다. 
+
+내가 지금 집중해서 작서앟고 있는 로직 이외의 영역에 대해서만 코드를 짜고 테스트하는 습관을 갖으려고 의식적으로 노력하고 있습니다. 좋은 단위 테스트를 진행하더 보면 로직의 크기와 책임이 자연스럽게 줄어들게 됩니다.
+
+### 서비스 계층 테스트
+서비스 계층등 스프링 Bean들이 필요한 테스트는 Mockito 기반의 Mock 테스트를 지향합니다. 특히 서비스영역에서 데이터베이스 트랜잭션 까지 확인하는 테스트는 통합테스트에 가깝다고 생각합니다. 그래서 서비스영역에서의 로직을 주로 테스트하고 인프라 스트럭처에 대해서는 Mock 기반으로 테스팅을 진향하는 것을 지향합니다.
+
+### 외부 인프라 스트럭처
+외부 API를 의존하는 로직들은 각 환경별로 관리하기가 어려울 떄가 있습니다. api call 당 비용이 발생한다든지, 실제 api 콜을 하면 결제 및 송금 등 돈이 지출되는 예가 대표적인 예입니다.
+
+이런 부분은 통합 테스트하기 어렵습니다. 이런 경우에는 test 디렉토리에 해당 인터페이스를 상속하는 해서 mock 으로 모킹한 뒤에 테스트를 위해서만 구현합니다.
 
 
 
