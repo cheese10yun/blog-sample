@@ -3,7 +3,7 @@
 사실은 테스트 코드 작성 시 효율적인 방법을 소개하는 포스팅을 진행하려 했으나 이런 고민들에 명확한 결론이 없어 지금까지도 겪고 있는 문제를 나름 정리한 포스팅입니다.
 
 
-## POJO 테스트는 언제 나 옳다
+## POJO 테스트는 언제나 옳다
 이전에 포스팅한 [Test 전략 가이드](https://github.com/cheese10yun/spring-guide/blob/master/docs/test-guide.md), [Spring Boot 테스트 종류](https://github.com/cheese10yun/spring-guide/blob/master/docs/test-guide.md)등 스프링에서는 매우 다양한 테스트 방법을 제공해주고 있습니다. 이런 Slice 테스트 지원으로 테스트하고 싶은 레이어를 부분적으로 빠르게 테스트할 수 있습니다.
 
 **이런 강력한 기능들 때문에 POJO에 대한 테스팅은 상대적으로 덜 중요하게 여겨지다 보니 POJO 테스트 코드 작성도 등한시하게 되는 거 같습니다.**
