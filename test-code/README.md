@@ -120,7 +120,7 @@ public MemberSingUpRequest(final String name, final String email) {
   }
 ```
 
-Validation을 어노테이션들이 동작하지 않는다. 내가 의도하지 않은 객체 생성이 이루어지는 가능성이 있고 무엇보다 해당 코드는 테스트 코드에서만 사용되는 코드입니다.
+Validation을 어노테이션들이 동작하지 않습니다. 내가 의도하지 않은 객체 생성이 이루어지는 가능성이 있고 무엇보다 해당 코드는 테스트 코드에서만 사용되는 코드인 점이 좋지 않다고 생각합니다.
 
 ### JSON 기반으로 테스트
 
