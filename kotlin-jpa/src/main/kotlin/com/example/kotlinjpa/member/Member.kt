@@ -5,14 +5,17 @@ import javax.persistence.*
 
 @Table(name = "member")
 @Entity
-data class Member(
-        @Id
-        @GeneratedValue
-        var id: Long = 0,
+class Member protected constructor() {
 
-        @Column(name = "email", nullable = false, updatable = false)
-        var email: String,
+    @Id
+    @GeneratedValue
+    var id: Long = 0L
 
-        @Column(name = "name", nullable = false)
-        var name: String
-)
+    @Column(name = "email", nullable = false, updatable = false)
+    lateinit var email: String
+
+    @Column(name = "name", nullable = false)
+    lateinit var name: String
+
+
+}
