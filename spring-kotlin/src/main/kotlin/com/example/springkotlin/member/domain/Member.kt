@@ -1,4 +1,4 @@
-package com.example.springkotlin.member
+package com.example.springkotlin.member.domain
 
 import javax.persistence.*
 
@@ -16,7 +16,7 @@ class Member protected constructor() {
     lateinit var email: String
         protected set
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     lateinit var name: String
         protected set
 
