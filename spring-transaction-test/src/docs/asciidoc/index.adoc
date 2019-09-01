@@ -1,0 +1,35 @@
+= API Document
+Andy Wilkinson;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 1
+:sectlinks:
+
+
+= Overview
+== HTTP status codes
+|===
+| Status code | Usage
+
+| `200 OK`
+| successfully
+
+| `400 Bad Request`
+| Bad Request
+
+| `500 Not Found`
+| Server Error
+|===
+
+== Format
+|===
+| Date Time | x.....
+| Date | x.....
+|===
+
+
+= Members API
+operation::member-api-integration-test/get-member[snippets='http-request,http-response']
+
