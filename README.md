@@ -45,6 +45,7 @@
 * [Spring Actuator 기초 설정](https://github.com/cheese10yun/blog-sample/tree/master/actuator)
 * [테스트 코드 작성에 대한 나름의 고찰](https://github.com/cheese10yun/blog-sample/tree/master/test-code)
 * [Transaction Rollback 정리](https://github.com/cheese10yun/blog-sample/tree/master/spring-transaction-test)
+* [Spring Batch Study](https://github.com/cheese10yun/batch-study)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
