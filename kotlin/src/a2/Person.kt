@@ -1,6 +1,8 @@
 package a2
 
+import java.io.BufferedReader
 import java.lang.IllegalArgumentException
+import java.lang.NumberFormatException
 import java.util.*
 
 class Person(
@@ -11,7 +13,6 @@ class Person(
 fun main(args: Array<String>) {
 
     val oneToTen = 1..10
-
 
 
 //    for (i in 1..100){
@@ -102,4 +103,25 @@ fun map() {
         println("$letter = $binary")
     }
 
+}
+
+fun isLetter(c: Char) = c in 'a'..'z' || c in 'A'..'Z'
+
+fun isNotDigit(c: Char) = c !in '0'..'9'
+
+fun reconize(c: Char) = when (c) {
+    in '0'..'9' -> "number"
+    in 'a'..'z', in 'A'..'Z' -> "string"
+    else -> "what ? "
+}
+
+fun readNumber(reader: BufferedReader): Int?{
+    try {
+        val line = reader.readLine()
+        return Integer.parseInt(line)
+    } catch (e: NumberFormatException){
+        return null
+    } finally {
+        reader.close()
+    }
 }
