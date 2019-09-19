@@ -27,9 +27,16 @@ public class InactiveUserJobTest {
 
     @Test
     public void 휴면_회원_전환_테스트() throws Exception {
+
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+
+
         assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+
+
         final LocalDateTime localDateTime = LocalDateTime.now().minusYears(1);
+
+
         assertEquals(0, userRepository.findByUpdatedDateBeforeAndStatusEquals(localDateTime, UserStatus.ACTIVE).size());
     }
 
