@@ -1,46 +1,46 @@
 > 출처 [처음으로 배우는 스프링 부트 2](http://www.kyobobook.co.kr/product/detailViewKor.laf?ejkGb=KOR&mallGb=KOR&barcode=9791162241264&orderClick=LAA&Kc=)을 보고 정리한 포스팅입니다. 배치 관련된 국내 서적 중에서 스프링 배치를 가장 잘 정리 한 거 같습니다.
 
 ## 목차
-- [목차](#%EB%AA%A9%EC%B0%A8)
-- [스프링 부트 배치의 장점](#%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B6%80%ED%8A%B8-%EB%B0%B0%EC%B9%98%EC%9D%98-%EC%9E%A5%EC%A0%90)
-- [스프링 부트 배치 주의사항](#%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B6%80%ED%8A%B8-%EB%B0%B0%EC%B9%98-%EC%A3%BC%EC%9D%98%EC%82%AC%ED%95%AD)
-- [스프링 부트 배치 이해하기](#%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B6%80%ED%8A%B8-%EB%B0%B0%EC%B9%98-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0)
-  - [Job](#Job)
-  - [JobInstance](#JobInstance)
-  - [JobExcution](#JobExcution)
-  - [JobParameters](#JobParameters)
-  - [Step](#Step)
-    - [StepExcution](#StepExcution)
-  - [JobRepository](#JobRepository)
-  - [JobLauncher](#JobLauncher)
-  - [ItemReader](#ItemReader)
-  - [ItemProcessor](#ItemProcessor)
-  - [ItemWriter](#ItemWriter)
-- [휴먼회원 배치 설계](#%ED%9C%B4%EB%A8%BC%ED%9A%8C%EC%9B%90-%EB%B0%B0%EC%B9%98-%EC%84%A4%EA%B3%84)
-- [휴먼회원 배치 구현](#%ED%9C%B4%EB%A8%BC%ED%9A%8C%EC%9B%90-%EB%B0%B0%EC%B9%98-%EA%B5%AC%ED%98%84)
-  - [Job 설정](#Job-%EC%84%A4%EC%A0%95)
-  - [Step 설정](#Step-%EC%84%A4%EC%A0%95)
-  - [Reader설정](#Reader%EC%84%A4%EC%A0%95)
-  - [Processor 설정](#Processor-%EC%84%A4%EC%A0%95)
-  - [Writer 설정](#Writer-%EC%84%A4%EC%A0%95)
-- [배치 심화](#%EB%B0%B0%EC%B9%98-%EC%8B%AC%ED%99%94)
-  - [다양한 ItemReader 구현 클래스](#%EB%8B%A4%EC%96%91%ED%95%9C-ItemReader-%EA%B5%AC%ED%98%84-%ED%81%B4%EB%9E%98%EC%8A%A4)
-  - [다양한 ItemWriter 구현 클래스](#%EB%8B%A4%EC%96%91%ED%95%9C-ItemWriter-%EA%B5%AC%ED%98%84-%ED%81%B4%EB%9E%98%EC%8A%A4)
-  - [JobParameter 사용하기](#JobParameter-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0)
-  - [테스트 시에만 H2 데이터베이스를 사용하도록 설정](#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%8B%9C%EC%97%90%EB%A7%8C-H2-%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%98%EB%8F%84%EB%A1%9D-%EC%84%A4%EC%A0%95)
-  - [청크 지향 프로세싱](#%EC%B2%AD%ED%81%AC-%EC%A7%80%ED%96%A5-%ED%94%84%EB%A1%9C%EC%84%B8%EC%8B%B1)
-  - [배치 인터셉터 Listener 설정하기](#%EB%B0%B0%EC%B9%98-%EC%9D%B8%ED%84%B0%EC%85%89%ED%84%B0-Listener-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0)
-  - [어노테이션 기반 Listener 설정하기](#%EC%96%B4%EB%85%B8%ED%85%8C%EC%9D%B4%EC%85%98-%EA%B8%B0%EB%B0%98-Listener-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0)
-  - [JobParameter 사용하기](#JobParameter-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0-1)
-  - [Step의 흐름을 제어하는 Flow](#Step%EC%9D%98-%ED%9D%90%EB%A6%84%EC%9D%84-%EC%A0%9C%EC%96%B4%ED%95%98%EB%8A%94-Flow)
-- [재시도](#%EC%9E%AC%EC%8B%9C%EB%8F%84)
-  - [스템 구성하기](#%EC%8A%A4%ED%85%9C-%EA%B5%AC%EC%84%B1%ED%95%98%EA%B8%B0)
-  - [재시도 템플릿](#%EC%9E%AC%EC%8B%9C%EB%8F%84-%ED%85%9C%ED%94%8C%EB%A6%BF)
-  - [AOP 기반 재시도](#AOP-%EA%B8%B0%EB%B0%98-%EC%9E%AC%EC%8B%9C%EB%8F%84)
-- [Spring Batch Table](#Spring-Batch-Table)
-  - [BATCH_JOB_INSTANCE](#BATCHJOBINSTANCE)
-  - [BATCH_JOB_EXECUTION](#BATCHJOBEXECUTION)
-- [참고](#%EC%B0%B8%EA%B3%A0)
+- [목차](#%eb%aa%a9%ec%b0%a8)
+- [스프링 부트 배치의 장점](#%ec%8a%a4%ed%94%84%eb%a7%81-%eb%b6%80%ed%8a%b8-%eb%b0%b0%ec%b9%98%ec%9d%98-%ec%9e%a5%ec%a0%90)
+- [스프링 부트 배치 주의사항](#%ec%8a%a4%ed%94%84%eb%a7%81-%eb%b6%80%ed%8a%b8-%eb%b0%b0%ec%b9%98-%ec%a3%bc%ec%9d%98%ec%82%ac%ed%95%ad)
+- [스프링 부트 배치 이해하기](#%ec%8a%a4%ed%94%84%eb%a7%81-%eb%b6%80%ed%8a%b8-%eb%b0%b0%ec%b9%98-%ec%9d%b4%ed%95%b4%ed%95%98%ea%b8%b0)
+  - [Job](#job)
+  - [JobInstance](#jobinstance)
+  - [JobExecution](#jobexecution)
+  - [JobParameters](#jobparameters)
+  - [Step](#step)
+    - [StepExecution](#stepexecution)
+  - [JobRepository](#jobrepository)
+  - [JobLauncher](#joblauncher)
+  - [ItemReader](#itemreader)
+  - [ItemProcessor](#itemprocessor)
+  - [ItemWriter](#itemwriter)
+- [휴먼회원 배치 설계](#%ed%9c%b4%eb%a8%bc%ed%9a%8c%ec%9b%90-%eb%b0%b0%ec%b9%98-%ec%84%a4%ea%b3%84)
+- [휴먼회원 배치 구현](#%ed%9c%b4%eb%a8%bc%ed%9a%8c%ec%9b%90-%eb%b0%b0%ec%b9%98-%ea%b5%ac%ed%98%84)
+  - [Job 설정](#job-%ec%84%a4%ec%a0%95)
+  - [Step 설정](#step-%ec%84%a4%ec%a0%95)
+  - [Reader설정](#reader%ec%84%a4%ec%a0%95)
+  - [Processor 설정](#processor-%ec%84%a4%ec%a0%95)
+  - [Writer 설정](#writer-%ec%84%a4%ec%a0%95)
+- [배치 심화](#%eb%b0%b0%ec%b9%98-%ec%8b%ac%ed%99%94)
+  - [다양한 ItemReader 구현 클래스](#%eb%8b%a4%ec%96%91%ed%95%9c-itemreader-%ea%b5%ac%ed%98%84-%ed%81%b4%eb%9e%98%ec%8a%a4)
+  - [다양한 ItemWriter 구현 클래스](#%eb%8b%a4%ec%96%91%ed%95%9c-itemwriter-%ea%b5%ac%ed%98%84-%ed%81%b4%eb%9e%98%ec%8a%a4)
+  - [JobParameter 사용하기](#jobparameter-%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0)
+  - [테스트 시에만 H2 데이터베이스를 사용하도록 설정](#%ed%85%8c%ec%8a%a4%ed%8a%b8-%ec%8b%9c%ec%97%90%eb%a7%8c-h2-%eb%8d%b0%ec%9d%b4%ed%84%b0%eb%b2%a0%ec%9d%b4%ec%8a%a4%eb%a5%bc-%ec%82%ac%ec%9a%a9%ed%95%98%eb%8f%84%eb%a1%9d-%ec%84%a4%ec%a0%95)
+  - [청크 지향 프로세싱](#%ec%b2%ad%ed%81%ac-%ec%a7%80%ed%96%a5-%ed%94%84%eb%a1%9c%ec%84%b8%ec%8b%b1)
+  - [배치 인터셉터 Listener 설정하기](#%eb%b0%b0%ec%b9%98-%ec%9d%b8%ed%84%b0%ec%85%89%ed%84%b0-listener-%ec%84%a4%ec%a0%95%ed%95%98%ea%b8%b0)
+  - [어노테이션 기반 Listener 설정하기](#%ec%96%b4%eb%85%b8%ed%85%8c%ec%9d%b4%ec%85%98-%ea%b8%b0%eb%b0%98-listener-%ec%84%a4%ec%a0%95%ed%95%98%ea%b8%b0)
+  - [JobParameter 사용하기](#jobparameter-%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0-1)
+  - [Step의 흐름을 제어하는 Flow](#step%ec%9d%98-%ed%9d%90%eb%a6%84%ec%9d%84-%ec%a0%9c%ec%96%b4%ed%95%98%eb%8a%94-flow)
+- [재시도](#%ec%9e%ac%ec%8b%9c%eb%8f%84)
+  - [스템 구성하기](#%ec%8a%a4%ed%85%9c-%ea%b5%ac%ec%84%b1%ed%95%98%ea%b8%b0)
+  - [재시도 템플릿](#%ec%9e%ac%ec%8b%9c%eb%8f%84-%ed%85%9c%ed%94%8c%eb%a6%bf)
+  - [AOP 기반 재시도](#aop-%ea%b8%b0%eb%b0%98-%ec%9e%ac%ec%8b%9c%eb%8f%84)
+- [Spring Batch Table](#spring-batch-table)
+  - [BATCH_JOB_INSTANCE](#batchjobinstance)
+  - [BATCH_JOB_EXECUTION](#batchjobexecution)
+- [참고](#%ec%b0%b8%ea%b3%a0)
 
 스프링 배치는 벡엔드의 배치처리 기능을 구현하는 데 사용하는 프레임워크입니다. 스프링 부트 배치는 스프링 배치 설정 요소들을 간편화시켜 스프링 배치를 빠르게 설정하는 데 도움을 줍니다.
 
@@ -123,30 +123,30 @@ public JobFlowBuilder flow(Step step){
 
 ### JobInstance
 * **JobInstance는 배치 처리에서 Job이 실행될 때 하나의 Job 실행 단위입니다.** 만약 하루에 한 번 씩 배치의 Job이 실행된다면 어제와 오늘 실행 각각 Job을 JobInstance라고 부를 수 있습니다.
-* 각각의 JobInstance는 하나의 JobExcution을 갖는 것은아닙니다. 오늘 Job이 실행 했는데 실패했다면 다음날 동일한 JobInstance를 가지고 또 실행합니다.
-* Job 실행이 실패하면 JobInstance가 끝난것으로 간주하지 않기 때문입니다. 그렇다면 JobInstance는 어제 실패한 JobExcution과 오늘의 성공한 JobExcution 두 개를 가지게 됩니다. **즉 JobExcution 는 여러 개 가질 수 있습니다.**
+* 각각의 JobInstance는 하나의 JobExecution을 갖는 것은아닙니다. 오늘 Job이 실행 했는데 실패했다면 다음날 동일한 JobInstance를 가지고 또 실행합니다.
+* Job 실행이 실패하면 JobInstance가 끝난것으로 간주하지 않기 때문입니다. 그렇다면 JobInstance는 어제 실패한 JobExecution과 오늘의 성공한 JobExecution 두 개를 가지게 됩니다. **즉 JobExecution 는 여러 개 가질 수 있습니다.**
 
-### JobExcution
-* JobExcution은 JobIstance에 대한 한 번의 실행을 나타내는 객체입니다.
+### JobExecution
+* JobExecution은 JobIstance에 대한 한 번의 실행을 나타내는 객체입니다.
 * 만약 오늘 Job이 실패해 내일 다시 동일한 Job을 실행하면 오늘/내일의 실행 모두 같은 JobInstance를 사용합니다.
-* 실제로 JobExcution 인터페이스를 보면 Job 실행에 대한 정보를 담고 있는 도메인 객체가 있습니다. JobExcution은 JobInstance, 배치 실행 상태, 시작 시간, 끝난 시간, 실패했을 때 메시지 등의 정보를 담고 있습니다. JobExcution 객체 안에 어떤 실행 정보를 포함 하고 있습니다.
+* 실제로 JobExecution 인터페이스를 보면 Job 실행에 대한 정보를 담고 있는 도메인 객체가 있습니다. *JobExecution은 JobInstance, 배치 실행 상태, 시작 시간, 끝난 시간, 실패했을 때 메시지 등의 정보를 담고 있습니다. JobExecution 객체 안에 어떤 실행 정보를 포함 하고 있습니다.*
 
 ### JobParameters
 * JobParameters는 Job이 실행될 때 필요한 파라미터들은 Map 타입으로 지정하는 객체 입니다.
 * JobParameters는 JobInstance를 구분하는 기준이 되기도 합니다.
-* JobParameters와 JobInstance는 1:1 관계입니다.
+* **JobParameters와 JobInstance는 1:1 관계입니다.**
 
 ### Step
 * Step은 실직적인 배치 처리를 정의하고 제어 하는데 필요한 모든 정보가 있는 도메인 객체입니다. Job을 처리하는 실질적인 단위로 쓰입니다.
 * 모든 Job에는 1개 이상의 Step이 있어야 합니다.
 
-#### StepExcution
-* Job에 JobExcution Job실행 정보가 있다면 Step에는 StepExcution이라는 Step 실행 정보를 담는 객체가 있습니다.
+#### StepExecution
+* Job에 JobExecution Job실행 정보가 있다면 Step에는 StepExecution이라는 Step 실행 정보를 담는 객체가 있습니다.
 
 ### JobRepository
 * JobRepository는 배치 처리 정보를 담고 있는 매커니즘입니다. 어떤 Job이 실행되었으면 몇 번 실행되었고 언제 끝났는지 등 배치 처리에 대한 메타데이터를 저장합니다.
-* 예를들어 Job 하나가 실행되면 JobRepository에서는 배치 실행에 관련된 정보를 담고 있는 도메인 JobExcution을 생성합니다.
-* JobRepository는 Step의 실행 정보를 담고 있는 StepExcution도 저장소에 저장하여 전체 메타데이터를 저장/관리하는 역할을 수행합니다.
+* 예를들어 Job 하나가 실행되면 JobRepository에서는 배치 실행에 관련된 정보를 담고 있는 도메인 JobExecution을 생성합니다.
+* JobRepository는 Step의 실행 정보를 담고 있는 StepExecution도 저장소에 저장하여 전체 메타데이터를 저장/관리하는 역할을 수행합니다.
 
 ### JobLauncher
 * JobLauncher는 Job. JobParamerters와 함께 배치를 실행하는 인터페이스입니다.

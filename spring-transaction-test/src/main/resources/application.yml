@@ -1,0 +1,26 @@
+server:
+  port: 8787
+
+spring:
+  jpa:
+    database: mysql
+    properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+    open-in-view: false
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/lezhin?useSSL=false&serverTimezone=UTC
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+logging:
+  level:
+    ROOT: info
+    org:
+      hibernate:
+        type: trace
