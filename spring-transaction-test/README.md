@@ -76,7 +76,7 @@ public class BService {
 * `a.setName("1111");` : **update query 발생**
 * `bRepository.save(new B());` : `throw new RuntimeException();` 때문에 insert 되지 않음 (`a.setName("1111");`는 update query 발생함)
 * `@Transactional` 어노테이션이 있는 경우 `a.setName("1111");`의 update query 발생하지 않음
-* **`@Transactional`가 있는 경우 `bCreate(final A a){...}` 메서드의 트랜잭션 범위가 같이 그룹화되기 때문에 RuntimeException(); 발생하면 Rollback이 징행된다. 반면 `@Transcation`이 없는 경우 트랜잭션 범위가 같이 그룹화되지 않기 때문에 `a.setName("1111");` 의 commit과, `bRepository.save(new B());` commit이 다르기 떄문으로 판단, `bRepository.save(new B());`의 `@Transcation`이 발동하면 `a.setName("1111");`의 트랜잭션이 Commit되는 것으로 보임**
+* **`@Transactional`가 있는 경우 `bCreate(final A a){...}` 메서드의 트랜잭션 범위가 같이 그룹화되기 때문에 RuntimeException(); 발생하면 Rollback이 징행된다. 반면 `@Transcation`이 없는 경우 트랜잭션 범위가 같이 그룹화되지 않기 때문에 `a.setName("1111");` 의 commit과, `bRepository.save(new B());` commit이 다르기 때문으로 판단, `bRepository.save(new B());`의 `@Transcation`이 발동하면 `a.setName("1111");`의 트랜잭션이 Commit되는 것으로 보임**
 
 
 ## Case 2 
@@ -128,7 +128,7 @@ public class BService {
 
 * **컨틀로러 a.create -> a.save(), b.Create() -> b.save();**의 순서를 가짐
 * `@Trnasaction`어노테이션이 없기 때문에 `AService`의 트랜잭션이 그대로 전이됨
-* `@Transactional`어노테이션이 있어도 `AService`의 트랜잭션이 그대로 전이 되기 떄문에 `currentTransactionName` 동일 하다.
+* `@Transactional`어노테이션이 있어도 `AService`의 트랜잭션이 그대로 전이 되기 때문에 `currentTransactionName` 동일 하다.
 * a Insert, a Update, B Insert 그대로 동작한다.
 
 
