@@ -128,7 +128,7 @@ Content-Type: application/json
 
 ## ConstraintValidator 사용법
 
-### Anootation 생성
+### Annotation 생성
 ```java
 @Documented
 @Constraint(validatedBy = OrderSheetFormValidator.class)
