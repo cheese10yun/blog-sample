@@ -20,6 +20,7 @@ public class AService {
     private final EntityManager entityManager;
 
     public A aCreate() {
+        entityManager.clear();
         final A a = aRepository.save(new A());
         log.error("A -> currentTransactionName : {}", TransactionSynchronizationManager.getCurrentTransactionName());
         bService.bCreate(a);

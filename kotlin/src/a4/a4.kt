@@ -1,13 +1,16 @@
 package a4
 
+import java.io.Serializable
+import java.lang.IllegalArgumentException
+
 interface Clickable {
     fun click() // 일반 메서드 선언
     fun showOff() = println("Im clickable!") // 디폴트 구현이 있는 메서드
 }
 
-class Button : Clickable {
-    override fun click() = println("I was clicked")
-}
+//class Button : Clickable {
+//    override fun click() = println("I was clicked")
+//}
 
 open class RichButton : Clickable {
     fun disable() {} // 이 함수는 final이다. 하위 클래스가 이 메서드를 오버라이드할 수 없다.
@@ -34,7 +37,125 @@ internal open class TalkativeButton {
     protected fun whisper() = print("Let talk")
 }
 
-fun TalkativeButton.giveSpeech() {
-    yell()
-    whisper()
+//fun TalkativeButton.giveSpeech() {
+//    yell()
+//    whisper()
+//}
+
+interface State : Serializable
+
+interface View {
+    fun getCurrentState(): State
+    fun restoreState(state: State)
 }
+
+//class Button : View {
+//
+////    override fun getCurrentState(): State {}
+//
+//    override fun restoreState(state: State) {}
+//
+//    class ButtonState : State {} // 이 클래스는 자바 중첩(static class) 클래스와 대응한다
+//
+//}
+
+class Outer {
+    inner class Inner {
+        fun getOuterReference(): Outer = this@Outer
+    }
+}
+
+//interface Expr
+//class Num(val value: Int) : Expr
+//class Sum(val left: Expr, val right: Expr) : Expr
+
+sealed class Expr {
+    class Num(val value: Int) : Expr()
+    class Sum(val left: Expr, val right: Expr) : Expr()
+}
+
+
+fun eval(e: Expr): Int =
+    when (e) {
+        is Expr.Num -> e.value
+        is Expr.Sum -> eval(e.left) + eval(e.right)
+    }
+
+
+//class User constructor(_nickname: String) {
+//    val nickname: String
+//
+//    init {
+//        nickname = _nickname
+//    }
+//}
+
+//interface User {
+//    val nickname: String
+//}
+
+//class PrivateUser(override val nickname: String) : User
+//
+//class SubscribingUser(val email: String) : User {
+//    override val nickname: String
+//        get() = email.substringBefore('@')
+//}
+//
+//class FacebookUser(val accountId: Int): User{
+//    override val nickname = getFacebookName(accountId)
+//}
+
+class User(val name: String) {
+    var address: String = "unspecified"
+        set(value: String) {
+            println(
+                """
+                Address was changed for $name:
+                "$field" -> "$value".""".trimIndent()
+            )
+            field = value
+        }
+}
+
+class LengthCounter {
+    var counter: Int = 0
+        private set
+
+    fun addWord(word: String) {
+        counter += word.length
+    }
+}
+
+fun main() {
+    val user = User("yun")
+    user.address = "신림역"
+    user.address = "낙성대"
+}
+
+//class Client(val name: String, val postalCode: Int) {
+//
+//    override fun toString(): String {
+//        return "Client(name='$name', postalCode=$postalCode)"
+//    }
+//
+//    override fun equals(other: Any?): Boolean {
+//        if (this === other) return true
+//        if (other !is Client) return false
+//
+//        if (name != other.name) return false
+//        if (postalCode != other.postalCode) return false
+//
+//        return true
+//    }
+//
+//    override fun hashCode(): Int {
+//        var result = name.hashCode()
+//        result = 31 * result + postalCode
+//        return result
+//    }
+//}
+
+data class Client(val name: String, val postalCode: Int)
+
+
+
