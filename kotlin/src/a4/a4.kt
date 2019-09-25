@@ -105,17 +105,17 @@ fun eval(e: Expr): Int =
 //    override val nickname = getFacebookName(accountId)
 //}
 
-class User(val name: String) {
-    var address: String = "unspecified"
-        set(value: String) {
-            println(
-                """
-                Address was changed for $name:
-                "$field" -> "$value".""".trimIndent()
-            )
-            field = value
-        }
-}
+//class User(val name: String) {
+//    var address: String = "unspecified"
+//        set(value: String) {
+//            println(
+//                """
+//                Address was changed for $name:
+//                "$field" -> "$value".""".trimIndent()
+//            )
+//            field = value
+//        }
+//}
 
 class LengthCounter {
     var counter: Int = 0
@@ -127,9 +127,9 @@ class LengthCounter {
 }
 
 fun main() {
-    val user = User("yun")
-    user.address = "신림역"
-    user.address = "낙성대"
+//    val user = User("yun")
+//    user.address = "신림역"
+//    user.address = "낙성대"
 }
 
 //class Client(val name: String, val postalCode: Int) {
@@ -156,6 +156,12 @@ fun main() {
 //}
 
 data class Client(val name: String, val postalCode: Int)
+
+
+//fun asd(){
+//    A.bar() // 접근 가능
+//    A.foo() // 접근 불가능
+//}
 
 
 
