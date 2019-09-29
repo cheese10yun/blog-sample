@@ -112,6 +112,15 @@ fun printProblemCounts(responses: Collection<String>) {
     println("$clientErrors client errors, $serverErrors server errors")
 }
 
+//fun strLen(s: String) = s.length()
+
+//fun printShppingLabel(person: Person){
+//    var address = person.company?.address?: throw IllegalArgumentException()
+//    with(address){
+//        println(streetAddress)
+//    }
+//}
+
 
 
 
