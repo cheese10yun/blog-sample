@@ -15,3 +15,10 @@ spring:
     username: root
     password:
     driver-class-name: org.h2.Driver
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        exclude: "*"
