@@ -132,30 +132,30 @@ fun main() {
 //    user.address = "낙성대"
 }
 
-//class Client(val name: String, val postalCode: Int) {
-//
-//    override fun toString(): String {
-//        return "Client(name='$name', postalCode=$postalCode)"
-//    }
-//
-//    override fun equals(other: Any?): Boolean {
-//        if (this === other) return true
-//        if (other !is Client) return false
-//
-//        if (name != other.name) return false
-//        if (postalCode != other.postalCode) return false
-//
-//        return true
-//    }
-//
-//    override fun hashCode(): Int {
-//        var result = name.hashCode()
-//        result = 31 * result + postalCode
-//        return result
-//    }
-//}
+class Client(val name: String, val postalCode: Int) {
 
-data class Client(val name: String, val postalCode: Int)
+    override fun toString(): String {
+        return "Client(name='$name', postalCode=$postalCode)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Client) return false
+
+        if (name != other.name) return false
+        if (postalCode != other.postalCode) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + postalCode
+        return result
+    }
+}
+
+//data class Client(val name: String, val postalCode: Int)
 
 
 //fun asd(){
@@ -163,5 +163,27 @@ data class Client(val name: String, val postalCode: Int)
 //    A.foo() // 접근 불가능
 //}
 
+//class Person2(val firstName: String, val lastName: String) {
+//    override fun equals(o: Any?): Boolean {
+//        val otherPerson = o as Person2 ?: return false
+//        return otherPerson.firstName == firstName && otherPerson.lastName == lastName;
+//    }
+//}
+
+class Person2(val age: Int? = null) {
+
+    fun isOlderThan(other: Person2): Boolean? {
+
+        if(age == null || other.age == null)
+            return null
+
+        return age > other.age
+    }
+}
+
+fun ignoreNulls(s: String?) {
+    val sNotnull: String = s!! // 예외는 이 지점을 가리킨다.
+    print(sNotnull.length)
+}
 
 
