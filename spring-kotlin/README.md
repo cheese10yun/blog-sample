@@ -114,3 +114,142 @@ public class SimpleJpaRepository<T, ID> implements JpaRepositoryImplementation<T
 반면 컨트롤러 코드에 `@Transactional` 어노테이션이 있는 경우는 트랜젝션 이름이 `MemberApi.getMembers`으로 동일한 것을 확인 할 수 있다. 그렇다는 것은 **memberRepository.findAll(), member.updateName(..)가 동일한 트랜잭션에서 진행된다는 것이고 트랜잭션이 있는 경우 `show-sql: true`의 log가 찍히는 것으로 판단된다.**
 
 그렇다면 트랜잭션 범위와, 영속성 컨텍스트의 범위는 다르다는 것으로 보인다. 그렇다면 이 둘이 어떻게 다른지 알아보자.
+
+
+## 벌크 연산
+
+
+### 벌크 연산 안됨
+```kotlin
+@RestController
+@RequestMapping("/members")
+class MemberApi(
+private var memberRepository: MemberRepository) {
+
+    @GetMapping
+    @Transactional
+    fun getMembers(page: Pageable): List<Member> {
+        val members = memberRepository.findAll()
+
+        for(member in members){
+            member.updateName("none_name")
+        }
+        return members
+    }
+}
+```
+
+
+```SQL
+2019-10-06 04:18:57.291  INFO 4988 --- [(3)-192.168.0.3] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2019-10-06 04:18:57.291  INFO 4988 --- [(3)-192.168.0.3] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2019-10-06 04:18:57.311  INFO 4988 --- [(3)-192.168.0.3] o.s.web.servlet.DispatcherServlet        : Completed initialization in 20 ms
+2019-10-06 04:19:02.081  INFO 4988 --- [nio-8890-exec-1] o.h.h.i.QueryTranslatorFactoryInitiator  : HHH000397: Using ASTQueryTranslatorFactory
+Hibernate: 
+    select
+        member0_.id as id1_0_,
+        member0_.email as email2_0_,
+        member0_.name as name3_0_ 
+    from
+        member member0_
+Hibernate: 
+    update
+        member 
+    set
+        email=?,
+        name=? 
+    where
+        id=?
+Hibernate: 
+    update
+        member 
+    set
+        email=?,
+        name=? 
+    where
+        id=?
+Hibernate: 
+    update
+        member 
+    set
+        email=?,
+        name=? 
+    where
+        id=?
+Hibernate: 
+    update
+        member 
+    set
+        email=?,
+        name=? 
+    where
+        id=?
+Hibernate: 
+    update
+        member 
+    set
+        email=?,
+        name=? 
+    where
+        id=?
+```
+
+### 벌크 연산 가능
+
+```kotlin
+@RestController
+@RequestMapping("/members")
+class MemberApi(
+private var memberRepository: MemberRepository) {
+    @GetMapping
+    @Transactional
+    fun getMembers(page: Pageable): List<Member> {
+        val members = memberRepository.findAll()
+
+        val ids = mutableListOf<Long>()
+
+        for(member in members){
+            ids.add(member.id)
+        }
+
+        val count = memberRepository.updateName(ids)
+        println(count)
+
+        return members
+    }
+}
+```
+
+
+```kotlin
+interface MemberRepository : JpaRepository<Member, Long> {
+
+    @Modifying
+    @Query(
+            "update Member m set m.name = 'none_name' " +
+                    "where m.id in :ids "
+    )
+    fun updateName(@Param("ids") ids: List<Long>) : Int
+
+}
+```
+
+```sql
+Hibernate: 
+    select
+        member0_.id as id1_0_,
+        member0_.email as email2_0_,
+        member0_.name as name3_0_ 
+    from
+        member member0_
+Hibernate: 
+    update
+        member 
+    set
+        name='none_name' 
+    where
+        id in (
+            ? , ? , ? , ? , ?
+        )
+5
+```

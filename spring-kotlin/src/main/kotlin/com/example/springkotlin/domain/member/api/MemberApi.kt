@@ -23,16 +23,44 @@ class MemberApi(
         return memberRepository.save(dto.toEntity())
     }
 
+//    @GetMapping
+//    @Transactional
+//    fun getMembers(page: Pageable): List<Member> {
+//        println("Transaction Start name : ${TransactionSynchronizationManager.getCurrentTransactionName()}")
+//        val members = memberRepository.findAll()
+//        val member = members[0]
+//        member.updateName(name = UUID.randomUUID().toString())
+//        println(member.name)
+//
+//        println("Transaction End name : ${TransactionSynchronizationManager.getCurrentTransactionName()}")
+//        return members
+//    }
+
+//    @GetMapping
+//    @Transactional
+//    fun getMembers(page: Pageable): List<Member> {
+//        val members = memberRepository.findAll()
+//
+//        val ids = mutableListOf<Long>()
+//
+//        for(member in members){
+//            ids.add(member.id)
+//        }
+//
+//        val count = memberRepository.updateName(ids)
+//        println(count)
+//
+//        return members
+//    }
+
     @GetMapping
     @Transactional
     fun getMembers(page: Pageable): List<Member> {
-        println("Transaction Start name : ${TransactionSynchronizationManager.getCurrentTransactionName()}")
         val members = memberRepository.findAll()
-        val member = members[0]
-        member.updateName(name = UUID.randomUUID().toString())
-        println(member.name)
 
-        println("Transaction End name : ${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        for(member in members){
+            member.updateName("none_name")
+        }
         return members
     }
 }
