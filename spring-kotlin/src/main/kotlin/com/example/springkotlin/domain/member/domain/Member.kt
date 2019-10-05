@@ -24,4 +24,14 @@ class Member protected constructor() {
         this.email = email
         this.name = name
     }
+
+    override fun toString(): String {
+        return "Member(id=$id, email='$email', name='$name')"
+    }
+
+    fun updateName(name: String){
+        this.name = name
+    }
+
+
 }

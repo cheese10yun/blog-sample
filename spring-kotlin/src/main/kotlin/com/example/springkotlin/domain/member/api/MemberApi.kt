@@ -5,12 +5,17 @@ import com.example.springkotlin.domain.member.domain.Member
 import com.example.springkotlin.domain.member.dto.MemberSignUpRequest
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronizationManager
+import org.springframework.util.StringUtils
 import org.springframework.web.bind.annotation.*
+import java.util.*
 
 
 @RestController
 @RequestMapping("/members")
-class MemberApi constructor(
+class MemberApi(
         private var memberRepository: MemberRepository) {
 
     @PostMapping
@@ -19,8 +24,15 @@ class MemberApi constructor(
     }
 
     @GetMapping
-    fun getMembers(page: Pageable): Page<Member> {
-        return memberRepository.findAll(page)
-    }
+    @Transactional
+    fun getMembers(page: Pageable): List<Member> {
+        println("Transaction Start name : ${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        val members = memberRepository.findAll()
+        val member = members[0]
+        member.updateName(name = UUID.randomUUID().toString())
+        println(member.name)
 
+        println("Transaction End name : ${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        return members
+    }
 }

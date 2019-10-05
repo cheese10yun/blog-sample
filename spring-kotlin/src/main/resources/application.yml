@@ -1,0 +1,41 @@
+server:
+  port: 8890
+
+spring:
+  profiles:
+    active: local
+  jpa:
+    database: h2
+    properties.hibernate.dialect: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+##        use_sql_comments: true
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: root
+    password:
+    driver-class-name: org.h2.Driver
+#    initialization-mode: always
+
+  jackson:
+    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
+
+
+#  data:
+#    web:
+#      pageable:
+#        default-page-size: 10
+#        max-page-size: 50
+#        one-indexed-parameters: true
+
+#logging:
+#  level:
+#    root: info
+#    org:
+#      hibernate:
+#        type: trace
