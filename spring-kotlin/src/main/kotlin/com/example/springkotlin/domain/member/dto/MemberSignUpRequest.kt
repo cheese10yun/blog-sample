@@ -1,6 +1,6 @@
-package com.example.springkotlin.member.dto
+package com.example.springkotlin.domain.member.dto
 
-import com.example.springkotlin.member.domain.Member
+import com.example.springkotlin.domain.member.domain.Member
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotEmpty
 

@@ -1,10 +1,9 @@
-package com.example.springkotlin.member.api
+package com.example.springkotlin.domain.member.api
 
-import com.example.springkotlin.member.dao.MemberRepository
-import com.example.springkotlin.member.domain.Member
-import com.example.springkotlin.member.dto.MemberSignUpRequest
+import com.example.springkotlin.domain.member.dao.MemberRepository
+import com.example.springkotlin.domain.member.domain.Member
+import com.example.springkotlin.domain.member.dto.MemberSignUpRequest
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.*
 

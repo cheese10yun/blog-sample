@@ -1,11 +1,11 @@
-package com.example.springkotlin.member.domain
+package com.example.springkotlin.domain.member.domain
 
 import javax.persistence.*
 
 
 @Entity
 @Table(name = "member")
-@Access(AccessType.FIELD) // 용도는 ?
+//@Access(AccessType.FIELD) // 용도는 ?
 class Member protected constructor() {
 
     @Id
@@ -24,6 +24,4 @@ class Member protected constructor() {
         this.email = email
         this.name = name
     }
-
-
 }

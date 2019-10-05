@@ -174,7 +174,7 @@ class Person2(val age: Int? = null) {
 
     fun isOlderThan(other: Person2): Boolean? {
 
-        if(age == null || other.age == null)
+        if (age == null || other.age == null)
             return null
 
         return age > other.age
@@ -184,6 +184,33 @@ class Person2(val age: Int? = null) {
 fun ignoreNulls(s: String?) {
     val sNotnull: String = s!! // 예외는 이 지점을 가리킨다.
     print(sNotnull.length)
+}
+
+data class Point(val x: Int, val y: Int) : Comparable<Point> {
+
+    operator fun plus(other: Point): Point {
+        return Point(x + other.x, y + other.y)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Point) return false
+
+        if (x != other.x) return false
+        if (y != other.y) return false
+
+        return true
+    }
+
+    override fun compareTo(other: Point): Int {
+        return compareValuesBy(this, other, Point::x, Point::y)
+    }
+
+    override fun hashCode(): Int {
+        var result = x
+        result = 31 * result + y
+        return result
+    }
 }
 
 

@@ -1,6 +1,6 @@
-package com.example.springkotlin.member.dao
+package com.example.springkotlin.domain.member.dao
 
-import com.example.springkotlin.member.domain.Member
+import com.example.springkotlin.domain.member.domain.Member
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface MemberRepository : JpaRepository<Member, Long>{
