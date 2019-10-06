@@ -36,31 +36,23 @@ class MemberApi(
 //        return members
 //    }
 
+    @GetMapping
+    @Transactional
+    fun getMembers(page: Pageable): List<Member> {
+        val ids = listOf(1L, 2L, 3L, 4L, 5L)
+        val count = memberRepository.updateName(ids)
+        println("update count : $count")
+        return memberRepository.findAll()
+    }
+
 //    @GetMapping
 //    @Transactional
 //    fun getMembers(page: Pageable): List<Member> {
 //        val members = memberRepository.findAll()
 //
-//        val ids = mutableListOf<Long>()
-//
 //        for(member in members){
-//            ids.add(member.id)
+//            member.updateName("none_name")
 //        }
-//
-//        val count = memberRepository.updateName(ids)
-//        println(count)
-//
 //        return members
 //    }
-
-    @GetMapping
-    @Transactional
-    fun getMembers(page: Pageable): List<Member> {
-        val members = memberRepository.findAll()
-
-        for(member in members){
-            member.updateName("none_name")
-        }
-        return members
-    }
 }

@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param
 
 interface MemberRepository : JpaRepository<Member, Long> {
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query(
             "update Member m set m.name = 'none_name' " +
                     "where m.id in :ids "
