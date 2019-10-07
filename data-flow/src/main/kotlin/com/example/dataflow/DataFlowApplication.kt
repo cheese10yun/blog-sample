@@ -17,9 +17,7 @@ class DataFlowApplication : ApplicationRunner, TaskExecutionListener {
     }
 
     override fun onTaskStartup(taskExecution: TaskExecution) {
-
         println("TaskName : ${taskExecution.taskName}, Execution Id : ${taskExecution.executionId}, started....")
-
     }
 
     override fun onTaskEnd(taskExecution: TaskExecution) {

@@ -6,7 +6,7 @@ services:
     image: mysql/mysql-server:5.7
     environment:
       MYSQL_ROOT_HOST: '%'
-      MYSQL_DATABASE: 'yun-test'
+      MYSQL_DATABASE: 'data_flow'
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     ports:
       - '3366:3306'
