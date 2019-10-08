@@ -1,5 +1,8 @@
 package com.example.springkotlin.domain.member.domain
 
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
+import java.time.LocalDateTime
 import javax.persistence.*
 
 
@@ -19,6 +22,14 @@ class Member protected constructor() {
     @Column(name = "name", nullable = false)
     lateinit var name: String
         protected set
+
+    @CreatedDate
+    @Column(name ="created_at", nullable = false, updatable = false)
+    lateinit var createdAt: LocalDateTime
+
+    @LastModifiedDate
+    @Column(name ="updated_ay_at", nullable = false)
+    lateinit var updatedAt: LocalDateTime
 
     constructor(email: String, name: String) : this() {
         this.email = email
