@@ -1,41 +1,27 @@
 server:
-  port: 8890
+  port: 8787
 
 spring:
   profiles:
     active: local
+
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
   jpa:
-    database: h2
-    properties.hibernate.dialect: org.hibernate.dialect.H2Dialect
+    database: mysql
+    properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-##        use_sql_comments: true
+        use_sql_comments: true
 
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:mysql://localhost:3366/sample?useSSL=false&serverTimezone=UTC
     username: root
     password:
-    driver-class-name: org.h2.Driver
-#    initialization-mode: always
-
-  jackson:
-    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
-
-
-#  data:
-#    web:
-#      pageable:
-#        default-page-size: 10
-#        max-page-size: 50
-#        one-indexed-parameters: true
-
-#logging:
-#  level:
-#    root: info
-#    org:
-#      hibernate:
-#        type: trace
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    initialization-mode: always

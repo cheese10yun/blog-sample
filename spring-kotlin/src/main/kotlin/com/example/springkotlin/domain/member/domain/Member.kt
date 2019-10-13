@@ -23,13 +23,15 @@ class Member protected constructor() {
     lateinit var name: String
         protected set
 
-    @CreatedDate
-    @Column(name ="created_at", nullable = false, updatable = false)
-    lateinit var createdAt: LocalDateTime
-
-    @LastModifiedDate
-    @Column(name ="updated_ay_at", nullable = false)
-    lateinit var updatedAt: LocalDateTime
+//    @CreatedDate
+//    @Column(name = "created_at", nullable = false, updatable = false)
+//    lateinit var createdAt: LocalDateTime
+//        protected set
+//
+//    @LastModifiedDate
+//    @Column(name = "updated_at", nullable = false)
+//    lateinit var updatedAt: LocalDateTime
+//        protected set
 
     constructor(email: String, name: String) : this() {
         this.email = email
@@ -40,7 +42,7 @@ class Member protected constructor() {
         return "Member(id=$id, email='$email', name='$name')"
     }
 
-    fun updateName(name: String){
+    fun updateName(name: String) {
         this.name = name
     }
 
