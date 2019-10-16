@@ -17,6 +17,11 @@ import java.util.*
 class KafkaConfiguration(private val env: Environment) {
 
 
+    @Bean
+    open fun kafkaTemplate(): KafkaTemplate<String, String> {
+        return KafkaTemplate(DefaultKafkaProducerFactory(producerConfig()))
+    }
+
     private fun producerConfig(): HashMap<String, Any?> {
         val config = HashMap<String, Any?>()
 
@@ -25,11 +30,6 @@ class KafkaConfiguration(private val env: Environment) {
         config[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = StringSerializer::class.java
 
         return config
-    }
-
-    @Bean
-    fun kafkaTemplate(): KafkaTemplate<String, String> {
-        return KafkaTemplate(DefaultKafkaProducerFactory(producerConfig()))
     }
 
 }

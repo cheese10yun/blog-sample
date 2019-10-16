@@ -34,6 +34,10 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
+tasks.bootJar {
+    isEnabled = true
+}
+
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
@@ -41,6 +45,11 @@ tasks.withType<KotlinCompile> {
     }
 }
 
+tasks.register("customBootJar") {
+    println("customBootJar!")
+    val bootJar by tasks
+    dependsOn(bootJar)
+}
 
 allOpen {
     annotation("javax.persistence.Entity")
