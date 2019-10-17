@@ -20,7 +20,7 @@ class AppRunner(val transactionRepository: TransactionRepository) : ApplicationR
         val transactions = ArrayList<Transaction>()
 
         stopWatch.start("Transaction")
-        for (i in 1..10000){
+        for (i in 1..10){
 
             transactions.add(Transaction.newInstance(
                     code = UUID.randomUUID().toString(),

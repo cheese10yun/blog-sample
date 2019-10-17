@@ -1,5 +1,7 @@
 package com.example.springkotlin.domain.member.domain
 
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import java.time.LocalDateTime
@@ -23,15 +25,15 @@ class Member protected constructor() {
     lateinit var name: String
         protected set
 
-//    @CreatedDate
-//    @Column(name = "created_at", nullable = false, updatable = false)
-//    lateinit var createdAt: LocalDateTime
-//        protected set
-//
-//    @LastModifiedDate
-//    @Column(name = "updated_at", nullable = false)
-//    lateinit var updatedAt: LocalDateTime
-//        protected set
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    lateinit var createdAt: LocalDateTime
+        protected set
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    lateinit var updatedAt: LocalDateTime
+        protected set
 
     constructor(email: String, name: String) : this() {
         this.email = email

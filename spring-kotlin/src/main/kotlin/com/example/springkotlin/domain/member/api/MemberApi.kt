@@ -37,7 +37,12 @@ class MemberApi(
 //    }
 
     @GetMapping
+    fun get(page: Pageable): Page<Member>{
+        return memberRepository.findAll(page)
+    }
+
     @Transactional
+    @GetMapping("/update")
     fun getMembers(page: Pageable): List<Member> {
         val ids = listOf(1L, 2L, 3L, 4L, 5L)
         val count = memberRepository.updateName(ids)
