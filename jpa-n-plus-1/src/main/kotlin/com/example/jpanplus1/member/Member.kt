@@ -33,11 +33,17 @@ class Member private constructor() {
         private set
 
     @OneToMany(mappedBy = "member")
-    lateinit var orders: MutableList<Order>
+    var orders: List<Order> = emptyList()
         private set
 
     constructor(email: String, name: String) : this() {
         this.email = email
         this.name = name
     }
+
+    override fun toString(): String {
+        return "Member(id=$id, email='$email', name='$name', createdAt=$createdAt, updatedAt=$updatedAt)"
+    }
+
+
 }

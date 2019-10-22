@@ -27,7 +27,6 @@ class Order private constructor() {
     @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now()
 
-
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false, updatable = false)
     lateinit var member: Member
@@ -38,8 +37,7 @@ class Order private constructor() {
     }
 
     override fun toString(): String {
-        return "Order(id=$id, number='$number', createdAt=$createdAt, updatedAt=$updatedAt, member=$member)"
+        return "Order(id=$id, number='$number', createdAt=$createdAt, updatedAt=$updatedAt)"
     }
-
 
 }
