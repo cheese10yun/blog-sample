@@ -15,6 +15,7 @@ internal class MemberJpaTest(val memberRepository: MemberRepository) {
     @DisplayName("asd")
     internal fun name() {
         val members = memberRepository.findAll()
+        assertThat(members).hasSize(0)
         for (member in members) {
             println(member)
         }
@@ -25,7 +26,6 @@ internal class MemberJpaTest(val memberRepository: MemberRepository) {
     @DisplayName("SQL TEST")
     internal fun sqlTest() {
         val members = memberRepository.findAll()
-
-        assertThat(members).hasSize(7)
+//        assertThat(members).hasSize(7)
     }
 }
