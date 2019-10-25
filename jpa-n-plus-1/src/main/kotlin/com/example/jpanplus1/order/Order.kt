@@ -14,7 +14,7 @@ class Order private constructor() {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0
 
-    @Column(name = "number", nullable = false)
+    @Column(name = "number", unique = true, nullable = false)
     lateinit var number: String
         private set
 
@@ -26,10 +26,12 @@ class Order private constructor() {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now()
+        private set
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false, updatable = false)
     lateinit var member: Member
+        private set
 
     constructor(member: Member, number: String) : this() {
         this.member = member
@@ -39,5 +41,4 @@ class Order private constructor() {
     override fun toString(): String {
         return "Order(id=$id, number='$number', createdAt=$createdAt, updatedAt=$updatedAt)"
     }
-
 }

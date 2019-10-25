@@ -44,6 +44,4 @@ class Member private constructor() {
     override fun toString(): String {
         return "Member(id=$id, email='$email', name='$name', createdAt=$createdAt, updatedAt=$updatedAt)"
     }
-
-
 }
