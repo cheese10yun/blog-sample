@@ -26,7 +26,7 @@ class Order private constructor() {
         private set
 ```
 
-위 엔티티 처럼 멤버 <-> 주문 관계가 기준으로 살명드리겠습니다.
+위 엔티티 처럼 멤버 <-> 주문 관계를 기준으로 살명드리겠습니다.
 
 
 ## 발생 케이스
@@ -36,6 +36,7 @@ class Order private constructor() {
 ```kotlin
 @Test
 internal fun `즉시로딩 n+1`() {
+    // fetch = FetchType.EAGER 의 경우
     val members = memberRepository.findAll()
 }
 ```
@@ -48,6 +49,7 @@ internal fun `즉시로딩 n+1`() {
 ```kotlin
 @Test
 internal fun `즉시로딩 n+1`() {
+    // fetch = FetchType.LAZY 의 경우
     val members = memberRepository.findAll()
 }
 ```
@@ -100,7 +102,7 @@ JPQL 특징이 있습니다.. `findById()` 같은 경우에는 엔티티를 영�
 2. 조회한 값을 영속성 컨텍스트에 저장한다.
 3. 영속성 컨텍스트에 조회할 때 이미 존재하는 데이터가 있다면(같은 영속성 컨텍스트에서 이미 조회한 유저가 있는 경우) 데이터를 버린다.
 
-**JPQL의 동작 순서는 위와 같고 그렇다면 왜 N+1이 발생하는 것일까? JPQL에서는 글로벌 패치 전략을 완전히 무시하고 SQL을 생성합니다.** `findAll()`메서드를 호출하게 되면 아래와 같은 SQL이 실행됩니다.
+**JPQL의 동작 순서는 위와 같고 그렇다면 왜 N+1이 발생하는 것일까요? JPQL에서는 글로벌 패치 전략을 완전히 무시하고 SQL을 생성합니다.** `findAll()`메서드를 호출하게 되면 아래와 같은 SQL이 실행됩니다.
 
 ```sql
 select *from member // findAll()의 SQL
@@ -199,7 +201,7 @@ internal fun `페치 조인 키워드 제거`() {
 출력되는 SQL을 보면 조인을 통해서 연관관계 컬렉션까지 함께 조회되는 것으로 생각할 수 있습니다. **하지만 JPQL은 결과를 반환할 때 연관관계까지 고려하지 않고 select 절에 지정한 엔티티만 조회하게 됩니다.** 따라서 컬렉션은 초기화하지 않은 컬렉션 레퍼를 반환하게 되고 컬렉션이 없기 때문에 Lazy 로딩이 발생하게 되고 **결과적으로 N+1 문제가 발생하게 됩니다.**
 
 ## 페치 조인의 한계
-그렇다면 Fetch 조인이 만능일까? 아쉽지만 Fetch 조인은 몇가지의 한계가 있습니다.
+그렇다면 Fetch 조인이 만능일까요? 아쉽지만 Fetch 조인은 몇가지의 한계가 있습니다.
 
 ### 컬렉션을 페치 조인하면 페이징 API를 사용할 수 없다.
 ```kotlin
