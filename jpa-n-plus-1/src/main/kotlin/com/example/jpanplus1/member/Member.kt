@@ -1,6 +1,8 @@
 package com.example.jpanplus1.member
 
+import com.example.jpanplus1.copon.Coupon
 import com.example.jpanplus1.order.Order
+import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
@@ -32,8 +34,12 @@ class Member private constructor() {
     lateinit var updatedAt: LocalDateTime
         private set
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     var orders: List<Order> = emptyList()
+        private set
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    var copons: List<Coupon> = emptyList()
         private set
 
     constructor(email: String, name: String) : this() {
@@ -42,6 +48,8 @@ class Member private constructor() {
     }
 
     override fun toString(): String {
-        return "Member(id=$id, email='$email', name='$name', createdAt=$createdAt, updatedAt=$updatedAt)"
+        return "Member(id=$id, email='$email', name='$name', createdAt=$createdAt, updatedAt=$updatedAt, orders=$orders, copons=$copons)"
     }
+
+
 }
