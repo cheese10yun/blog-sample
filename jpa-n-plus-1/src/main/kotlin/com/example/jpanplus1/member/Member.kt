@@ -2,7 +2,6 @@ package com.example.jpanplus1.member
 
 import com.example.jpanplus1.copon.Coupon
 import com.example.jpanplus1.order.Order
-import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
@@ -35,11 +34,11 @@ class Member private constructor() {
         private set
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    var orders: List<Order> = emptyList()
+    var orders: Set<Order> = emptySet()
         private set
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
-    var copons: List<Coupon> = emptyList()
+    var coupons: Set<Coupon> = emptySet()
         private set
 
     constructor(email: String, name: String) : this() {
@@ -48,7 +47,7 @@ class Member private constructor() {
     }
 
     override fun toString(): String {
-        return "Member(id=$id, email='$email', name='$name', createdAt=$createdAt, updatedAt=$updatedAt, orders=$orders, copons=$copons)"
+        return "Member(id=$id, email='$email', name='$name', createdAt=$createdAt, updatedAt=$updatedAt, orders=$orders, copons=$coupons)"
     }
 
 

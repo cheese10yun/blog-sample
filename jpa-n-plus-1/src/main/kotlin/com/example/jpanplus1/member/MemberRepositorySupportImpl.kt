@@ -16,20 +16,36 @@ class MemberRepositorySupportImpl : QuerydslRepositorySupport(Member::class.java
     val qOrder: QOrder = QOrder.order
 
     override fun findMemberAll(): MutableList<MemberDto> {
-
-
         return from(qMember)
-                .leftJoin(qMember.copons, qCoupon)
-                .leftJoin(qMember.orders, qOrder)
                 .select(Projections.constructor(MemberDto::class.java,
                         qMember.id,
                         qMember.email,
                         qMember.name,
-                        qMember.orders,
-                        qMember.copons,
                         qMember.createdAt,
                         qMember.updatedAt
                 ))
+                .leftJoin(qMember.coupons, qCoupon)
+                .leftJoin(qMember.orders, qOrder)
                 .fetch()
+    }
+
+    override fun findMemberww() {
+        val members = from(qMember)
+                .select(qMember.id,
+                        qMember.email,
+                        qMember.name,
+                        qOrder,
+                        qMember.createdAt,
+                        qMember.updatedAt
+                ).leftJoin(qMember.orders, qOrder)
+                .distinct()
+                .fetch()
+
+        for (member in members) {
+            println("member name is : ${member.get(qMember.name)}")
+
+            println(member.get(qMember.orders.isEmpty))
+
+        }
     }
 }

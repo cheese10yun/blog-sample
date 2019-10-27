@@ -1,7 +1,5 @@
 package com.example.jpanplus1.member
 
-import com.example.jpanplus1.copon.Coupon
-import com.example.jpanplus1.order.Order
 import sun.rmi.runtime.Log
 import java.time.LocalDateTime
 
@@ -9,8 +7,6 @@ data class MemberDto(
         val id: Long,
         val email: String,
         val name: String,
-        val orders: List<Order>,
-        val coupons: List<Coupon>,
         val createdAt: LocalDateTime,
         val updatedAt: LocalDateTime
 )
