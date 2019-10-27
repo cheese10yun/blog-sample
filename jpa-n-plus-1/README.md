@@ -229,7 +229,7 @@ internal fun `컬렉션을 페치 조인하면 페이징 API를 사용할 수 �
 ```
 ![](images/jpa-paging.png)
 
-이전에 [Paging 처리 Fetch Join 적용 시 limit 동작하지 않는 이슈](https://github.com/cheese10yun/blog-sample/tree/master/jpa-fetch-join)에서도 다룬 적있습니다. 해당 쿼리에서는 limit offset 관련된 쿼리문이 없습니다. **하이버네이트에서 컬렉션을 페치 조인하고 페지이 API를 사용하면 메모리에서 페이징 처리를 진행합니다.** 즉 데이터베이스에서는 FULL Scan 한 이후 모든 데이터를 메모리에 올린 이후 limit에 맞게 데이터를 만들게 됩니다. 우선 데이터베이스에 Full Sacn 하는 것도 문제지만 그것을 메모리에 올리기 때문에 메모리를 심하게 잡아먹게 됩니다. **컬렉션이 아닌 단일 값 연관 필드 페치 조인을 사용해도 페이징 API를 사용할 수 있습니다.**
+이전에 [Paging 처리 Fetch Join 적용 시 limit 동작하지 않는 이슈](https://github.com/cheese10yun/blog-sample/tree/master/jpa-fetch-join)에서도 다룬 적있습니다. 해당 쿼리에서는 limit offset 관련된 쿼리문이 없습니다. **하이버네이트에서 컬렉션을 페치 조인하고 페지이 API를 사용하면 메모리에서 페이징 처리를 진행합니다.** 즉 데이터베이스에서는 FULL Scan 한 이후 모든 데이터를 메모리에 올린 이후 limit에 맞게 데이터를 만들게 됩니다. 우선 데이터베이스에 Full Sacn 하는 것도 문제지만 그것을 메모리에 올리기 때문에 메모리를 심하게 잡아먹게 됩니다. **컬렉션이 아닌 단일 값 연관 필드의 경우에는 패치 조인을 사용해도 페이징 API를 사용할 수 있습니다.**
 
 ### 둘 이상 컬렉션을 페치할 수 없다.
 
