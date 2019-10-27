@@ -48,6 +48,7 @@
 * [Transaction Rollback 정리](https://github.com/cheese10yun/blog-sample/tree/master/spring-transaction-test)
 * [Spring Batch Study](https://github.com/cheese10yun/batch-study)
 * [Paging 처리 Fetch Join 적용시 limit 동작하지 않는 이슈](https://github.com/cheese10yun/blog-sample/tree/master/jpa-fetch-join)
+* [JPA N+1 발생원인과 해결방법](https://github.com/cheese10yun/blog-sample/tree/master/jpa-n-plus-1)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
