@@ -35,7 +35,7 @@ class Order private constructor() {
 
 ```kotlin
 @Test
-internal fun `즉시로딩 n+1`() {
+internal fun `즉시 로딩 n+1`() {
     // fetch = FetchType.EAGER 의 경우
     val members = memberRepository.findAll()
 }
@@ -48,7 +48,7 @@ internal fun `즉시로딩 n+1`() {
 ### 지연로딩과 N+1
 ```kotlin
 @Test
-internal fun `즉시로딩 n+1`() {
+internal fun `지연 로딩 n+1`() {
     // fetch = FetchType.LAZY 의 경우
     val members = memberRepository.findAll()
 }
