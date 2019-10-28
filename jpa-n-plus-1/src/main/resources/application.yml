@@ -2,7 +2,8 @@ spring:
   profiles:
     active: local
   jpa:
-    database: mysql
+#    database: mysql
+    database: h2
     hibernate:
       ddl-auto: create
     show-sql: true
@@ -10,20 +11,20 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
-#        dialect: org.hibernate.dialect.H2Dialect
-        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        dialect: org.hibernate.dialect.H2Dialect
+#        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
 
-
-#  datasource:
-#    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-#    username: root
-#    password:
-#    driver-class-name: org.h2.Driver
-#    initialization-mode: always
 
   datasource:
-    url: jdbc:mysql://localhost:3366/jpa_test?useSSL=false&serverTimezone=UTC
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: root
     password:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.h2.Driver
     initialization-mode: always
+
+#  datasource:
+#    url: jdbc:mysql://localhost:3366/jpa_test?useSSL=false&serverTimezone=UTC
+#    username: root
+#    password:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    initialization-mode: always
