@@ -11,6 +11,7 @@ import javax.persistence.*
 class Coupon private constructor() {
 
     @Id
+    @EmbeddedId
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0
 
@@ -36,5 +37,10 @@ class Coupon private constructor() {
     constructor(code: String) : this() {
         this.code = code
     }
+
+    override fun toString(): String {
+        return "Coupon(id=$id, code='$code', createdAt=$createdAt, updatedAt=$updatedAt, member=$member)"
+    }
+
 
 }
