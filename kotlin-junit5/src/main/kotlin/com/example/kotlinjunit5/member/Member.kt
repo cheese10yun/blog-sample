@@ -4,7 +4,7 @@ import javax.persistence.*
 
 
 @Table(name = "member")
-class Member protected constructor() {
+class Member private constructor() {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,11 +12,11 @@ class Member protected constructor() {
 
     @Column(name = "email", nullable = false, unique = true)
     lateinit var email: String
-        protected set
+        private set
 
     @Column(name = "name", nullable = false)
     lateinit var name: String
-        protected set
+        private set
 
     constructor(email: String, name: String) : this() {
         this.email = email
@@ -26,10 +26,5 @@ class Member protected constructor() {
     override fun toString(): String {
         return "Member(id=$id, email='$email', name='$name')"
     }
-
-    fun updateName(name: String) {
-        this.name = name
-    }
-
 
 }
