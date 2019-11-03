@@ -45,7 +45,7 @@ internal fun `분기의  value 값은 1 ~ 4 값이다`(quarter: Quarter) {
     assertThat(quarter.value in 1..4).isTrue()
 }
 ```
-enum에 정의된 모든 값들을 출력하는 것을 확인 할 수 있습니다. `@EnumSource`을 사용하면 모든 enum을 iterator 하기 편리합니다.   
+enum에 정의된 모든 값들을 출력하는 것을 확인할 수 있습니다. `@EnumSource`을 사용하면 모든 enum을 iterator 하기 편리합니다.
 
 ```kotlin
 @ParameterizedTest
@@ -55,7 +55,7 @@ internal fun `names을 통해서 특정 enum 값만 가져올 수 있다`(quarte
     assertThat(quarter.value in 1..2).isTrue()
 }
 ```
-특정 enum을 지정해서 가져오고 싶은 경우 `names = ["Q1", "Q2"]`을 사용하면 됩니다.  
+특정 enum을 지정해서 가져오고 싶은 경우 `names = ["Q1", "Q2"]`을 사용하면 됩니다.
 
 
 ## @CsvSource
@@ -77,7 +77,7 @@ internal fun `전화번호는 '-'를 제거한다`(value: String, expected: Stri
 
 ## @MethodSource
 
-`@MethodSource` 어노테이션을 통해서 복잡한 객체를 보다 쉽게 생성하고 테스트 할 수 있습니다. 
+`@MethodSource` 어노테이션을 통해서 복잡한 객체를 보다 쉽게 생성하고 테스트할 수 있습니다.
 
 ```kotlin
 data class Amount(
@@ -88,7 +88,7 @@ data class Amount(
         get() = price * ea
 }
 ```
-가격과 수량을 입력하면 totalPrice 계산하는 단순한 객체 입니다. 해당 객체를 `@MethodSource`를 통해서 테스트를 진행해 보겠습니다.  
+가격과 수량을 입력하면 totalPrice 계산하는 단순한 객체 입니다. 해당 객체를 `@MethodSource`를 통해서 테스트를 진행해 보겠습니다.
 
 ```kotlin
 @ParameterizedTest
@@ -107,7 +107,7 @@ companion object {
     )
 }
 ``` 
-`@MethodSource()`에 입력하는 문자열과,  값을 지정하는 static 메서드명과 일치해야 합니다. 테스트 하고자 하는 객체와, 예상되는 값을 넘겨 받아 다양한 객체의 경우를 쉽게 테스트 할 수 있습니다.
+`@MethodSource()`에 입력하는 문자열과,  값을 지정하는 static 메서드명과 일치해야 합니다. 테스트 하고자 하는 객체와, 예상되는 값을 넘겨받아 다양한 객체의 경우를 쉽게 테스트할 수 있습니다.
 
 ## Spring Boot
 
@@ -121,7 +121,7 @@ companion object {
 internal class MemberRepositoryTest(val memberRepository: MemberRepository) {
 
     @Test
-    internal fun `member save test`() {
+    internal fun `members 조회 테스트`() {
         //given
         val email = "asd@asd.com"
         val name = "name"
@@ -135,39 +135,90 @@ internal class MemberRepositoryTest(val memberRepository: MemberRepository) {
     }
 }
 ``` 
+
+### DSL 지원
+
+```kotlin
+@SpringBootTest
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@ActiveProfiles("test")
+@AutoConfigureMockMvc
+internal class MemberApiTest(
+        val memberRepository: MemberRepository,
+        val mockMvc: MockMvc
+) {
+
+    @Test
+    internal fun `test`() {
+        memberRepository.saveAll(listOf(
+                Member("email1@asd.com", "jin"),
+                Member("email2@asd.com", "yun"),
+                Member("email3@asd.com", "wan"),
+                Member("email4@asd.com", "kong"),
+                Member("email5@asd.com", "joo")
+        ))
+
+        mockMvc.get("/members") {
+            accept = MediaType.APPLICATION_JSON
+        }.andExpect {
+            content { contentType(MediaType.APPLICATION_JSON) }
+            jsonPath("$[0].name") { value("jin") }
+            jsonPath("$[1].name") { value("yun") }
+            jsonPath("$[2].name") { value("wan") }
+            jsonPath("$[3].name") { value("kong") }
+            jsonPath("$[4].name") { value("joo") }
+        }.andDo {
+            print()
+        }
+    }
+}
+```
+WebMvc에서도 DSL 사용을 할 수 있습니다. Web 관련 테스트 코드를 작성하기 더욱 편리해졌습니다.
+
 ## AssertJ
+Junit5의 관련된 내용은 아니지만 이번 Spring Boot 2.2 Release에서 AssertJ 관련된 내용이 있어 AssertJ의 사용과 간략한 팁을 정리했습니다.
 
-`AssertJ`는 개인적으로 선호 하는 Test Matcher입니다. static 메서드로 동작하기 때문에 자동 완성으로 Matcher 기능들을 손쉽게 사용 할 수 있고, Matcher에서 지원해주는 기능도 막강합니다. 
-
-AssertJ에서는 BDD 스타일의 BDDAssertion을 제공 해주고 있습니다.
+`AssertJ`는 개인적으로 선호하는 Test Matcher입니다. static 메서드로 동작하기 때문에 자동 완성으로 Matcher 기능들을 손쉽게 사용할 수 있고, Matcher에서 지원해주는 기능도 막강합니다. AssertJ에서는 BDD 스타일의 BDDAssertion을 제공해주고 있습니다.
 
 
 ```kotlin
-    @Test
-    internal fun `member save test`() {
-        //given
-        val email = "asd@asd.com"
-        val name = "name"
+@Test
+internal fun `member save test`() {
+    //given
+    val email = "asd@asd.com"
+    val name = "name"
 
-        //when
-        val member = memberRepository.save(Member(email, name))
+    //when
+    val member = memberRepository.save(Member(email, name))
 
-        //then
-        
-        // 기존 사용법 assertThat 
-        assertThat(member.email).isEqualTo(email)
-        assertThat(member.name).isEqualTo(name)
-        assertThat(member.createdAt).isBeforeOrEqualTo(LocalDateTime.now())
-        assertThat(member.updatedAt).isBeforeOrEqualTo(LocalDateTime.now())
-        
-        // BDD 사용법
-        then(member.email).isEqualTo(email)
-        then(member.name).isEqualTo(name)
-        then(member.createdAt).isBeforeOrEqualTo(LocalDateTime.now())
-        then(member.updatedAt).isBeforeOrEqualTo(LocalDateTime.now())
-    }
+    //then
+    
+    // 기존 사용법 assertThat 
+    assertThat(member.email).isEqualTo(email)
+    assertThat(member.name).isEqualTo(name)
+    assertThat(member.createdAt).isBeforeOrEqualTo(LocalDateTime.now())
+    assertThat(member.updatedAt).isBeforeOrEqualTo(LocalDateTime.now())
+    
+    // BDD 사용법
+    then(member.email).isEqualTo(email)
+    then(member.name).isEqualTo(name)
+    then(member.createdAt).isBeforeOrEqualTo(LocalDateTime.now())
+    then(member.updatedAt).isBeforeOrEqualTo(LocalDateTime.now())
+}
 ```
+`assertThat` -> `then` 으로 대체되었습니다. 코드도 적어지고 더 직관적으로 되어서 좋아졌습니다.
 
+
+```kotlin
+@Test
+internal fun `문장 검사`() {
+    then("AssertJ is best matcher").isNotNull()
+            .startsWith("AssertJ")
+            .contains(" ")
+            .endsWith("matcher")
+}
+```
+위와 같은 형식으로 코드를 연결해서 테스트할 수도 있습니다.
 
 ```kotlin
 @Test
@@ -185,19 +236,16 @@ internal fun `findByName test`() {
     val members = memberRepository.findByName("kim")
 
     //then
-    assertThat(members).anySatisfy {
-        assertThat(it.name).isEqualTo("kim")
+    then(members).anySatisfy {
+        then(it.name).isEqualTo("kim")
     }
 }
 ```
 
-`anySatisfy` 람다 표현식으로 members를 iterator돌리면서 해당 `kim`과 일치하는지 편리하게 확인할 수 있습니다.
- 
-
-
-
-
-
+`anySatisfy` 람다 표현식으로 members를 iterator 돌리면서 해당 `kim`과 일치하는지 편리하게 확인할 수 있습니다. 이 밖에도 다양한 것들을 제공하고 있고 계속 발전하고 있는 AssertJ를 추천드립니다.
 
 ## 참고
 * [Guide to JUnit 5 Parameterized Tests](https://www.baeldung.com/parameterized-tests-junit-5)
+* [머루의개발블로그 : Spring 5.2 와 Spring boot 2.2 추가된 Test 기능들](http://wonwoo.ml/index.php/post/category/kotlin)
+* [Spring Boot 2.2 Release Notes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.2-Release-Notes)
+* 
