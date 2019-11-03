@@ -106,7 +106,7 @@ companion object {
             Arguments.of(Amount(5000, 3), 15000)
     )
 }
-``` 
+```
 `@MethodSource()`에 입력하는 문자열과,  값을 지정하는 static 메서드명과 일치해야 합니다. 테스트 하고자 하는 객체와, 예상되는 값을 넘겨받아 다양한 객체의 경우를 쉽게 테스트할 수 있습니다.
 
 ## Spring Boot
@@ -248,4 +248,4 @@ internal fun `findByName test`() {
 * [Guide to JUnit 5 Parameterized Tests](https://www.baeldung.com/parameterized-tests-junit-5)
 * [머루의개발블로그 : Spring 5.2 와 Spring boot 2.2 추가된 Test 기능들](http://wonwoo.ml/index.php/post/category/kotlin)
 * [Spring Boot 2.2 Release Notes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.2-Release-Notes)
-* 
+* [Baeldung : Guide to JUnit 5 Parameterized Tests](https://www.baeldung.com/parameterized-tests-junit-5)
