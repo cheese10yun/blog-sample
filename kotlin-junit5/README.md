@@ -110,6 +110,7 @@ companion object {
 `@MethodSource()`에 입력하는 문자열과,  값을 지정하는 static 메서드명과 일치해야 합니다. 테스트 하고자 하는 객체와, 예상되는 값을 넘겨받아 다양한 객체의 경우를 쉽게 테스트할 수 있습니다.
 
 ## Spring Boot
+Junit5 관련된 내용은 아니지만 Junit5와 Spring Boot 관련 테스트할때 좋은 패턴을 정리했습니다.
 
 ### 생성자 주입
 `@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)` 어노테이션을 통해서 테스트 코드에서도 생성자 주입이 가능해 졌습니다.
@@ -137,7 +138,6 @@ internal class MemberRepositoryTest(val memberRepository: MemberRepository) {
 ``` 
 
 ### DSL 지원
-
 ```kotlin
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
@@ -174,6 +174,49 @@ internal class MemberApiTest(
 }
 ```
 WebMvc에서도 DSL 사용을 할 수 있습니다. Web 관련 테스트 코드를 작성하기 더욱 편리해졌습니다.
+
+### @Sql 손쉽게 Data Set up
+`*.sql` 파일로 손쉽게 데이터를 Set up할 수 있습니다. JPA를 사용중이라면 Given절로 JPA를 만들기가 어렵고 불편한 경우 사용하면 좋을거 같습니다.
+
+
+```sql
+# member-data-setup.sql
+insert into member (`email`, `name`, `created_at`, `updated_at`)
+values
+('sample1@asd.com', 'name', now(), now()),
+('sample2@asd.com', 'name', now(), now()),
+('sample3@asd.com', 'name', now(), now()),
+('sample4@asd.com', 'name', now(), now()),
+('sample5@asd.com', 'name', now(), now()),
+('sample6@asd.com', 'name', now(), now()),
+('sample15@asd.com', 'name', now(), now());
+```
+
+```
+└── test
+    ├── kotlin
+    │   └── com
+    └── resources
+        └── member-data-setup.sql
+```
+
+위에서 작성한  `*.sql` 파일을 `test/resources` 디렉토리에 위치시킵니다
+
+```kotlin
+@Test
+@Sql("/member-data-setup.sql")
+internal fun name() {
+    val members = memberRepository.findAll()
+
+    then(members).anySatisfy {
+        then(it.name).isEqualTo("name")
+        then(it.email).contains("@")
+                .startsWith("sample")
+                .endsWith("com")
+    }
+}
+```
+`@Sql` 어노테이션을 통헤서 해당 디렉터리의 위치와 파일 이름을 작성합니다. 기본적인 디렉터리를 `test/resources`을 바라보기 때문에 위와 같은 경우 파일명만 작성합니다.
 
 ## AssertJ
 Junit5의 관련된 내용은 아니지만 이번 Spring Boot 2.2 Release에서 AssertJ 관련된 내용이 있어 AssertJ의 사용과 간략한 팁을 정리했습니다.

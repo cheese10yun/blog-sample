@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
+import org.springframework.test.context.jdbc.Sql
 import java.time.LocalDateTime
 import javax.persistence.EntityManager
 
@@ -70,5 +71,18 @@ internal class MemberRepositoryTest(
                 .startsWith("AssertJ")
                 .contains(" ")
                 .endsWith("matcher")
+    }
+
+    @Test
+    @Sql("/member-data-setup.sql")
+    internal fun name() {
+        val members = memberRepository.findAll()
+
+        then(members).anySatisfy {
+            then(it.name).isEqualTo("name")
+            then(it.email).contains("@")
+                    .startsWith("sample")
+                    .endsWith("com")
+        }
     }
 }
