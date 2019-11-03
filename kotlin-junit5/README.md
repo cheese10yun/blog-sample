@@ -1,6 +1,6 @@
 # Junit5 With Kotlin
 
-Spring boot 2.2 버전부터는 Junit5 디펜던시를 기본으로 포함하고 있습니다.
+Spring boot 2.2 버전부터는 Junit5 디펜던시를 기본으로 포함하고 있습니다. Junit5 주요 테스트 어노테이션과 Spring boot에서 활용법을 정리해보았습니다. 
 
 ## @ValueSource
 
@@ -107,7 +107,97 @@ companion object {
     )
 }
 ``` 
-`@MethodSource()`에 입력하는 문자열과,  값을 지정하는 static 메서드명과 일치해야 합니다. 테스트 하고자 하는 객체와, 예상되는 값을 넘겨 받아 다양한 객체의 경우를 쉽게 테스트 할 수 있습니다. 
+`@MethodSource()`에 입력하는 문자열과,  값을 지정하는 static 메서드명과 일치해야 합니다. 테스트 하고자 하는 객체와, 예상되는 값을 넘겨 받아 다양한 객체의 경우를 쉽게 테스트 할 수 있습니다.
+
+## Spring Boot
+
+### 생성자 주입
+`@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)` 어노테이션을 통해서 테스트 코드에서도 생성자 주입이 가능해 졌습니다.
+
+```kotlin
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@ActiveProfiles("test")
+@DataJpaTest
+internal class MemberRepositoryTest(val memberRepository: MemberRepository) {
+
+    @Test
+    internal fun `member save test`() {
+        //given
+        val email = "asd@asd.com"
+        val name = "name"
+
+        //when
+        val member = memberRepository.save(Member(email, name))
+
+        //then
+        assertThat(member.email).isEqualTo(email)
+        assertThat(member.name).isEqualTo(name)
+    }
+}
+``` 
+## AssertJ
+
+`AssertJ`는 개인적으로 선호 하는 Test Matcher입니다. static 메서드로 동작하기 때문에 자동 완성으로 Matcher 기능들을 손쉽게 사용 할 수 있고, Matcher에서 지원해주는 기능도 막강합니다. 
+
+AssertJ에서는 BDD 스타일의 BDDAssertion을 제공 해주고 있습니다.
+
+
+```kotlin
+    @Test
+    internal fun `member save test`() {
+        //given
+        val email = "asd@asd.com"
+        val name = "name"
+
+        //when
+        val member = memberRepository.save(Member(email, name))
+
+        //then
+        
+        // 기존 사용법 assertThat 
+        assertThat(member.email).isEqualTo(email)
+        assertThat(member.name).isEqualTo(name)
+        assertThat(member.createdAt).isBeforeOrEqualTo(LocalDateTime.now())
+        assertThat(member.updatedAt).isBeforeOrEqualTo(LocalDateTime.now())
+        
+        // BDD 사용법
+        then(member.email).isEqualTo(email)
+        then(member.name).isEqualTo(name)
+        then(member.createdAt).isBeforeOrEqualTo(LocalDateTime.now())
+        then(member.updatedAt).isBeforeOrEqualTo(LocalDateTime.now())
+    }
+```
+
+
+```kotlin
+@Test
+internal fun `findByName test`() {
+    //given
+    memberRepository.saveAll(listOf(
+            Member("email1@asd.com", "kim"),
+            Member("email2@asd.com", "kim"),
+            Member("email3@asd.com", "kim"),
+            Member("email4@asd.com", "name"),
+            Member("email5@asd.com", "name")
+    ))
+
+    //when
+    val members = memberRepository.findByName("kim")
+
+    //then
+    assertThat(members).anySatisfy {
+        assertThat(it.name).isEqualTo("kim")
+    }
+}
+```
+
+`anySatisfy` 람다 표현식으로 members를 iterator돌리면서 해당 `kim`과 일치하는지 편리하게 확인할 수 있습니다.
+ 
+
+
+
+
+
 
 ## 참고
 * [Guide to JUnit 5 Parameterized Tests](https://www.baeldung.com/parameterized-tests-junit-5)
