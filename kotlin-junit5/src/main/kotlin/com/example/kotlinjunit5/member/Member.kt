@@ -2,8 +2,6 @@ package com.example.kotlinjunit5.member
 
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
-import org.springframework.data.annotation.CreatedDate
-import org.springframework.data.annotation.LastModifiedDate
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -24,10 +22,10 @@ class Member private constructor() {
     lateinit var name: String
         private set
 
-   @CreationTimestamp
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     lateinit var createdAt: LocalDateTime
-       private set
+        private set
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
@@ -39,7 +37,7 @@ class Member private constructor() {
         this.name = name
     }
 
-    fun changeName( name:String){
+    fun changeName(name: String) {
         this.name = name
     }
 
@@ -47,4 +45,13 @@ class Member private constructor() {
         return "Member(id=$id, email='$email', name='$name')"
     }
 
+    fun validateBeforeSave() {
+        fun validate(value: String, fieldName: String) {
+            if (value.isEmpty()) {
+                throw IllegalArgumentException("$id empty $fieldName")
+            }
+        }
+        validate(email, "email")
+        validate(name, "name")
+    }
 }

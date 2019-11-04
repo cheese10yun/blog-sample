@@ -287,6 +287,36 @@ internal fun `findByName test`() {
 
 `anySatisfy` 람다 표현식으로 members를 iterator 돌리면서 해당 `kim`과 일치하는지 편리하게 확인할 수 있습니다. 이 밖에도 다양한 것들을 제공하고 있고 계속 발전하고 있는 AssertJ를 추천드립니다.
 
+### thenThrownBy
+thenThrownBy을 통해서 Exception 테스트를 쉽게 진행할 수 있습니다.
+
+```kotlin
+class Member private constructor() {
+
+    fun validateBeforeSave() {
+        fun validate(value: String, fieldName: String) {
+            if (value.isEmpty()) {
+                throw IllegalArgumentException("$id empty $fieldName")
+            }
+        }
+        validate(email, "email")
+        validate(name, "name")
+    }
+}
+```
+빈 문자열인 경우 `IllegalArgumentException` 예외를 발생시키는 로직을 아래 처럼 테스트할 수 있습니다.
+
+```kotlin
+@Test
+internal fun `member 실패`() {
+    val member = Member("", "")
+    thenThrownBy { member.validateBeforeSave() }
+            .isExactlyInstanceOf(IllegalArgumentException::class.java)
+            .hasMessageContaining("empty")
+}
+```
+특정 예외가 발생하는지, 예외 메시지의 특정한 값이 존재하는지 간단하게 확인할 수 있습니다.
+
 ## 참고
 * [Guide to JUnit 5 Parameterized Tests](https://www.baeldung.com/parameterized-tests-junit-5)
 * [머루의개발블로그 : Spring 5.2 와 Spring boot 2.2 추가된 Test 기능들](http://wonwoo.ml/index.php/post/category/kotlin)
