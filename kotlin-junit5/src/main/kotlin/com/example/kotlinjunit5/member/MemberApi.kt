@@ -1,6 +1,7 @@
 package com.example.kotlinjunit5.member
 
 import org.springframework.web.bind.annotation.*
+import javax.validation.constraints.NotEmpty
 
 @RestController
 @RequestMapping("/members")
@@ -20,7 +21,9 @@ class MemberApi(
 }
 
 data class MemberSignUpRequest(
+        @field:NotEmpty
         val name: String,
+        @field:NotEmpty
         val email: String
 ) {
 

@@ -16,3 +16,9 @@ spring:
     password:
     driver-class-name: org.h2.Driver
     initialization-mode: always
+
+
+sample:
+  email: "yun@sample.com"
+  number: 20
+  date: "2019-10-10"
