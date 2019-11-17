@@ -5,7 +5,7 @@ Checked Exception을 처리하는 전략과 그것에 유의해야 할 점들에
 
 ## Checked,Unchecked *Exception* 차이
 
-![](https://github.com/cheese10yun/TIL/blob/master/draw/excpetion-class-diagram.png?raw=true)
+![](https://raw.githubusercontent.com/cheese10yun/TIL/master/assets/excpetion-class-diagram.png)
 
 
 Error는 시스템이 비정상적인 상황에서 발생하다. 이 수준의 Error는 시스템 레벨에서 발생하는 심각한 수준의 오류이기 때문에 개발자가 미리 예측할 수도 없고 처리할 수 있는 방법도 없다. 애플리케이션 반에서는 Error에 대한 처리를 신경 쓰지 않아도 된다. OutOfMemoryError이나 ThreadDeath 같은 에러는 try catch으로 잡아도 할 수 있는 것이 없기 때문이다.
