@@ -14,12 +14,12 @@ class Config {
         return RestTemplate()
     }
 
-    @HystrixCommand(
-            commandProperties = [HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "10")]
-    )
-    fun getOrganization(organizationId: String) {
-
-    }
+//    @HystrixCommand(
+//            commandProperties = [HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "10")]
+//    )
+//    fun getOrganization(organizationId: String) {
+//
+//    }
 
 //    @HystrixCommand(fallbackMethod = "buildFallbackLicenseList")
 //    fun getLicenses(organizationId: String): List<String> {
@@ -32,13 +32,13 @@ class Config {
 //                .withProductName("sample"))
 //    }
 
-    @HystrixCommand(
-            fallbackMethod = "buildFallbackLicenseList",
-            threadPoolKey = "licenseByOrgThreadPool",
-            threadPoolProperties = [
-                HystrixProperty(name = "coreSize", value = "30"),
-                HystrixProperty(name = "maxQueueSize", value = "30"),
-            ]
-    )
+//    @HystrixCommand(
+//            fallbackMethod = "buildFallbackLicenseList",
+//            threadPoolKey = "licenseByOrgThreadPool",
+//            threadPoolProperties = [
+//                HystrixProperty(name = "coreSize", value = "30"),
+//                HystrixProperty(name = "maxQueueSize", value = "30"),
+//            ]
+//    )
 
 }
