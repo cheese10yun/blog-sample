@@ -7,17 +7,27 @@ import org.springframework.validation.annotation.Validated
 import java.time.LocalDate
 import javax.validation.constraints.Email
 import javax.validation.constraints.Min
+import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
 
 @ConstructorBinding
-@ConfigurationProperties(prefix = "sample")
+@ConfigurationProperties(prefix = "user")
 @Validated
-data class SampleProperties(
+data class UserProperties(
         @field:Email
         val email: String,
 
+        @field:NotEmpty
+        val nickname: String,
+
         @field:Min(10)
-        val number: Long,
+        val age: Int,
+
+        @field:NotNull
+        val auth: Boolean,
+
+        @field:Min(10)
+        val amount: Double,
 
         @DateTimeFormat(pattern = "yyyy-MM-dd")
         @field:NotNull

@@ -18,7 +18,10 @@ spring:
     initialization-mode: always
 
 
-sample:
-  email: "yun@sample.com"
-  number: 20
+user:
+  email: "yun@test.com"
+  nickname: "yun"
+  age: 28
+  auth: false
+  amount: 101
   date: "2019-10-10"

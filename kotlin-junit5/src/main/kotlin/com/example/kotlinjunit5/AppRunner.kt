@@ -5,20 +5,10 @@ import org.springframework.boot.ApplicationRunner
 import org.springframework.stereotype.Component
 
 @Component
-class AppRunner(private val sampleProperties: SampleProperties) :ApplicationRunner{
-
-
+class AppRunner(private val userProperties: UserProperties) :ApplicationRunner{
     override fun run(args: ApplicationArguments?) {
-
         println("=====================")
-        println(sampleProperties.toString())
+        println(userProperties.toString())
         println("=====================")
-
-
-        println("==================")
-        println(Sample.Properties.email)
-        println("==================")
-
-
     }
 }
