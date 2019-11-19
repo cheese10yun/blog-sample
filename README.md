@@ -50,6 +50,7 @@
 * [Paging 처리 Fetch Join 적용시 limit 동작하지 않는 이슈](https://github.com/cheese10yun/blog-sample/tree/master/jpa-fetch-join)
 * [JPA N+1 발생원인과 해결방법](https://github.com/cheese10yun/blog-sample/tree/master/jpa-n-plus-1)
 * [Junit5 with Spring boot](https://github.com/cheese10yun/blog-sample/tree/master/kotlin-junit5)
+* [Immutable Properties 설정하는 방법](https://github.com/cheese10yun/blog-sample/blob/master/kotlin-junit5/docs/data-properties.md)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
