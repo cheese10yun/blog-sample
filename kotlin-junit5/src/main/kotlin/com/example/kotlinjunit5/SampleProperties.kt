@@ -22,17 +22,4 @@ data class SampleProperties(
         @DateTimeFormat(pattern = "yyyy-MM-dd")
         @field:NotNull
         val date: LocalDate
-) {
-
-    init {
-        Sample.Properties.email = this.email
-
-    }
-}
-
-
-enum class Sample {
-    Properties;
-
-    lateinit var email: String
-}
+)
