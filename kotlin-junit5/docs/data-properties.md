@@ -20,9 +20,9 @@ public class SampleProperties {
 }
 ```
 
-**기존 방식은 위처럼 setter 기반으로 바인딩 되기 때문에 해당 Properteis 설정은 언제든지 변경될 가능성이 있습니다.** 이런 단점을 스프링 부트 2.2에서는 생성자 바인딩을 지원해서 해결했습니다.
+**기존 방식은 위처럼 setter 기반으로 바인딩 되기 때문에 해당 Properties 설정은 언제든지 변경될 가능성이 있습니다.** 이런 단점을 스프링 부트 2.2에서는 생성자 바인딩을 지원해서 해결했습니다.
 
-## Immutable Properteis 방법
+## Immutable Properties 방법
 해당 예제는 Kotlin `data class` 기준으로 작성했습니다.
 
 ```kotlin
