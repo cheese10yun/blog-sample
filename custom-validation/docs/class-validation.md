@@ -71,7 +71,7 @@ ConstraintValidator을 직접 구현하지 않고도 다양한 방법으로 해�
 이러한 컨트롤러에서의 중복 코드를 제거하기 위해서는 **컨트롤러 진입 직전 Interceptor에서 검증하는 것이 바람직합니다.** `ConstraintValidator` 기반으로 유효성 검증을 진행하면 검증 시점의(Interceptor에서 진행) 통일성을 갖습니다. 
 
 ### 일관성 있는 ErrorResponse
-[스프링 가이드 - 통일된 Error Response 객체](https://github.com/cheese10yun/spring-guide/blob/master/docs/exception-guide.md#통일된-error-response-객체)에서 이야기했듯이 ErrorReponse는 항상 동일한 포맷으로 나 갸야 합니다. `ConstraintValidator`을 사용해서 `@Valid`을 기반으로 검증을 하면 `MethodArgumentNotValidException`이 발생하고 이 예외를 [@ControllerAdvice로 모든 예외를 핸들링](https://github.com/cheese10yun/spring-guide/blob/master/docs/exception-guide.md#controlleradvice로-모든-예외를-핸들링)에서 정리한 것처럼 통일성 있는 ErrorResponse 포맷으로 처리할 수 있습니다.
+[스프링 가이드 - 통일된 Error Response 객체](https://github.com/cheese10yun/spring-guide/blob/master/docs/exception-guide.md#통일된-error-response-객체)에서 이야기했듯이 ErrorReponse는 항상 동일한 포맷으로 응답해야 합니다. `ConstraintValidator`을 사용해서 `@Valid`을 기반으로 검증을 하면 `MethodArgumentNotValidException`이 발생하고 이 예외를 [@ControllerAdvice로 모든 예외를 핸들링](https://github.com/cheese10yun/spring-guide/blob/master/docs/exception-guide.md#controlleradvice로-모든-예외를-핸들링)에서 정리한 것처럼 통일성 있는 ErrorResponse 포맷으로 처리할 수 있습니다.
 
 ```
 POST http://127.0.0.1:8080/order
