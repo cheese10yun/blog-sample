@@ -73,7 +73,7 @@ spring:
       bindings:
         output: # output은 채널 이름
           destination:  orgChangeTopic # 메시지를 넣을 메시지 큐(또는 토픽) 이름이다
-          content-type: application/json # 스프링 클라우드 스트림에 송수신할 메시지 타입 정보를 제공한다
+          content-type: application/json# 스프링 클라우드 스트림에 송수신할 메시지 타입 정보를 제공한다
         kafka: # cloud.bindings.kafka 프로퍼티는 해당 서비스가 메시지 버스로 카파를 사ㅛㅇ할 것이라고 스프링에 전달한다 (대안으로 Rabbmit MQ를 사용할 수 있다.)
           binder:
             zkNodes: localhost # zkNodes와 brokers 프로퍼티는 스프링 클라우드 스트림에 카프카와 주키퍼의 네이퉈크를 위치를 전달한다.
