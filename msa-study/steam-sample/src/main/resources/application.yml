@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: organization-service
+
+  cloud:
+    stream:
+      bindings:
+        output:
+          destination:  orgChangeTopic
+          content-type: application/json
+        kafka:
+          binder:
+            zkNodes: localhost
+            brokers: localhost
