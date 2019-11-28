@@ -11,7 +11,6 @@ import javax.persistence.*
 class Coupon private constructor() {
 
     @Id
-    @EmbeddedId
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long = 0
 
