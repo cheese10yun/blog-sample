@@ -52,6 +52,8 @@
 * [Junit5 with Spring boot](https://github.com/cheese10yun/blog-sample/tree/master/kotlin-junit5)
 * [Immutable Properties 설정하는 방법](https://github.com/cheese10yun/blog-sample/blob/master/kotlin-junit5/docs/data-properties.md)
 * [트랜잭션 단위](https://github.com/cheese10yun/blog-sample/blob/master/kotlin-junit5/docs/transaction.md)
+* [Application Event](https://github.com/cheese10yun/blog-sample/tree/master/application-event)
+
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
 * [IntelliJ 사용법](https://github.com/cheese10yun/IntelliJ)
