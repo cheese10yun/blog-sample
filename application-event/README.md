@@ -71,11 +71,3 @@ class OrderEventHandler(
 }
 ```
 이벤트 리스너를 담당합니다. 주문 완료 이벤트가 발생하면 해당 리스너가 동작하게 되고 장바구니에서 주문 상품들을 제거하는 코드입니다.
-
-
-
-
-
-* https://engkimbs.tistory.com/718
-* https://javacan.tistory.com/entry/Handle-DomainEvent-with-Spring-ApplicationEventPublisher-EventListener-TransactionalEventListener
-* https://medium.com/@SlackBeck/spring-framework%EC%9D%98-applicationevent-%ED%99%9C%EC%9A%A9%EA%B8%B0-845fd2d29f32
