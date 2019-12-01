@@ -15,7 +15,14 @@
 스프링 클라우드 스트림에서 서비스는 싱크를 사용해 큐에서 메시지를 받는다. 싱크는 들어오는 메시지를 위해 채널을 수신 대기하고, 메시지를 다시 POJO로 역질렬화한다. 이 과정에서 스프링 서비스의 비지니스 로직이 메시지를 처리할 수 있다.
 
 
-## Code 
+## 메시지 생상자 작성 : 이벤트 Publisher
+
+![](https://github.com/cheese10yun/TIL/raw/master/assets/spring-cloud-stream.png)
+
+* 소스: 메시지를 발행하기 위해 내부적으로 사용하는 bean 이름
+* 채널: 카프카 토픽에 매핑되는 스프링 클라우드 스트림의 채널 이름
+* 바인더: 카프카 서버에 바인딩하는 스프링 클라우드 스트림 클래스와 구성
+
 ```kotlin
 @SpringBootApplication
 @EnableBinding(Source::class)
@@ -31,7 +38,7 @@ fun main(args: Array<String>) {
 * 스프링 클라우드 스트림은 메시지 브로커와 통신할 수 있는 기본 채널이 있다.
 
  
- ```kotlin
+```kotlin
 @Component
 class SimpleSourceBean(
         private val source: Source
@@ -93,4 +100,43 @@ class OrganizationService(
     }
 }
 ```
-메시지를 발행한다 
+메시지를 발행한다.
+
+## 메시지 소비자 작성 : 이벤스 Consumer
+![](https://github.com/cheese10yun/TIL/raw/master/assets/spring-cloud-consumer.png)
+
+```kotlin
+@SpringBootApplication
+@EnableBinding(Sink::class)
+class SteamApplication
+
+fun main(args: Array<String>) {
+    runApplication<SteamApplication>(*args)
+}
+
+@StreamListener(Sink.INPUT)
+fun loggerSink(model: OrganizationChangeModel){
+    println("Received an event for : $model")  
+}
+```
+
+* 메시지 소비자 이므로 `@EnableBinding(Sink::class)`애너테이션에 `Sink.class`을 전달한다.
+* `Sink.INPUT` 스프링 클라우드 스트림은 Sink 인터페이스에 기본 채널을 노출한다. Sink 인터페이스의 채널은 Input 이라고 하며 채널로 들어오는 메시지를 수신한다.
+* `@EnableBinding` 애너테이션을 사용해서 메시지를 수신한다고 정의 한다. 이제 싱크 input 채널에 들어오는 세메지를 처리하는 코드를 작성 할 수 있다.
+* `@StreamListener` 애너테이션은 input 채널에 메시지가 수신될 때 마다 `loggerSink()`메서드를 실행하도록 스프링 클라우드 스트림을 설정한다. 스프링 클라우드 스트림은 채널에서 받은 메시지를 POJO로 자동 역직렬화 한다.
+
+
+```yml
+cloud:
+    stream:
+      bindings:
+        input: // input 채널을 orgChangeTopic 큐에 매핑한다.
+          destination:  orgChangeTopic
+          content-type: application/json
+          group: licensingGroup // group 프로퍼트는 한번 만 처리하는 의미를 보장하는 데 사용 된다.
+        kafka:
+          binder:
+            zkNodes: localhost
+            brokers: localhost
+```
+input 채널 orgChangeTopic에 매핑된다. group 이라는 프로퍼티는 메시지를 소비할 소비자 그룹의 이름을 정의한다. 소비자 그룹 갸뇸과 같다. 동일한 메시지 큐를 수신하는 여러 서비스 도두 많은 인스턴스를 가지고 있다. 각각의 고유 서비스가 메시지 복사본을 처리하길 원하지만 서비스 인스턴스 그룹 안에서는 한 서비스 인서턴스만 메시지를 사용하고 처리해야 한다.
