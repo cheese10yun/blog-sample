@@ -105,6 +105,7 @@ class OrganizationService(
 ## 메시지 소비자 작성 : 이벤스 Consumer
 ![](https://github.com/cheese10yun/TIL/raw/master/assets/spring-cloud-consumer.png)
 
+
 ```kotlin
 @SpringBootApplication
 @EnableBinding(Sink::class)
@@ -140,3 +141,8 @@ cloud:
             brokers: localhost
 ```
 input 채널 orgChangeTopic에 매핑된다. group 이라는 프로퍼티는 메시지를 소비할 소비자 그룹의 이름을 정의한다. 소비자 그룹 갸뇸과 같다. 동일한 메시지 큐를 수신하는 여러 서비스 도두 많은 인스턴스를 가지고 있다. 각각의 고유 서비스가 메시지 복사본을 처리하길 원하지만 서비스 인스턴스 그룹 안에서는 한 서비스 인서턴스만 메시지를 사용하고 처리해야 한다.
+
+![](https://github.com/cheese10yun/TIL/raw/master/assets/spring-cloud-event-topic.png)
+
+**라이선싱 서비스 인스턴스끼리 동일한 소비자 그룹을 공유하므로 메세지는 정확하게 하나의 서비스 인스턴스로 소비된다.**
+
