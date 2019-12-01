@@ -1,0 +1,12 @@
+piVersion: v1
+kind: Service
+metadata:
+  name: hello-svc
+spec:
+  selector:
+    app: hello
+  ports:
+    - port: 8200
+      targetPort: 8000
+  externalIPs:
+  - 192.168.0.30
