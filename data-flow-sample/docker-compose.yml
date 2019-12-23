@@ -8,6 +8,10 @@ services:
       MYSQL_DATABASE: dataflow
       MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: rootpw
+    ports:
+      - '3306:3306'
+    volumes:
+      - './volumes/mysql:/var/lib/mysql'
     expose:
       - 3306
 
