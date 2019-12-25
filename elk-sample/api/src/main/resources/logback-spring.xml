@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <appender name="stash" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>info</level>
+    </filter>
+    <file>/Users/yun.cheese/Desktop/file.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>/Users/yun.cheese/Desktop/file.log.%d{yyyy-MM-dd}</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+  </appender>
+  <root level="all">
+    <appender-ref ref="stash"/>
+  </root>
+</configuration>
