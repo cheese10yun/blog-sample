@@ -1,4 +1,4 @@
-version: '2.2'
+version: '3.2'
 services:
   es01:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.5.1
@@ -74,12 +74,38 @@ services:
     networks:
       - elastic
 
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.5.1
+    container_name: logstash
+    command: logstash -f /usr/share/logstash/pipeline/logstash.conf
+    volumes:
+      - type: bind
+        source: ./logstash/config/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+      - type: bind
+        source: ./logstash/pipeline
+        target: /usr/share/logstash/pipeline
+        read_only: true
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    ports:
+      - 5044:5044
+    networks:
+      - elastic
+    depends_on:
+      - es01
+      - es02
+      - es03
+
 volumes:
   data01:
     driver: local
   data02:
     driver: local
   data03:
+    driver: local
+  logstash:
     driver: local
 
 networks:

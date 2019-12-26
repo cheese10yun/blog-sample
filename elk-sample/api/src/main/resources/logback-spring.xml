@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <appender name="stash" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+  <springProperty scope="context" name="port" source="server.port"/>
+  <springProperty scope="context" name="profile" source="spring.profiles.active"/>
+
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+  <appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+
+    <destination>127.0.0.1:5044</destination>
+
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>info</level>
     </filter>
-    <file>/Users/yun.cheese/Desktop/file.log</file>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>/Users/yun.cheese/Desktop/file.log.%d{yyyy-MM-dd}</fileNamePattern>
-      <maxHistory>30</maxHistory>
-    </rollingPolicy>
+
     <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
   </appender>
-  <root level="all">
+
+  <root level="info">
     <appender-ref ref="stash"/>
   </root>
+
 </configuration>
