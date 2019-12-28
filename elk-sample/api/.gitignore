@@ -31,3 +31,4 @@ out/
 ### VS Code ###
 .vscode/
 /volume/
+.DS_Store
