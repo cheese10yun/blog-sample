@@ -97,6 +97,7 @@ services:
       - es01
       - es02
       - es03
+      - kib01
 
 volumes:
   data01:
