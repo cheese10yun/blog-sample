@@ -32,3 +32,5 @@ out/
 .vscode/
 /volume/
 .DS_Store
+
+applicatoin.*log
