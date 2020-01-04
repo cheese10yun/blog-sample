@@ -13,7 +13,7 @@ import org.springframework.cloud.task.repository.TaskExecution
 class DataFlowApplication : ApplicationRunner, TaskExecutionListener {
 
     override fun run(args: ApplicationArguments) {
-        println("Spring Cloud Task!  : ${args.sourceArgs[0]}")
+//        println("Spring Cloud Task!  : ${args.sourceArgs[0]}")
     }
 
     override fun onTaskStartup(taskExecution: TaskExecution) {
