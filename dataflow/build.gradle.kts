@@ -4,7 +4,6 @@ plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
     kotlin("jvm")
-    kotlin("kapt")
     kotlin("plugin.spring")
     kotlin("plugin.jpa")
 }
@@ -19,21 +18,23 @@ configurations {
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
 extra["springCloudVersion"] = "Hoxton.SR1"
+
+allprojects{
+    repositories {
+        jcenter()
+    }
+}
 
 subprojects {
 
     apply(plugin = "java")
     apply(plugin = "kotlin")
-    apply(plugin = "kotlin-kapt")
     apply(plugin = "kotlin-spring")
     apply(plugin = "kotlin-jpa")
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
+    apply(plugin = "maven")
 
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-batch")
@@ -48,22 +49,22 @@ subprojects {
         }
         testImplementation("org.springframework.batch:spring-batch-test")
     }
-}
 
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+        }
+    }
 
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "1.8"
+        }
     }
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "1.8"
-    }
-}

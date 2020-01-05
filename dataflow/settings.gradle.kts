@@ -1,5 +1,10 @@
 rootProject.name = "dataflow"
 
+include(
+        "task"
+//        "task:sample-task"
+)
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
