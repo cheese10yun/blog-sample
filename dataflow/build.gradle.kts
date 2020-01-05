@@ -5,7 +5,7 @@ plugins {
     id("io.spring.dependency-management")
     kotlin("jvm")
     kotlin("plugin.spring")
-    kotlin("plugin.jpa") apply false
+    kotlin("plugin.jpa")
 }
 
 group = "com.dataflow"

@@ -1,20 +1,29 @@
 spring:
+  main.allow-bean-definition-overriding: true
+
   application:
     name: task-sample
   jpa:
     database: mysql
-    properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         format_sql: true
         use_sql_comments: true
 
   datasource:
-    url: jdbc:mysql://localhost:3306/task_sample?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/dataflow?useSSL=false&serverTimezone=UTC
     username: root
     password: rootpw
     driver-class-name: com.mysql.cj.jdbc.Driver
     initialization-mode: always
+
+  batch:
+    initialize-schema: never
+
+  cloud:
+    task:
+      initialize-enabled: false
