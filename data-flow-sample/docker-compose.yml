@@ -57,7 +57,7 @@ services:
       - kafka
     entrypoint: "./wait-for-it.sh mysql:3306 -- java -jar /maven/spring-cloud-dataflow-server.jar"
     volumes:
-      - ./volume/apps:/root/apps
+      - ./volume/apps:/root/jar
 
 
   app-import:
