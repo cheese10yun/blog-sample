@@ -57,8 +57,7 @@ services:
       - kafka
     entrypoint: "./wait-for-it.sh mysql:3306 -- java -jar /maven/spring-cloud-dataflow-server.jar"
     volumes:
-      - ./volume/apps:/root/jar
-
+      - ./volume/.m2:/root/.m2
 
   app-import:
     image: springcloud/openjdk:2.0.0.RELEASE
@@ -88,8 +87,6 @@ services:
       - SPRING_DATASOURCE_PASSWORD=rootpw
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.mariadb.jdbc.Driver
     entrypoint: "./wait-for-it.sh mysql:3306 -- java -Djava.security.egd=file:/dev/./urandom -jar /spring-cloud-skipper-server.jar"
-    volumes:
-      - ./volume/apps:/root/apps
 
   # Grafana is configured with the Prometheus datasource.
   # Use `docker exec -it prometheus /bin/sh` to logging in the container
