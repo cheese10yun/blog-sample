@@ -8,7 +8,7 @@ plugins {
     kotlin("plugin.jpa") apply false
 }
 
-group = "com.example"
+group = "com.dataflow"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
