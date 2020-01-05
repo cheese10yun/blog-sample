@@ -1,3 +1,5 @@
+version = "0.0.1-SNAPSHOT"
+
 plugins {
     kotlin("plugin.jpa")
     kotlin("plugin.spring")
