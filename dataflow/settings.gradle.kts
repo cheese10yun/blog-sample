@@ -1,8 +1,8 @@
 rootProject.name = "dataflow"
 
 include(
-        "task"
-//        "task:sample-task"
+        "task",
+        "task:sample-task"
 )
 
 pluginManagement {
