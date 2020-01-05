@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: task-sample
+  jpa:
+    database: mysql
+    properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/task_sample?useSSL=false&serverTimezone=UTC
+    username: root
+    password: rootpw
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    initialization-mode: always
