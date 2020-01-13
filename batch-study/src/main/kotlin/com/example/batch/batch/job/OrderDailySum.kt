@@ -32,6 +32,7 @@ class OrderDailySum(
     @Bean
     @JobScope
     fun orderDailySumStep(@Value("#{jobParameters[requestDate]}") requestDate : String): Step {
+        println(requestDate)
         return stepBuilderFactory.get("orderDailrequestDateySumStep")
                 .tasklet(tasklet())
                 .build()

@@ -63,19 +63,12 @@ public class InactiveUserJobConfig {
     @StepScope
     public JpaPagingItemReader<User> inactiveUserReader2() {
 
-
-        final JpaPagingItemReader reader = new JpaPagingItemReader(){
-
+        return new JpaPagingItemReader(){
             @Override
             public int getPage(){
                 return 0;
             }
         };
-
-
-
-
-
     }
 
     public ItemProcessor<User, User> inactiveUserProcessor() {

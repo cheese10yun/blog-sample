@@ -10,7 +10,7 @@ spring:
 #      hibernate.format_sql: true
 
   datasource:
-    url: jdbc:mysql://localhost:3306/batch_study?useSSL=false&serverTimezone=UTC&autoReconnect=true
+    url: jdbc:mysql://localhost:3366/batch?useSSL=false&serverTimezone=UTC&autoReconnect=true
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
