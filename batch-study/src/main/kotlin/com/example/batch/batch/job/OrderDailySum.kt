@@ -7,6 +7,7 @@ import org.springframework.batch.core.StepContribution
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
+import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.repeat.RepeatStatus
 import org.springframework.beans.factory.annotation.Value
@@ -25,6 +26,7 @@ class OrderDailySum(
     @Bean
     fun orderDailySumJob(): Job {
         return jobBuilderFactory.get("orderDailySumJob")
+                .incrementer(RunIdIncrementer())
                 .start(orderDailySumStep(""))
                 .build()
     }
