@@ -9,7 +9,6 @@ import java.util.*
 @Repository
 class JdbcBookRepository(
         private val jdbcTemplate: JdbcTemplate
-
 ) : BookRepository {
 
     override fun count(): Int {

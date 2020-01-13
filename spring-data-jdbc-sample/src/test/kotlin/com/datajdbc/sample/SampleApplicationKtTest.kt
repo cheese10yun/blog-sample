@@ -39,35 +39,28 @@ internal class SampleApplicationKtTest {
             bookRepository.save(book)
         })
 
-
-        // count
         // count
         val count = bookRepository.count()
         log.info("[COUNT] Total books: {$count}")
 
         // find all
-        // find all
         val findAll1 = bookRepository.findAll()
         log.info("[FIND_ALL] {$findAll1}")
 
-        // find by id
         // find by id
         log.info("[FIND_BY_ID] :2L")
         val book: Book = bookRepository.findById(2L).orElseThrow({ IllegalArgumentException() })
         log.info("{$book}")
 
         // find by name (like) and price
-        // find by name (like) and price
         log.info("[FIND_BY_NAME_AND_PRICE] : like '%Java%' and price <= 10")
         val findByNameAndPrice = bookRepository.findByNameAndPrice("Java", BigDecimal(10))
         log.info("{$findByNameAndPrice}")
 
         // get name (string) by id
-        // get name (string) by id
         val nameById = bookRepository.getNameById(1L)
         log.info("[GET_NAME_BY_ID] :1L = {$nameById}")
 
-        // update
         // update
         log.info("[UPDATE] :2L :99.99")
         book.price = BigDecimal("99.99")
@@ -75,15 +68,12 @@ internal class SampleApplicationKtTest {
         log.info("rows affected: {$update}")
 
         // delete
-        // delete
         log.info("[DELETE] :3L")
         val deleteById = bookRepository.deleteById(3L)
         log.info("rows affected: {$deleteById}")
 
         // find all
-        // find all
         val findAll = bookRepository.findAll()
         log.info("[FIND_ALL] {$findAll}")
-
     }
 }
