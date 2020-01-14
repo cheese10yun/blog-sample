@@ -1,4 +1,5 @@
 spring:
+  main.allow-bean-definition-overriding: true
   batch.job.names: ${job.name:NONE}
   jpa:
     database: mysql
@@ -6,8 +7,8 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: true
-#    properties:
-#      hibernate.format_sql: true
+  #    properties:
+  #      hibernate.format_sql: true
 
   datasource:
     url: jdbc:mysql://localhost:3366/batch?useSSL=false&serverTimezone=UTC&autoReconnect=true
@@ -19,7 +20,6 @@ spring:
       test-on-borrow: true
       validation-query: select 1
 
-logging:
   level:
     ROOT: info
     org:
