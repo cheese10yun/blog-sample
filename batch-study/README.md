@@ -8,3 +8,4 @@
 * [Multi Step](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/multi-step.md)
 * [Batch Table](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-table.md)
 * [Batch Test](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-test.md)
+* [Batch Job](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-job.md)
