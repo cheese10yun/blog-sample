@@ -305,3 +305,112 @@ Flow을 설명할때 **BatchStatus와 ExitStatus의 차이를 아는 것이 중�
    * 실제 해당 Step이 처리해야할 로직외에도 분기를 시키기 위해 ExitStatus 조작이 필요합니다.
  * 다양한 분기 로직 처리의 어려움
    * ExitStatus를 커스텀하게 고치기 위해서는 Listener를 생성하고 Job Flow에 등록하는 등 번거로움이 존재합니다.
+
+**Spring Batch에서는 Step들의 Flow속에서 분기만 담당하는 타입이 있습니다.**
+
+```kotlin
+@Configuration
+class DeciderJobConfiguration(
+        private val jobBuilderFactory: JobBuilderFactory,
+        private val stepBuilderFactory: StepBuilderFactory
+) {
+
+    private val log by logger()
+
+    @Bean
+    fun deciderJob(inactiveJobListener: InactiveJobListener): Job {
+
+        //@formatter:off
+        return jobBuilderFactory.get("deciderJob")
+                .listener(inactiveJobListener)
+                .start(startStep())
+                .next(decider()) // 짝수 or 홀 수 구분
+                .from(decider()) // decider의 상태가
+                    .on("ODD") // ODD 라면
+                    .to(oddStep()) // oddStep 으로 간다
+                .from(decider()) // decider 상태가
+                    .on("EVEN") // EVEN 이면
+                    .to(evenStep()) // evenStep 으로 간다
+                .end()
+                .build()
+        //@formatter:on
+
+    }
+
+    @Bean
+    fun startStep(): Step = stepBuilderFactory.get("startStep")
+            .tasklet { contribution, chunkContext ->
+                log.info("Start")
+                RepeatStatus.FINISHED
+            }
+            .build()
+
+    @Bean
+    fun evenStep(): Step = stepBuilderFactory.get("evenStep")
+            .tasklet { contribution, chunkContext ->
+                log.info("짝수입니다.")
+                RepeatStatus.FINISHED
+            }
+            .build()
+
+    @Bean
+    fun oddStep(): Step = stepBuilderFactory.get("oddStep")
+            .tasklet { contribution, chunkContext ->
+                log.info("홀수입니다.")
+                RepeatStatus.FINISHED
+            }
+            .build()
+
+    @Bean
+    fun decider(): JobExecutionDecider = OddDecider()
+}
+
+class OddDecider : JobExecutionDecider {
+
+    override fun decide(jobExecution: JobExecution, @Nullable stepExecution: StepExecution?): FlowExecutionStatus {
+        val random = Random()
+        val randomNumber = random.nextInt(50) + 1
+        return when {
+            randomNumber % 2 == 0 -> FlowExecutionStatus("EVEN")
+            else -> FlowExecutionStatus("ODD")
+        }
+    }
+}
+```
+
+* start()
+  * Job Flow의 첫번째 Step을 시작합니다.
+* next()
+  * startStep 이후에 decider를 실행합니다.
+* from()
+  * from은 이벤트 리스너 역할을 합니다.
+  * decider의 상태값을 보고 일치하는 상태라면 to()에 포함된 step 를 호출합니다.
+
+ 분기 로직에 대한 모든 일은 `OddDecider`에서 전담하고 있습니다. 즉 분기에 대한 책임을 해당 객체에서 수행하고 Step 에서는 분기에 따른 책임을 가지게되지 않습니다.
+
+
+STEP_EXECUTION_ID | VERSION | STEP_NAME | JOB_EXECUTION_ID | START_TIME | END_TIME | STATUS | COMMIT_COUNT | READ_COUNT | FILTER_COUNT | WRITE_COUNT | READ_SKIP_COUNT | WRITE_SKIP_COUNT | PROCESS_SKIP_COUNT | ROLLBACK_COUNT | EXIT_CODE | EXIT_MESSAGE | LAST_UPDATED
+------------------|---------|-----------|------------------|------------|----------|--------|--------------|------------|--------------|-------------|-----------------|------------------|--------------------|----------------|-----------|--------------|-------------
+20 | 3 | startStep | 13 | 2020-01-15 16:56:22 | 2020-01-15 16:56:22 | COMPLETED | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | COMPLETED |  | 2020-01-15 16:56:22
+21 | 3 | evenStep | 13 | 2020-01-15 16:56:22 | 2020-01-15 16:56:22 | COMPLETED | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | COMPLETED |  | 2020-01-15 16:56:22
+22 | 3 | startStep | 14 | 2020-01-15 16:57:39 | 2020-01-15 16:57:39 | COMPLETED | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | COMPLETED |  | 2020-01-15 16:57:39
+23 | 3 | oddStep | 14 | 2020-01-15 16:57:39 | 2020-01-15 16:57:39 | COMPLETED | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | COMPLETED |  | 2020-01-15 16:57:39
+
+evenStep, oddStep 홀수 짝수 Step들이 각각 실행된것을 확인 할 수 있씁니다.
+
+
+
+ ```kotlin
+ class OddDecider : JobExecutionDecider {
+
+    override fun decide(jobExecution: JobExecution, @Nullable stepExecution: StepExecution?): FlowExecutionStatus {
+        val random = Random()
+        val randomNumber = random.nextInt(50) + 1
+        return when {
+            randomNumber % 2 == 0 -> FlowExecutionStatus("EVEN")
+            else -> FlowExecutionStatus("ODD")
+        }
+    }
+}
+ ```
+ JobExecutionDecider 인터페이스를 구현한 OddDecider입니다. **주의하실 것은 Step으로 처리하는게 아니기 때문에 ExitStatus가 아닌 FlowExecutionStatus로 상태를 관리합니다.**
