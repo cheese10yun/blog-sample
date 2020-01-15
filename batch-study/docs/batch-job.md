@@ -1,6 +1,8 @@
 > [spring batch in action : 메타테이블엿보기](https://github.com/jojoldu/spring-batch-in-action/blob/master/3_%EB%A9%94%ED%83%80%ED%85%8C%EC%9D%B4%EB%B8%94%EC%97%BF%EB%B3%B4%EA%B8%B0.md)을 보고 정리한 글입니다.
 
 # Job
+
+## Simple Job 
 간단한 Simple Job을 구성 합니다. Step1, Step2으로 구성하고 Step1에서 무조건 실패하게 구성했습니다.
 
 ```kotlin
@@ -61,3 +63,245 @@ STEP_EXECUTION_ID | VERSION | STEP_NAME | JOB_EXECUTION_ID | START_TIME | END_TI
 9 | 3 | simpleStep1 | 8 | 2020-01-14 16:41:49 | 2020-01-14 16:41:49 | COMPLETED | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | COMPLETED |  | 2020-01-14 16:41:49
 
 동일한 Job Parameter로 2번 실행했는데 같은 파라미터로 실행되었다는 에러가 발생하지 않습니다. **즉 Spring Batch에서는 동일한 Job Parameter로 성공한 기록이 있을 경우에만 재실행 되지 않습니다.**
+
+## Next
+
+```kotlin
+@Configuration
+class SimpleJobConfiguration(
+        private val jobBuilderFactory: JobBuilderFactory,
+        private val stepBuilderFactory: StepBuilderFactory
+) {
+    private val log by logger()
+
+    @Bean
+    fun simpleJob(): Job {
+        return jobBuilderFactory.get("simpleJob")
+                .incrementer(RunIdIncrementer())
+                .start(simpleStep1())
+                .next(simpleStep2())
+                .next(simpleStep3())
+                .build()
+    }
+
+    @Bean
+    fun simpleStep1(): Step {
+        return stepBuilderFactory.get("simpleStep1")
+                .tasklet { contribution, chunkContext ->
+                    log.info("This is Step 1")
+                    RepeatStatus.FINISHED
+                }
+                .build()
+    }
+
+    @Bean
+    fun simpleStep2(): Step {
+        return stepBuilderFactory.get("simpleStep1")
+                .tasklet { contribution, chunkContext ->
+                    log.info("This is Step 2")
+                    RepeatStatus.FINISHED
+                }
+                .build()
+    }
+
+    @Bean
+    fun simpleStep3(): Step {
+        return stepBuilderFactory.get("simpleStep1")
+                .tasklet { _, _ ->
+                    log.info("This is Step 3")
+                    RepeatStatus.FINISHED
+                }
+                .build()
+    }
+}
+```
+`next()` 순차적으로 Step들을 연결 시킬떄 사용합니다. 해당 잡은 step1 -> step2 -> step3 으로 순차적으로 Job이 실행 됩니다.
+
+## 지정된 Job만 실항
+
+```yml
+spring:
+  batch.job.names: ${job.name:NONE}
+```
+Spring Batch가 실행될때 Program arguments로 `job.name` 값이 넘어오면 **해당 값과 일치하는 Job만 실행할 수 있게 합니다.** 해당 코드의 의미는 `job.name`이 있으면 `job.name`에 할당하고 없으면 `NONE`을 할당하라는 의미입니다. `job.names`가 `NONE`인 경우 어떠한 Job도 실행되지 않습니다. 실제 jar을 실행 시키는 운영환경에서는 `java -jar batch-application.jar --job.name=simpleJob` 으로 job.name을 지정하게 됩니다.
+
+## 조건별 흐름제어 Flow
+Next가 순차적으로 Step의 순서를 제어할 수는 있지만 Step에서 오류가 나면 나머지 뒤에 있는 Step 들은 실행되지 못한다는 문제가 있습니다. **필요에 따라 정상일때는 Step B로, 오류가 발생했을 경우에는 Step C로 Step을 조정할 필요가 있습니다.**
+
+![](https://github.com/cheese10yun/TIL/raw/master/assets/batch-flow.png)
+
+```kotlin
+@Configuration
+class StepNextConditionJobConfiguration(
+        private val jobBuilderFactory: JobBuilderFactory,
+        private val stepBuilderFactory: StepBuilderFactory
+) {
+
+    private val log by logger()
+
+    @Bean
+    fun stepNextConditionalJob(): Job {
+        ////@formatter:off
+        return jobBuilderFactory.get("stepNextConditionalJob")
+                .start(conditionalJobStep1())
+                    .on("FAILED") // FAILED 일 경우
+                    .to(conditionalJobStep3()) // Step3 으로 이동한다.
+                    .on("*") // Step3의 결과와 관계 없이
+                    .end() // Step3 이동이후 Flow 종료
+                .from(conditionalJobStep1()) // Step1 으로부터
+                    .on("*") // FAILED 외에 모든 경우
+                    .to(conditionalJobStep2()) // Step2로 이동한다.
+                    .next(conditionalJobStep3()) // Step2가 정상 종료되면 Step3로 이동한다.
+                .end() // Job 종료
+                .build()
+        //@formatter:on
+    }
+
+    @Bean
+    fun conditionalJobStep1(): Step {
+
+        return stepBuilderFactory.get("step1")
+                .tasklet { contribution, chunkContext ->
+                    log.info("This is Step conditionalJobStep1 Step1")
+                    contribution.exitStatus = ExitStatus.FAILED
+                    RepeatStatus.FINISHED
+                }
+                .build()
+    }
+
+    @Bean
+    fun conditionalJobStep2(): Step {
+        return stepBuilderFactory.get("step2")
+                .tasklet { contribution, chunkContext ->
+                    log.info("This is Step conditionalJobStep2 Step2")
+                    RepeatStatus.FINISHED
+                }
+                .build()
+    }
+
+    @Bean
+    fun conditionalJobStep3(): Step {
+        return stepBuilderFactory.get("step3")
+                .tasklet { contribution, chunkContext ->
+                    log.info("This is Step conditionalJobStep3 Step3")
+                    RepeatStatus.FINISHED
+                }
+                .build()
+    }
+
+}
+```
+해당 코드의 시나리오는 다음과 같습니다.
+
+* Step1 실패시 : Step1 -> Step3
+* Step1 성공시 : Step1 -> Step2 -> Step3
+
+```kotlin
+@Bean
+fun stepNextConditionalJob(): Job {
+    ////@formatter:off
+    return jobBuilderFactory.get("stepNextConditionalJob")
+            .start(conditionalJobStep1())
+                .on("FAILED") // FAILED 일 경우
+                .to(conditionalJobStep3()) // Step3 으로 이동한다.
+                .on("*") // Step3의 결과와 관계 없이
+                .end() // Step3 이동이후 Flow 종료
+            .from(conditionalJobStep1()) // Step1 으로부터
+                .on("*") // FAILED 외에 모든 경우
+                .to(conditionalJobStep2()) // Step2로 이동한다.
+                .next(conditionalJobStep3()) // Step2가 정상 종료되면 Step3로 이동한다.
+            .end() // Job 종료
+            .build()
+    //@formatter:on
+}
+```
+* `.on()`
+  * 캐치할 ExitStatus 지정, 
+  * `*`일 경우 모든 ExitStatus가 지정된다.
+* `to()`
+  * 다음으로 이동할 Step 지정
+* `from()`
+  * 일종의 이벤트 리스너 역할
+  * 상태값을 보고 일치하는 상태라면 `to()`에 포함된 Step을 호출한다.
+  * **Step1의 이벤트 캐치가 FAILED로 되어있는 상태에서 추가로 이벤트 캐치히려면 from을 써야만함**
+* `end()`
+  * end FlowBuilder를 반환하는 end와 FlowBuilder를 종료하는 end 2개가 있음
+  * `on(*)` 뒤에 있는 end는 FlowBuilder를 반환하는 end
+  * `build()` 앞에있는 end는 FlowBuilder를 종료하는 end
+  * FlowBuilder를 반환하는 end는 계속해서 `from`을 이어갈 수 있음
+
+중요한 부분은 `on`이 캐치하는 **상태값이 BatchStatus가 아닌 ExistStatus라는 점입니다.** 그래서 분기를 처리를 위하 상태값 조정이 필요하다면 ExitStatus를 조정해야합니다.
+
+```kotlin
+@Bean
+fun conditionalJobStep1(): Step {
+
+    return stepBuilderFactory.get("step1")
+            .tasklet { contribution, chunkContext ->
+                log.info("This is Step conditionalJobStep1 Step1")
+                contribution.exitStatus = ExitStatus.FAILED
+                RepeatStatus.FINISHED
+            }
+            .build()
+}
+```
+ExistStatus를 FAILED로 지정합니다. 해당 status를 보고 Flow가 진행됩니다.
+
+### Step1 실패시 : Step1 -> Step3
+
+
+STEP_EXECUTION_ID | VERSION | STEP_NAME | JOB_EXECUTION_ID | START_TIME | END_TIME | STATUS | COMMIT_COUNT | READ_COUNT | FILTER_COUNT | WRITE_COUNT | READ_SKIP_COUNT | WRITE_SKIP_COUNT | PROCESS_SKIP_COUNT | ROLLBACK_COUNT | EXIT_CODE | EXIT_MESSAGE | LAST_UPDATED
+------------------|---------|-----------|------------------|------------|----------|--------|--------------|------------|--------------|-------------|-----------------|------------------|--------------------|----------------|-----------|--------------|-------------
+15 | 3 | step1 | 11 | 2020-01-15 15:58:07 | 2020-01-15 15:58:07 | COMPLETED | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | FAILED |  | 2020-01-15 15:58:07
+16 | 3 | step3 | 11 | 2020-01-15 15:58:07 | 2020-01-15 15:58:07 | COMPLETED | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | COMPLETED |  | 2020-01-15 15:58:07
+
+해당 Job을 실행하게되면 `STEP_NAME` step1-> step3 으로 실행된것을 볼 수 있습니다. 즉 `Step1 실패시 : Step1 -> Step3` 시나리오대로 실행되는 되었습니다.
+
+### Step2 성공시 : Step1 -> Step2 -> Step3
+
+STEP_EXECUTION_ID | VERSION | STEP_NAME | JOB_EXECUTION_ID | START_TIME | END_TIME | STATUS | COMMIT_COUNT | READ_COUNT | FILTER_COUNT | WRITE_COUNT | READ_SKIP_COUNT | WRITE_SKIP_COUNT | PROCESS_SKIP_COUNT | ROLLBACK_COUNT | EXIT_CODE | EXIT_MESSAGE | LAST_UPDATED
+------------------|---------|-----------|------------------|------------|----------|--------|--------------|------------|--------------|-------------|-----------------|------------------|--------------------|----------------|-----------|--------------|-------------
+17 | 3 | step1 | 12 | 2020-01-15 16:18:23 | 2020-01-15 16:18:23 | COMPLETED | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | COMPLETED |  | 2020-01-15 16:18:23
+18 | 3 | step2 | 12 | 2020-01-15 16:18:23 | 2020-01-15 16:18:23 | COMPLETED | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | COMPLETED |  | 2020-01-15 16:18:23
+19 | 3 | step3 | 12 | 2020-01-15 16:18:23 | 2020-01-15 16:18:23 | COMPLETED | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | COMPLETED |  | 2020-01-15 16:18:23
+
+`STEP_NAME`을 확인하면 성공 시라리오 `Step2 성공시 : Step1 -> Step2 -> Step3`이 실행된것을 확인 할 수 있습니다.
+
+### Batch Status vs Exit Status
+Flow을 설명할때 **BatchStatus와 ExitStatus의 차이를 아는 것이 중요합니다.** BatchStatus는 Job 또는 Step 의 실행 결과를 Spring에서 기록할 때 사용하는 Enum입니다.
+
+```
+.on("FAILED").to(stepB())
+```
+해당 코드는 `on` 메서드가 참조하는 것이 BatchStatus으로 생각할 수 있지만 **실제 Step의 ExitStatus을 참조합니다.** ExitStatus는 **Step의 실행 후 상태를 얘기합니다.**((ExitStatus는 Enum이 아닙니다.))
+
+해당 코드의 의미는 exitCode가 FAILED로 끝나게되면 StepB로 가라는 뜻입니다. **Spring Batch는 기본적으로 ExitStatus의 exitCode는 Step의 BatchStatus와 같도록 설정이 되어 있습니다.**
+
+만약 커스텀한 exitCode가 필요하게 된다면 아래처럼 처리해야 합니다.
+
+```
+.start(step1())
+    .on("FAILED")
+    .end()
+.from(step1())
+    .on("COMPLETED WITH SKIPS")
+    .to(errorPrint1())
+    .end()
+.from(step1())
+    .on("*")
+    .to(step2())
+    .end()
+```
+* step이 실패하면 Job 실패
+* step이 성공하면 step2가 수행
+* step이 성공적으로 완려되며. `COMPLETED WITH SKIPS`의 exit 코드로 종료
+
+
+
+## Decide
+ Step의 결과에 따라 서로 다른 Step으로 이동하는 방법을 알아보았습니다. 이번 에는 다른 방식으로 분기 처리하는 방식입니다. 위에서 진행했던 방식에 2가지 문제가 있습니다.
+
+ * Step이 담당하는 역할이 2개 이상이 됩니다.
+   * 실제 해당 Step이 처리해야할 로직외에도 분기를 시키기 위해 ExitStatus 조작이 필요합니다.
+ * 다양한 분기 로직 처리의 어려움
+   * ExitStatus를 커스텀하게 고치기 위해서는 Listener를 생성하고 Job Flow에 등록하는 등 번거로움이 존재합니다.
