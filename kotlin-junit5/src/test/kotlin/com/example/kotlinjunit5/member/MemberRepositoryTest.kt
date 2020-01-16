@@ -3,6 +3,8 @@ package com.example.kotlinjunit5.member
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor

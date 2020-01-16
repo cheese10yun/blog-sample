@@ -32,7 +32,7 @@ JobLauncherTestUtils에서 여러개의 등록된 Job Bean 중 어떤것을 올�
 ## @ContextConfiguration 사용하기
 > @SpringBootTest(classes={...}) 는 내부적으로 @ContextConfiguration를 사용하기 때문에 둘은 같습니다.
 
-해당 어노테이션으로 ApplicatopnContext에서 괸리할 Bean과 Configuration 들을 지정할수 있습니다. 떄문에 특정 Batch Job의 설정들만 가져와서 수행할 수 있습니다. **다만 이 방식을 선택해도 기본적으로 전체 테스트 수행시 Spring Context가 재실행되는 것은 여전합니다.**
+해당 어노테이션으로 ApplicatopnContext에서 괸리할 Bean과 Configuration 들을 지정할수 있습니다. 때문에 특정 Batch Job의 설정들만 가져와서 수행할 수 있습니다. **다만 이 방식을 선택해도 기본적으로 전체 테스트 수행시 Spring Context가 재실행되는 것은 여전합니다.**
 
 ```java
 @Configuration

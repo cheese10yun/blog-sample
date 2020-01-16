@@ -115,7 +115,7 @@ class SimpleJobConfiguration(
     }
 }
 ```
-`next()` 순차적으로 Step들을 연결 시킬떄 사용합니다. 해당 잡은 step1 -> step2 -> step3 으로 순차적으로 Job이 실행 됩니다.
+`next()` 순차적으로 Step들을 연결 시킬때 사용합니다. 해당 잡은 step1 -> step2 -> step3 으로 순차적으로 Job이 실행 됩니다.
 
 ## 지정된 Job만 실항
 
@@ -273,7 +273,7 @@ Flow을 설명할때 **BatchStatus와 ExitStatus의 차이를 아는 것이 중�
 ```
 .on("FAILED").to(stepB())
 ```
-해당 코드는 `on` 메서드가 참조하는 것이 BatchStatus으로 생각할 수 있지만 **실제 Step의 ExitStatus을 참조합니다.** ExitStatus는 **Step의 실행 후 상태를 얘기합니다.**((ExitStatus는 Enum이 아닙니다.))
+해당 코드는 `on` 메서드가 참조하는 것이 BatchStatus으로 생각할 수 있지만 **실제 Step의 ExitStatus을 참조합니다.** ExitStatus는 **Step의 실행 후 상태를 이야기합니다.**(ExitStatus는 Enum이 아닙니다.)
 
 해당 코드의 의미는 exitCode가 FAILED로 끝나게되면 StepB로 가라는 뜻입니다. **Spring Batch는 기본적으로 ExitStatus의 exitCode는 Step의 BatchStatus와 같도록 설정이 되어 있습니다.**
 
