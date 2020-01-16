@@ -1,12 +1,14 @@
 package com.example.batch.batch.job
 
 import com.example.batch.domain.order.dao.OrderRepository
+import logger
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.StepContribution
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
+import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.core.scope.context.ChunkContext
 import org.springframework.batch.repeat.RepeatStatus
@@ -23,6 +25,8 @@ class OrderDailySum(
 
 ) {
 
+    private val log by logger()
+
     @Bean
     fun orderDailySumJob(): Job {
         return jobBuilderFactory.get("orderDailySumJob")
@@ -32,15 +36,18 @@ class OrderDailySum(
     }
 
     @Bean
-    @JobScope
-    fun orderDailySumStep(@Value("#{jobParameters[requestDate]}") requestDate : String): Step {
-        println(requestDate)
+//    @JobScope
+    fun orderDailySumStep(@Value("#{jobParameters[requestDate]}") requestDate: String): Step {
+        log.info("requestDate: $requestDate")
         return stepBuilderFactory.get("orderDailrequestDateySumStep")
-                .tasklet(tasklet())
+                .tasklet(tasklet(""))
                 .build()
     }
 
-    private fun tasklet(): (contribution: StepContribution, chunkContext: ChunkContext) -> RepeatStatus? {
+    @Bean
+    @StepScope
+    fun tasklet(@Value("#{jobParameters[requestDate]}") requestDate: String): (contribution: StepContribution, chunkContext: ChunkContext) -> RepeatStatus? {
+        log.info("requestDate: $requestDate")
         return { stepContribution, chunkContext ->
             run {
                 val orders = orderRepository.findAll()
@@ -53,7 +60,6 @@ class OrderDailySum(
             RepeatStatus.FINISHED
         }
     }
-
 
 }
 
