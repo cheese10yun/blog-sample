@@ -25,9 +25,7 @@ JobLauncherTestUtils에서 여러개의 등록된 Job Bean 중 어떤것을 올�
 ```
 위와 같이 properties으로 해결이 가능하지만 properties 변경되게 되면 Spring에서는 테스트가 구동되는 동안 계속 Spring Bean Context를 올리게 됩니다. 그렇게 되면 테스트 결과가 현저하게 느려집니다.
 
-하지만 장점도 있습니다. Job, Step, Reader 등의 Bean의 name이 중복되더라도 해당 실행에서는 Bean을 올리지않기 때문에 비교적 Bean name문제에서 자유롭습니다.
-
-또 실제 Spring Batch가 구동되는 Production에서도 해당 Job에서 사용할 Bean들만 올리기 때문에 속도, 리소스 적인 면에서 장점이 될 수 있습니다.
+하지만 장점도 있습니다. Job, Step, Reader 등의 Bean의 name이 중복되더라도 해당 실행에서는 Bean을 올리지않기 때문에 비교적 Bean name문제에서 자유롭습니다. 또 실제 Spring Batch가 구동되는 Production에서도 해당 Job에서 사용할 Bean들만 올리기 때문에 속도, 리소스 적인 면에서 장점이 될 수 있습니다.
 
 ## @ContextConfiguration 사용하기
 > @SpringBootTest(classes={...}) 는 내부적으로 @ContextConfiguration를 사용하기 때문에 둘은 같습니다.
