@@ -3,7 +3,6 @@
 
 * [JPA Paging Reader 정리](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/jpa-paging-reader.md)
 * [Job Parameter](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/job-parameter.md)
-* [Batch Listener](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-Interceptor-listener.md)
 * [Flow](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/flow.md)
 * [Multi Step](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/multi-step.md)
 * [Batch Table](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-table.md)
