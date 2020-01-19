@@ -46,7 +46,7 @@
 * [Spring Actuator 기초 설정](https://github.com/cheese10yun/blog-sample/tree/master/actuator)
 * [테스트 코드 작성에 대한 나름의 고찰](https://github.com/cheese10yun/blog-sample/tree/master/test-code)
 * [Transaction Rollback 정리](https://github.com/cheese10yun/blog-sample/tree/master/spring-transaction-test)
-* [Spring Batch Study](https://github.com/cheese10yun/batch-study)
+* [Spring Batch Study](https://github.com/cheese10yun/blog-sample/tree/master/batch-study)
 * [Paging 처리 Fetch Join 적용시 limit 동작하지 않는 이슈](https://github.com/cheese10yun/blog-sample/tree/master/jpa-fetch-join)
 * [JPA N+1 발생원인과 해결방법](https://github.com/cheese10yun/blog-sample/tree/master/jpa-n-plus-1)
 * [Junit5 with Spring boot](https://github.com/cheese10yun/blog-sample/tree/master/kotlin-junit5)
