@@ -9,6 +9,7 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepScope
+import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.item.ItemProcessor
 import org.springframework.batch.item.ItemWriter
 import org.springframework.batch.item.database.JpaPagingItemReader
@@ -31,11 +32,12 @@ class OrderPaging(
         private val entityManagerFactory: EntityManagerFactory
 ) {
 
-    private val CHUNK_SZIE: Int = 100
+    private val CHUNK_SZIE: Int = 7
 
     @Bean
     fun orderPagingJob(orderPagingStep: Step, inactiveJobListener: InactiveJobListener): Job {
         return jobBuilderFactory.get("orderPagingJob")
+                .incrementer(RunIdIncrementer())
                 .listener(inactiveJobListener)
                 .start(orderPagingStep)
                 .build()
@@ -43,14 +45,13 @@ class OrderPaging(
 
     @Bean
     @JobScope
-    fun orderPagingStep(orderPagingReader: JpaPagingItemReader<Order>, taskExecutor: TaskExecutor): Step {
+    fun orderPagingStep(orderPagingReader: JpaPagingItemReader<Order>): Step {
         return stepBuilderFactory.get("orderPagingStep")
                 .chunk<Order, Order>(CHUNK_SZIE)
                 .reader(orderPagingReader)
                 .processor(pagingProcessor())
                 .writer(pagingWriter())
-                .taskExecutor(taskExecutor)
-                .throttleLimit(4)
+//                .throttleLimit(4)
                 .build()
     }
 
@@ -65,7 +66,7 @@ class OrderPaging(
                 return 0
             }
         }
-        itemReader.setQueryString("select o from Order o where o.amount < :targetAmount")
+        itemReader.setQueryString("select o from Order o where o.amount < :targetAmount order by o.id desc")
         itemReader.pageSize = CHUNK_SZIE
         itemReader.setEntityManagerFactory(entityManagerFactory)
         val parameterValues = HashMap<String, Any>()
@@ -92,9 +93,9 @@ class OrderPaging(
         }
     }
 
-    @Bean
-    @StepScope
-    fun taskExecutor(): TaskExecutor {
-        return SimpleAsyncTaskExecutor("Batch_task")
-    }
+//    @Bean
+//    @StepScope
+//    fun taskExecutor(): TaskExecutor {
+//        return SimpleAsyncTaskExecutor("Batch_task")
+//    }
 }

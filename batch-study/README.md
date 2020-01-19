@@ -11,3 +11,4 @@
 * [Batch Job](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-job.md)
 * [Batch Batch Scope & Job Parameter](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-scope-job-parameter.md)
 * [Batch Chunk](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-chunk.md)
+* [Batch ItemReader](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-item-reader.md)
