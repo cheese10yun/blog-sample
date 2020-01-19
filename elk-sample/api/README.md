@@ -4,7 +4,8 @@
 
 > [Install Elasticsearch with Dockeredit Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html) 기반으로 조금 수정해서 docker-compose를 구성했습니다.
 
-```yamlversion: '3.2'
+```yml
+yamlversion: '3.2'
 services:
   es01:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.5.1
