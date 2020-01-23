@@ -23,3 +23,97 @@ public interface ItemProcessor<I, O> {
 
 }
 ```
+
+* I : ItemReader에서 받은 데이터 타입
+* O : ItemWriter에 보낼 데이터 타입
+
+`Reader`에서 읽은 데이터가 `ItemProcessor`의 `processor` 를 통과해서 `Writer`에 전달됩니다.
+
+
+```kotlin
+@Bean
+fun jpaItemProcessor(): ItemProcessor<Order, Order2> {
+    return ItemProcessor { order: Order -> Order2(order.amount) }
+}
+```
+익명 클래스 혹은 람다식을 사용하면 불필요한 코드가 없이 구현 코드 양이 적어 빠르게 구현이 가능합니다. 고정된 형태가 없어서 원하는 형태의 어떤 처리도 가능합니다.
+
+## 변환
+변환이란 Reader에서 읽은 타입을 변환하여 Writer에 전달해주는 것을 의미합니다.
+
+```kotlin
+@Configuration
+class ProcessorConvertJobConfiguration(
+        private val jobBuilderFactory: JobBuilderFactory,
+        private val stepBuilderFactory: StepBuilderFactory,
+        private val entityManagerFactory: EntityManagerFactory
+) {
+
+    private val chunkSize = 100
+
+    private val log by logger()
+
+    @Bean
+    fun processorConvertJob(): Job {
+        return jobBuilderFactory
+                .get("processorConvertJob")
+                .incrementer(RunIdIncrementer())
+                .start(processorConvertStep())
+                .build()
+    }
+
+    @Bean
+    @JobScope
+    fun processorConvertStep(): Step {
+        return stepBuilderFactory
+                .get("processorConvertStep")
+                .chunk<Order, String>(chunkSize)
+                .reader(reader())
+                .processor(processor())
+                .writer(writer())
+                .build()
+    }
+
+    @Bean
+    fun reader(): JpaPagingItemReader<Order> {
+        return JpaPagingItemReaderBuilder<Order>()
+                .name("reader")
+                .entityManagerFactory(entityManagerFactory)
+                .pageSize(chunkSize)
+                .queryString("select o from Order o")
+                .build()
+    }
+
+    @Bean
+    fun processor(): ItemProcessor<Order, String> {
+        return ItemProcessor {
+            it.amount.toString()
+        }
+    }
+
+    fun writer(): ItemWriter<String> {
+        return ItemWriter { items ->
+            for (item in items) {
+                log.info("amount value = {}", item)
+            }
+        }
+    }
+}
+```
+
+ItemProcessor에서는 Reader에서 읽어올 타입이 `Order`이며, Writer에서 넘겨줄 타입이 `String` 이기 때문에 제네릭 타입은 `<Teacher, String>`가 됩니다. 즉 `<Input, Output>`의 타입이 되는 것입니다.
+
+
+```kotlin
+@Bean
+fun processor(): ItemProcessor<Order, String> {
+    return ItemProcessor {
+        it.amount.toString()
+    }
+}
+```
+여기서 **ChunkSize 앞에 선언될 타입 역시 Reader와 Writer 타입을 따라가야하기 때문에 다음과 같이 선언됩니다.**
+
+## 필터
+Writer에 값을 넘길지 말지를 Processor에서 판단하는 것을 판단 하는 필터의 역할을 합니다.
+
