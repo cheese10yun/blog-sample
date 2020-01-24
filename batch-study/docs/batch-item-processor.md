@@ -10,9 +10,9 @@
 ItemProcessor로 크게 2가지 처리를 합니다.
 
 * 반환 
-  * Reader에서 읽은 데이터를 원하는 데이터 타입으로 변환해서 Writer에게 넘긴다.
+  * `Reader`에서 읽은 데이터를 원하는 데이터 타입으로 변환해서 Writer에게 넘긴다.
 * 필터
-  * Reader에서 넘겨준 데이터를 Writer로 넘겨 줄것인지를 결정
+  * `Reader`에서 넘겨준 데이터를 Writer로 넘겨 줄것인지를 결정
   * **null을 반환하면 Writer에 전달되지 않습니다.**
 
 ## 기본 사용법
@@ -101,7 +101,7 @@ class ProcessorConvertJobConfiguration(
 }
 ```
 
-ItemProcessor에서는 Reader에서 읽어올 타입이 `Order`이며, Writer에서 넘겨줄 타입이 `String` 이기 때문에 제네릭 타입은 `<Teacher, String>`가 됩니다. 즉 `<Input, Output>`의 타입이 되는 것입니다.
+`ItemProcessor`에서는 Reader에서 읽어올 타입이 `Order`이며, Writer에서 넘겨줄 타입이 `String` 이기 때문에 제네릭 타입은 `<Teacher, String>`가 됩니다. 즉 `<Input, Output>`의 타입이 되는 것입니다.
 
 
 ```kotlin
@@ -115,7 +115,7 @@ fun processor(): ItemProcessor<Order, String> {
 여기서 **ChunkSize 앞에 선언될 타입 역시 Reader와 Writer 타입을 따라가야하기 때문에 다음과 같이 선언됩니다.**
 
 ## 필터
-Writer에 값을 넘길지 말지를 Processor에서 판단하는 것을 판단 하는 필터의 역할을 합니다. `Order`의 amount가 짝수인 것을 필터링 하는 예제입니다.
+Writer에 값을 넘길지 말지를 `Processor`에서 판단하는 것을 판단 하는 필터의 역할을 합니다. `Order`의 amount가 짝수인 것을 필터링 하는 예제입니다.
 
 ```kotlin
 @Configuration
@@ -386,5 +386,4 @@ Hibernate: select items0_.order_id as order_id5_0_0_, items0_.id as id1_0_0_, it
 2020-01-24 15:55:33.170  INFO 32330 --- [       Thread-7] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
 
 Process finished with exit code 0
-
 ```
