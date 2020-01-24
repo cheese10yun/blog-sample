@@ -24,7 +24,6 @@ class ProcessorConvertJobConfiguration(
 ) {
 
     private val chunkSize = 100
-
     private val log by logger()
 
     @Bean
