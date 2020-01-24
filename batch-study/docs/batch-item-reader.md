@@ -85,6 +85,82 @@ JPA는 Hibernate와 많은 유사점을 가지고 있습니다만, 한가지 다
 
 **PagingItemReader 주의 사항 정렬 (Order) 가 무조건 포함되어 있어야 합니다.**
 
+### RepositoryItemReader
+RepositoryItemReader는 PagingAndSortingRepository를 이용한 ItemReader 구현체입니다. JpaPagingItemReader와 동일한 방법로 Builder로 구성하며 구현이 보다 쉬운 장점이 있습니다.
+
+
+```kotlin
+@Configuration
+class RepositoryItemReaderJobConfiguration(
+        private val jobBuilderFactory: JobBuilderFactory,
+        private val stepBuilderFactory: StepBuilderFactory,
+        private val orderRepository: OrderRepository
+) {
+    private val chunkSize = 100
+    private val log by logger()
+
+    @Bean
+    fun repositoryItemReaderJob(): Job {
+        return jobBuilderFactory
+                .get("repositoryItemReaderJob")
+                .incrementer(RunIdIncrementer())
+                .start(step())
+                .build()
+    }
+
+    fun step(): Step {
+        return stepBuilderFactory
+                .get("step")
+                .chunk<Order, Order>(chunkSize)
+                .reader(reader())
+                .processor(processor())
+                .writer(write())
+                .build()
+    }
+
+
+    private fun reader(): RepositoryItemReader<Order> {
+        return RepositoryItemReaderBuilder<Order>()
+                .name("reader")
+                .repository(orderRepository)
+                .methodName("findByAmountGreaterThan")
+                .arguments(listOf(BigDecimal.ZERO))
+                .sorts(Collections.singletonMap("id", Sort.Direction.ASC))
+                .saveState(false)
+                .pageSize(chunkSize)
+                .build()
+    }
+
+    private fun processor(): ItemProcessor<Order, Order> {
+        return ItemProcessor {
+            log.info("ItemProcessor ->>>>>>>>>>>>>>>> ${it.amount}")
+            it
+        }
+
+    }
+
+
+    private fun write(): ItemWriter<Order> {
+        return ItemWriter {
+            for (order in it) {
+                log.info("ItemWriter ->>>>>>>>>>>>>>> ${order.amount}")
+            }
+        }
+    }
+}
+```
+
+**사용시 주의해야할점은 반드시 sorts 정보를 해야하며, methodName()의 메서드 즉, Query Method 리턴 타입이 Page 이어야 한다는 것이다.**
+
+```kotlin
+interface OrderRepository : JpaRepository<Order, Long> {
+    fun findByAmountGreaterThan(amount: BigDecimal, pageable: Pageable) : Page<Order>
+}
+```
+`JpaPagingItemReader` 보다는 구현이 쉽긴 하지만 `methodName` 방식은 type safe 하지 않기 때문에 결국 ItemReader는 직접 구현해서 사용하는 방식이 적절한거 같다.
+
+
+
 
 ## JpaPagingItemReader 더 살펴 보기
 JpaPagingItemReader에는 지정한 setPageSize 크기만큼 데이터베이스에서 읽어옵니다.(대부분 CHUNK_SZIE와 맞추는 게 좋을 거 같다.) 즉 모든 데이터를 가져와서 처리하는 방식이 아닌 paging 처리만큼 가져와서 처리하는 방식입니다.
