@@ -9,4 +9,4 @@
 * [Batch Chunk](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-chunk.md)
 * [Batch ItemReader](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-item-reader.md)
 * [Batch Writer](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-writer.md)
-* [Batch Process](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-item-process.md)
+* [Batch Process](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-item-processor.md)
