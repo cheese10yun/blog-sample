@@ -309,7 +309,7 @@ Hibernate: select items0_.order_id as order_id5_0_0_, items0_.id as id1_0_0_, it
 
 ### Writer
 
-```
+```kotlin
 @Bean
 fun step(): Step {
     return stepBuilderFactory.get("step")
