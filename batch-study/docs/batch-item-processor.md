@@ -115,5 +115,88 @@ fun processor(): ItemProcessor<Order, String> {
 여기서 **ChunkSize 앞에 선언될 타입 역시 Reader와 Writer 타입을 따라가야하기 때문에 다음과 같이 선언됩니다.**
 
 ## 필터
-Writer에 값을 넘길지 말지를 Processor에서 판단하는 것을 판단 하는 필터의 역할을 합니다.
+Writer에 값을 넘길지 말지를 Processor에서 판단하는 것을 판단 하는 필터의 역할을 합니다. `Order`의 amount가 짝수인 것을 필터링 하는 예제입니다.
+
+```kotlin
+@Configuration
+class ProcessorFilterJobConfiguration(
+        private val jobBuilderFactory: JobBuilderFactory,
+        private val stepBuilderFactory: StepBuilderFactory,
+        private val entityManagerFactory: EntityManagerFactory
+) {
+    private val chunkSize = 10;
+    private val log by logger()
+
+    @Bean
+    fun processorFilterJob(): Job {
+        return jobBuilderFactory.get("processorFilterJob")
+                .incrementer(RunIdIncrementer())
+                .start(processorFilterStep())
+                .build()
+    }
+
+    @Bean
+    @JobScope
+    fun processorFilterStep(): Step {
+        return stepBuilderFactory.get("step")
+                .chunk<Order, Order>(chunkSize)
+                .reader(reader())
+                .processor(processor())
+                .writer(writer())
+                .build()
+    }
+
+    @Bean
+    fun reader(): JpaPagingItemReader<Order> {
+        return JpaPagingItemReaderBuilder<Order>()
+                .name("reader")
+                .entityManagerFactory(entityManagerFactory)
+                .pageSize(chunkSize)
+                .queryString("select o from Order o")
+                .build()
+    }
+
+    @Bean
+    fun processor(): ItemProcessor<Order, Order> {
+        return ItemProcessor label@{
+            val amount = it.amount
+            if (BigDecimal.ZERO == amount.divide(BigDecimal(2))) {
+                return@label null
+            }
+            it
+        }
+    }
+
+    private fun writer(): ItemWriter<Order> {
+        return ItemWriter {
+            for (order in it)
+                log.info("amount value :  ${order.amount}")
+        }
+    }
+}
+```
+```
+2020-01-24 04:42:04.439 DEBUG 25963 --- [           main] o.s.batch.repeat.support.RepeatTemplate  : Repeat operation about to start at count=2
+2020-01-24 04:42:04.439 DEBUG 25963 --- [           main] o.s.batch.repeat.support.RepeatTemplate  : Repeat operation about to start at count=3
+2020-01-24 04:42:04.439 DEBUG 25963 --- [           main] o.s.batch.repeat.support.RepeatTemplate  : Repeat operation about to start at count=4
+2020-01-24 04:42:04.439 DEBUG 25963 --- [           main] o.s.batch.repeat.support.RepeatTemplate  : Repeat operation about to start at count=5
+2020-01-24 04:42:04.439 DEBUG 25963 --- [           main] o.s.batch.repeat.support.RepeatTemplate  : Repeat operation about to start at count=6
+2020-01-24 04:42:04.439 DEBUG 25963 --- [           main] o.s.batch.repeat.support.RepeatTemplate  : Repeat operation about to start at count=7
+2020-01-24 04:42:04.439 DEBUG 25963 --- [           main] o.s.batch.repeat.support.RepeatTemplate  : Repeat operation about to start at count=8
+2020-01-24 04:42:04.439 DEBUG 25963 --- [           main] o.s.batch.repeat.support.RepeatTemplate  : Repeat operation about to start at count=9
+2020-01-24 04:42:04.439 DEBUG 25963 --- [           main] o.s.batch.repeat.support.RepeatTemplate  : Repeat operation about to start at count=10
+2020-01-24 04:42:04.439 DEBUG 25963 --- [           main] o.s.batch.repeat.support.RepeatTemplate  : Repeat is complete according to policy and result value.
+2020-01-24 04:42:04.439  INFO 25963 --- [           main] uration$$EnhancerBySpringCGLIB$$4e540223 : amount value :  2648.00
+2020-01-24 04:42:04.439  INFO 25963 --- [           main] uration$$EnhancerBySpringCGLIB$$4e540223 : amount value :  6320.00
+2020-01-24 04:42:04.439  INFO 25963 --- [           main] uration$$EnhancerBySpringCGLIB$$4e540223 : amount value :  3658.00
+2020-01-24 04:42:04.439  INFO 25963 --- [           main] uration$$EnhancerBySpringCGLIB$$4e540223 : amount value :  9329.00
+2020-01-24 04:42:04.439  INFO 25963 --- [           main] uration$$EnhancerBySpringCGLIB$$4e540223 : amount value :  5670.00
+2020-01-24 04:42:04.439  INFO 25963 --- [           main] uration$$EnhancerBySpringCGLIB$$4e540223 : amount value :  362.00
+2020-01-24 04:42:04.439  INFO 25963 --- [           main] uration$$EnhancerBySpringCGLIB$$4e540223 : amount value :  4802.00
+2020-01-24 04:42:04.439  INFO 25963 --- [           main] uration$$EnhancerBySpringCGLIB$$4e540223 : amount value :  2924.00
+2020-01-24 04:42:04.439  INFO 25963 --- [           main] uration$$EnhancerBySpringCGLIB$$4e540223 : amount value :  213.00
+2020-01-24 04:42:04.439  INFO 25963 --- [           main] uration$$EnhancerBySpringCGLIB$$4e540223 : amount value :  2295.00
+```
+
+`ItemProcessor`에서는 Order Amount 짝수일 경우는 `return null`을 함으로써 Writer에 넘기지 않도록 합니다. 코틀린에서는 `return null` 하기 위해서는  `label@` 키워드를 추가 해야합니다.
 

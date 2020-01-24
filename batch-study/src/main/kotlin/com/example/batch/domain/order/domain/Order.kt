@@ -1,34 +1,22 @@
 package com.example.batch.domain.order.domain
 
-import org.springframework.data.annotation.CreatedDate
-import org.springframework.data.annotation.LastModifiedDate
 import java.math.BigDecimal
-import java.time.LocalDateTime
 import javax.persistence.*
 
 
 @Entity
 @Table(name = "orders")
-@Access(AccessType.FIELD) // 용도는 ?
-class Order {
+data class Order(
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long = 0
+        @Column(name = "amount", nullable = false)
+        var amount: BigDecimal,
 
-    @Column(name = "amount", nullable = false)
-    lateinit var amount: BigDecimal
-        protected set
 
-    @CreatedDate
-    @Column(name = "created_at", nullable = true, updatable = false)
-    lateinit var createdAt: LocalDateTime
-        protected set
+        @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
+        val items: List<OrderItem> = listOf()
 
-    @LastModifiedDate
-    @Column(name = "updated_at", nullable = true)
-    lateinit var updatedAt: LocalDateTime
-        protected set
+
+) : EntityAuditing() {
 
     fun updatePrice() {
         amount = BigDecimal("1209.11")
