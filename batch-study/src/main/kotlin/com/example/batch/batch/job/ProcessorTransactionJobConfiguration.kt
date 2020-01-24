@@ -63,7 +63,7 @@ class ProcessorTransactionJobConfiguration(
     fun writer(): ItemWriter<Order> {
         return ItemWriter {
             for (order in it) {
-                log.info("ItemWriter Processor ----------> ${order.amount}")
+                log.info("Item Writer Processor order item size ----------> ${order.items.size}")
             }
         }
     }
