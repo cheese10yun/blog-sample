@@ -159,6 +159,22 @@ interface OrderRepository : JpaRepository<Order, Long> {
 ```
 `JpaPagingItemReader` 보다는 구현이 쉽긴 하지만 `methodName` 방식은 type safe 하지 않기 때문에 결국 ItemReader는 직접 구현해서 사용하는 방식이 적절한거 같다.
 
+```kotlin
+private fun reader(): RepositoryItemReader<Order> {
+	return RepositoryItemReaderBuilder<Order>()
+			.name("reader")
+			.repository(orderRepository)
+			.methodName("findByAmountGreaterThan")
+			.arguments(listOf(BigDecimal.ZERO))
+			.sorts(Collections.singletonMap("id", Sort.Direction.ASC))
+			.saveState(false)
+			.pageSize(chunkSize)
+			.maxItemCount(1000)
+			.build()
+}
+```
+`maxItemCount` 를 지정할 수 있다. 해당 값을 지정하면 max count만큼 item까지 읽어 오기 때문에 정확한 limit이 있으면 편리하게 사용할 수 있다.
+
 
 
 

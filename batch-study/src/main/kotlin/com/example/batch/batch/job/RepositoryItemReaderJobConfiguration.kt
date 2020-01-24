@@ -59,6 +59,7 @@ class RepositoryItemReaderJobConfiguration(
                 .sorts(Collections.singletonMap("id", Sort.Direction.ASC))
                 .saveState(false)
                 .pageSize(chunkSize)
+                .maxItemCount(1000)
                 .build()
     }
 
