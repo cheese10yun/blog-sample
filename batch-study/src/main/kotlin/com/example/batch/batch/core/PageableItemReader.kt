@@ -60,7 +60,7 @@ open class PageableItemReader<T>(
     @AfterRead
     @Suppress("UNUSED")
     fun afterRead() {
-        if (readContent.isEmpty()) page--
+        if (readContent.isEmpty()) --page
     }
 
     private fun readRows(page: Int = 0): Page<T> {

@@ -54,12 +54,11 @@ class PageableItemReaderJobConfiguration(
 //    }
 
     private fun reader(): PageableItemReader<Order> {
-
         return PageableItemReader(
                 name = "PageableItemReaderReader",
                 sort = Sort.by(Sort.Direction.ASC, "id"),
                 pageSize = chunkSize,
-                query = { orderRepository.findByAmountGreaterThan(BigDecimal(8000), it) }
+                query = { orderRepository.findByAmountGreaterThan(BigDecimal(5000), it) }
         )
     }
 
