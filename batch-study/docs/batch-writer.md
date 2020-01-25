@@ -3,7 +3,7 @@
 Writer는 Reader, Processor와 함께 ChunkOrientedTasklet을 구성하는 3 요소입니다. 여기서 Processor가 아닌 Writer를 우선 선택한 이유는 **Processor는 선택이기 때문입니다. Processor가 없어도 ChunkOrientedTasklet을 구성할 수 있습니다. 반면 Reader, Writer는 ChunkOrientedTasklet에서 필수로 구성해야 합니다.**
 
 
-Spring Batch가 처음 나왔을 때, **ItemWirtet는 ItemReader와 마찬가지로 item을 하나씩 다루었습니다.** 그러나 Spring Batch2와 Chunk 기반 처리의 도입으로 인해 ItemWriter의 큰 변경이 있었습니다. **ItemWirtet는 item 하나를 작성하지 않고 Chunk 단위로 묶인 item List를 다룹니다.** 이 때문에 ItemWriter 인터페이스는 ItemReader 인터페이스와 약간 다릅니다.
+Spring Batch가 처음 나왔을 때, **ItemWriter는 ItemReader와 마찬가지로 item을 하나씩 다루었습니다.** 그러나 Spring Batch2와 Chunk 기반 처리의 도입으로 인해 ItemWriter의 큰 변경이 있었습니다. **ItemWriter는 item 하나를 작성하지 않고 Chunk 단위로 묶인 item List를 다룹니다.** 이 때문에 ItemWriter 인터페이스는 ItemReader 인터페이스와 약간 다릅니다.
 
 
 ```java
