@@ -6,7 +6,7 @@ spring:
     properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
       ddl-auto: create
-    show-sql: true
+    show-sql: false
     properties:
 
   datasource:
@@ -23,4 +23,4 @@ logging:
   level:
     ROOT: info
     org.springframework.batch: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: trace
+    # org.hibernate.type.descriptor.sql.BasicBinder: trace

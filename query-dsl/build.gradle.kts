@@ -30,9 +30,14 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.querydsl:querydsl-jpa")
+
+    implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.8")
+
     runtimeOnly("com.h2database:h2")
+
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor(group = "com.querydsl", name = "querydsl-apt", classifier = "jpa")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
