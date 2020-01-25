@@ -54,7 +54,7 @@ class PageableItemReaderJobConfiguration(
 
     private fun processor(): ItemProcessor<Order, Order> {
         return ItemProcessor {
-            log.info("ItemProcessor ->>>>>>> ${it.id}")
+            log.info("ItemProcessor ->>>>>>> order id : ${it.id}")
             it
         }
 
@@ -64,7 +64,7 @@ class PageableItemReaderJobConfiguration(
     private fun writer(): ItemWriter<Order> {
         return ItemWriter {
             for (order in it) {
-                log.info("ItemWriter ->>>>>>>>> ${order.id}")
+                log.info("ItemWriter ->>>>>>>>> order id : ${order.id}")
             }
         }
     }
