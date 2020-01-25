@@ -51,9 +51,10 @@ open class PageableItemReader<T>(
     @BeforeRead
     @Suppress("UNUSED")
     fun beforeRead() {
-        if (this.page < 0) {
-            return
-        } else if (this.readContent.isEmpty()) readContent = readRows(page).content.toMutableList()
+        when {
+            this.page < 0 -> return
+            this.readContent.isEmpty() -> readContent = readRows(page).content.toMutableList()
+        }
     }
 
     @AfterRead

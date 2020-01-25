@@ -18,12 +18,6 @@ internal class OrderRepositoryTest {
 
     @Test
     fun test() {
-        val orders = orderRepository.findByAmountGreaterThan(BigDecimal.ZERO)
-
-        println("")
-
-
-
 
     }
 }
