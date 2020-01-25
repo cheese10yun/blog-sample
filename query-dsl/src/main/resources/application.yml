@@ -1,9 +1,9 @@
 spring:
   main.allow-bean-definition-overriding: true
-#  jpa:
-#    show-sql: true
+  jpa:
+    show-sql: false
 
 logging:
   level:
     ROOT: info
-    org.hibernate.type.descriptor.sql.BasicBinder: trace
+#    org.hibernate.type.descriptor.sql.BasicBinder: trace
