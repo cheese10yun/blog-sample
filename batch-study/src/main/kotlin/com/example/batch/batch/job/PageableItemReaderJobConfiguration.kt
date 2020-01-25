@@ -14,6 +14,7 @@ import org.springframework.batch.item.ItemWriter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.domain.Sort
+import java.math.BigDecimal
 
 @Configuration
 class PageableItemReaderJobConfiguration(
@@ -43,12 +44,22 @@ class PageableItemReaderJobConfiguration(
     }
 
 
+//    private fun reader(): PageableItemReader<Order> {
+//        return PageableItemReader(
+//                name = "PageableItemReaderReader",
+//                sort = Sort.by(Sort.Direction.ASC, "id"),
+//                pageSize = chunkSize,
+//                query = orderRepository::findAll
+//        )
+//    }
+
     private fun reader(): PageableItemReader<Order> {
+
         return PageableItemReader(
                 name = "PageableItemReaderReader",
                 sort = Sort.by(Sort.Direction.ASC, "id"),
                 pageSize = chunkSize,
-                query = orderRepository::findAll
+                query = { orderRepository.findByAmountGreaterThan(BigDecimal(100), it) }
         )
     }
 
@@ -57,7 +68,6 @@ class PageableItemReaderJobConfiguration(
             log.info("ItemProcessor ->>>>>>> order id : ${it.id}")
             it
         }
-
     }
 
 
