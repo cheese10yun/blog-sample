@@ -15,12 +15,4 @@ data class Member(
         @ManyToOne(fetch = FetchType.LAZY, optional = false)
         @JoinColumn(name = "team_id", nullable = false)
         var team: Team
-) : EntityAuditing() {
-
-    fun changeTeam(team: Team) {
-        this.team = team
-        team.members.add(this)
-    }
-
-
-}
+) : EntityAuditing()

@@ -15,5 +15,4 @@ data class Team(
     @OneToMany(mappedBy = "team")
     var members: MutableList<Member> = mutableListOf()
 
-
 }
