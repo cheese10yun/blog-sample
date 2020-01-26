@@ -9,7 +9,7 @@ import javax.persistence.Table
 @Table(name = "team")
 data class Team(
         @Column(name = "name", nullable = false)
-        private var name: String
+        var name: String
 ) : EntityAuditing() {
 
     @OneToMany(mappedBy = "team")

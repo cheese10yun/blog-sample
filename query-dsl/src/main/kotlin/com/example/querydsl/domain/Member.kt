@@ -7,20 +7,19 @@ import javax.persistence.*
 @Table(name = "member")
 data class Member(
         @Column(name = "username", nullable = false)
-        private var username: String,
+        var username: String,
 
         @Column(name = "age", nullable = false)
-        private var age: Int = 0,
+        var age: Int = 0,
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "team_id")
-        private var team: Team? = null
+        @ManyToOne(fetch = FetchType.LAZY, optional = false)
+        @JoinColumn(name = "team_id", nullable = false)
+        var team: Team
 ) : EntityAuditing() {
 
     fun changeTeam(team: Team) {
         this.team = team
         team.members.add(this)
-
     }
 
 

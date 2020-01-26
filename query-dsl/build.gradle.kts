@@ -30,8 +30,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.querydsl:querydsl-jpa")
-
-    implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.8")
+//    implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.8")
 
     runtimeOnly("com.h2database:h2")
 
