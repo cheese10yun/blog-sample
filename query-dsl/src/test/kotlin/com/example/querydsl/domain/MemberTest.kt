@@ -2,7 +2,6 @@ package com.example.querydsl.domain
 
 
 import com.querydsl.jpa.JPAExpressions
-import com.querydsl.jpa.JPAExpressions.*
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.BeforeEach
@@ -249,7 +248,7 @@ internal class MemberTest(
                 .fetch()
 
         then(members).anySatisfy {
-            then(it.team!!.name).isEqualTo("teamA")
+            then(it.team.name).isEqualTo("teamA")
         }
     }
 
@@ -282,7 +281,7 @@ internal class MemberTest(
         val member = query
                 .selectFrom(qMember)
                 .where(qMember.age.eq(
-                        select(qMemberSub.age.max())
+                        JPAExpressions.select(qMemberSub.age.max())
                                 .from(qMemberSub)
                 ))
                 .fetchOne()!!
@@ -296,13 +295,28 @@ internal class MemberTest(
         val members = query
                 .selectFrom(qMember)
                 .where(qMember.age.goe(
-                        select(qMemberSub.age.avg())
+                        JPAExpressions.select(qMemberSub.age.avg())
                                 .from(qMemberSub)
                 ))
                 .fetch()!!
 
         then(members).anySatisfy {
             then(it.age).isIn(30, 40)
+        }
+    }
+
+    @Test
+    internal fun `query dsl basic case`() {
+        val results = query
+                .select(qMember.age
+                        .`when`(10).then("열살")
+                        .`when`(20).then("스무살")
+                        .otherwise("이타"))
+                .from(qMember)
+                .fetch()
+
+        for (str in results){
+            println(str)
         }
     }
 }
