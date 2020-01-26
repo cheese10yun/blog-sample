@@ -1,6 +1,11 @@
 package com.example.querydsl.domain
 
 
+import com.example.querydsl.dto.MemberDto
+import com.example.querydsl.dto.QMemberDto
+import com.querydsl.core.BooleanBuilder
+import com.querydsl.core.types.Projections
+import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.assertj.core.api.BDDAssertions.then
@@ -108,7 +113,6 @@ internal class MemberTest(
 
     @Test
     internal fun `query dsl fetch type`() {
-
         // 단건 조회
         val member = query
                 .selectFrom(qMember)
@@ -164,7 +168,6 @@ internal class MemberTest(
                 .limit(2)
                 .fetchResults()
 
-
         then(paging.total).isEqualTo(4)
         then(paging.limit).isEqualTo(2)
         then(paging.offset).isEqualTo(1)
@@ -173,7 +176,6 @@ internal class MemberTest(
 
     @Test
     internal fun `query dsl aggregation set`() {
-
         val result = query
                 .select(
                         qMember.count(),
@@ -197,7 +199,6 @@ internal class MemberTest(
 
     @Test
     internal fun `query dsl group by`() {
-
         val result = query
                 .select(qTeam.name, qMember.age.avg())
                 .from(qMember)
@@ -226,7 +227,7 @@ internal class MemberTest(
 
         then(members).anySatisfy {
             then(it.username).isIn("member1", "member2")
-            then(it.team!!.name).isEqualTo("teamA")
+            then(it.team.name).isEqualTo("teamA")
         }
     }
 
@@ -315,8 +316,165 @@ internal class MemberTest(
                 .from(qMember)
                 .fetch()
 
-        for (str in results){
-            println(str)
+        for (result in results) {
+            println(result)
         }
+    }
+
+    @Test
+    internal fun `query dsl projection simple`() {
+        val results = query
+                .select(qMember.username)
+                .from(qMember)
+                .fetch()
+
+        for (result in results) {
+            println(result)
+        }
+    }
+
+    @Test
+    internal fun `query dsl tuple projection`() {
+        val results = query
+                .select(qMember.username, qMember.age)
+                .from(qMember)
+                .fetch()
+
+        for (tuple in results) {
+
+            val username = tuple.get(qMember.username)
+            val age = tuple.get(qMember.age)
+
+            println("""
+                username : $username
+                age : $age
+            """.trimIndent())
+
+        }
+    }
+
+    @Test
+    internal fun `query dsl projection dto`() {
+        val members = query
+                .select(Projections.constructor(
+                        MemberDto::class.java,
+                        qMember.username,
+                        qMember.age
+                ))
+                .from(qMember)
+                .fetch()
+
+        for (member in members) {
+            println(member)
+        }
+    }
+
+    @Test
+    internal fun `query dsl projection dto 2`() {
+        val members = query
+                .select(Projections.constructor(
+                        MemberDto::class.java,
+                        qMember.username,
+                        qMember.age.max().`as`("age")
+                ))
+                .from(qMember)
+                .groupBy(qMember.age)
+                .fetch()
+
+        for (member in members) {
+            println(member)
+        }
+    }
+
+    @Test
+    internal fun `query dsl dto projection QueryProjection`() {
+        val members = query
+                .select(QMemberDto(qMember.username, qMember.age))
+                .from(qMember)
+                .fetch()
+
+        for (member in members) {
+            println(member)
+        }
+    }
+
+    @Test
+    internal fun `query dsl dynamic query boolean builder`() {
+
+        val username = "member1"
+        val age = 10
+
+        val members = searchMember(username, age)
+
+        for (member in members) {
+            println(member)
+        }
+    }
+
+    @Test
+    internal fun `query dsl dynamic query`() {
+        val username = "member1"
+        val age = 10
+
+        val members = query
+                .selectFrom(qMember)
+                .where(usernameEq(username), ageEq(age))
+                .fetch()
+
+        for (member in members) {
+            println(member)
+        }
+    }
+
+    @Test
+    internal fun `query  dsl bulk update`() {
+        val count = query
+                .update(qMember)
+                .set(qMember.username, "set username")
+                .where(qMember.age.lt(20))
+                .execute()
+
+        then(count).isEqualTo(1)
+    }
+
+    @Test
+    internal fun `query  dsl bulk delete`() {
+        val count = query
+                .delete(qMember)
+                .where(qMember.age.gt(10))
+                .execute()
+
+        then(count).isEqualTo(3)
+    }
+
+    private fun usernameEq(username: String?): BooleanExpression? {
+        return when (username) {
+            null -> null
+            else -> qMember.username.eq(username)
+        }
+    }
+
+    private fun ageEq(age: Int?): BooleanExpression? {
+        return when (age) {
+            null -> null
+            else -> qMember.age.eq(age)
+        }
+    }
+
+    private fun searchMember(username: String?, age: Int?): List<Member> {
+        val booleanBuilder = BooleanBuilder()
+
+        username.let {
+            booleanBuilder.and(qMember.username.eq(username))
+        }
+
+        age.let {
+            booleanBuilder.and(qMember.age.eq(age))
+        }
+
+        return query
+                .selectFrom(qMember)
+                .where(booleanBuilder)
+                .fetch()
     }
 }

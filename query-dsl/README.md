@@ -1,9 +1,9 @@
 # Query DSl 실전! 강의 학습 정리
 > [실전! Querydsl](https://www.inflearn.com/course/Querydsl-%EC%8B%A4%EC%A0%84#)을 학습 내용 정리입니다.
 
-## Query DSL With Kotlin Setting
+# Query DSL With Kotlin Setting
 
-### build.gradle.kts
+## build.gradle.kts
 
 ```groovy
 plugins {
@@ -26,7 +26,7 @@ dependencies {
 }
 
 ```
-### Setting Test
+## Setting Test
 
 ```kotlin
 @Entity
@@ -80,6 +80,7 @@ select hello0_.id as id1_0_, hello0_.created_at as created_2_0_, hello0_.updated
 ```
 query 정상동작 확인
 
+# 기본 문법
 ## 검색 조건 쿼리
 
 ```kotlin
@@ -580,3 +581,268 @@ select
 from
     member member0_
 ```
+
+# 중급 문법
+
+## 프로젝션과 결과 반환 - 기본
+```kotlin
+@Test
+internal fun `query dsl projection simple`() {
+    val results = query
+            .select(qMember.username)
+            .from(qMember)
+            .fetch()
+
+    for (result in results) {
+        println(result)
+    }
+}
+```
+```sql
+select
+    member0_.username as col_0_0_ 
+from
+    member member0_
+```
+* 프로젝션 대상이 하나면 타입을 명확하게 지정할 수 있음 
+* 프로젝션 대상이 둘 이상이면 튜플이나 DTO로 조회
+
+## 튜플 조회
+```kotlin
+@Test
+internal fun `query dsl tuple projection`() {
+
+    val results = query
+            .select(qMember.username, qMember.age)
+            .from(qMember)
+            .fetch()
+
+    for (tuple in results) {
+
+        val username = tuple.get(qMember.username)
+        val age = tuple.get(qMember.age)
+
+        println("""
+            username : $username
+            age : $age
+        """.trimIndent())
+
+    }
+}
+```
+
+```sql
+select
+    member0_.username as col_0_0_,
+    member0_.age as col_1_0_ 
+from
+    member member0_
+```
+## 프로젝션과 결과 반환 - DTO 조회
+결과를 DTO 반환할 때 사용 다음 3가지 방법 지원
+
+* 프로퍼티 접근 
+* 필드 직접 접근 
+* **생성자 사용**
+
+생성가 기반의 프로젝션 처리가 좋은 코드라고 생각, setter 방식은 setter 코드 때문에 객체가 mutable 상태로 변경되게 되며, 필드 방식은 필드명이 정확하게 일치해야 하는 문제가 있다. 생성자 방식이 가장 POJO 스럽게 코드를 작성할 수 있음
+
+### 생성자 사용
+```kotlin
+data class MemberDto(
+        val username: String,
+        val age: Int
+)
+
+@Test
+internal fun `query dsl projection dto`() {
+    val members = query
+            .select(Projections.constructor(
+                    MemberDto::class.java,
+                    qMember.username,
+                    qMember.age
+            ))
+            .from(qMember)
+            .fetch()
+
+    for (member in members) {
+        println(member)
+    }
+}
+```
+```sql
+select
+    member0_.username as col_0_0_,
+    member0_.age as col_1_0_ 
+from
+    member member0_
+```
+### 별칭이 다를 때
+```kotlin
+@Test
+internal fun `query dsl projection dto 2`() {
+    val members = query
+            .select(Projections.constructor(
+                    MemberDto::class.java,
+                    qMember.username,
+                    qMember.age.max().`as`("age")
+            ))
+            .from(qMember)
+            .groupBy(qMember.age)
+            .fetch()
+
+    for (member in members) {
+        println(member)
+    }
+}
+```
+
+```sql
+select
+    member0_.username as col_0_0_,
+    max(member0_.age) as col_1_0_ 
+from
+    member member0_ 
+group by
+    member0_.age
+```
+* 프로퍼티나, 필드 접근 생성 방식에서 이름이 다를 때 해결 방안 
+* ExpressionUtils.as(source,alias) : 필드나, 서브 쿼리에 별칭 적용
+* username.as("memberName") : 필드에 별칭 적용
+
+
+
+## 프로젝션과 결과 반환 - @QueryProjection
+```kotlin
+data class MemberDto @QueryProjection constructor(
+        val username: String,
+        val age: Int) {
+}
+
+@Test
+internal fun `query dsl dto projection QueryProjection`() {
+    val members = query
+            .select(QMemberDto(qMember.username, qMember.age))
+            .from(qMember)
+            .fetch()
+
+    for (member in members) {
+        println(member)
+    }
+}
+```
+**이 방법은 컴파일러로 타입을 체크할 수 있으므로 가장 안전한 방법이다.** 다만 DTO에 QueryDSL 어노테 이션을 유지해야 하는 점과 DTO까지 Q 파일을 생성해야 하는 단점이 있다.
+
+또 다른 하나의 단점은 DTO의 의존관계의 문제이다. DTO는 모든 레이어에서 공통적으로 사용하는 코드로 어떠한 의존관계를 갖지 않는 것이 바람직하다. 그런데 `@QueryProjection` 어노테이션은 Query DSL의 의존성이 필요하다. 그래서 해당 DTO의 의존성이 추가 되는게 문제이긴 하다. 그래도 어노테이션정도 추가이기 떄문에 그렇게 안티패턴이라고 생각하지 않는다.
+
+## 동적 쿼리 : BooleanBuilder 사용
+
+```kotlin
+@Test
+internal fun `query dsl dynamic query boolean builder`() {
+
+    val username = "member1"
+    val age = 10
+
+    val members = searchMember(username, age)
+
+    for (member in members) {
+        println(member)
+    }
+}
+
+private fun searchMember(username: String?, age: Int?): List<Member> {
+    val booleanBuilder = BooleanBuilder()
+
+    username.let {
+        booleanBuilder.and(qMember.username.eq(username))
+    }
+
+    age.let {
+        booleanBuilder.and(qMember.age.eq(age))
+    }
+    
+    return query
+            .selectFrom(qMember)
+            .where(
+                    booleanBuilder
+            )
+            .fetch()
+}
+```
+## 동적 쿼리 - Where 다중 파라미터 사용
+```kotlin
+@Test
+internal fun `query dsl dynamic query`() {
+    val username = "member1"
+    val age = 10
+    
+    val members = query
+            .selectFrom(qMember)
+            .where(usernameEq(username), ageEq(age))
+            .fetch()
+
+    for (member in members) {
+        println(member)
+    }
+
+}
+
+private fun usernameEq(username: String?): BooleanExpression? {
+    return when (username) {
+        null -> null
+        else -> qMember.username.eq(username)
+    }
+}
+
+private fun ageEq(age: Int?): BooleanExpression? {
+    return when (age) {
+        null -> null
+        else -> qMember.age.eq(age)
+    }
+}
+```
+* where 조건에 null 값은 무시된다. 
+* 메서드를 다른 쿼리에서도 재활용 할 수 있다.
+* 쿼리 자체의 가독성이 높아진다.
+* 작성한 메서드의 조합으로 재사용성이 높아진다.
+
+## 수정, 삭제 벌크 연산
+```kotlin
+@Test
+internal fun `query  dsl bulk update`() {
+    val count = query
+            .update(qMember)
+            .set(qMember.username, "set username")
+            .where(qMember.age.lt(20))
+            .execute()
+
+    then(count).isEqualTo(1)
+}
+
+@Test
+internal fun `query  dsl bulk delete`() {
+    val count = query
+            .delete(qMember)
+            .where(qMember.age.gt(10))
+            .execute()
+
+    then(count).isEqualTo(3)
+}
+```
+
+```sql
+update
+    member 
+set
+    username=? 
+where
+    age<?
+
+delete 
+from
+    member 
+where
+    age>?
+```
+**주의: JPQL 배치와 마찬가지로, 영속성 컨텍스트에 있는 엔티티를 무시하고 실행되기 때문에 배치 쿼리를 실행하고 나면 영속성 컨텍스트를 초기화 하는 것이 안전하다.**
