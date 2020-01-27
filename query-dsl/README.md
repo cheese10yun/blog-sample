@@ -846,3 +846,143 @@ where
     age>?
 ```
 **주의: JPQL 배치와 마찬가지로, 영속성 컨텍스트에 있는 엔티티를 무시하고 실행되기 때문에 배치 쿼리를 실행하고 나면 영속성 컨텍스트를 초기화 하는 것이 안전하다.**
+
+## 사용자 정의 리포지토리
+![](images/query-dsl-custin-repo.png))
+1. 사용자 정의 인터페이스 작성
+2. 사용자 정의 인터페이스 구현
+3. 스프링 데이터 리포지토리에 사용자 정의 인터페이스 상속
+
+### 사용 방법
+
+```kotlin
+interface MemberRepository : JpaRepository<Member, Long>, MemberRepositoryCustom
+
+interface MemberRepositoryCustom {
+
+    fun search(username: String?, age: Int?): Member
+    
+}
+
+class MemberRepositoryImpl(
+        private val query : JPAQueryFactory
+) :  MemberRepositoryCustom {
+    
+    override fun search(username: String?, age: Int?): Member {
+        return query
+                .selectFrom(qMember)
+                .where(qMember.username.eq("member1"))
+                .fetchOne()!!
+
+    }
+}
+
+@Configuration
+class Configuration {
+
+    @Bean
+    fun query(entityManager: EntityManager): JPAQueryFactory {
+        return JPAQueryFactory(entityManager)
+    }
+}
+```
+
+`XXXImpl`의 이름이 패턴이 동일 해야함
+
+### Count Query 최적화
+
+```kotlin
+override fun search(username: String?, age: Int?, page: Pageable): Page<MemberDto> {
+    val content = query
+            .select(QMemberDto(
+                    qMember.username,
+                    qMember.age))
+            .from(qMember)
+            .where(searchCondition(username, age))
+            .offset(page.offset)
+            .limit(page.pageSize.toLong())
+            .orderBy()
+            .fetch()
+
+    val countQuery = query
+            .select(QMemberDto(
+                    qMember.username,
+                    qMember.age))
+            .from(qMember)
+            .where(searchCondition(username, age))
+
+    return PageableExecutionUtils.getPage(content, page) { countQuery.fetchCount() }
+}
+```
+* content, totalCount를 별도로 쿼리한다. count 쿼리는 여러거지 이유로 content의 쿼리와 동일하지 않을 수 있음, 불필요한 조인이 있는 경우 등등
+* 람다식으로 `{ countQuery.fetchCount() }` 카운트 쿼리를 넘겨줌
+
+```kotlin
+public static <T> Page<T> getPage(List<T> content, Pageable pageable, LongSupplier totalSupplier) {
+
+    Assert.notNull(content, "Content must not be null!");
+    Assert.notNull(pageable, "Pageable must not be null!");
+    Assert.notNull(totalSupplier, "TotalSupplier must not be null!");
+
+    if (pageable.isUnpaged() || pageable.getOffset() == 0) {
+
+        if (pageable.isUnpaged() || pageable.getPageSize() > content.size()) {
+            return new PageImpl<>(content, pageable, content.size());
+        }
+
+        return new PageImpl<>(content, pageable, totalSupplier.getAsLong());
+    }
+
+    if (content.size() != 0 && pageable.getPageSize() > content.size()) {
+        return new PageImpl<>(content, pageable, pageable.getOffset() + content.size());
+    }
+
+    return new PageImpl<>(content, pageable, totalSupplier.getAsLong());
+}
+```
+다양한 이유로 count queqry를 최적화함, total count가 size를 넘지 않은 경우는 count query를 동작시킬 필요 없음 등등 유틸 클래스에서 최적화 시켜줌
+
+* count 쿼리가 생략 가능한 경우 생략해서 처리
+  * 페이지 시작이면서 컨텐츠 사이즈가 페이지 사이즈보다 작을 때
+  * 마지막 페이지 일 때 (offset + 컨텐츠 사이즈를 더해서 전체 사이즈 구함)
+
+## 인터페이스 지원 - QuerydslPredicateExecutor
+
+```java
+public interface QuerydslPredicateExecutor<T> {
+    Optional<T> findById(Predicate predicate);
+    Iterable<T> findAll(Predicate predicate);
+    long count(Predicate predicate);
+    boolean exists(Predicate predicate);
+// ... more functionality omitted.
+}
+```
+
+### 한계점
+* 조인X (묵시적 조인은 가능하지만 left join이 불가능하다.)
+* 클라이언트가 Querydsl에 의존해야 한다. 서비스 클래스가 Querydsl이라는 구현 기술에 의존해야 한다. 
+* 복잡한 실무환경에서 사용하기에는 한계가 명확하다.
+
+# 스프링 데이터 JPA가 제공하는 Query 기능
+
+## 리포지토리 지원 - QuerydslRepositorySupport
+
+### 장점
+* getQuerydsl().applyPagination() 스프링 데이터가 제공하는 페이징을 Querydsl로 편리하게 변환 가능(단! Sort는 오류발생)
+* from() 으로 시작 가능(최근에는 QueryFactory를 사용해서 select() 로 시작하는 것이 더 명시적) 
+* EntityManager 제공
+
+### 한계
+* Querydsl 3.x 버전을 대상으로 만듬
+* Querydsl 4.x에 나온 JPAQueryFactory로 시작할 수 없음
+  * select로 시작할 수 없음 (from으로 시작해야함) QueryFactory 를 제공하지 않음
+* 스프링 데이터 Sort 기능이 정상 동작하지 않음
+
+## Query Dsl 지원 클래스 직접 만들기
+스프링 데이터가 제공하는 QuerydslRepositorySupport 가 지닌 한계를 극복하기 위해 직접 Querydsl
+지원 클래스를 만들어보자.
+
+### 장점
+* 스프링 데이터가 제공하는 페이징을 편리하게 변환 페이징과 카운트 쿼리 분리 가능
+* 스프링 데이터 Sort 지원
+* select() , selectFrom() 으로 시작 가능 EntityManager , QueryFactory 제공
