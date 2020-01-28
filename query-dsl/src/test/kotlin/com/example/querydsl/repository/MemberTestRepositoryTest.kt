@@ -1,7 +1,9 @@
 package com.example.querydsl.repository
 
 import com.example.querydsl.domain.Member
+import com.example.querydsl.domain.QTeam
 import com.example.querydsl.domain.Team
+import com.querydsl.jpa.impl.JPAQueryFactory
 import org.junit.jupiter.api.Assertions.*
 
 import org.assertj.core.api.BDDAssertions.then
@@ -12,6 +14,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.test.context.TestConstructor
 import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
+import com.example.querydsl.domain.QTeam.team as qTeam
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
@@ -20,6 +23,7 @@ internal class MemberTestRepositoryTest(
         private val em: EntityManager,
         private val memberTestRepository: MemberTestRepository
 ){
+    val query = JPAQueryFactory(em)
 
     @BeforeEach
     internal fun setUp() {
@@ -41,6 +45,24 @@ internal class MemberTestRepositoryTest(
 
         em.flush()
         em.clear()
+    }
+
+    @Test
+    internal fun `JPQL 쿼리 실행시 플러시 자동 호출`() {
+        val teamA = Team("teamA")
+        val teamB = Team("teamB")
+
+        em.persist(teamA)
+        em.persist(teamB)
+
+
+        val teams = query.select(qTeam)
+                .from(qTeam)
+                .fetch()
+
+        for (team in teams) {
+            println("team : $team")
+        }
     }
 
     @Test
