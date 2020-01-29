@@ -1,13 +1,9 @@
 package com.example.querydsl.repository
 
 import com.example.querydsl.domain.Member
-import com.example.querydsl.domain.QTeam
 import com.example.querydsl.domain.Team
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.querydsl.jpa.impl.JPAQueryFactory
-import org.junit.jupiter.api.Assertions.*
-
-import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest

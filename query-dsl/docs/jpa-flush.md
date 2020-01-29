@@ -69,11 +69,11 @@ em.persist(new Member()); // 1
 em.persist(new Member()); // 2
 em.persist(new Member()); // 3
 em.persist(new Member()); // 4
-em.persist(new Orders()); // 5, 다른 SQL이 추가 되었기 때문에  SQL 배치를 다시 시작 해야 한다
+em.persist(new Orders()); // 1-1, 다른 SQL이 추가 되었기 때문에  SQL 배치를 다시 시작 해야 한다
 em.persist(new Member()); // 1
 em.persist(new Member()); // 2
 ```
-1,2,3,4를 모아서 하나의 SQL 배치를 실행하고 5를 한 번 실행하고 1,2을 모아서 실행한다. 따라서 총 3번의 SQL 배치를 실행한다.
+1,2,3,4를 모아서 하나의 SQL 배치를 실행하고 1-1를 한 번 실행하고 1,2을 모아서 실행한다. 따라서 총 3번의 SQL 배치를 실행한다.
 
 모든 경우에 사용할 수 이쓴ㄴ것은 아니다. 엔티티가 영속 상태가 디려면 식별자가 꼭 필요하다. **그런데 IDENTITY 식별자 생성 전략은 엔티티를 데이터베이스에 저장해야 식별자를 구할 수 있으므로 em.persist()를 호출하는 즉시 INSERT SQL이 데이터베이스에 전달된다. 따라서 쓰지 지연을 활용한 성능 최적화를 할 수가 없다.**
 
