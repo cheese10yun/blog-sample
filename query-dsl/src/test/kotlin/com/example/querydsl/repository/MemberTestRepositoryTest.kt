@@ -3,6 +3,7 @@ package com.example.querydsl.repository
 import com.example.querydsl.domain.Member
 import com.example.querydsl.domain.QTeam
 import com.example.querydsl.domain.Team
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.junit.jupiter.api.Assertions.*
 
@@ -21,7 +22,8 @@ import com.example.querydsl.domain.QTeam.team as qTeam
 @Transactional
 internal class MemberTestRepositoryTest(
         private val em: EntityManager,
-        private val memberTestRepository: MemberTestRepository
+        private val memberTestRepository: MemberTestRepository,
+        private val objectMapper: ObjectMapper
 ){
     val query = JPAQueryFactory(em)
 
@@ -73,5 +75,16 @@ internal class MemberTestRepositoryTest(
             println(member)
 
         }
+    }
+
+    @Test
+    internal fun asdasdasdasd() {
+        val readValue = objectMapper.readValue(
+                "{\n" +
+                        "  \"name\": \"123\"\n" +
+                        "}"
+                , Team::class.java)
+
+        println(readValue)
     }
 }
