@@ -1,6 +1,7 @@
 package com.example.querydsl.domain
 
 
+import com.example.querydsl.SpringBootTestSupport
 import com.example.querydsl.dto.MemberDto
 import com.example.querydsl.dto.QMemberDto
 import com.querydsl.core.BooleanBuilder
@@ -11,19 +12,14 @@ import com.querydsl.jpa.impl.JPAQueryFactory
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.TestConstructor
-import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 import com.example.querydsl.domain.QMember.member as qMember
 import com.example.querydsl.domain.QTeam.team as qTeam
 
-@SpringBootTest
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-@Transactional
+
 internal class MemberTest(
         private val em: EntityManager
-) {
+): SpringBootTestSupport() {
 
     val query = JPAQueryFactory(em)
 

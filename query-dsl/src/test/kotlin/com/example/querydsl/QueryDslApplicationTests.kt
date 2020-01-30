@@ -5,17 +5,11 @@ import com.example.querydsl.domain.QHello
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.TestConstructor
-import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 
-@SpringBootTest
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-@Transactional
 class QueryDslApplicationTests(
         private val em: EntityManager
-) {
+) : SpringBootTestSupport(){
 
     @Test
     internal fun `querydsl setting test`() {

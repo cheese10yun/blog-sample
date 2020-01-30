@@ -1,23 +1,19 @@
 package com.example.querydsl.repository
 
+import com.example.querydsl.SpringBootTestSupport
 import com.example.querydsl.domain.Member
 import com.example.querydsl.domain.Team
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
-import org.springframework.test.context.TestConstructor
-import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 
-@SpringBootTest
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-@Transactional
+
 internal class MemberRepositoryTest(
         private val em: EntityManager,
         private val memberRepository: MemberRepository
-){
+) : SpringBootTestSupport() {
 
     @BeforeEach
     internal fun setUp() {
@@ -51,11 +47,7 @@ internal class MemberRepositoryTest(
 
     @Test
     internal fun `search page`() {
-
         val search = memberRepository.search("member1", 10, PageRequest.of(0, 4))
-
         println(search)
-
-
     }
 }

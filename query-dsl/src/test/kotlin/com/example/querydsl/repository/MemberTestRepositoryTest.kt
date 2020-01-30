@@ -1,26 +1,20 @@
 package com.example.querydsl.repository
 
+import com.example.querydsl.SpringBootTestSupport
 import com.example.querydsl.domain.Member
 import com.example.querydsl.domain.Team
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
-import org.springframework.test.context.TestConstructor
-import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 import com.example.querydsl.domain.QTeam.team as qTeam
 
-@SpringBootTest
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-@Transactional
+
 internal class MemberTestRepositoryTest(
         private val em: EntityManager,
-        private val memberTestRepository: MemberTestRepository,
-        private val objectMapper: ObjectMapper
-){
+        private val memberTestRepository: MemberTestRepository
+) : SpringBootTestSupport() {
     val query = JPAQueryFactory(em)
 
     @BeforeEach
@@ -64,23 +58,12 @@ internal class MemberTestRepositoryTest(
     }
 
     @Test
-    internal fun `test asdasdasdasd`() {
+    internal fun `simplePage test`() {
         val members = memberTestRepository.simplePage(PageRequest.of(0, 4))
 
         for (member in members) {
             println(member)
 
         }
-    }
-
-    @Test
-    internal fun asdasdasdasd() {
-        val readValue = objectMapper.readValue(
-                "{\n" +
-                        "  \"name\": \"123\"\n" +
-                        "}"
-                , Team::class.java)
-
-        println(readValue)
     }
 }
