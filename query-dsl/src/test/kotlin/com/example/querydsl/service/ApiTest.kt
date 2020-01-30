@@ -14,7 +14,7 @@ import kotlin.properties.Delegates.notNull
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-internal class MemberServiceTest(
+internal class ApiTest(
         private val restTemplate: RestTemplate,
         private val memberService: MemberService
 
@@ -30,13 +30,12 @@ internal class MemberServiceTest(
 
 
     @Test
-    internal fun asdasd() {
+    internal fun `api test`() {
         server.expect(requestTo("https://www.naver.com/"))
                 .andRespond(
                         withSuccess("123123", MediaType.APPLICATION_JSON))
 
         val get = memberService.get()
         println(get)
-
     }
 }
