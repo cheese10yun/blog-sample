@@ -12,7 +12,6 @@ import javax.persistence.EntityManager
 @Configuration
 class Configuration {
 
-
     @Bean
     fun query(entityManager: EntityManager): JPAQueryFactory {
         return JPAQueryFactory(entityManager)
@@ -23,7 +22,6 @@ class Configuration {
         return RestTemplateBuilder()
             .rootUri("http://localhost:8080")
             .setConnectTimeout(Duration.ofSeconds(10))
-//            .messageConverters(MappingJackson2HttpMessageConverter(objectMapper))
             .additionalMessageConverters()
             .build()
     }

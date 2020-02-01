@@ -27,7 +27,8 @@ class AppRunner(
             Team("team 6"),
             Team("team 7"),
             Team("team 8"),
-            Team("team 9")
+            Team("team 9"),
+            Team("team 10")
         )
 
         for (team in teams) {

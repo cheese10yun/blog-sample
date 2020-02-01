@@ -16,11 +16,11 @@ class TeamApi(
 
     @GetMapping
     fun get(@RequestParam(required = false) name: String?): List<Team> {
-
         return query.selectFrom(qTeam)
             .from(qTeam)
+            .where(
+                qTeam.name.like("%$name%")
+            )
             .fetch()
-
     }
-
 }
