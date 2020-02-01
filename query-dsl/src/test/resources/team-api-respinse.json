@@ -1,0 +1,65 @@
+[
+  {
+    "name": "team 1",
+    "id": 1,
+    "createdAt": "2020-02-01T16:00:52.66",
+    "updatedAt": "2020-02-01T16:00:52.66",
+    "members": []
+  },
+  {
+    "name": "team 2",
+    "id": 2,
+    "createdAt": "2020-02-01T16:00:52.677",
+    "updatedAt": "2020-02-01T16:00:52.677",
+    "members": []
+  },
+  {
+    "name": "team 3",
+    "id": 3,
+    "createdAt": "2020-02-01T16:00:52.678",
+    "updatedAt": "2020-02-01T16:00:52.678",
+    "members": []
+  },
+  {
+    "name": "team 4",
+    "id": 4,
+    "createdAt": "2020-02-01T16:00:52.679",
+    "updatedAt": "2020-02-01T16:00:52.679",
+    "members": []
+  },
+  {
+    "name": "team 5",
+    "id": 5,
+    "createdAt": "2020-02-01T16:00:52.68",
+    "updatedAt": "2020-02-01T16:00:52.68",
+    "members": []
+  },
+  {
+    "name": "team 6",
+    "id": 6,
+    "createdAt": "2020-02-01T16:00:52.681",
+    "updatedAt": "2020-02-01T16:00:52.681",
+    "members": []
+  },
+  {
+    "name": "team 7",
+    "id": 7,
+    "createdAt": "2020-02-01T16:00:52.682",
+    "updatedAt": "2020-02-01T16:00:52.682",
+    "members": []
+  },
+  {
+    "name": "team 8",
+    "id": 8,
+    "createdAt": "2020-02-01T16:00:52.683",
+    "updatedAt": "2020-02-01T16:00:52.683",
+    "members": []
+  },
+  {
+    "name": "team 9",
+    "id": 9,
+    "createdAt": "2020-02-01T16:00:52.684",
+    "updatedAt": "2020-02-01T16:00:52.684",
+    "members": []
+  }
+]
