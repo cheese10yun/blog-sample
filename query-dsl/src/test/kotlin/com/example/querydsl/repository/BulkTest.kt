@@ -54,12 +54,15 @@ internal class BulkTest(
 
         println("update count : $updateCount")
 
+
         for (team in teams) {
             println("after update team : $team")
         }
 
-        val newSelectTeams = query.selectFrom(qTeam).fetch()
 
+        // em.clear() // 영속성 컨텍스트를 초기화 한다.
+
+        val newSelectTeams = query.selectFrom(qTeam).fetch()
 
         for (team in newSelectTeams) {
             println("new select team : $team")
