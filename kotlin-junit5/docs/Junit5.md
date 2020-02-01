@@ -212,7 +212,7 @@ value: 1
 this address : com.example.kotlinjunit5.SampleTest@37e547da
 ```
 
-```
+```kotlin
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class SampleTest {
 
