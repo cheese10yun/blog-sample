@@ -137,7 +137,7 @@ given 절에 있는 `/team-api-response.json`는 `/src/test/resources/` 디렉�
 물론 객체 기반으로 만들고 그것을 시리얼 라이즈 해서 json으로 만들어도 되지만 [테스트 코드 작성에 대한 나름의 고찰](https://cheese10yun.github.io/spring-about-test/#json)에서 한 번 다뤘지만 해당 테스트에서 Team 객체가 Response body가 객체가 시리얼 라이즈 되는지까지 책임이 부여되기 때문에 json 파일로 response body를 관리하는 것이 더 효율적이라고 생각합니다.
 
 
-## 무억을 테스트 하는가?
+## 무엇을 테스트할 것인가?
 일단 Mock 기반 테스트는 단위 테스트 성격이 높습니다. 그렇다면 무엇을 테스트할 것인지 명확하게 테스트해야 합니다. **해당 테스트에서는 원하는 곳으로 Request가 가는지, 우리가 원하는 Reponse가 예상되었을 경우 우리 로직이 제대로 동작하는지 테스트를 진행하겠습니다.**
 
 ### Request 테스트
