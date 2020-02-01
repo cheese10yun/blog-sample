@@ -55,6 +55,7 @@
 * [Application Event](https://github.com/cheese10yun/blog-sample/tree/master/application-event)
 * [JPA 영속성 컨텍스트 주의점](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/jpa-persistence-context.md)
 * [JPA Bulk 주의점](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/jpa-bulk.md)
+* [RestTemplate Mock 기반 테스트 하기](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/rest-template-mock-test.md)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
