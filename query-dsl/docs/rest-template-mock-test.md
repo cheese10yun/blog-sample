@@ -1,5 +1,5 @@
-# RestTempalte Mock 기반 테스트 하기
-스프링 프로젝트에서는 외부 API 모듈을 RestTemplate를 이용해서 호출하는 경우가 많습니다, 이런 경우 RestTempalte을 기반으로 Mock 테스트를 보다 쉽게 진행할 수 있습니다.
+# RestTemplate Mock 기반 테스트 하기
+스프링 프로젝트에서는 외부 API 모듈을 RestTemplate를 이용해서 호출하는 경우가 많습니다, 이런 경우 RestTemplate을 기반으로 Mock 테스트를 보다 쉽게 진행할 수 있습니다.
 
 
 ## 왜 Mock 기반 테스트를 진행 해야하나 ?
