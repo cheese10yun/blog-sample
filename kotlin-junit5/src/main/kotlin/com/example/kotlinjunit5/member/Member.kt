@@ -54,4 +54,8 @@ class Member private constructor() {
         validate(email, "email")
         validate(name, "name")
     }
+
+    fun updateName(name: String){
+        this.name = name
+    }
 }
