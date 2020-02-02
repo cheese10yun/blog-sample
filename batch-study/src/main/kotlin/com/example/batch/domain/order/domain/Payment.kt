@@ -5,9 +5,9 @@ import javax.persistence.*
 
 
 @Entity
-@Table(name = "orders2")
+@Table(name = "payment")
 @Access(AccessType.FIELD) // 용도는 ?
-data class Order2(
+data class Payment(
 
         @Column(name = "amount", nullable = false)
         var amount: BigDecimal

@@ -1,7 +1,7 @@
 package com.example.batch.batch.job
 
 import com.example.batch.domain.order.domain.Order
-import com.example.batch.domain.order.domain.Order2
+import com.example.batch.domain.order.domain.Payment
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
@@ -35,7 +35,7 @@ class JpaItemWriterJobConfiguration(
     @Bean
     fun jpaItemWriterStep(): Step {
         return stepBuilderFactory.get("jpaItemWriterStep")
-                .chunk<Order, Order2>(10)
+                .chunk<Order, Payment>(10)
                 .reader(jpaItemWriterReader())
                 .processor(jpaItemProcessor())
 //                .writer(jpaItemWriter())
@@ -54,8 +54,8 @@ class JpaItemWriterJobConfiguration(
     }
 
     @Bean
-    fun jpaItemProcessor(): ItemProcessor<Order, Order2> {
-        return ItemProcessor { order: Order -> Order2(order.amount) }
+    fun jpaItemProcessor(): ItemProcessor<Order, Payment> {
+        return ItemProcessor { order: Order -> Payment(order.amount) }
     }
 
     //    @Bean
@@ -65,7 +65,7 @@ class JpaItemWriterJobConfiguration(
 //        return itemWriter;
 //    }
     @Bean
-    fun customItemWriter(): ItemWriter<Order2> {
+    fun customItemWriter(): ItemWriter<Payment> {
         return ItemWriter { items ->
             for (item in items) {
                 println(item.amount)
