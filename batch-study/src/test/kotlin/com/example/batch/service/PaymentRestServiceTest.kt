@@ -2,6 +2,7 @@ package com.example.batch.service
 
 
 import com.example.batch.SpringBootTestSupport
+import com.example.batch.domain.order.domain.Payment
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -57,7 +58,7 @@ internal class PaymentRestServiceTest(
 
 
         //when
-        val page = paymentRestService.requestPayment(amount, pageSize, size)
+        val page = paymentRestService.requestPayment<Payment>(amount, pageSize, size)
 
         //then
         then(page.content).hasSize(10)
