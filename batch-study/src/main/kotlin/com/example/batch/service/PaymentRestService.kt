@@ -16,6 +16,7 @@ class PaymentRestService(
     private val paymentRestTemplate: RestTemplate
 ) {
 
+
     fun requestPayment(amount: BigDecimal, page: Int, size: Int): PageResponse<Payment> {
         val url = UriComponentsBuilder.fromUri(URI.create("http://localhost:8080/payment"))
             .queryParam("amount", amount)

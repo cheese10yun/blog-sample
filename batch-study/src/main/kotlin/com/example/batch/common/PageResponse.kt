@@ -8,5 +8,5 @@ data class PageResponse<T>(
     val size: Int,
     val number: Int,
     val empty: Boolean,
-    val content: List<T>
+    val content: MutableList<T>
 )
