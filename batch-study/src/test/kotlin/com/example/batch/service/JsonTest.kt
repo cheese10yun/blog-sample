@@ -30,6 +30,7 @@ class JsonTest : SpringBootTestSupport() {
         val page = readPage(path, object : TypeReference<PageResponse<Payment>>() {})
 
         //then
+        then(page.content).hasSize(10)
         then(page.totalPages).isEqualTo(224)
         then(page.totalElements).isEqualTo(2232)
         then(page.last).isFalse()

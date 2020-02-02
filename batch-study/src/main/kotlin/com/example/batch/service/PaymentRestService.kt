@@ -13,7 +13,7 @@ import java.net.URI
 
 @Service
 class PaymentRestService(
-    private val restTemplate: RestTemplate
+    private val paymentRestTemplate: RestTemplate
 ) {
 
     fun requestPayment(amount: BigDecimal, page: Int, size: Int): PageResponse<Payment> {
@@ -26,7 +26,7 @@ class PaymentRestService(
         val request = RequestEntity<Any>(HttpMethod.GET, url.toUri())
         val respType = object: ParameterizedTypeReference<PageResponse<Payment>>(){}
 
-        return restTemplate.exchange(request, respType).body!!
+        return paymentRestTemplate.exchange(request, respType).body!!
     }
 }
 
