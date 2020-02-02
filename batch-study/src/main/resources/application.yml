@@ -1,5 +1,8 @@
 spring:
-  main.allow-bean-definition-overriding: true
+  main:
+    allow-bean-definition-overriding: true
+    web-application-type: none
+
   batch.job.names: ${job.name:NONE}
   jpa:
     database: mysql
