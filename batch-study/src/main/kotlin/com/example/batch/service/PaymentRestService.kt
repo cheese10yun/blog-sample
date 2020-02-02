@@ -1,6 +1,7 @@
 package com.example.batch.service
 
 import com.example.batch.common.PageResponse
+import com.example.batch.domain.order.domain.Payment
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpMethod
 import org.springframework.http.RequestEntity
@@ -27,6 +28,15 @@ class PaymentRestService(
         val respType = object : ParameterizedTypeReference<PageResponse<T>>() {}
 
         return paymentRestTemplate.exchange<PageResponse<T>>(request, respType).body!!
+    }
+
+    fun requestPayment2(): List<Payment> {
+        val url = UriComponentsBuilder.fromUri(URI.create("http://localhost:8080/payment/test"))
+            .build()
+        val request = RequestEntity<Any>(HttpMethod.GET, url.toUri())
+        val respType = object : ParameterizedTypeReference<List<Payment>>() {}
+
+        return paymentRestTemplate.exchange(request, respType).body!!
     }
 }
 

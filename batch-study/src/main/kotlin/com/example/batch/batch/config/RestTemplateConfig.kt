@@ -37,13 +37,13 @@ class RestTemplateClientHttpRequestInterceptor : ClientHttpRequestInterceptor {
     }
 
     private fun loggingRequest(request: HttpRequest, body: ByteArray) {
-        log.info("=====Request======")
-        log.info("Headers: {}", request.headers)
-        log.info("Request Method: {}", request.method)
-        log.info("Request URI: {}", request.uri)
-        log.info("Request body: {}",
-            if (body.isEmpty()) null else String(body, StandardCharsets.UTF_8))
-        log.info("=====Request======")
+//        log.info("=====Request======")
+//        log.info("Headers: {}", request.headers)
+//        log.info("Request Method: {}", request.method)
+//        log.info("Request URI: {}", request.uri)
+//        log.info("Request body: {}",
+//            if (body.isEmpty()) null else String(body, StandardCharsets.UTF_8))
+//        log.info("=====Request======")
     }
 
 }

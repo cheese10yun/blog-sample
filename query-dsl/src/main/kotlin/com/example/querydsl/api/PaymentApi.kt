@@ -22,4 +22,8 @@ class PaymentApi (
         return paymentRepositoryImpl.findBy(amount, pageable)
     }
 
+    @GetMapping("/test")
+    fun get2(): List<Payment> {
+        return paymentRepositoryImpl.findByLimit(10)
+    }
 }

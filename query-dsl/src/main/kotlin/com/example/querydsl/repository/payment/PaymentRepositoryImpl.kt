@@ -20,4 +20,10 @@ class PaymentRepositoryImpl : Querydsl4RepositorySupport(Payment::class.java) {
                 .where(qPayment.amount.gt(amount))
         })
     }
+
+    fun findByLimit(limit: Long): List<Payment> {
+        return selectFrom(qPayment)
+            .limit(limit)
+            .fetch()
+    }
 }
