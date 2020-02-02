@@ -1,19 +1,21 @@
-package com.example.querydsl.repository
+package com.example.querydsl.repository.member
 
 import com.example.querydsl.SpringBootTestSupport
 import com.example.querydsl.domain.Member
 import com.example.querydsl.domain.Team
-import org.assertj.core.api.BDDAssertions.then
+import com.querydsl.jpa.impl.JPAQueryFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageRequest
 import javax.persistence.EntityManager
+import com.example.querydsl.domain.QTeam.team as qTeam
 
 
-internal class MemberRepositoryTest(
+internal class MemberTestRepositoryTest(
         private val em: EntityManager,
-        private val memberRepository: MemberRepository
+        private val memberTestRepository: MemberTestRepository
 ) : SpringBootTestSupport() {
+    val query = JPAQueryFactory(em)
 
     @BeforeEach
     internal fun setUp() {
@@ -38,16 +40,30 @@ internal class MemberRepositoryTest(
     }
 
     @Test
-    internal fun `search test`() {
-        val member = memberRepository.search("member1", 10)
+    internal fun `JPQL 쿼리 실행시 플러시 자동 호출`() {
+        val teamA = Team("teamA")
+        val teamB = Team("teamB")
 
-        then(member.username).isEqualTo("member1")
-        then(member.age).isEqualTo(10)
+        em.persist(teamA)
+        em.persist(teamB)
+
+
+        val teams = query.select(qTeam)
+                .from(qTeam)
+                .fetch()
+
+        for (team in teams) {
+            println("team : $team")
+        }
     }
 
     @Test
-    internal fun `search page`() {
-        val search = memberRepository.search("member1", 10, PageRequest.of(0, 4))
-        println(search)
+    internal fun `simplePage test`() {
+        val members = memberTestRepository.simplePage(PageRequest.of(0, 4))
+
+        for (member in members) {
+            println(member)
+
+        }
     }
 }

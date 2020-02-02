@@ -1,4 +1,4 @@
-package com.example.querydsl.repository
+package com.example.querydsl.repository.member
 
 import com.example.querydsl.domain.Member
 import com.example.querydsl.repository.support.Querydsl4RepositorySupport

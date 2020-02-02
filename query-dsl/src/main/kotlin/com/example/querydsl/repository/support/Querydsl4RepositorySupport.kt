@@ -18,8 +18,7 @@ import javax.persistence.EntityManager
 import kotlin.properties.Delegates.notNull
 
 @Repository
-abstract class Querydsl4RepositorySupport(
-        private val domainClass: Class<*>) {
+abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
 
     private var querydsl: Querydsl by notNull()
 
