@@ -16,7 +16,7 @@ import java.time.Duration
 class RestTemplateConfig {
 
     @Bean
-    fun restTemplate(): RestTemplate {
+    fun paymentRestTemplate(): RestTemplate {
         return RestTemplateBuilder()
             .rootUri("http://localhost:8080")
             .setConnectTimeout(Duration.ofSeconds(30))

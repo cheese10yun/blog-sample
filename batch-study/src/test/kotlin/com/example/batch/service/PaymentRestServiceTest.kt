@@ -1,7 +1,6 @@
 package com.example.batch.service
 
 
-import com.example.batch.SpringBootTestSupport
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -13,13 +12,19 @@ import java.math.BigDecimal
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @Transactional
 @ActiveProfiles("test")
-internal class RestServiceTest(
-    private val restService: RestService
+internal class PaymentRestServiceTest(
+    private val paymentRestService: PaymentRestService
 )  {
 
 
     @Test
     internal fun asd() {
-        restService.requestPayment(BigDecimal.valueOf(20), 10, 1)
+        val page = paymentRestService.requestPayment(BigDecimal.valueOf(20), 0, 10)
+
+        val contents = page.content
+
+        for (content in contents) {
+            println(content)
+        }
     }
 }
