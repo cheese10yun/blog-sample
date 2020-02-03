@@ -54,27 +54,26 @@ class PagingApiReaderJobConfiguration(
             size = chunkSize,
             page = 0,
             amount = BigDecimal(100),
-            restService = paymentRestService
+            paymentRestService = paymentRestService
 
         )
     }
 
     private fun processor(): ItemProcessor<PaymentDto, Payment> {
         return ItemProcessor {
-            println("adasd")
-            val payment = Payment(it.amount)
-            payment
-
+            Payment(it.amount)
         }
     }
 
     private fun writer(): ItemWriter<Payment> {
         return ItemWriter {
 
-            println("")
-            it.forEach(Consumer { t ->
-                println(t)
-            })
+            for (payment in it){
+                paymentRepository.save(payment)
+            }
+
         }
+
+
     }
 }

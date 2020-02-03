@@ -2,6 +2,7 @@ package com.example.batch.service
 
 import com.example.batch.common.PageResponse
 import com.example.batch.domain.order.domain.Payment
+import com.example.batch.domain.order.dto.PaymentDto
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.core.ParameterizedTypeReference
@@ -17,9 +18,9 @@ import java.net.URI
 class PaymentRestService(
     private val paymentRestTemplate: RestTemplate,
     private val objectMapper: ObjectMapper
-) :RestService{
+) {
 
-    override fun <T> requestPage(amount: BigDecimal, page: Int, size: Int): PageResponse<T> {
+     fun <T> requestPage(amount: BigDecimal, page: Int, size: Int): PageResponse<PaymentDto> {
         val url = UriComponentsBuilder.fromUri(URI.create("http://localhost:8080/payment"))
             .queryParam("amount", amount)
             .queryParam("page", page)
@@ -27,7 +28,7 @@ class PaymentRestService(
             .build()
 
         val body = paymentRestTemplate.getForObject(url.toUri(), String::class.java)!!
-        return objectMapper.readValue<PageResponse<T>>(body, object : TypeReference<PageResponse<T>>() {})
+        return objectMapper.readValue<PageResponse<PaymentDto>>(body, object : TypeReference<PageResponse<PaymentDto>>() {})
     }
 
     fun requestPayment2(): List<Payment> {
