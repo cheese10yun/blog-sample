@@ -1,27 +1,26 @@
 package com.example.batch.batch.core
 
 import com.example.batch.common.PageResponse
-import com.example.batch.service.PaymentRestService
+import com.example.batch.service.RestService
 import org.springframework.batch.core.StepExecution
 import org.springframework.batch.core.annotation.AfterRead
 import org.springframework.batch.core.annotation.BeforeRead
 import org.springframework.batch.core.annotation.BeforeStep
 import org.springframework.batch.item.ItemReader
 import java.math.BigDecimal
-import kotlin.properties.Delegates.notNull
 
 open class PageApiItemReader<T>(
     private val size: Int = 100,
     private var page: Int = 0,
     private val amount: BigDecimal = BigDecimal(100),
-    private val paymentRestService: PaymentRestService
+    private val restService: RestService
 ) : ItemReader<T> {
 
     private lateinit var stepExecution: StepExecution
 
     private var readContent = mutableListOf<T>()
 
-    private var totalPage by notNull<Int>()
+//    private var totalPage by notNull<Int>()
 
 
     // 페이지를 하나씩 읽는다.
@@ -29,11 +28,7 @@ open class PageApiItemReader<T>(
     override fun read(): T? {
         return when {
             this.readContent.isEmpty() -> null
-            else -> {
-
-                println(readContent)
-                readContent.removeAt(this.readContent.size - 1)
-            }
+            else -> readContent.removeAt(this.readContent.size - 1)
         }
     }
 
@@ -41,7 +36,6 @@ open class PageApiItemReader<T>(
     @Suppress("UNUSED")
     fun beforeStep(stepExecution: StepExecution) {
         this.stepExecution = stepExecution
-        this.totalPage = readRows().totalPages
     }
 
     @BeforeRead
@@ -62,7 +56,7 @@ open class PageApiItemReader<T>(
     }
 
     private fun readRows(page: Int = 0): PageResponse<T> {
-        return paymentRestService.requestPayment(
+        return restService.requestPage(
             BigDecimal(10),
             page,
             size

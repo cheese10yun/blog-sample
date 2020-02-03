@@ -17,9 +17,9 @@ import java.net.URI
 class PaymentRestService(
     private val paymentRestTemplate: RestTemplate,
     private val objectMapper: ObjectMapper
-) {
+) :RestService{
 
-    fun <T> requestPayment(amount: BigDecimal, page: Int, size: Int): PageResponse<T> {
+    override fun <T> requestPage(amount: BigDecimal, page: Int, size: Int): PageResponse<T> {
         val url = UriComponentsBuilder.fromUri(URI.create("http://localhost:8080/payment"))
             .queryParam("amount", amount)
             .queryParam("page", page)
@@ -38,6 +38,7 @@ class PaymentRestService(
 
         return paymentRestTemplate.exchange(request, respType).body!!
     }
+
 }
 
 

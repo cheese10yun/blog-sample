@@ -21,7 +21,7 @@ import java.net.URI
 import kotlin.properties.Delegates.notNull
 
 
-internal class PaymentRestServiceTest(
+internal class PaymentRestServiceMockTest(
     private val paymentRestService: PaymentRestService,
     private val paymentRestTemplate: RestTemplate
 ) : SpringBootTestSupport() {
@@ -58,7 +58,7 @@ internal class PaymentRestServiceTest(
 
 
         //when
-        val page = paymentRestService.requestPayment<Payment>(amount, pageSize, size)
+        val page = paymentRestService.requestPage<Payment>(amount, pageSize, size)
 
         //then
         then(page.content).hasSize(10)
