@@ -1,0 +1,18 @@
+spring:
+  main.allow-bean-definition-overriding: true
+  profiles.active: test
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: create
+  datasource:
+    url: jdbc:tc:postgresql:///querydsl
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+logging:
+  level:
+    ROOT: info
+    org.hibernate.type.descriptor.sql.BasicBinder: trace

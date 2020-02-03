@@ -31,16 +31,19 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.querydsl:querydsl-jpa")
 
-    runtimeOnly("com.h2database:h2")
+    runtimeOnly("org.postgresql:postgresql")
+
+    kapt("com.querydsl:querydsl-apt:4.2.1:jpa")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor(group = "com.querydsl", name = "querydsl-apt", classifier = "jpa")
 
+    testImplementation("org.testcontainers:junit-jupiter:1.12.4")
+    testImplementation("org.testcontainers:postgresql:1.12.4")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
-
-    kapt("com.querydsl:querydsl-apt:4.2.1:jpa")
 }
 
 tasks.withType<Test> {
