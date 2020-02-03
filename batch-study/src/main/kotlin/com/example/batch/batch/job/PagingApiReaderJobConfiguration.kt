@@ -2,6 +2,7 @@ package com.example.batch.batch.job
 
 import com.example.batch.batch.core.PageApiItemReader
 import com.example.batch.common.PageResponse
+import com.example.batch.domain.order.dao.PaymentRepository
 import com.example.batch.domain.order.domain.Payment
 import com.example.batch.service.PaymentRestService
 import logger
@@ -20,7 +21,8 @@ import java.math.BigDecimal
 class PagingApiReaderJobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
     private val stepBuilderFactory: StepBuilderFactory,
-    private val paymentRestService: PaymentRestService
+    private val paymentRestService: PaymentRestService,
+    private val paymentRepository: PaymentRepository
 ) {
 
     private val log by logger()
@@ -49,13 +51,19 @@ class PagingApiReaderJobConfiguration(
             size = chunkSize,
             page = 0,
             amount = BigDecimal(100),
-            paymentRestService = paymentRestService
+            paymentRestService = paymentRestService,
+
         )
     }
 
     private fun writer(): ItemWriter<Payment> {
         return ItemWriter {
-            println("asdasd")
+
+
+            println(111)
+            for (payment in it) {
+                paymentRepository.save(payment)
+            }
         }
     }
 }

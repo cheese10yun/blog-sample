@@ -10,7 +10,7 @@ import org.springframework.batch.item.ItemReader
 import java.math.BigDecimal
 import kotlin.properties.Delegates.notNull
 
-open class PageApiItemReader<T>(
+open class PageApiItemReader<domainClass: Class<*>>(
     private val size: Int = 100,
     private var page: Int = 0,
     private val amount: BigDecimal = BigDecimal(100),
@@ -19,14 +19,14 @@ open class PageApiItemReader<T>(
 
     private lateinit var stepExecution: StepExecution
 
-    private var readContent = mutableListOf<T>()
+    private var readContent = mutableListOf<domainClass>()
 
     private var totalPage by notNull<Int>()
 
 
     // 페이지를 하나씩 읽는다.
     // 읽으면 제거 한다.
-    override fun read(): T? {
+    override fun read(): domainClass? {
         return when {
             this.readContent.isEmpty() -> null
             else -> {
@@ -61,7 +61,7 @@ open class PageApiItemReader<T>(
         }
     }
 
-    private fun readRows(page: Int = 0): PageResponse<T> {
+    private fun readRows(page: Int = 0): PageResponse<domainClass> {
         return paymentRestService.requestPayment(
             BigDecimal(10),
             page,
