@@ -19,14 +19,8 @@ open class PageApiItemReader(
 ) : ItemReader<PaymentDto> {
 
     private lateinit var stepExecution: StepExecution
-
     private var readContent = mutableListOf<PaymentDto>()
 
-//    private var totalPage by notNull<Int>()
-
-
-    // 페이지를 하나씩 읽는다.
-    // 읽으면 제거 한다.
     override fun read(): PaymentDto? {
         return when {
             this.readContent.isEmpty() -> null
