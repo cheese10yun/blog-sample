@@ -3,6 +3,7 @@ package com.example.batch.batch.job
 import com.example.batch.batch.core.PageApiItemReader
 import com.example.batch.domain.order.dao.PaymentRepository
 import com.example.batch.domain.order.domain.Payment
+import com.example.batch.domain.order.dto.PaymentDto
 import com.example.batch.service.PaymentRestService
 import logger
 import org.springframework.batch.core.Job
@@ -41,14 +42,14 @@ class PagingApiReaderJobConfiguration(
 
     private fun step(): Step {
         return stepBuilderFactory.get("pagingApiReaderStep")
-            .chunk<Payment, Payment>(chunkSize)
+            .chunk<PaymentDto, Payment>(chunkSize)
             .reader(reader())
             .processor(processor())
             .writer(writer())
             .build()
     }
 
-    private fun reader(): ItemReader<Payment> {
+    private fun reader(): ItemReader<PaymentDto> {
         return PageApiItemReader(
             size = chunkSize,
             page = 0,
@@ -58,10 +59,12 @@ class PagingApiReaderJobConfiguration(
         )
     }
 
-    private fun processor(): ItemProcessor<Payment, Payment> {
+    private fun processor(): ItemProcessor<PaymentDto, Payment> {
         return ItemProcessor {
             println("adasd")
-            Payment(it.amount)
+            val payment = Payment(it.amount)
+            payment
+
         }
     }
 

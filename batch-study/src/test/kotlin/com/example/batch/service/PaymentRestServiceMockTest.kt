@@ -3,6 +3,7 @@ package com.example.batch.service
 
 import com.example.batch.SpringBootTestSupport
 import com.example.batch.domain.order.domain.Payment
+import com.example.batch.domain.order.dto.PaymentDto
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -58,7 +59,7 @@ internal class PaymentRestServiceMockTest(
 
 
         //when
-        val page = paymentRestService.requestPage<Payment>(amount, pageSize, size)
+        val page = paymentRestService.requestPage<PaymentDto>(amount, pageSize, size)
 
         //then
         then(page.content).hasSize(10)

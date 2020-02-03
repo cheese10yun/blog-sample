@@ -3,6 +3,7 @@ package com.example.batch.service
 import com.example.batch.SpringBootTestSupport
 import com.example.batch.common.PageResponse
 import com.example.batch.domain.order.domain.Payment
+import com.example.batch.domain.order.dto.PaymentDto
 import com.fasterxml.jackson.core.type.TypeReference
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
@@ -15,7 +16,7 @@ class JsonTest : SpringBootTestSupport() {
         val path = "/json/payment.json"
 
         //when
-        val payments = read(path, object : TypeReference<List<Payment>>() {})
+        val payments = read(path, object : TypeReference<List<PaymentDto>>() {})
 
         //then
         then(payments).hasSize(10)
@@ -27,7 +28,7 @@ class JsonTest : SpringBootTestSupport() {
         val path = "/json/payment-page.json"
 
         //when
-        val page = readPage(path, object : TypeReference<PageResponse<Payment>>() {})
+        val page = readPage(path, object : TypeReference<PageResponse<PaymentDto>>() {})
 
         //then
         then(page.content).hasSize(10)
