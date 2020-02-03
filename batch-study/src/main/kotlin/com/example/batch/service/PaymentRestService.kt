@@ -2,6 +2,8 @@ package com.example.batch.service
 
 import com.example.batch.common.PageResponse
 import com.example.batch.domain.order.domain.Payment
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpMethod
 import org.springframework.http.RequestEntity
@@ -13,9 +15,9 @@ import java.net.URI
 
 @Service
 class PaymentRestService(
-    private val paymentRestTemplate: RestTemplate
+    private val paymentRestTemplate: RestTemplate,
+    private val objectMapper: ObjectMapper
 ) {
-
 
     fun <T> requestPayment(amount: BigDecimal, page: Int, size: Int): PageResponse<T> {
         val url = UriComponentsBuilder.fromUri(URI.create("http://localhost:8080/payment"))
@@ -24,10 +26,8 @@ class PaymentRestService(
             .queryParam("size", size)
             .build()
 
-        val request = RequestEntity<Any>(HttpMethod.GET, url.toUri())
-        val respType = object : ParameterizedTypeReference<PageResponse<T>>() {}
-
-        return paymentRestTemplate.exchange<PageResponse<T>>(request, respType).body!!
+        val body = paymentRestTemplate.getForObject(url.toUri(), String::class.java)!!
+        return objectMapper.readValue<PageResponse<T>>(body, object : TypeReference<PageResponse<T>>() {})
     }
 
     fun requestPayment2(): List<Payment> {
