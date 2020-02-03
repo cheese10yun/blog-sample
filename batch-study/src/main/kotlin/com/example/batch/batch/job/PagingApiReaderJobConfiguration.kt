@@ -66,13 +66,9 @@ class PagingApiReaderJobConfiguration(
 
     private fun writer(): ItemWriter<Payment> {
         return ItemWriter {
-
             for (payment in it){
                 paymentRepository.save(payment)
             }
-
         }
-
-
     }
 }
