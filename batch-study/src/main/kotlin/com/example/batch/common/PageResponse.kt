@@ -1,6 +1,6 @@
 package com.example.batch.common
 
-data class PageResponse<Payment>(
+data class PageResponse<T>(
     val totalPages: Int,
     val totalElements: Int,
     val last: Boolean,
@@ -8,5 +8,5 @@ data class PageResponse<Payment>(
     val size: Int,
     val number: Int,
     val empty: Boolean,
-    var content: MutableList<Payment>
+    var content: MutableList<T>
 )
