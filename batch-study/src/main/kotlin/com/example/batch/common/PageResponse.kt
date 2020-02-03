@@ -1,6 +1,6 @@
 package com.example.batch.common
 
-data class PageResponse<domainClass: Class<*>>(
+data class PageResponse<T>(
     val totalPages: Int,
     val totalElements: Int,
     val last: Boolean,
@@ -8,5 +8,5 @@ data class PageResponse<domainClass: Class<*>>(
     val size: Int,
     val number: Int,
     val empty: Boolean,
-    val content: MutableList<domainClass>
+    val content: MutableList<T>
 )
