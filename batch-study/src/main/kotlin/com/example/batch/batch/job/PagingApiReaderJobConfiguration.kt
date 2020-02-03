@@ -51,7 +51,7 @@ class PagingApiReaderJobConfiguration(
             size = chunkSize,
             page = 0,
             amount = BigDecimal(100),
-            paymentRestService = paymentRestService,
+            paymentRestService = paymentRestService
 
         )
     }
