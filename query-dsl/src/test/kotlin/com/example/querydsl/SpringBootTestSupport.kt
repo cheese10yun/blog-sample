@@ -16,9 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @Testcontainers
 abstract class SpringBootTestSupport {
 
-
     companion object {
-
         @JvmStatic
         @Container
         val container = PostgreSQLContainer<Nothing>()
