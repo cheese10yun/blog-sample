@@ -5,10 +5,12 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
 import org.springframework.transaction.annotation.Transactional
+import org.testcontainers.containers.DockerComposeContainer
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.output.Slf4jLogConsumer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.io.File
 
 
 @SpringBootTest
@@ -28,6 +30,10 @@ abstract class SpringBootTestSupport {
             .apply {
                 withDatabaseName("querydsl")
             }
+
+        @JvmStatic
+        @Container
+        val dockerComposeContainer = DockerComposeContainer<Nothing>(File("src/test/resource/docker-compose.yml"))
 
 //        @JvmStatic
 //        @Container

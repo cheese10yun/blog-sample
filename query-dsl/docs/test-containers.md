@@ -98,3 +98,37 @@ fun beforeAll() {
 00:34:41.810 [Test worker] DEBUG org.testcontainers.containers.output.WaitingConsumer - STDOUT: selecting default shared_buffers ... 128MB
 00:34:41.810 [Test worker] DEBUG org.testcontainers.containers.output.WaitingConsumer - STDOUT: selecting dynamic shared memory implementation ... posix
 ```
+
+## Docker Compose
+```yaml
+version: '3'
+
+services:
+  mysql_member:
+    container_name: mysql.default
+    image: mysql/mysql-server:5.7
+    environment:
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: 'yun-test'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      # - '3366:3306'
+       - '3366'
+
+    volumes:
+      - './volumes/mysql/default:/var/lib/mysql'
+    command:
+      - 'mysqld'
+      - '--character-set-server=utf8mb4'
+      - '--collation-server=utf8mb4_unicode_ci'
+```
+
+```kotlin
+companion object {
+    @JvmStatic
+    @Container
+    val dockerComposeContainer = DockerComposeContainer<Nothing>(File("src/test/resource/docker-compose.yml"))
+}
+```
+* docker compose 기반으로 test container 테스트를 진행할 수 있음
+* ports를 지정할 때 3366 port만 작성하면 test container는 사용할 수 있는 port 중에서 random 으로 설정할 수 있음
