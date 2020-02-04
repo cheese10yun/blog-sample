@@ -53,6 +53,8 @@ internal class BulkTest(
         for (team in teams) {
             println("after update team : $team")
         }
+    
+        val newSelectTeams = query.selectFrom(qTeam).fetch()
 
         for (team in newSelectTeams) {
             println("new select team : $team")
@@ -81,6 +83,8 @@ for (team in teams) {
 예상했던 `none name`이 아닌 이전 데이터가 출력 되는 것을 획인 할 수 있습니다. 그렇다면 새로 query dsl으로 조회 쿼리를 해보겠습니다.
 
 ```kotlin
+val newSelectTeams = query.selectFrom(qTeam).fetch()
+
 for (team in newSelectTeams) {
     println("new select team : $team")
 }
@@ -95,6 +99,7 @@ for (team in newSelectTeams) {
 업데이트 이후 아래 코드가 `team name` 변경 전 데이터인 이유를 설명드리겠습니다.
 
 ```kotlin
+
 for (team in teams) {
     println("after update team : $team")
 }
@@ -122,6 +127,8 @@ for (team in teams) {
 `after update team`를 조회했을 때는 영속성 컨텍스트와 무관했기 때문에 기존 데이터가 나왔지만 **신규 조회를 한 아래 코드 왜 변경 전 name이 출력 되었을까요? 그 이유는 영속성 컨텍스트 저장 메커니즘에 있습니다.**
 
 ```kotlin
+val newSelectTeams = query.selectFrom(qTeam).fetch()
+
 for (team in newSelectTeams) {
     println("new select team : $team")
 }
