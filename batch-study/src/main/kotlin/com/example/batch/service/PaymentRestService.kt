@@ -27,8 +27,11 @@ class PaymentRestService(
             .queryParam("size", size)
             .build()
 
-        val body = paymentRestTemplate.getForObject(url.toUri(), String::class.java)!!
-        return objectMapper.readValue<PageResponse<PaymentDto>>(body, object : TypeReference<PageResponse<PaymentDto>>() {})
+
+         val request = RequestEntity<Any>(HttpMethod.GET, url.toUri())
+         val respType = object : ParameterizedTypeReference<PageResponse<PaymentDto>>() {}
+         return paymentRestTemplate.exchange(request, respType).body!!
+
     }
 
     fun requestPayment2(): List<Payment> {
