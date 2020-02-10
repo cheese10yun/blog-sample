@@ -6,13 +6,13 @@ import javax.persistence.*
 @Entity
 @Table(name = "member")
 data class Member(
-        @Column(name = "username", nullable = false)
-        var username: String,
+    @Column(name = "username", nullable = false)
+    var username: String,
 
-        @Column(name = "age", nullable = false)
-        var age: Int = 0,
+    @Column(name = "age", nullable = false)
+    var age: Int = 0,
 
-        @ManyToOne(fetch = FetchType.LAZY, optional = false)
-        @JoinColumn(name = "team_id", nullable = false)
-        var team: Team
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "team_id", nullable = false)
+    var team: Team
 ) : EntityAuditing()

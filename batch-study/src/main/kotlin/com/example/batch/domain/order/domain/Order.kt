@@ -8,12 +8,12 @@ import javax.persistence.*
 @Table(name = "orders")
 data class Order(
 
-        @Column(name = "amount", nullable = false)
-        var amount: BigDecimal,
+    @Column(name = "amount", nullable = false)
+    var amount: BigDecimal,
 
 
-        @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
-        val items: List<OrderItem> = listOf()
+    @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
+    val items: List<OrderItem> = listOf()
 
 
 ) : EntityAuditing() {
