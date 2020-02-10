@@ -3,7 +3,6 @@ package com.example.batch.service
 import com.example.batch.common.PageResponse
 import com.example.batch.domain.order.domain.Payment
 import com.example.batch.domain.order.dto.PaymentDto
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpMethod
@@ -20,7 +19,7 @@ class PaymentRestService(
     private val objectMapper: ObjectMapper
 ) {
 
-     fun <T> requestPage(amount: BigDecimal, page: Int, size: Int): PageResponse<PaymentDto> {
+     fun requestPage(amount: BigDecimal, page: Int, size: Int): PageResponse<PaymentDto> {
         val url = UriComponentsBuilder.fromUri(URI.create("http://localhost:8080/payment"))
             .queryParam("amount", amount)
             .queryParam("page", page)

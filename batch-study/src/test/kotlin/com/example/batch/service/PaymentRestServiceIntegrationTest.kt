@@ -2,8 +2,6 @@ package com.example.batch.service
 
 
 import com.example.batch.SpringBootTestSupport
-import com.example.batch.domain.order.domain.Payment
-import com.example.batch.domain.order.dto.PaymentDto
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 
@@ -16,7 +14,7 @@ internal class PaymentRestServiceIntegrationTest(
     @Test
     internal fun `requestPayment test`() {
 
-        val page = paymentRestService.requestPage<PaymentDto>(BigDecimal(10), 0, 10)
+        val page = paymentRestService.requestPage(BigDecimal(10), 0, 10)
         val content = page.content
 
         for (payment in content) {

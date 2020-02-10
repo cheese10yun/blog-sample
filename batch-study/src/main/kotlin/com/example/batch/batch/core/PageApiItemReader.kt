@@ -1,7 +1,6 @@
 package com.example.batch.batch.core
 
 import com.example.batch.common.PageResponse
-import com.example.batch.domain.order.domain.Payment
 import com.example.batch.domain.order.dto.PaymentDto
 import com.example.batch.service.PaymentRestService
 import org.springframework.batch.core.StepExecution
@@ -52,7 +51,7 @@ open class PageApiItemReader(
     }
 
     private fun readRows(page: Int = 0): PageResponse<PaymentDto> {
-        return paymentRestService.requestPage<Any>(
+        return paymentRestService.requestPage(
             BigDecimal(10),
             page,
             size
