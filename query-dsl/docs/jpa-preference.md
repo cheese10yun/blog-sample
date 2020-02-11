@@ -195,3 +195,7 @@ data class Member(
 `@MappedSuperclass`, `@EntityListeners`를 사용하면 반복적인 id, createdAt, updatedAt을 코드를 상속받아 해결할 수 있다. 예전에는 이런 식의 상속 구조는 올바르지 않다고 생각해서 이런 패턴에 거부감이 있었다.
 
 하지만 요즘에는 잘 사용하고 있다. 순수한 객체지향 코드를 유지하는 것도 중요하지만 결국 실리성 있는 부분을 택하는 것도 중요하다고 본다. 특히 코틀린으로 넘어오면서 id, createdAt, updatedAt 등 우리가 직접적으로 핸들링하지 않는 값에 대한 바인딩 방법이 많기 때문에 각각 엔티티에서 처리하면 코드 통일성이 떨어진다. 그래서 이렇게 처리하는 것이 좋다고 생각한다.
+
+## 참고
+* [자바 ORM 표준 JPA 프로그래밍](http://acornpub.co.kr/book/jpa-programmig)
+* [DDD Start](http://www.yes24.com/Product/Goods/27750871)
