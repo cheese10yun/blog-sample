@@ -145,7 +145,7 @@ public class AccountCustomRepositoryImpl extends QuerydslRepositorySupport imple
 }
 
 ```
-이건 정말 개인적인 선호도이다. 일단 조건이 까다로운 조회용 코드인 경우 **쿼리메서드로 표현하면 너무 장황해서 코드 가독성이 좋지 않다고 본다.**
+이건 정말 개인적인 선호도이다. 일단 조건이 까다로운 조회용 코드인 경우 **쿼리 메서드로 표현하면 너무 장황해서 코드 가독성이 좋지 않다고 본다.**
 
 쿼리 메서드를 사용하지 않고 QuerydslRepositorySupport를 이용한 Query DSL 기반으로 모두 작성하는 것을 선호한다. 물론 findByEmail 같은 것들은 쿼리 메서드가 더 편리하고 직관적이다고 생각하지만 위에서도 한 번 언급했지만 예외를 하나를 허용하면 추가적인 예외가 생기게 되기 때문에 **아주 명확한 가이드가 없다면 모두 Query DSL 기반으로 작성하는 것을 선호한다.**
 
