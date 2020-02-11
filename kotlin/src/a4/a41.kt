@@ -49,7 +49,7 @@ interface JsonFactory<T> {
 //    }
 //}
 
-//// 비지니스 로직 모듈 : 해당 객체
+//// 비즈니스 로직 모듈 : 해당 객체
 //class Person(val firstName: String, val lastName: String) {
 //    companion object {}
 //}

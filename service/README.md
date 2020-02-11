@@ -52,7 +52,7 @@ public class ShinhanCardPaymentService implements Card{
     @Override
     public void pay() {
         shinhanCard.pay(); //신한 카드 결제 API 호출
-        // 결제를 위한 비지니스 로직 실행....
+        // 결제를 위한 비즈니스 로직 실행....
     }
 }
 ```
