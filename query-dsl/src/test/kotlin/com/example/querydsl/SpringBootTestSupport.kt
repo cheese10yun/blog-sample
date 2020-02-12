@@ -22,8 +22,6 @@ abstract class SpringBootTestSupport {
 
 
     companion object {
-
-
         @JvmStatic
         @Container
         val postgrContainer = PostgreSQLContainer<Nothing>()
