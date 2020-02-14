@@ -12,8 +12,8 @@ import javax.persistence.EntityManagerFactory
 open class QuerydslPagingItemReader<T>(
     name: String,
     pageSize: Int, // page size == chunk size
-    protected val entityManagerFactory: EntityManagerFactory,
-    protected val queryFunction: Function<JPAQueryFactory, JPAQuery<T>>
+    private val entityManagerFactory: EntityManagerFactory,
+    private val queryFunction: Function<JPAQueryFactory, JPAQuery<T>>
 
 ) : AbstractPagingItemReader<T>() {
     private val jpaPropertyMap = hashMapOf<String, Any>()
@@ -59,7 +59,6 @@ open class QuerydslPagingItemReader<T>(
             else -> super.results.addAll(query.fetch())
         }
     }
-
 
     private fun clearEntityManagerIfTransacted() {
         when {
