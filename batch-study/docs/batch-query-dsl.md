@@ -11,3 +11,17 @@
 
 여기서 JPQL이 실행되는 부분은 `doReadPage()` 입니다. 죽 `doReadPage()` 에서 쿼리가 수행되는 부분을 Quety DSL의 쿼리로 변경하면 됩니다.
 
+```kotlin
+override fun doReadPage() {
+    clearEntityManagerIfTransacted()
+    val query = createQuery()
+        .offset((page * pageSize).toLong())
+        .limit(pageSize.toLong())
+    initResults()
+    fetchQuery(query)
+}
+````
+`offset`, `limit`은 super 클래스인 AbstractPagingItemReader의 `page`, `pageSzie`를 사용해 최대한 변경 요소를 줄임
+
+
+기존 JpaPagingItemReader의 `EntityTransacion` 부분이 다릅니다. 

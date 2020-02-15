@@ -43,13 +43,13 @@ class QuerydslPagingItemReaderJobConfiguration(
     }
 
     private fun reader(): QuerydslPagingItemReader<Order> {
-
         return QuerydslPagingItemReader(
             "reader",
             chunkSize,
             entityManagerFactory,
             Function {
-                it.selectFrom(qOrder)
+                it
+                    .selectFrom(qOrder)
                     .where(qOrder.amount.gt(BigDecimal(5000)))
             }
         )
@@ -68,7 +68,6 @@ class QuerydslPagingItemReaderJobConfiguration(
                 println(order.id)
                 println("==========")
             }
-
         }
     }
 }
