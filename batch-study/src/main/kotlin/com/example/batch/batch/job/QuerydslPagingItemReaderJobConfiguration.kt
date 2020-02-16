@@ -12,7 +12,6 @@ import org.springframework.batch.item.ItemWriter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.math.BigDecimal
-import java.util.function.Function
 import javax.persistence.EntityManagerFactory
 import com.example.batch.domain.order.domain.QOrder.order as qOrder
 
@@ -46,13 +45,12 @@ class QuerydslPagingItemReaderJobConfiguration(
         return QuerydslPagingItemReader(
             "reader",
             chunkSize,
-            entityManagerFactory,
-            Function {
-                it
-                    .selectFrom(qOrder)
-                    .where(qOrder.amount.gt(BigDecimal(5000)))
-            }
-        )
+            entityManagerFactory)
+        {
+            it
+                .selectFrom(qOrder)
+                .where(qOrder.amount.gt(BigDecimal(5000)))
+        }
     }
 
     private fun processor(): ItemProcessor<Order, Order> {

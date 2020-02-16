@@ -5,7 +5,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.batch.item.database.AbstractPagingItemReader
 import org.springframework.dao.DataAccessResourceFailureException
 import java.util.concurrent.CopyOnWriteArrayList
-import java.util.function.Function
 import javax.persistence.EntityManager
 import javax.persistence.EntityManagerFactory
 
@@ -13,7 +12,7 @@ open class QuerydslPagingItemReader<T>(
     name: String,
     pageSize: Int, // page size == chunk size
     private val entityManagerFactory: EntityManagerFactory,
-    private val queryFunction: Function<JPAQueryFactory, JPAQuery<T>>
+    private val query: (JPAQueryFactory) -> JPAQuery<T>
 
 ) : AbstractPagingItemReader<T>() {
     private val jpaPropertyMap = hashMapOf<String, Any>()
@@ -26,6 +25,8 @@ open class QuerydslPagingItemReader<T>(
     }
 
     override fun doOpen() {
+        super.doOpen()
+
         entityManager = entityManagerFactory.createEntityManager(jpaPropertyMap).let {
             it ?: throw DataAccessResourceFailureException("Unable to obtain an EntityManager")
         }
@@ -67,7 +68,7 @@ open class QuerydslPagingItemReader<T>(
     }
 
     private fun createQuery(): JPAQuery<T> {
-        return this.queryFunction.apply(JPAQueryFactory(this.entityManager))
+        return this.query.invoke(JPAQueryFactory(entityManager))
     }
 
     private fun initResults() {
