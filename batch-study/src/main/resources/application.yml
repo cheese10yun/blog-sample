@@ -13,7 +13,7 @@ spring:
     properties:
 
   datasource:
-    url: jdbc:mysql://localhost:3366/batch?useSSL=false&serverTimezone=UTC&autoReconnect=true
+    url: jdbc:mysql://localhost:3366/batch_test?useSSL=false&serverTimezone=UTC&autoReconnect=true
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -21,9 +21,11 @@ spring:
     dbcp2:
       test-on-borrow: true
       validation-query: select 1
+  batch:
+    initialize-schema: always
 
 logging:
   level:
     ROOT: info
-    org.springframework.batch: DEBUG
-    # org.hibernate.type.descriptor.sql.BasicBinder: trace
+    #org.springframework.batch: DEBUG
+    #org.hibernate.type.descriptor.sql.BasicBinder: trace
