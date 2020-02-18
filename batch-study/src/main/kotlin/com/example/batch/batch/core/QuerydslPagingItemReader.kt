@@ -11,12 +11,11 @@ import javax.persistence.EntityManagerFactory
 open class QuerydslPagingItemReader<T>(
     name: String,
     pageSize: Int, // page size == chunk size
-    private val entityManagerFactory: EntityManagerFactory,
-    private val query: (JPAQueryFactory) -> JPAQuery<T>
-
+    protected val entityManagerFactory: EntityManagerFactory,
+    protected val query: (JPAQueryFactory) -> JPAQuery<T>
 ) : AbstractPagingItemReader<T>() {
     private val jpaPropertyMap = hashMapOf<String, Any>()
-    private lateinit var entityManager: EntityManager
+    protected lateinit var entityManager: EntityManager
     private var transacted = true
 
     init {
@@ -34,11 +33,13 @@ open class QuerydslPagingItemReader<T>(
 
     override fun doReadPage() {
         clearEntityManagerIfTransacted()
-        val query = createQuery()
-            .offset((page * pageSize).toLong())
-            .limit(pageSize.toLong())
+
         initResults()
-        fetchQuery(query)
+
+        createQuery()
+            .offset(page * pageSize)
+            .limit(pageSize)
+            .fetchQuery()
     }
 
     override fun doJumpToPage(itemIndex: Int) {}
@@ -48,30 +49,38 @@ open class QuerydslPagingItemReader<T>(
         super.doClose()
     }
 
-    private fun fetchQuery(query: JPAQuery<T>) {
-        when {
-            this.transacted.not() -> {
-                val results = query.fetch()
-                for (entity in results) {
-                    this.entityManager.detach(entity)
-                    results.add(entity)
+    protected fun JPAQuery<T>.fetchQuery() {
+        this.fetch().let { queryResult ->
+            if (transacted) {
+                results.addAll(queryResult)
+            } else {
+                queryResult.forEach { item ->
+                    entityManager.detach(item)
+                    results.add(item)
                 }
             }
-            else -> super.results.addAll(query.fetch())
         }
     }
 
-    private fun clearEntityManagerIfTransacted() {
+    protected fun clearEntityManagerIfTransacted() {
         when {
             this.transacted -> this.entityManager.clear()
         }
     }
 
-    private fun createQuery(): JPAQuery<T> {
+    protected open fun createQuery(): JPAQuery<T> {
         return this.query.invoke(JPAQueryFactory(entityManager))
     }
 
-    private fun initResults() {
+    protected fun JPAQuery<T>.limit(limit: Int): JPAQuery<T> {
+        return this.limit(limit.toLong())
+    }
+
+    protected fun JPAQuery<T>.offset(offset: Int): JPAQuery<T> {
+        return this.offset(offset.toLong())
+    }
+
+    protected fun initResults() {
         when {
             super.results.isNullOrEmpty() -> super.results = CopyOnWriteArrayList()
             else -> super.results.clear()
