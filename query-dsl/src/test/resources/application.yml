@@ -8,9 +8,9 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: create
-  datasource:
-    url: jdbc:tc:postgresql:///querydsl
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+#  datasource:
+#    url: jdbc:tc:postgresql:///querydsl
+#    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
 
 logging:
   level:
