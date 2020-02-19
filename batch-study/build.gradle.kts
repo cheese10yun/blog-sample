@@ -36,7 +36,7 @@ dependencies {
     implementation("com.querydsl:querydsl-jpa")
     kapt("com.querydsl:querydsl-apt:4.2.1:jpa")
 
-//    implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.8")
+    implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.8")
 
     runtimeOnly("mysql:mysql-connector-java")
 

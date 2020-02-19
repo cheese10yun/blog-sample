@@ -11,35 +11,35 @@ import org.springframework.data.repository.support.PageableExecutionUtils
 import com.example.querydsl.domain.QMember.member as qMember
 
 class MemberRepositoryImpl(
-        private val query: JPAQueryFactory
+    private val query: JPAQueryFactory
 ) : MemberRepositoryCustom {
 
     override fun search(username: String?, age: Int?): Member {
         return query
-                .selectFrom(qMember)
-                .where(searchCondition(username, age))
-                .fetchOne()!!
+            .selectFrom(qMember)
+            .where(searchCondition(username, age))
+            .fetchOne()!!
 
     }
 
     override fun search(username: String?, age: Int?, page: Pageable): Page<MemberDto> {
         val content = query
-                .select(QMemberDto(
-                        qMember.username,
-                        qMember.age))
-                .from(qMember)
-                .where(searchCondition(username, age))
-                .offset(page.offset)
-                .limit(page.pageSize.toLong())
-                .orderBy()
-                .fetch()
+            .select(QMemberDto(
+                qMember.username,
+                qMember.age))
+            .from(qMember)
+            .where(searchCondition(username, age))
+            .offset(page.offset)
+            .limit(page.pageSize.toLong())
+            .orderBy()
+            .fetch()
 
         val countQuery = query
-                .select(QMemberDto(
-                        qMember.username,
-                        qMember.age))
-                .from(qMember)
-                .where(searchCondition(username, age))
+            .select(QMemberDto(
+                qMember.username,
+                qMember.age))
+            .from(qMember)
+            .where(searchCondition(username, age))
 
         return PageableExecutionUtils.getPage(content, page) { countQuery.fetchCount() }
     }

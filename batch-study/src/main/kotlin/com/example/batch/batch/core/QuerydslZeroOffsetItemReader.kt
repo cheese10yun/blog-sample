@@ -15,7 +15,7 @@ open class QuerydslZeroOffsetItemReader<T : Any>(
     pageSize: Int,
     entityManagerFactory: EntityManagerFactory,
     private val expression: Expression,
-    private val id: NumberPath<Long>,
+    private val field: NumberPath<Long>,
     query: (JPAQueryFactory) -> JPAQuery<T>
 ) : QuerydslPagingItemReader<T>(
     name,
@@ -23,23 +23,21 @@ open class QuerydslZeroOffsetItemReader<T : Any>(
     entityManagerFactory,
     query
 ) {
-
     private var offsetId: Long by Delegates.notNull()
 
     private var lastId: Long by Delegates.notNull()
 
-    private val variationOfOffset: Int = if (expression.isAsc) pageSize else -1
+    private val variationOfOffset: Int = if (expression.isAsc) pageSize else -pageSize
 
     override fun doOpen() {
-
         fun findFirstId(): Long =
             query.invoke(JPAQueryFactory(entityManager))
-                .select(if (expression.isAsc) id.min() else id.max())
+                .select(if (expression.isAsc) field.min() else field.max())
                 .fetchOne() ?: 0
 
         fun findLastId(): Long =
             query.invoke(JPAQueryFactory(entityManager))
-                .select(if (expression.isAsc) id.max() else id.min())
+                .select(if (expression.isAsc) field.max() else field.min())
                 .fetchOne() ?: -1
 
         super.doOpen()
@@ -49,13 +47,12 @@ open class QuerydslZeroOffsetItemReader<T : Any>(
     }
 
     override fun doReadPage() {
-
         fun hasNextChunk(): Boolean =
             results.isEmpty() && if (expression.isAsc) offsetId <= lastId else offsetId > -1
 
-        clearEntityManagerIfTransacted()
+        clearTransactionManagerIfTransacted()
 
-        initResults()
+        initResult()
 
         while (hasNextChunk()) {
             createQuery().fetchQuery()
@@ -64,13 +61,11 @@ open class QuerydslZeroOffsetItemReader<T : Any>(
         }
     }
 
-    override fun createQuery(): JPAQuery<T> {
-        return query.invoke(JPAQueryFactory(entityManager))
-            .where(expression.where(id, offsetId, pageSize))
-            .orderBy(expression.order(id))
-            .limit(pageSize.toLong())
-    }
-
+    override fun createQuery(): JPAQuery<T> =
+        query.invoke(JPAQueryFactory(entityManager))
+            .where(expression.where(field, offsetId, pageSize))
+            .orderBy(expression.order(field))
+            .limit(pageSize)
 }
 
 object Asc : Expression(
@@ -87,6 +82,9 @@ object Desc : Expression(
     Sort.Direction.DESC
 )
 
+/**
+ * @author devcken.seven
+ */
 open class Expression(
     private val whereExpression: (id: NumberPath<Long>, offsetId: Long, pageSize: Int) -> BooleanExpression,
     private val direction: Sort.Direction

@@ -7,11 +7,9 @@ import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.launch.support.RunIdIncrementer
-import org.springframework.batch.item.ItemProcessor
 import org.springframework.batch.item.ItemWriter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import java.math.BigDecimal
 import javax.persistence.EntityManagerFactory
 import com.example.batch.domain.order.domain.QOrder.order as qOrder
 
@@ -22,7 +20,7 @@ class QuerydslPagingItemReaderJobConfiguration(
     private val entityManagerFactory: EntityManagerFactory
 ) {
 
-    private val chunkSize = 100
+    private val chunkSize = 5000
 
     @Bean
     fun querydslPagingItemReaderJob(): Job {
@@ -36,7 +34,6 @@ class QuerydslPagingItemReaderJobConfiguration(
         return stepBuilderFactory.get("step")
             .chunk<Order, Order>(chunkSize)
             .reader(reader())
-            .processor(processor())
             .writer(writer())
             .build()
     }
@@ -49,23 +46,12 @@ class QuerydslPagingItemReaderJobConfiguration(
         {
             it
                 .selectFrom(qOrder)
-                .where(qOrder.amount.gt(BigDecimal(5000)))
-        }
-    }
-
-    private fun processor(): ItemProcessor<Order, Order> {
-        return ItemProcessor {
-            it
         }
     }
 
     private fun writer(): ItemWriter<Order> {
         return ItemWriter {
-            for (order in it) {
-                println("==========")
-                println(order.id)
-                println("==========")
-            }
+            println(it[0].id)
         }
     }
 }

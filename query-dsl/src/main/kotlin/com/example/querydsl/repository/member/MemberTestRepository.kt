@@ -14,7 +14,7 @@ class MemberTestRepository : Querydsl4RepositorySupport(Member::class.java) {
 
     fun simpleSelect(): List<Member> {
         return selectFrom(qMember)
-                .fetch()
+            .fetch()
     }
 
     fun simplePage(pageable: Pageable): Page<Member> {

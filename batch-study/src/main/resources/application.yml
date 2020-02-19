@@ -8,7 +8,7 @@ spring:
     database: mysql
     properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     show-sql: false
     properties:
 
@@ -17,7 +17,7 @@ spring:
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    initialization-mode: always
+    initialization-mode: never
     dbcp2:
       test-on-borrow: true
       validation-query: select 1
