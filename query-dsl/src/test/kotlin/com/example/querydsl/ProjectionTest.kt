@@ -2,7 +2,10 @@ package com.example.querydsl
 
 import com.example.querydsl.domain.Member
 import com.example.querydsl.domain.Team
-import com.example.querydsl.dto.QMemberDto
+import com.example.querydsl.dto.MemberDtoBean
+import com.example.querydsl.dto.MemberDtoConstructor
+import com.example.querydsl.dto.QMemberDtoQueryProjection
+import com.querydsl.core.types.Projections
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -39,11 +42,43 @@ class ProjectionTest(
     }
 
     @Test
+    internal fun `projection bean`() {
+        val members = query
+            .select(Projections.bean(
+                MemberDtoBean::class.java,
+                qMember.username,
+                qMember.age
+            ))
+            .from(qMember)
+            .fetch()
+
+        for (member in members) {
+            println(member)
+        }
+    }
+
+    @Test
+    internal fun `projection constructor`() {
+        val members = query
+            .select(Projections.constructor(
+                MemberDtoConstructor::class.java,
+                qMember.username,
+                qMember.age
+            ))
+            .from(qMember)
+            .fetch()
+
+        for (member in members) {
+            println(member)
+        }
+    }
+
+    @Test
     internal fun `projection annotation`() {
         val members = query
-            .select(QMemberDto(
+            .select(QMemberDtoQueryProjection(
                 qMember.username,
-                qMember.age.max()
+                qMember.age
             ))
             .from(qMember)
             .fetch()

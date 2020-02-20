@@ -3,7 +3,17 @@ package com.example.querydsl.dto
 import com.querydsl.core.annotations.QueryProjection
 
 
-data class MemberDto @QueryProjection constructor(
+data class MemberDtoQueryProjection @QueryProjection constructor(
     val username: String,
-    val age: Int) {
+    val age: Int
+)
+
+class MemberDtoBean {
+    var username: String? = null
+    var age: Int? = null
 }
+
+data class MemberDtoConstructor(
+    val username: String,
+    val age: Int
+)

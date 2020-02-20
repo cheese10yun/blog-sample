@@ -1,8 +1,9 @@
 package com.example.querydsl.repository.member
 
 import com.example.querydsl.domain.Member
-import com.example.querydsl.dto.MemberDto
-import com.example.querydsl.dto.QMemberDto
+import com.example.querydsl.dto.MemberDtoQueryProjection
+import com.example.querydsl.dto.QMemberDtoQueryProjection
+
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.data.domain.Page
@@ -22,9 +23,9 @@ class MemberRepositoryImpl(
 
     }
 
-    override fun search(username: String?, age: Int?, page: Pageable): Page<MemberDto> {
+    override fun search(username: String?, age: Int?, page: Pageable): Page<MemberDtoQueryProjection> {
         val content = query
-            .select(QMemberDto(
+            .select(QMemberDtoQueryProjection(
                 qMember.username,
                 qMember.age))
             .from(qMember)
@@ -35,7 +36,7 @@ class MemberRepositoryImpl(
             .fetch()
 
         val countQuery = query
-            .select(QMemberDto(
+            .select(QMemberDtoQueryProjection(
                 qMember.username,
                 qMember.age))
             .from(qMember)

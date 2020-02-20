@@ -2,8 +2,8 @@ package com.example.querydsl.domain
 
 
 import com.example.querydsl.SpringBootTestSupport
-import com.example.querydsl.dto.MemberDto
-import com.example.querydsl.dto.QMemberDto
+import com.example.querydsl.dto.MemberDtoQueryProjection
+import com.example.querydsl.dto.QMemberDtoQueryProjection
 import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Projections
 import com.querydsl.core.types.dsl.BooleanExpression
@@ -353,7 +353,7 @@ internal class MemberTest(
     internal fun `query dsl projection dto`() {
         val members = query
             .select(Projections.constructor(
-                MemberDto::class.java,
+                MemberDtoQueryProjection::class.java,
                 qMember.username,
                 qMember.age
             ))
@@ -369,7 +369,7 @@ internal class MemberTest(
     internal fun `query dsl projection dto 2`() {
         val members = query
             .select(Projections.constructor(
-                MemberDto::class.java,
+                MemberDtoQueryProjection::class.java,
                 qMember.username,
                 qMember.age.max().`as`("age")
             ))
@@ -385,7 +385,7 @@ internal class MemberTest(
     @Test
     internal fun `query dsl dto projection QueryProjection`() {
         val members = query
-            .select(QMemberDto(
+            .select(QMemberDtoQueryProjection(
                 qMember.username, qMember.age
             ))
             .from(qMember)
