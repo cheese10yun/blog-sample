@@ -40,7 +40,7 @@ class ProjectionTest(
     }
 }
 ```
-`Projections.bean` 방식은 settet 기반으로 동작하게 됩니다. 그러기 때문에 `MemberDtoBean`객체의 setter 메서드를 열어야 합니다. 일반적으로 Response, Request 객체는 불변 객체를 지향하는 것이 바람직하다고 생각하기 때문에 권장하는 패턴은 아닙니다.
+`Projections.bean` 방식은 setter 기반으로 동작하게 됩니다. 그러기 때문에 `MemberDtoBean`객체의 setter 메서드를 열어야 합니다. 일반적으로 Response, Request 객체는 불변 객체를 지향하는 것이 바람직하다고 생각하기 때문에 권장하는 패턴은 아닙니다.
 
 ## Projections.constructor
 ```kotlin
