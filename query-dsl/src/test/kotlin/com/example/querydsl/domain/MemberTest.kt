@@ -8,7 +8,6 @@ import com.querydsl.core.BooleanBuilder
 import com.querydsl.core.types.Projections
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.JPAExpressions
-import com.querydsl.jpa.impl.JPAQueryFactory
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -20,8 +19,6 @@ import com.example.querydsl.domain.QTeam.team as qTeam
 internal class MemberTest(
     private val em: EntityManager
 ) : SpringBootTestSupport() {
-
-    val query = JPAQueryFactory(em)
 
     @BeforeEach
     internal fun setUp() {

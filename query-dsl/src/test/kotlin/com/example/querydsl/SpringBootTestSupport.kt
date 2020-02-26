@@ -5,10 +5,13 @@ package com.example.querydsl
 //import org.testcontainers.containers.output.Slf4jLogConsumer
 //import org.testcontainers.junit.jupiter.Container
 //import org.testcontainers.junit.jupiter.Testcontainers
+import com.querydsl.jpa.impl.JPAQueryFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
 import org.springframework.transaction.annotation.Transactional
+import javax.persistence.EntityManager
 
 
 @SpringBootTest
@@ -17,6 +20,29 @@ import org.springframework.transaction.annotation.Transactional
 @ActiveProfiles("test")
 //@Testcontainers
 abstract class SpringBootTestSupport {
+
+    @Autowired
+    protected lateinit var entityManager: EntityManager
+
+    @Autowired
+    protected lateinit var query: JPAQueryFactory
+
+    protected fun <T> save(entity: T): T {
+        entityManager.persist(entity)
+
+        entityManager.flush()
+        entityManager.clear()
+
+        return entity
+    }
+
+    protected fun <T> saveAll(entities: Iterable<T>): Iterable<T> {
+        for (entity in entities) {
+            entityManager.persist(entity)
+        }
+
+        return entities
+    }
 
 
 //    companion object {

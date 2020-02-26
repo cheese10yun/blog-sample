@@ -6,7 +6,6 @@ import com.example.querydsl.dto.MemberDtoBean
 import com.example.querydsl.dto.MemberDtoConstructor
 import com.example.querydsl.dto.QMemberDtoQueryProjection
 import com.querydsl.core.types.Projections
-import com.querydsl.jpa.impl.JPAQueryFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import javax.persistence.EntityManager
@@ -16,7 +15,6 @@ class ProjectionTest(
     private val em: EntityManager
 ) : SpringBootTestSupport() {
 
-    val query = JPAQueryFactory(em)
 
     @BeforeEach
     internal fun setUp() {

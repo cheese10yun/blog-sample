@@ -2,7 +2,6 @@ package com.example.querydsl
 
 import com.example.querydsl.domain.Member
 import com.example.querydsl.domain.Team
-import com.querydsl.jpa.impl.JPAQueryFactory
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import javax.persistence.EntityManager
@@ -14,7 +13,6 @@ class PersistenceContextTest(
         private val em: EntityManager
 ) : SpringBootTestSupport() {
 
-    val query = JPAQueryFactory(em)
 
     @Test
     internal fun `persistence context test`() {

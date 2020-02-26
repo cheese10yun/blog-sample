@@ -3,7 +3,6 @@ package com.example.querydsl.repository.member
 import com.example.querydsl.SpringBootTestSupport
 import com.example.querydsl.domain.Member
 import com.example.querydsl.domain.Team
-import com.querydsl.jpa.impl.JPAQueryFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageRequest
@@ -15,7 +14,6 @@ internal class MemberTestRepositoryTest(
         private val em: EntityManager,
         private val memberTestRepository: MemberTestRepository
 ) : SpringBootTestSupport() {
-    val query = JPAQueryFactory(em)
 
     @BeforeEach
     internal fun setUp() {

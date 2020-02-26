@@ -2,7 +2,6 @@ package com.example.querydsl.repository
 
 import com.example.querydsl.SpringBootTestSupport
 import com.example.querydsl.domain.Team
-import com.querydsl.jpa.impl.JPAQueryFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import javax.persistence.EntityManager
@@ -11,8 +10,6 @@ import com.example.querydsl.domain.QTeam.team as qTeam
 internal class BulkTest(
         private val em: EntityManager
 ) : SpringBootTestSupport() {
-
-    val query = JPAQueryFactory(em)
 
     @BeforeEach
     internal fun setUp() {
