@@ -1,12 +1,31 @@
 package com.example.querydsl.service
 
 import com.example.querydsl.api.PaymentApi
+import com.example.querydsl.domain.QPayment
+import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
 
 @Service
+@Transactional(readOnly = true)
 class PaymentService(
-    private val bankClient: BankClient
+    private val bankClient: BankClient,
+    private val query: JPAQueryFactory
 ) {
+
+
+    @Transactional
+    fun paymentZero(targetAmount: BigDecimal) {
+
+        val payments = query.selectFrom(QPayment.payment)
+            .where(QPayment.payment.amount.gt(targetAmount))
+            .fetch()
+
+        for (payment in payments) {
+            payment.amount = BigDecimal.ZERO
+        }
+    }
 
 
     fun doPayment(dto: PaymentApi.BankAccountPayment) {

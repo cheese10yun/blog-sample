@@ -5,6 +5,7 @@ package com.example.querydsl
 //import org.testcontainers.containers.output.Slf4jLogConsumer
 //import org.testcontainers.junit.jupiter.Container
 //import org.testcontainers.junit.jupiter.Testcontainers
+import com.querydsl.core.types.dsl.EntityPathBase
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -41,7 +42,18 @@ abstract class SpringBootTestSupport {
             entityManager.persist(entity)
         }
 
+        entityManager.flush()
+        entityManager.clear()
+
         return entities
+    }
+
+    protected fun deleteAll(qEntity: EntityPathBase<*>) {
+
+        query.delete(qEntity).execute()
+
+        entityManager.flush()
+        entityManager.clear()
     }
 
 
