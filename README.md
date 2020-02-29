@@ -59,6 +59,7 @@
 * [RestTemplate Mock 기반 테스트 하기](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/rest-template-mock-test.md)
 * [JPA 선호 하는 패턴](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/jpa-preference.md)
 * [Querydsl Repository Support 활용](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/querydsl-custom-repository.md)
+* [JPA 기반 테스트 코드 작성 팁](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/jpa-test-support.md)
 
 
 ## 기타
