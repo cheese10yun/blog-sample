@@ -13,6 +13,4 @@ data class Payment(
     var amount: BigDecimal
 
 ) : EntityAuditing() {
-
-
 }
