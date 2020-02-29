@@ -7,8 +7,10 @@ import com.example.querydsl.domain.Team
 import com.example.querydsl.repository.coupon.Coupon
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 
+@Transactional
 internal class JpaTestSupport(
     private val paymentRepository: PaymentRepository
 ) : SpringBootTestSupport() {

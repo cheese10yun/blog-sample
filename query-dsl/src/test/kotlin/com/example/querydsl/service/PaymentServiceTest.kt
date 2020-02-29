@@ -3,7 +3,6 @@ package com.example.querydsl.service
 import com.example.querydsl.SpringBootTestSupport
 import com.example.querydsl.domain.Payment
 import org.assertj.core.api.BDDAssertions.then
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import com.example.querydsl.domain.QPayment.payment as qPayment
@@ -11,11 +10,6 @@ import com.example.querydsl.domain.QPayment.payment as qPayment
 internal class PaymentServiceTest(
     private val paymentService: PaymentService
 ) : SpringBootTestSupport() {
-
-    @BeforeEach
-    internal fun setUp() {
-        deleteAll(qPayment)
-    }
 
     @Test
     internal fun `payment test`() {

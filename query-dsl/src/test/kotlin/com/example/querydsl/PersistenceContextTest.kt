@@ -4,11 +4,12 @@ import com.example.querydsl.domain.Member
 import com.example.querydsl.domain.Team
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
+import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 import com.example.querydsl.domain.QMember.member as qMember
 import com.example.querydsl.domain.QTeam.team as qTeam
 
-
+@Transactional
 class PersistenceContextTest(
     private val em: EntityManager
 ) : SpringBootTestSupport() {

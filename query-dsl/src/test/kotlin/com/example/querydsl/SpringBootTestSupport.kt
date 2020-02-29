@@ -1,20 +1,16 @@
 package com.example.querydsl
 
-import com.querydsl.core.types.dsl.EntityPathBase
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
-import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 import javax.persistence.EntityManagerFactory
 import javax.persistence.EntityTransaction
 
-
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-@Transactional
 @ActiveProfiles("test")
 abstract class SpringBootTestSupport {
 
@@ -29,7 +25,7 @@ abstract class SpringBootTestSupport {
     }
 
     protected val transaction: EntityTransaction by lazy {
-        transaction
+        entityManager.transaction
     }
 
     protected fun <T> save(entity: T): T {
@@ -65,15 +61,5 @@ abstract class SpringBootTestSupport {
         }
 
         return entities
-    }
-
-    protected fun deleteAll(qEntity: EntityPathBase<*>) {
-        transaction.begin()
-
-        query.delete(qEntity).execute()
-
-        entityManager.flush()
-        transaction.commit()
-        entityManager.clear()
     }
 }

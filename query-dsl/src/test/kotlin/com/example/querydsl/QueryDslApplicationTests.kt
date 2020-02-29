@@ -5,8 +5,10 @@ import com.example.querydsl.domain.QHello
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
+import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 
+@Transactional
 class QueryDslApplicationTests(
     private val em: EntityManager
 ) : SpringBootTestSupport() {

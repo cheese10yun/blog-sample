@@ -8,9 +8,11 @@ import com.example.querydsl.dto.QMemberDtoQueryProjection
 import com.querydsl.core.types.Projections
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 import com.example.querydsl.domain.QMember.member as qMember
 
+@Transactional
 class ProjectionTest(
     private val em: EntityManager
 ) : SpringBootTestSupport() {

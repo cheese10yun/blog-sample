@@ -6,10 +6,11 @@ import com.example.querydsl.domain.Team
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageRequest
+import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 import com.example.querydsl.domain.QTeam.team as qTeam
 
-
+@Transactional
 internal class MemberTestRepositoryTest(
     private val em: EntityManager,
     private val memberTestRepository: MemberTestRepository

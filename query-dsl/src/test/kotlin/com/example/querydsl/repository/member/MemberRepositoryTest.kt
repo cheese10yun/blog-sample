@@ -7,9 +7,10 @@ import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageRequest
+import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 
-
+@Transactional
 internal class MemberRepositoryTest(
     private val em: EntityManager,
     private val memberRepository: MemberRepository
