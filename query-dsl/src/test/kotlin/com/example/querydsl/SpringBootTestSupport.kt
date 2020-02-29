@@ -33,14 +33,12 @@ abstract class SpringBootTestSupport {
 
         try {
             entityManager.persist(entity)
-            entityManager.flush()
+            entityManager.flush() // transaction commit시 자동으로 flush 발생시키나 명시적으로 선언
             transaction.commit()
             entityManager.clear()
-
         } catch (e: Exception) {
             transaction.rollback()
         }
-
         return entity
     }
 
@@ -59,7 +57,6 @@ abstract class SpringBootTestSupport {
                 transaction.rollback()
             }
         }
-
         return entities
     }
 }
