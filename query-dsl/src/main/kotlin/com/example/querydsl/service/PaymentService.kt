@@ -1,7 +1,9 @@
 package com.example.querydsl.service
 
 import com.example.querydsl.api.PaymentApi
+import com.example.querydsl.domain.Payment
 import com.example.querydsl.domain.QPayment
+import com.example.querydsl.repository.payment.PaymentRepository
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -11,9 +13,9 @@ import java.math.BigDecimal
 @Transactional(readOnly = true)
 class PaymentService(
     private val bankClient: BankClient,
-    private val query: JPAQueryFactory
+    private val query: JPAQueryFactory,
+    private val paymentRepository: PaymentRepository
 ) {
-
 
     @Transactional
     fun paymentZero(targetAmount: BigDecimal) {
@@ -27,6 +29,10 @@ class PaymentService(
         }
     }
 
+    @Transactional
+    fun save(amount: BigDecimal): Payment {
+        return paymentRepository.save(Payment(amount))
+    }
 
     fun doPayment(dto: PaymentApi.BankAccountPayment) {
         val isMatched = bankClient.requestAccount(dto.bankAccount, dto.bankAccount, dto.bankCode)
@@ -35,6 +41,4 @@ class PaymentService(
         }
         // 무통장 결제 진행...
     }
-
-
 }

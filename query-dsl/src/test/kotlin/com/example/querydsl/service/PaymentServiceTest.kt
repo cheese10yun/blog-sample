@@ -42,4 +42,18 @@ internal class PaymentServiceTest(
 
         then(count).isEqualTo(0)
     }
+
+    @Test
+    internal fun `save test`() {
+        val amount = 1209.toBigDecimal()
+        val payment = paymentService.save(amount)
+
+        then(payment.amount).isEqualTo(amount)
+
+        val findPayment = query.selectFrom(qPayment)
+            .where(qPayment.id.eq(payment.id))
+            .fetchOne()!!
+
+        then(findPayment.amount).isEqualByComparingTo(amount)
+    }
 }
