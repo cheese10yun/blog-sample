@@ -11,8 +11,8 @@ import com.example.querydsl.domain.QTeam.team as qTeam
 
 
 internal class MemberTestRepositoryTest(
-        private val em: EntityManager,
-        private val memberTestRepository: MemberTestRepository
+    private val em: EntityManager,
+    private val memberTestRepository: MemberTestRepository
 ) : SpringBootTestSupport() {
 
     @BeforeEach
@@ -47,8 +47,8 @@ internal class MemberTestRepositoryTest(
 
 
         val teams = query.select(qTeam)
-                .from(qTeam)
-                .fetch()
+            .from(qTeam)
+            .fetch()
 
         for (team in teams) {
             println("team : $team")

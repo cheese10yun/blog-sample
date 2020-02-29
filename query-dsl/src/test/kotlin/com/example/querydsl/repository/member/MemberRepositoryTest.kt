@@ -11,8 +11,8 @@ import javax.persistence.EntityManager
 
 
 internal class MemberRepositoryTest(
-        private val em: EntityManager,
-        private val memberRepository: MemberRepository
+    private val em: EntityManager,
+    private val memberRepository: MemberRepository
 ) : SpringBootTestSupport() {
 
     @BeforeEach

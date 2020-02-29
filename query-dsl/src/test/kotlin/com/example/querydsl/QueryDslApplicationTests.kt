@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test
 import javax.persistence.EntityManager
 
 class QueryDslApplicationTests(
-        private val em: EntityManager
-) : SpringBootTestSupport(){
+    private val em: EntityManager
+) : SpringBootTestSupport() {
 
     @Test
     internal fun `querydsl setting test`() {
@@ -21,9 +21,9 @@ class QueryDslApplicationTests(
         val qHello = QHello.hello
 
         val findHello = query
-                .selectFrom(qHello)
-                .where(qHello.name.eq("yun"))
-                .fetchOne()!!
+            .selectFrom(qHello)
+            .where(qHello.name.eq("yun"))
+            .fetchOne()!!
 
         then(findHello.id).isNotNull()
         then(findHello.name).isEqualTo("yun")

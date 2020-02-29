@@ -15,7 +15,6 @@ import javax.persistence.EntityManager
 import com.example.querydsl.domain.QMember.member as qMember
 import com.example.querydsl.domain.QTeam.team as qTeam
 
-
 internal class MemberTest(
     private val em: EntityManager
 ) : SpringBootTestSupport() {

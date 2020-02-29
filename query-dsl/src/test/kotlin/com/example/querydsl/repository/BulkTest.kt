@@ -8,22 +8,22 @@ import javax.persistence.EntityManager
 import com.example.querydsl.domain.QTeam.team as qTeam
 
 internal class BulkTest(
-        private val em: EntityManager
+    private val em: EntityManager
 ) : SpringBootTestSupport() {
 
     @BeforeEach
     internal fun setUp() {
         val teams = listOf(
-                Team("team_1"),
-                Team("team_2"),
-                Team("team_3"),
-                Team("team_4"),
-                Team("team_5"),
-                Team("team_6"),
-                Team("team_7"),
-                Team("team_8"),
-                Team("team_9"),
-                Team("team_10")
+            Team("team_1"),
+            Team("team_2"),
+            Team("team_3"),
+            Team("team_4"),
+            Team("team_5"),
+            Team("team_6"),
+            Team("team_7"),
+            Team("team_8"),
+            Team("team_9"),
+            Team("team_10")
         )
 
         for (team in teams) {
@@ -45,9 +45,9 @@ internal class BulkTest(
 
         // team  name 전체를 none name으로 변경한다.
         val updateCount = query.update(qTeam)
-                .set(qTeam.name, "none name")
-                .where(qTeam.id.`in`(ids))
-                .execute()
+            .set(qTeam.name, "none name")
+            .where(qTeam.id.`in`(ids))
+            .execute()
 
         println("update count : $updateCount")
 
