@@ -1,107 +1,79 @@
 package com.example.querydsl
 
-//import org.testcontainers.containers.DockerComposeContainer
-//import org.testcontainers.containers.PostgreSQLContainer
-//import org.testcontainers.containers.output.Slf4jLogConsumer
-//import org.testcontainers.junit.jupiter.Container
-//import org.testcontainers.junit.jupiter.Testcontainers
 import com.querydsl.core.types.dsl.EntityPathBase
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
+import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
-import javax.transaction.Transactional
+import javax.persistence.EntityManagerFactory
+import javax.persistence.EntityTransaction
 
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @Transactional
 @ActiveProfiles("test")
-//@Testcontainers
 abstract class SpringBootTestSupport {
 
     @Autowired
-    protected lateinit var entityManager: EntityManager
+    protected lateinit var entityManagerFactory: EntityManagerFactory
 
     @Autowired
     protected lateinit var query: JPAQueryFactory
 
+    protected val entityManager: EntityManager by lazy {
+        entityManagerFactory.createEntityManager()
+    }
+
+    protected val transaction: EntityTransaction by lazy {
+        transaction
+    }
 
     protected fun <T> save(entity: T): T {
-        entityManager.transaction.begin()
+        transaction.begin()
 
         try {
             entityManager.persist(entity)
             entityManager.flush()
+            transaction.commit()
             entityManager.clear()
-            entityManager.transaction.commit()
+
         } catch (e: Exception) {
-            entityManager.transaction.rollback()
+            transaction.rollback()
         }
+
         return entity
     }
 
+
     protected fun <T> saveAll(entities: Iterable<T>): Iterable<T> {
-        entityManager.transaction.begin()
+        transaction.begin()
 
         for (entity in entities) {
             try {
                 entityManager.persist(entity)
                 entityManager.flush() // transaction commit시 자동으로 flush 발생시키나 명시적으로 선언
+                transaction.commit()
                 entityManager.clear()
-                entityManager.transaction.commit()
 
             } catch (e: Exception) {
-                entityManager.transaction.rollback()
+                transaction.rollback()
             }
         }
-
 
         return entities
     }
 
     protected fun deleteAll(qEntity: EntityPathBase<*>) {
+        transaction.begin()
+
         query.delete(qEntity).execute()
 
         entityManager.flush()
+        transaction.commit()
         entityManager.clear()
     }
-
-
-//    companion object {
-//        @JvmStatic
-//        @Container
-//        val postgrContainer = PostgreSQLContainer<Nothing>()
-//            .apply {
-//                withDatabaseName("querydsl")
-//            }
-//
-//        @JvmStatic
-//        @Container
-//        val dockerComposeContainer = DockerComposeContainer<Nothing>(File("src/test/resource/docker-compose.yml"))
-//
-////        @JvmStatic
-////        @Container
-////        val genericContainer = GenericContainer<Nothing>("dockerImageName")
-////            .apply {
-////                withEnv("POSTGRES_DB", "DATABASE_NAME")
-////                withExposedPorts(5432) // 포트를 선언하지만 실제값은 랜덤이다. 사용할 수있는 포트 중에서 랜덤으로
-////            }
-//
-//        @BeforeAll
-//        @JvmStatic
-//        fun beforeAll() {
-//            val log by logger()
-//            val logConsumer = Slf4jLogConsumer(log)
-//            postgrContainer.followOutput(logConsumer)
-//        }
-//
-//    }
-
-//    @Test
-//    internal fun `container port`() {
-//        val realPort = genericContainer.getMappedPort(5432) // 실제 컨테이너가 사용하는 포트
-//    }
 }
