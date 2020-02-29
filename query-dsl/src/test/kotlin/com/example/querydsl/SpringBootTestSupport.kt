@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
-import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
+import javax.transaction.Transactional
 
 
 @SpringBootTest
@@ -28,21 +28,36 @@ abstract class SpringBootTestSupport {
     @Autowired
     protected lateinit var query: JPAQueryFactory
 
-    protected fun <T> save(entity: T): T {
-        entityManager.persist(entity)
-        entityManager.flush()
-        entityManager.clear()
 
+    protected fun <T> save(entity: T): T {
+        entityManager.transaction.begin()
+
+        try {
+            entityManager.persist(entity)
+            entityManager.flush()
+            entityManager.clear()
+            entityManager.transaction.commit()
+        } catch (e: Exception) {
+            entityManager.transaction.rollback()
+        }
         return entity
     }
 
     protected fun <T> saveAll(entities: Iterable<T>): Iterable<T> {
+        entityManager.transaction.begin()
+
         for (entity in entities) {
-            entityManager.persist(entity)
+            try {
+                entityManager.persist(entity)
+                entityManager.flush() // transaction commit시 자동으로 flush 발생시키나 명시적으로 선언
+                entityManager.clear()
+                entityManager.transaction.commit()
+
+            } catch (e: Exception) {
+                entityManager.transaction.rollback()
+            }
         }
 
-        entityManager.flush()
-        entityManager.clear()
 
         return entities
     }
