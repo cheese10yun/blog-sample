@@ -14,26 +14,26 @@ import com.example.querydsl.domain.QPayment.payment as qPayment
 
 class PaymentCustomRepositoryImpl : QuerydslCustomRepositorySupport(Payment::class.java), PaymentCustomRepository {
 
-    override fun findUseForm(targetAmount: BigDecimal): List<Payment>? {
+    override fun findUseFrom(targetAmount: BigDecimal): List<Payment>? {
         return from(qPayment)
             .where(qPayment.amount.gt(targetAmount))
             .fetch()
     }
 }
 ```
-해당 코드를 보면 `form`으로 시작해야 합니다. `QuerydslRepositorySupport` 구현체의 form 메서드는 아래와 같습니다.
+해당 코드를 보면 `From`으로 시작해야 합니다. `QuerydslRepositorySupport` 구현체의 From 메서드는 아래와 같습니다.
 
 ```kotlin
 protected <T> JPQLQuery<T> from(EntityPath<T> path) {
     return getRequiredQuerydsl().createQuery(path).select(path);
 }
 ```
-즉 `JPQLQuery`을 사용해서 쿼리 작업을 진행해야 되기 때문에 `form`으로 시작할 수밖에 없습니다.
+즉 `JPQLQuery`을 사용해서 쿼리 작업을 진행해야 되기 때문에 `From`으로 시작할 수밖에 없습니다.
 
 사실 별거 아닌 거 같지만 우리는 일반적으로 query를 시작할 때는 `select`으로 시작합니다. `queryFactory`을 이용하면 select, selectFrom으로 쿼리를 시작할 수 있습니다.
 
 ```kotlin
-override fun findUseSelectForm(targetAmount: BigDecimal): List<Payment> {
+override fun findUseSelectFrom(targetAmount: BigDecimal): List<Payment> {
     return selectFrom(qPayment)
         .where(qPayment.amount.gt(targetAmount))
         .fetch()
@@ -82,12 +82,12 @@ internal class PaymentRepositoryTest(
 ) : SpringBootTestSupport() {
 
     @Test
-    internal fun `findUseSelectForm`() {
+    internal fun `findUseSelectFrom`() {
         //given
         val targetAmount = 200.toBigDecimal()
 
         //when
-        val payments = paymentRepository.findUseSelectForm(targetAmount)
+        val payments = paymentRepository.findUseSelectFrom(targetAmount)
 
         //then
         then(payments).anySatisfy {

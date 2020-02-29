@@ -10,20 +10,20 @@ interface PaymentRepository : JpaRepository<Payment, Long>, PaymentCustomReposit
 }
 
 interface PaymentCustomRepository {
-    fun findUseSelectForm(targetAmount: BigDecimal): List<Payment>
+    fun findUseSelectFrom(targetAmount: BigDecimal): List<Payment>
     fun findUseSelect(targetAmount: BigDecimal): List<Long>
-    fun findUseForm(targetAmount: BigDecimal): List<Payment>
+    fun findUseFrom(targetAmount: BigDecimal): List<Payment>
 }
 
 class PaymentCustomRepositoryImpl : QuerydslCustomRepositorySupport(Payment::class.java), PaymentCustomRepository {
 
-    override fun findUseForm(targetAmount: BigDecimal): List<Payment> {
+    override fun findUseFrom(targetAmount: BigDecimal): List<Payment> {
         return from(qPayment)
             .where(qPayment.amount.gt(targetAmount))
             .fetch()
     }
 
-    override fun findUseSelectForm(targetAmount: BigDecimal): List<Payment> {
+    override fun findUseSelectFrom(targetAmount: BigDecimal): List<Payment> {
         return selectFrom(qPayment)
             .where(qPayment.amount.gt(targetAmount))
             .fetch()
