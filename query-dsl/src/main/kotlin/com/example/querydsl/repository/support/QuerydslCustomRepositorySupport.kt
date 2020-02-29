@@ -9,7 +9,7 @@ import javax.persistence.EntityManager
 import javax.persistence.PersistenceContext
 import kotlin.properties.Delegates
 
-abstract class QuerydslCusomRepositorySupport(domainClass: Class<*>) : QuerydslRepositorySupport(domainClass) {
+abstract class QuerydslCustomRepositorySupport(domainClass: Class<*>) : QuerydslRepositorySupport(domainClass) {
 
     private var queryFactory: JPAQueryFactory by Delegates.notNull()
 
@@ -26,5 +26,4 @@ abstract class QuerydslCusomRepositorySupport(domainClass: Class<*>) : QuerydslR
     protected fun <T> selectFrom(from: EntityPath<T>): JPAQuery<T> {
         return queryFactory.selectFrom(from)
     }
-
 }

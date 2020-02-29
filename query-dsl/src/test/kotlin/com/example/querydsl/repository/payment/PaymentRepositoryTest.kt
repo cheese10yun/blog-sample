@@ -8,19 +8,19 @@ internal class PaymentRepositoryTest(
     private val paymentRepository: PaymentRepository
 ) : SpringBootTestSupport() {
 
-    @Test
-    internal fun `findUseForm`() {
-        //given
-        val targetAmount = 200.toBigDecimal()
-
-        //when
-        val payments = paymentRepository.findUseForm(targetAmount)
-
-        //then
-        then(payments).anySatisfy {
-            then(it.amount).isGreaterThan(targetAmount)
-        }
-    }
+//    @Test
+//    internal fun `findUseForm`() {
+//        //given
+//        val targetAmount = 200.toBigDecimal()
+//
+//        //when
+//        val payments = paymentRepository.findUseForm(targetAmount)
+//
+//        //then
+//        then(payments).anySatisfy {
+//            then(it.amount).isGreaterThan(targetAmount)
+//        }
+//    }
 
     @Test
     internal fun `findUseSelectForm`() {
@@ -42,9 +42,9 @@ internal class PaymentRepositoryTest(
         val targetAmount = 200.toBigDecimal()
 
         //when
-        val count = paymentRepository.findUseSelect(targetAmount)
+        val ids = paymentRepository.findUseSelect(targetAmount)
 
         //then
-        then(count).isGreaterThan(1)
+        then(ids).hasSizeGreaterThan(1)
     }
 }
