@@ -10,7 +10,7 @@ import com.example.querydsl.domain.QTeam.team as qTeam
 
 
 class PersistenceContextTest(
-        private val em: EntityManager
+    private val em: EntityManager
 ) : SpringBootTestSupport() {
 
 
@@ -33,10 +33,10 @@ class PersistenceContextTest(
 
         //when
         val team = query
-                .selectFrom(qTeam)
-                .join(qTeam.members, qMember).fetchJoin()
-                .where(qTeam.name.eq("teamA"))
-                .fetchOne()!!
+            .selectFrom(qTeam)
+            .join(qTeam.members, qMember).fetchJoin()
+            .where(qTeam.name.eq("teamA"))
+            .fetchOne()!!
 
         //then
         val members = team.members

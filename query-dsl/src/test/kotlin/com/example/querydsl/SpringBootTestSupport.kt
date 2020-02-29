@@ -30,7 +30,6 @@ abstract class SpringBootTestSupport {
 
     protected fun <T> save(entity: T): T {
         entityManager.persist(entity)
-
         entityManager.flush()
         entityManager.clear()
 
@@ -49,7 +48,6 @@ abstract class SpringBootTestSupport {
     }
 
     protected fun deleteAll(qEntity: EntityPathBase<*>) {
-
         query.delete(qEntity).execute()
 
         entityManager.flush()
