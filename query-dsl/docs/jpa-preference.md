@@ -153,7 +153,11 @@ public class AccountCustomRepositoryImpl extends QuerydslRepositorySupport imple
 
 물론 Query DSL도 멤버 필드 변경 시에는 문제가 발생한다. 그 문제는 `Qxx.class`관련 Syntax이기 때문에 더 명확하다는 장점이 있다고 본다.
 
-지극히 주관적인 생각이지만 쿼리 메서드는 인터페이스 기반으로 작성하기 때문에 테스트 코드를 작성하지 않는 경우도 많다. 반면 Query DSL 세부 클래스를 작성하기 때문에 뭔가 테스트를 더 작성하게 하는 심리적인 이유도 있는 거 같다.
+**그리고 무엇보다 비즈니스 로직의 컨텍스트를 메서드명으로 표현 못 한다.** 활동하지 않은 휴면 회원의 정의를 마지막 로그인, 회원의 등급, 현재 회원의 상태 등등으로 정의하는 경우 이것을 쿼리 메서드로 작성하면 `findByLastLoginatAndStatusAndGrade` 와 유사하게 작성해야 한다.
+
+**이것은 그냥 쿼리조건문을 뜻할 뿐 활동하지 않은 휴먼회원을 뜻하지 않는다.** 물론 앞뒤 코드를 가지고 어느정도 유추는할 수 있지만 정확하게 전달하는 것은 아니다. 차리리 Querydsl으로 코드를 작성하고 `findDormancyMember` 으로 메서드를 지정하는 것이 훨씬 더 좋다고 생각한다.
+
+또 다른 이유는, 지극히 주관적인 생각이지만 쿼리 메서드는 인터페이스 기반으로 작성하기 때문에 테스트 코드를 작성하지 않는 경우도 많다. 반면 Query DSL 세부 클래스를 작성하기 때문에 뭔가 테스트를 더 작성하게 하는 심리적인 이유도 있는 거 같다.
 
 위 코드처럼 QuerydslRepositorySupport을 이용하면 Repository를 통해서 세부 구현체의 코드를 제공하기 때문에 이런 식의 패턴을 선호한다. 해당 패턴은 [step-15: Querydsl를 이용해서 Repository 확장하기 (1)](https://github.com/cheese10yun/spring-jpa-best-practices/blob/master/doc/step-15.md)에서 자세하게 다룬 적 이 있다. 
 
