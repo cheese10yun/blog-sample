@@ -72,7 +72,7 @@ OneToOne, ManyToOne 정보 같은 경우 연관관계의 주인에서 FK를 갖�
 **무엇보다 OnyToMany, ManyToOne 관계는 설정은 선호하지 않는다.** OneToMany를 관계를 갖게 되면 N+1 문제(물론 OneToMany를 관계에서만 N+1 문제가 발생하지는 않는다.) OneToMany 2개 이상 갖는 경우 카테시안 곱 문제로 `MultipleBagFetchException` 발생한다. **양방향 메서드를 반드시 지정해야 할 이유가 없다면 단방향 관계를 지향하는 것이 좋다고 생각한다.**
 
 
-## Open Setting View false로 두자
+## Open Session In View false로 두자
 ![](https://github.com/cheese10yun/TIL/raw/master/assets/jpa-osiv-2.png)
 
 OSIV는 영속성 컨텍스트를 View 레이어까지 열어 둘 수 있다. 영속성 컨텍스트가 살아있으면 엔티티는 영속 상태로 유지된다. 따라서 **뷰에서도 지연 로딩을 사용할 수 있다. 하지만 View에서 트랜잭션을 계속 가지고 있는 것이 좋다고 생각하지 않는다.**
