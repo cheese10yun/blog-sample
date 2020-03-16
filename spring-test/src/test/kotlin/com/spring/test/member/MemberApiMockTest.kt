@@ -23,16 +23,13 @@ internal class MemberApiMockTest(
 
     @Test
     internal fun `create member`() {
-
         val name = "asd"
         val email = "asd@asd.com"
 
         given(memberService.create(name, email)).willReturn(Member(name, email))
 
-
         mockMvc.post("/members") {
                 contentType = MediaType.APPLICATION_JSON
-
                 content = """
                     {
                       "name": "$name",
@@ -41,7 +38,6 @@ internal class MemberApiMockTest(
                 """.trimIndent()
             }
             .andDo { print() }
-
             .andExpect {
                 status { isOk }
             }
