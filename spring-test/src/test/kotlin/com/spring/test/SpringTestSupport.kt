@@ -16,13 +16,22 @@ abstract class SpringTestSupport {
     @Autowired
     protected lateinit var entityManager: EntityManager
 
-    protected fun save(entity: Any) = entityManager.persist(entity)
+    protected fun save(entity: Any): Any {
+        entityManager.persist(entity)
+
+        entityManager.flush()
+        entityManager.clear()
+
+        return entity
+    }
 
     protected fun saveAll(entities: Iterable<Any>): Iterable<Any> {
         for (entity in entities) {
             entityManager.persist(entity)
         }
 
+        entityManager.flush()
+        entityManager.clear()
         return entities
     }
 }
