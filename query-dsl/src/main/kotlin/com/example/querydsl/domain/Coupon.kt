@@ -1,6 +1,5 @@
-package com.example.querydsl.repository.coupon
+package com.example.querydsl.domain
 
-import com.example.querydsl.domain.EntityAuditing
 import java.math.BigDecimal
 import javax.persistence.Column
 import javax.persistence.Entity
