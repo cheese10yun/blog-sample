@@ -12,12 +12,7 @@ class Sample(
     private val apiService: ApiService
 ) {
 
-    @GetMapping
-    fun asdasd(): ResponseEntity<String> {
 
-        return apiService.asd()
-
-    }
 
 
 }

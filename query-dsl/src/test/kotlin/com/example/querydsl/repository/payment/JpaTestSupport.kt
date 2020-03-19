@@ -2,7 +2,7 @@ package com.example.querydsl.repository.payment
 
 import com.example.querydsl.SpringBootTestSupport
 import com.example.querydsl.domain.*
-import com.example.querydsl.repository.coupon.QCoupon
+
 import org.junit.jupiter.api.Test
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
