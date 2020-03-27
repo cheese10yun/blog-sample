@@ -12,7 +12,7 @@ spring:
 #    url: jdbc:tc:postgresql:///querydsl
 #    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
 
-logging:
-  level:
-    ROOT: info
-    org.hibernate.type.descriptor.sql.BasicBinder: trace
+#logging:
+#  level:
+#    ROOT: info
+#    org.hibernate.type.descriptor.sql.BasicBinder: trace
