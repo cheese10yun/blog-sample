@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 @Component
 class Consumer {
 
-    @KafkaListener(topics = ["new"], groupId = "eddy")
+    @KafkaListener(topics = ["yun"])
     fun listener(message: String) {
 
         println("================================")

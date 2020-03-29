@@ -17,12 +17,12 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer
 @Configuration
 @EnableKafka  //TODO: 필요한지 정확히 모르겠음..
 @EnableConfigurationProperties(KafkaProperties::class)
-class ConsumerConfiguration(
+class KafkaConsumerConfiguration(
     private val properties: KafkaProperties
 ) {
 
     @Bean
-    fun stringConsumerConfigs(): Map<String, Any> {
+    fun consumerConfig(): Map<String, Any> {
         val props: MutableMap<String, Any> = HashMap()
         props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = "192.168.0.10:9092"
         props[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
@@ -33,14 +33,14 @@ class ConsumerConfiguration(
     }
 
     @Bean
-    fun stringConsumerFactory(): ConsumerFactory<String, String> {
-        return DefaultKafkaConsumerFactory(stringConsumerConfigs())
+    fun consumerFactory(): ConsumerFactory<String, String> {
+        return DefaultKafkaConsumerFactory(consumerConfig())
     }
 
     @Bean
     fun kafkaListenerContainerFactory(): KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
-        factory.consumerFactory = stringConsumerFactory()
+        factory.consumerFactory = consumerFactory()
         factory.setConcurrency(1)
         return factory
     }
