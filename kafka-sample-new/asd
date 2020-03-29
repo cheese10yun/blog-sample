@@ -1,0 +1,6 @@
+tickTime=2000
+initLimit=10
+syncLimit=5
+dataDir=/data
+clientPort=2181
+server.1=peter-zk001:2888:3888
