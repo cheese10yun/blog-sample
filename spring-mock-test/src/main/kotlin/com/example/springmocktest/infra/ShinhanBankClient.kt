@@ -1,5 +1,6 @@
 package com.example.springmocktest.infra
 
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 
 @Service
@@ -14,17 +15,32 @@ class ShinhanBankClient(
     }
 }
 
-@Service
-class ShinChanBankApi {
 
+interface ShinChanBankApi {
+    fun checkAccountHolder(accountHolder: String, accountNumber: String): AccountHolderVerificationResponse
+}
+
+@Service("shinChanBankApi")
+@Profile("production")
+class ShinChanBankApiImpl : ShinChanBankApi {
     // 계좌주명, 계좌번호가 하드 코딩된 값과 일치여불르 확인한다.
-    fun checkAccountHolder(accountHolder: String, accountNumber: String): AccountHolderVerificationResponse {
+    override fun checkAccountHolder(accountHolder: String, accountNumber: String): AccountHolderVerificationResponse {
         return when {
             accountHolder == "yun" && accountNumber == "110-2222-2222" -> AccountHolderVerificationResponse(true)
             else -> AccountHolderVerificationResponse(false)
         }
     }
 }
+
+@Service("shinChanBankApi")
+@Profile("sandbox", "beta", "local", "test")
+private class ShinChanBankApMock : ShinChanBankApi {
+    // 어떤 값이 들어 와도 일치 한다고 가정한다
+    override fun checkAccountHolder(accountHolder: String, accountNumber: String): AccountHolderVerificationResponse {
+        return AccountHolderVerificationResponse(true)
+    }
+}
+
 
 data class AccountHolderVerificationResponse(
     val matched: Boolean

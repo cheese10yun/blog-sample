@@ -11,7 +11,6 @@ class PartnerRegistrationService(
 ) {
 
     fun register(dto: PartnerRegistrationRequest): Partner {
-
         // 은행 코드 검증일 진행한다
         bankClient.verifyAccountHolder(
             accountHolder = dto.accountHolder,
