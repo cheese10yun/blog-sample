@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
+import javax.validation.constraints.NotEmpty
 
 @RestController
 @RequestMapping("/partners")
@@ -17,11 +18,13 @@ class PartnerApi(
     fun register(@RequestBody @Valid dto: PartnerRegistrationRequest) {
         partnerRegistrationService.register(dto)
     }
-
 }
 
 data class PartnerRegistrationRequest(
+    @field:NotEmpty
     val name: String,
+    @field:NotEmpty
     val accountHolder: String,
+    @field:NotEmpty
     val accountNumber: String
 )

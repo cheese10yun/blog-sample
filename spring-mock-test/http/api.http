@@ -1,0 +1,10 @@
+POST http://127.0.0.1:8080/partners
+Content-Type: application/json
+
+{
+  "name": "강남 마마 카페",
+  "accountHolder": "김석준",
+  "accountNumber": "110-11111-1111"
+}
+
+###

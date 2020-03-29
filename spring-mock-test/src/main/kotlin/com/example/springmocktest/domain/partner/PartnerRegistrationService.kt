@@ -12,19 +12,16 @@ class PartnerRegistrationService(
 
     fun register(dto: PartnerRegistrationRequest): Partner {
 
-
+        // 은행 코드 검증일 진행한다
         bankClient.verifyAccountHolder(
             accountHolder = dto.accountHolder,
             accountNumber = dto.accountHolder
         )
-
 
         return partnerRepository.save(Partner(
             accountNumber = dto.accountNumber,
             accountHolder = dto.accountHolder,
             name = dto.name
         ))
-
-
     }
 }
