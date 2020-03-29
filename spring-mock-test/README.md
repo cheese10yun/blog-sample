@@ -13,7 +13,7 @@
   * 계좌 주명, 계좌번호 일치하지 않은 경우 예외를 발생시킨다.
 
 ## Code
-
+코드는 자세히 보실 필요 없습니다. 아래의 흐름만 읽어 보시면 됩니다.
 ```kotlin
 @RestController
 @RequestMapping("/partners")
@@ -139,7 +139,7 @@ MockBean을 통해서 가짜 객체를 주입받고 `given()` 메서드를 통�
 * 실제 Email을 호출하는 경우
 * 실제 SMS으로 문자가 나가는 경우
 * 실제 송금을 진행하는 경우
-* 상대 서버에 sandbo, beta 등 production 환경 이외의 테스트 서버가 없는 경우
+* 상대 서버에 sandbox, beta 등 production 환경 이외의 테스트 서버가 없는 경우
 
 해당 이유들은 비용상의 문제, 서버 권한 문제 외 적으로 막아야 합니다. **그리고 무엇보다 Production 환경 외에서 해당 API를 사용(테스트) 할 수 없게 되는 것이 가장 큰 문제입니다.**
 
