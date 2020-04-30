@@ -11,4 +11,6 @@ dependencies {
 
     api("org.mock-server:mockserver-netty:$mockServerVersion")
     api("org.mock-server:mockserver-client-java:$mockServerVersion")
+
+    api(project(":support"))
 }
