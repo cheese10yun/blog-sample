@@ -1,6 +1,6 @@
-package com.example.batch.batch.listener
+package com.cheese.yun.listener
 
-import logger
+import com.cheese.yun.support.logger.logger
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobExecutionListener
 import org.springframework.batch.core.JobParameters
@@ -9,21 +9,20 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-
-class JobExecutionNotificationListener : JobExecutionListener {
+class SlackNotificationListener : JobExecutionListener {
 
     private val log by logger()
 
     override fun beforeJob(jobExecution: JobExecution): Unit = Unit
 
     override fun afterJob(jobExecution: JobExecution) {
-        log.info(jobReport(jobExecution, "test"))
+        log.info(jobReport(jobExecution))
         log.info(stepReport(jobExecution.stepExecutions))
     }
 
-    private fun jobReport(jobExecution: JobExecution, phase: String): String {
+    private fun jobReport(jobExecution: JobExecution): String {
         return """
-            [${jobExecution.jobInstance.jobName}@$phase 리포트]
+            [${jobExecution.jobInstance.jobName}@ 리포트]
             최종상태: ${jobExecution.status}
             시작일시: ${jobExecution.createTime.isoDateTime()}
             종료일시: ${jobExecution.endTime.isoDateTime()}()
