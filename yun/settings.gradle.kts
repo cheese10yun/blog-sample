@@ -3,6 +3,12 @@ rootProject.name = "yun"
 include("api")
 include("domain")
 include("batch")
+include(
+    "io",
+    "io:io-slack",
+    "io:io-spring",
+    "io:io-spring:io-slack-spring"
+)
 
 pluginManagement {
     repositories {

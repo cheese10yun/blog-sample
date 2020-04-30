@@ -1,7 +1,7 @@
 spring:
   main:
     allow-bean-definition-overriding: true
-    web-application-type: none
+    web-application-type: NONE
 
   batch.job.names: ${job.name:NONE}
   jpa:
