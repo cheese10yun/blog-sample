@@ -1,3 +1,3 @@
 dependencies{
-    api(project(":batch"))
+    api(project(":io:io-slack"))
 }

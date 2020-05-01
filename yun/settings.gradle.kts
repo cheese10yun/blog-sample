@@ -4,7 +4,8 @@ include("api")
 include("domain")
 include(
     "batch",
-    "batch:batch-support"
+    "batch:batch-support",
+    "batch:batch-sample"
 )
 include(
     "io",

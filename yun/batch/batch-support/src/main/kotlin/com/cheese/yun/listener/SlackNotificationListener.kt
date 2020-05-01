@@ -1,5 +1,6 @@
 package com.cheese.yun.listener
 
+import com.cheese.yun.io.slack.SlackClient
 import com.cheese.yun.support.logger.logger
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobExecutionListener
@@ -16,6 +17,16 @@ class SlackNotificationListener : JobExecutionListener {
     override fun beforeJob(jobExecution: JobExecution): Unit = Unit
 
     override fun afterJob(jobExecution: JobExecution) {
+
+        val slackClient = SlackClient()
+
+        slackClient.sendJobReport(
+            """
+                ${jobReport(jobExecution)}
+                ${stepReport(jobExecution.stepExecutions)}
+            """.trimIndent()
+        )
+
         log.info(jobReport(jobExecution))
         log.info(stepReport(jobExecution.stepExecutions))
     }

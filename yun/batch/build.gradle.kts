@@ -4,6 +4,7 @@ subprojects {
         implementation("org.springframework.boot:spring-boot-starter-batch")
 
         api(project(":support"))
+        api(project(":batch:batch-support"))
 
 //    runtimeOnly("mysql:mysql-connector-java")
 

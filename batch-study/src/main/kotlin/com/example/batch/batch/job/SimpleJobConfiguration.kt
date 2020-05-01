@@ -32,7 +32,7 @@ class SimpleJobConfiguration(
     @Bean
     fun simpleStep1(): Step {
         return stepBuilderFactory.get("simpleStep1")
-            .tasklet { contribution, chunkContext ->
+            .tasklet { _, _ ->
                 log.info("This is Step 1")
                 RepeatStatus.FINISHED
             }
@@ -42,7 +42,7 @@ class SimpleJobConfiguration(
     @Bean
     fun simpleStep2(): Step {
         return stepBuilderFactory.get("simpleStep1")
-            .tasklet { contribution, chunkContext ->
+            .tasklet { _, _ ->
                 log.info("This is Step 2")
                 RepeatStatus.FINISHED
             }
