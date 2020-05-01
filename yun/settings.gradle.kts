@@ -3,6 +3,10 @@ rootProject.name = "yun"
 include("api")
 include("domain")
 include(
+    "service",
+    "service:service-order"
+)
+include(
     "batch",
     "batch:batch-support",
     "batch:batch-sample"

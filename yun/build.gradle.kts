@@ -2,12 +2,12 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.spring")
     kotlin("plugin.jpa") apply false
-    kotlin("kapt")
+    kotlin("kapt") apply false
     id("org.springframework.boot")
     id("io.spring.dependency-management")
 }
 
-allprojects{
+allprojects {
     repositories {
         jcenter()
     }

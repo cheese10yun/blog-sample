@@ -1,0 +1,12 @@
+### Send POST request with json body
+POST {{host}}{{api}}/orders
+Content-Type: application/json
+
+{
+  "address": {
+    "zipCode": "zipcode",
+    "city": "city",
+    "detailAddress": "address"
+  },
+  "price": 22302.000
+}
