@@ -56,12 +56,12 @@
 * [JPA 영속성 컨텍스트 주의점](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/jpa-persistence-context.md)
 * [JPA Bulk 주의점](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/jpa-bulk.md)
 * [RestTemplate Mock 기반 테스트 하기](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/rest-template-mock-test.md)
-* [RestTemplate Mock 기반 테스트 하기](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/rest-template-mock-test.md)
 * [JPA 선호 하는 패턴](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/jpa-preference.md)
 * [Querydsl Repository Support 활용](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/querydsl-custom-repository.md)
 * [JPA 기반 테스트 코드 작성 팁](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/jpa-test-support.md)
 * [외부 인프라스트럭처 테스트](https://github.com/cheese10yun/blog-sample/tree/master/spring-mock-test)
-
+* [Github Action With Gradle](https://github.com/cheese10yun/github-action)
+* [JPA + Querydsl group_concat 사용법](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/query-dsl-group-concat.md)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
