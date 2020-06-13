@@ -35,7 +35,7 @@ data class Hello(
         @Column(name = "name", nullable = false)
         val name: String
 
-) : EntityAuditing() 
+) : EntityAuditing()
 ```
 Entity 정의
 
@@ -116,8 +116,8 @@ internal fun `query dsl and 생략 가능`() {
 }
 ```
 `and` 조건인 경우 생략이 가능하며 `,`으로 간략하게 가능하다.
- 
- 
+
+
  ## 결과 조회
  ```kotlin
 @Test
@@ -152,9 +152,9 @@ val count = query
 }
  ```
 * fetch() : 리스트 조회, 데이터 없으면 빈 리스트 반환
-* fetchOne() : 단 건 조회, 결과가 없으면 : null 결과가 둘 이상이면 : com.querydsl.core.NonUniqueResultException 
+* fetchOne() : 단 건 조회, 결과가 없으면 : null 결과가 둘 이상이면 : com.querydsl.core.NonUniqueResultException
 * fetchFirst() : limit(1).fetchOne()
-* fetchResults() : 페이징 정보 포함, total count 쿼리 추가 실행 
+* fetchResults() : 페이징 정보 포함, total count 쿼리 추가 실행
 * fetchCount() : count 쿼리로 변경해서 count 수 조회
 
 ## 정렬
@@ -248,7 +248,7 @@ internal fun `query dsl group by`() {
     then(teamB.get(qMember.age.avg())).isEqualTo(35.0)
 }
 ```
-* JPQL이 제공하는 모든 집합 함수를 제공한다. 
+* JPQL이 제공하는 모든 집합 함수를 제공한다.
 * tuple은 프로젝션과 결과반환에서 설명한다.
 
 
@@ -280,22 +280,22 @@ select
     member0_.updated_at as updated_3_1_,
     member0_.age as age4_1_,
     member0_.team_id as team_id6_1_,
-    member0_.username as username5_1_ 
+    member0_.username as username5_1_
 from
-    member member0_ 
+    member member0_
 inner join
-    team team1_ 
-        on member0_.team_id=team1_.id 
+    team team1_
+        on member0_.team_id=team1_.id
 where
     team1_.name=?
 ```
 
-* join() , innerJoin() : 내부 조인(inner join) 
-* leftJoin() : left 외부 조인(left outer join) 
+* join() , innerJoin() : 내부 조인(inner join)
+* leftJoin() : left 외부 조인(left outer join)
 * rightJoin() : rigth 외부 조인(rigth outer join)
 * JPQL의 on과 성능 최적화를 위한 fetch 조인 제공 -> 다음 on 절에서 설명
 
-### 세타 조인 
+### 세타 조인
 **연관관계가 없는 필드로 조인**
 ```kotlin
 @Test
@@ -315,11 +315,11 @@ select
     member0_.updated_at as updated_3_1_,
     member0_.age as age4_1_,
     member0_.team_id as team_id6_1_,
-    member0_.username as username5_1_ 
+    member0_.username as username5_1_
 from
-    member member0_ cross 
+    member member0_ cross
 join
-    team team1_ 
+    team team1_
 where
     member0_.username=team1_.name
 ```
@@ -353,11 +353,11 @@ select
     member0_.updated_at as updated_3_1_,
     member0_.age as age4_1_,
     member0_.team_id as team_id6_1_,
-    member0_.username as username5_1_ 
+    member0_.username as username5_1_
 from
-    member member0_ 
+    member member0_
 left outer join
-    team team1_ 
+    team team1_
         on member0_.team_id=team1_.id and (team1_.name=?)
 ```
 참고: on 절을 활용해 조인 대상을 필터링 할 때, 외부조인이 아니라 내부조인(inner join)을 사용하면, where 절에서 필터링 하는 것과 기능이 동일하다. 따라서 on 절을 활용한 조인 대상 필터링을 사용할 때, 내부조인 이면 익숙한 where 절로 해결하고, 정말 외부조인이 필요한 경우에만 이 기능을 사용하자.
@@ -391,11 +391,11 @@ select
     member0_.username as username5_1_0_,
     team1_.created_at as created_2_2_1_,
     team1_.updated_at as updated_3_2_1_,
-    team1_.name as name4_2_1_ 
+    team1_.name as name4_2_1_
 from
-    member member0_ 
+    member member0_
 left outer join
-    team team1_ 
+    team team1_
         on (
             member0_.username=team1_.name
         )
@@ -407,9 +407,9 @@ left outer join
 
 * 하이버네이트 5.1부터 on 을 사용해서 서로 관계가 없는 필드로 외부 조인하는 기능이 추가되었다. 물론 내 부 조인도 가능하다.
 * 주의! 문법을 잘 봐야 한다. leftJoin() 부분에 일반 조인과 다르게 엔티티 하나만 들어간다.
-  * 일반조인: leftJoin(member.team, team) 
+  * 일반조인: leftJoin(member.team, team)
   * on조인: from(member).leftJoin(team).on(xxx)
-  
+
 ### 조인 - fetch join
 * 페치 조인은 SQL에서 제공하는 기능은 아니다. SQL조인을 활용해서 연관된 엔티티를 SQL 한번에 조회하 는 기능이다. 주로 성능 최적화에 사용하는 방법이다.
 ```kotlin
@@ -435,12 +435,12 @@ select
     member0_.username as username5_1_0_,
     team1_.created_at as created_2_2_1_,
     team1_.updated_at as updated_3_2_1_,
-    team1_.name as name4_2_1_ 
+    team1_.name as name4_2_1_
 from
-    member member0_ 
+    member member0_
 inner join
-    team team1_ 
-        on member0_.team_id=team1_.id 
+    team team1_
+        on member0_.team_id=team1_.id
 where
     member0_.username=?
 ```
@@ -478,13 +478,13 @@ select
     member0_.updated_at as updated_3_1_,
     member0_.age as age4_1_,
     member0_.team_id as team_id6_1_,
-    member0_.username as username5_1_ 
+    member0_.username as username5_1_
 from
-    member member0_ 
+    member member0_
 where
     member0_.age=(
         select
-            max(member1_.age) 
+            max(member1_.age)
         from
             member member1_
     )
@@ -534,13 +534,13 @@ select
     member0_.updated_at as updated_3_1_,
     member0_.age as age4_1_,
     member0_.team_id as team_id6_1_,
-    member0_.username as username5_1_ 
+    member0_.username as username5_1_
 from
-    member member0_ 
+    member member0_
 where
     member0_.age>=(
         select
-            avg(cast(member1_.age as double)) 
+            avg(cast(member1_.age as double))
         from
             member member1_
     )
@@ -573,11 +573,11 @@ internal fun `query dsl basic case`() {
 ```
 ```sql
 select
-    case 
-        when member0_.age=? then ? 
-        when member0_.age=? then ? 
-        else '이타' 
-    end as col_0_0_ 
+    case
+        when member0_.age=? then ?
+        when member0_.age=? then ?
+        else '이타'
+    end as col_0_0_
 from
     member member0_
 ```
@@ -600,11 +600,11 @@ internal fun `query dsl projection simple`() {
 ```
 ```sql
 select
-    member0_.username as col_0_0_ 
+    member0_.username as col_0_0_
 from
     member member0_
 ```
-* 프로젝션 대상이 하나면 타입을 명확하게 지정할 수 있음 
+* 프로젝션 대상이 하나면 타입을 명확하게 지정할 수 있음
 * 프로젝션 대상이 둘 이상이면 튜플이나 DTO로 조회
 
 ## 튜플 조회
@@ -634,15 +634,15 @@ internal fun `query dsl tuple projection`() {
 ```sql
 select
     member0_.username as col_0_0_,
-    member0_.age as col_1_0_ 
+    member0_.age as col_1_0_
 from
     member member0_
 ```
 ## 프로젝션과 결과 반환 - DTO 조회
 결과를 DTO 반환할 때 사용 다음 3가지 방법 지원
 
-* 프로퍼티 접근 
-* 필드 직접 접근 
+* 프로퍼티 접근
+* 필드 직접 접근
 * **생성자 사용**
 
 생성가 기반의 프로젝션 처리가 좋은 코드라고 생각, setter 방식은 setter 코드 때문에 객체가 mutable 상태로 변경되게 되며, 필드 방식은 필드명이 정확하게 일치해야 하는 문제가 있다. 생성자 방식이 가장 POJO 스럽게 코드를 작성할 수 있음
@@ -673,7 +673,7 @@ internal fun `query dsl projection dto`() {
 ```sql
 select
     member0_.username as col_0_0_,
-    member0_.age as col_1_0_ 
+    member0_.age as col_1_0_
 from
     member member0_
 ```
@@ -700,13 +700,13 @@ internal fun `query dsl projection dto 2`() {
 ```sql
 select
     member0_.username as col_0_0_,
-    max(member0_.age) as col_1_0_ 
+    max(member0_.age) as col_1_0_
 from
-    member member0_ 
+    member member0_
 group by
     member0_.age
 ```
-* 프로퍼티나, 필드 접근 생성 방식에서 이름이 다를 때 해결 방안 
+* 프로퍼티나, 필드 접근 생성 방식에서 이름이 다를 때 해결 방안
 * ExpressionUtils.as(source,alias) : 필드나, 서브 쿼리에 별칭 적용
 * username.as("memberName") : 필드에 별칭 적용
 
@@ -761,7 +761,7 @@ private fun searchMember(username: String?, age: Int?): List<Member> {
     age.let {
         booleanBuilder.and(qMember.age.eq(age))
     }
-    
+
     return query
             .selectFrom(qMember)
             .where(
@@ -776,7 +776,7 @@ private fun searchMember(username: String?, age: Int?): List<Member> {
 internal fun `query dsl dynamic query`() {
     val username = "member1"
     val age = 10
-    
+
     val members = query
             .selectFrom(qMember)
             .where(usernameEq(username), ageEq(age))
@@ -802,7 +802,7 @@ private fun ageEq(age: Int?): BooleanExpression? {
     }
 }
 ```
-* where 조건에 null 값은 무시된다. 
+* where 조건에 null 값은 무시된다.
 * 메서드를 다른 쿼리에서도 재활용 할 수 있다.
 * 쿼리 자체의 가독성이 높아진다.
 * 작성한 메서드의 조합으로 재사용성이 높아진다.
@@ -833,15 +833,15 @@ internal fun `query  dsl bulk delete`() {
 
 ```sql
 update
-    member 
+    member
 set
-    username=? 
+    username=?
 where
     age<?
 
-delete 
+delete
 from
-    member 
+    member
 where
     age>?
 ```
@@ -861,13 +861,13 @@ interface MemberRepository : JpaRepository<Member, Long>, MemberRepositoryCustom
 interface MemberRepositoryCustom {
 
     fun search(username: String?, age: Int?): Member
-    
+
 }
 
 class MemberRepositoryImpl(
         private val query : JPAQueryFactory
 ) :  MemberRepositoryCustom {
-    
+
     override fun search(username: String?, age: Int?): Member {
         return query
                 .selectFrom(qMember)
@@ -960,7 +960,7 @@ public interface QuerydslPredicateExecutor<T> {
 
 ### 한계점
 * 조인X (묵시적 조인은 가능하지만 left join이 불가능하다.)
-* 클라이언트가 Querydsl에 의존해야 한다. 서비스 클래스가 Querydsl이라는 구현 기술에 의존해야 한다. 
+* 클라이언트가 Querydsl에 의존해야 한다. 서비스 클래스가 Querydsl이라는 구현 기술에 의존해야 한다.
 * 복잡한 실무환경에서 사용하기에는 한계가 명확하다.
 
 # 스프링 데이터 JPA가 제공하는 Query 기능
@@ -969,7 +969,7 @@ public interface QuerydslPredicateExecutor<T> {
 
 ### 장점
 * getQuerydsl().applyPagination() 스프링 데이터가 제공하는 페이징을 Querydsl로 편리하게 변환 가능(단! Sort는 오류발생)
-* from() 으로 시작 가능(최근에는 QueryFactory를 사용해서 select() 로 시작하는 것이 더 명시적) 
+* from() 으로 시작 가능(최근에는 QueryFactory를 사용해서 select() 로 시작하는 것이 더 명시적)
 * EntityManager 제공
 
 ### 한계
