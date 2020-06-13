@@ -33,6 +33,7 @@ dependencies {
 //    implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.8")
 
     runtimeOnly("com.h2database:h2")
+    runtimeOnly("mysql:mysql-connector-java")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor(group = "com.querydsl", name = "querydsl-apt", classifier = "jpa")
