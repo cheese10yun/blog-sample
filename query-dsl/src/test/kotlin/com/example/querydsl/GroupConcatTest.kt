@@ -48,7 +48,7 @@ internal class GroupConcatTest(
         val teamA = Team("teamA")
         em.persist(teamA)
 
-        (1..1000).map {
+        (1..2).map {
             em.persist(Member(username = "member-$it", age = it, team = teamA))
         }
 
