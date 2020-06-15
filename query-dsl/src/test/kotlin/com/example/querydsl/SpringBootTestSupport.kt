@@ -1,13 +1,12 @@
 package com.example.querydsl
 
 import com.querydsl.jpa.impl.JPAQueryFactory
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
 import org.testcontainers.containers.MySQLContainer
-import org.testcontainers.containers.output.Slf4jLogConsumer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import javax.persistence.EntityManager
@@ -18,7 +17,7 @@ import javax.persistence.EntityTransaction
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @ActiveProfiles("test")
 @Testcontainers
-//@TestInstance(Lifecycle.PER_CLASS)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class SpringBootTestSupport {
 
     @Autowired
@@ -27,26 +26,12 @@ abstract class SpringBootTestSupport {
     @Autowired
     protected lateinit var query: JPAQueryFactory
 
-
-    companion object {
-        @Container
-        @JvmStatic
-        val mysqlTestContainer = MySQLContainer<Nothing>()
-            .apply {
-                withDatabaseName("sample")
-                start()
-            }
-
-        @BeforeAll
-        @JvmStatic
-        private fun beforeAll() {
-            val log by logger()
-            val logConsumer = Slf4jLogConsumer(log)
-            mysqlTestContainer.followOutput(logConsumer)
+    @Container
+    private val mysqlTestContainer = MySQLContainer<Nothing>()
+        .apply {
+            withDatabaseName("sample")
+            start()
         }
-
-    }
-
 
     protected val entityManager: EntityManager by lazy {
         entityManagerFactory.createEntityManager()
