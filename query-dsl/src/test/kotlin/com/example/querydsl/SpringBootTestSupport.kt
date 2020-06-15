@@ -34,6 +34,7 @@ abstract class SpringBootTestSupport {
         val mysqlTestContainer = MySQLContainer<Nothing>()
             .apply {
                 withDatabaseName("sample")
+                start()
             }
 
         @BeforeAll
