@@ -2,7 +2,7 @@
 
 ## Instance 특징
 
-Junit5는 테스트 메서드마다 인스턴스를 새로 생성하는 것이 기본 전략입니다. 이는 테스트 코드(메서드) 간의 디펜던시 줄이기 위해서입니다. 아래 코드를 통해서 살펴보겠습니다.
+Junit5는 **테스트 메서드마다 인스턴스를 새로 생성**하는 것이 기본 전략입니다. 이는 테스트 코드(메서드) 간의 디펜던시 줄이기 위해서입니다. 아래 코드를 통해서 살펴보겠습니다.
 
 ```kotlin
 internal class Junit5 {
@@ -76,4 +76,104 @@ internal class Junit5 {
 
 ![](images/junit5-instance-3.png)
 
-`Junit5` 주솟값을 보면 동일한 주솟값을 출력하는 것을 확인할 수 있습니다. 그 결과 `private var value` 변숫값이 테스트 메서드에서 공유되는 것을 확인할 수 있습니다. 물론 테스트 코드 간의 디펜더시를 줄이는 것이 올바른 테스트 방식이라고 생각합니다. **하지만 테스트 메서드마다 인스턴스를 계속 생성하는 것이 효율적이지 않다고 생각합니다.** 테스트 코드는 디펜던시ㄷ 없이 작성하고, `@TestInstance(TestInstance.Lifecycle.PER_CLASS)`을 통해서 인스턴스를 계속 생성을 막는 것도 좋은 방법이라고 생각합니다.
+`Junit5` 주솟값을 보면 동일한 주솟값을 출력하는 것을 확인할 수 있습니다. 그 결과 `private var value` 변숫값이 테스트 메서드에서 공유되는 것을 확인할 수 있습니다. 물론 테스트 코드 간의 디펜더시를 줄이는 것이 올바른 테스트 방식이라고 생각합니다. **하지만 테스트 메서드마다 인스턴스를 계속 생성하는 것이 효율적이지 않다고 생각합니다.** 테스트 코드는 디펜던시 없이 작성하고, `@TestInstance(TestInstance.Lifecycle.PER_CLASS)`을 통해서 인스턴스를 계속 생성을 막는 것도 좋은 방법이라고 생각합니다.
+
+
+### 전처리 후처리
+
+| Annotation  | Description                          |
+| ----------- | ------------------------------------ |
+| @BeforeAll  | 테스트 실행되기 전 한번 실행됨       |
+| @BeforeEach | 모든 테스트 마다 실행되기 전에실행됨 |
+| @AfterEach  | 모든 테스트 마다 실행된후 전에실행됨 |
+| @AfterAll   | 테스트 실행된 후 한 번 실행됨        |
+
+Junit5에서는 테스트 메서드 실행 시 전처리, 후처리를 위해서 위와 같은 어노테이션을 지원합니다.
+
+
+```kotlin
+internal class SampleTest {
+
+    companion object {
+        @BeforeAll
+        @JvmStatic
+        internal fun beforeAll() {
+            println("BeforeAll : 테스트 실행되기 이전 단 한 번만 실행")
+        }
+
+        @AfterAll
+        @JvmStatic
+        internal fun afterAll() {
+            println("AfterAll : 테스트 실행 이후 단 한 번 실행됨")
+        }
+
+    }
+
+    @BeforeEach
+    internal fun beforeEach() {
+        println("BeforeEach : 모든 테스트 마다 실행되기 이전 실행")
+    }
+
+    @AfterEach
+    internal fun afterEach() {
+        println("AfterEach : 모든 테스트 마다 실행 이후 실행")
+    }
+
+    @Test
+    internal fun `test code1`() {
+        println("test code run 1")
+    }
+
+    @Test
+    internal fun `test code2`() {
+        println("test code run 2")
+    }
+}
+```
+
+![](images/junit5-instance-5.png)
+
+테스트 결과를 보면 `@BeforeXXX`는 테스트 실행 이전 이후 1번 실행되고, `@BeforeXXX`는 테스트 메서드 실행 이전 이후 실행되는 것을 확인할 수 있습니다.
+
+위에서 설명했듯이 테스트 메서드마다 인스턴스를 새로 생성하기 때문에 `@BeforeXXX`는 `companion object(static)`으로 처리하고 있습니다.
+
+```kotlin
+internal class SampleTest {
+
+    @BeforeAll
+    internal fun beforeAll() {
+        println("BeforeAll : 테스트 실행되기 이전 단 한 번만 실행")
+    }
+
+    @AfterAll
+    internal fun afterAll() {
+        println("AfterAll : 테스트 실행 이후 단 한 번 실행됨")
+    }
+}
+```
+
+만약 위처럼 설정하면 위와 같은 에러 메시지를 확인할 수 있습니다.
+
+```
+org.junit.platform.commons.JUnitException: @BeforeAll method 'public final void com.example.querydsl.SampleTest.beforeAll$query_dsl()' must be static unless the test class is annotated with @TestInstance(Lifecycle.PER_CLASS).
+```
+
+아래 코드처럼 `TestInstance.Lifecycle.PER_CLASS`을 추가하면 테스트 코드가 잘 실행되는 것을 확인할 수 있습니다.
+
+```kotlin
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+internal class SampleTest {
+
+    @BeforeAll
+    internal fun beforeAll() {
+        println("BeforeAll : 테스트 실행되기 이전 단 한 번만 실행")
+    }
+
+    @AfterAll
+    internal fun afterAll() {
+        println("AfterAll : 테스트 실행 이후 단 한 번 실행됨")
+    }
+    ...
+}
+```
+예제가 길었지만 전하고 싶은 것은 **테스트 메서드마다 인스턴스를 새로 생성하는 것입니다.**
