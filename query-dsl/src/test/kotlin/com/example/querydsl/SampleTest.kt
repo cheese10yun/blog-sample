@@ -3,6 +3,7 @@ package com.example.querydsl
 import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 internal class SampleTest {
 
     @BeforeAll
@@ -26,11 +27,13 @@ internal class SampleTest {
     }
 
     @Test
+    @Order(1)
     internal fun `test code1`() {
         println("test code run 1")
     }
 
     @Test
+    @Order(2)
     internal fun `test code2`() {
         println("test code run 2")
     }

@@ -177,3 +177,57 @@ internal class SampleTest {
 }
 ```
 예제가 길었지만 전하고 싶은 것은 **테스트 메서드마다 인스턴스를 새로 생성하는 것입니다.**
+
+## 테스트 순서
+
+![](images/junit5-instance-5.png)
+
+Junit5에는 테스트 코드 실행 순서는 명확하게 정해져있지 않습니다.(정확히는 순서가 있지만 그것이 명시적으로 정해져있지는 않은 거 같습니다.) 물론 테스트 간의 디펜더시를 줄이기 위해서는 테스트 간의 순서가 없는 것이 더 바람직합니다.
+
+하지만 특정 테스트에서는 순서를 명시해야 할 필요성도 있습니다. `@TestMethodOrder(MethodOrderer.OrderAnnotation::class)`을 사용하면 테스트 순서를 명시적으로 지정할 수 있습니다.
+
+```kotlin
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
+internal class SampleTest {
+
+    @BeforeAll
+    internal fun beforeAll() {
+        println("BeforeAll : 테스트 실행되기 이전 단 한 번만 실행")
+    }
+
+    @AfterAll
+    internal fun afterAll() {
+        println("AfterAll : 테스트 실행 이후 단 한 번 실행됨")
+    }
+
+    @BeforeEach
+    internal fun beforeEach() {
+        println("BeforeEach : 모든 테스트 마다 실행되기 이전 실행")
+    }
+
+    @AfterEach
+    internal fun afterEach() {
+        println("AfterEach : 모든 테스트 마다 실행 이후 실행")
+    }
+
+    @Test
+    @Order(1)
+    internal fun `test code1`() {
+        println("test code run 1")
+    }
+
+    @Test
+    @Order(2)
+    internal fun `test code2`() {
+        println("test code run 2")
+    }
+}
+```
+
+![](images/junit5-instance-6.png)
+
+`@Order()`을 사용하면 위와 같이 테스트 순서를 보장 받을 수 있습니다. **`value` 값이 낮을수록 테스트 코드 우선순위가 높습니다.**
+
+## 정리
+`Junit5`에서는 테스트마다 새로운 인스턴스 생성, 테스트 간의 순서를 보장하지 않습니다. 그러한 이유는 이런 방식으로 테스트 코드를 작성하는 것이 더 좋은 방법이라 생각하여 가이드를 하는 거 같습니다. 이러한 부분을 명확하게 이해하고 위와 같은 방법을 사용하는 것이 좋을 거 같습니다.
