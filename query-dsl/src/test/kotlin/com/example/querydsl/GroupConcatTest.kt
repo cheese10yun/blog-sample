@@ -5,12 +5,10 @@ import com.example.querydsl.domain.Team
 import com.example.querydsl.dto.QMemberGroupConcat
 import com.querydsl.core.types.dsl.Expressions
 import org.junit.jupiter.api.Test
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
 import javax.persistence.EntityManager
 import com.example.querydsl.domain.QMember.member as qMember
 
-@ActiveProfiles("mysql")
 @Transactional
 internal class GroupConcatTest(
     private val em: EntityManager
@@ -48,7 +46,7 @@ internal class GroupConcatTest(
         val teamA = Team("teamA")
         em.persist(teamA)
 
-        (1..2).map {
+        (1..200).map {
             em.persist(Member(username = "member-$it", age = it, team = teamA))
         }
 

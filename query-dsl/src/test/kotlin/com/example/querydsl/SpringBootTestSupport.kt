@@ -27,9 +27,10 @@ abstract class SpringBootTestSupport {
     protected lateinit var query: JPAQueryFactory
 
     @Container
-    private val mysqlTestContainer = MySQLContainer<Nothing>()
+    protected val mysqlTestContainer = MySQLContainer<Nothing>()
         .apply {
             withDatabaseName("sample")
+            setCommand("--sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION")
             start()
         }
 
