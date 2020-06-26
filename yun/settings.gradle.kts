@@ -21,6 +21,9 @@ include(
 include(
     "support"
 )
+include(
+    "test-support"
+)
 
 pluginManagement {
     repositories {

@@ -6,5 +6,6 @@ plugins{
 subprojects {
     dependencies {
         api(project(":domain"))
+        api(project(":test-support"))
     }
 }

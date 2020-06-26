@@ -19,5 +19,6 @@ internal class CouponRepositoryTest(
         }
 
         couponRepository.saveAll(coupons)
+
     }
 }

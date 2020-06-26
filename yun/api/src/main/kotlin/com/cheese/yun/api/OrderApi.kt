@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.math.BigDecimal
 
 @RestController
-@RequestMapping("api/orders")
+@RequestMapping("/api/orders")
 class OrderApi(
     private val orderRepository: OrderRepository,
     private val orderService: OrderService
