@@ -1,6 +1,5 @@
 package com.example.querydsl.domain
 
-
 import com.example.querydsl.SpringBootTestSupport
 import com.example.querydsl.dto.MemberDtoQueryProjection
 import com.querydsl.core.types.Projections
@@ -15,8 +14,10 @@ internal class MemberTest2(
     private val em: EntityManager
 ) : SpringBootTestSupport() {
 
-    @BeforeEach
-    internal fun setUp() {
+
+    @Test
+    internal fun `query dsl projection dto 2`() {
+
         val teamA = Team("teamA")
         val teamB = Team("teamB")
 
@@ -35,19 +36,14 @@ internal class MemberTest2(
 
         em.flush()
         em.clear()
-    }
 
-    @Test
-    internal fun `query dsl projection dto 2`() {
+        Thread.sleep(100_000)
 
-        val databaseName = mysqlTestContainer.databaseName
+        val privilegedMode = mysqlTestContainer.isPrivilegedMode
+        println("=======================")
+        println(privilegedMode)
+        println("=======================")
 
-        val env = mysqlTestContainer.env
-        println(databaseName)
-
-        for (e in env) {
-            println(e)
-        }
         val members = query
             .select(Projections.constructor(
                 MemberDtoQueryProjection::class.java,
@@ -55,7 +51,7 @@ internal class MemberTest2(
                 qMember.age.max().`as`("age")
             ))
             .from(qMember)
-//            .groupBy(qMember.age)
+            .groupBy(qMember.age)
             .fetch()
 
         for (member in members) {

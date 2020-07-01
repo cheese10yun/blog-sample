@@ -42,6 +42,7 @@ dependencies {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
 
+    testImplementation("org.testcontainers:testcontainers:1.14.3")
     testImplementation("org.testcontainers:junit-jupiter:1.14.3")
     testImplementation("org.testcontainers:mysql:1.14.3")
 

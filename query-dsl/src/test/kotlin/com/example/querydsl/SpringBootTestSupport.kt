@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
+import org.testcontainers.containers.DockerComposeContainer
 import org.testcontainers.containers.MySQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.io.File
 import javax.persistence.EntityManager
 import javax.persistence.EntityManagerFactory
 import javax.persistence.EntityTransaction
@@ -30,9 +32,15 @@ abstract class SpringBootTestSupport {
     protected val mysqlTestContainer = MySQLContainer<Nothing>()
         .apply {
             withDatabaseName("sample")
-            withCommand("sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION")
+            withCommand("mysqld", "--ql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION")
+            withPrivilegedMode(true)
+            withInitScript("set.sql")
             start()
         }
+
+//    @Container
+//    protected val dockerComposeContainer = DockerComposeContainer<Nothing>(File("src/test/resources/docker-compose.yaml"))
+
 
     protected val entityManager: EntityManager by lazy {
         entityManagerFactory.createEntityManager()
