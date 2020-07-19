@@ -2,6 +2,8 @@ package com.example.querydsl;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.Test;
 
 public class AAA {
@@ -32,6 +34,20 @@ public class AAA {
         Function<Integer, String> fuc = String::valueOf;
         final String apply = fuc.apply(1);
 
+    }
+
+    @Test
+    void asdasd() {
+
+        Supplier<Greeting> greeting = Greeting::new;
+
+        final Greeting greeting1 = greeting.get();
+
+        UnaryOperator<String> hello = greeting1::hello;
+
+        final String asdasd = hello.apply("asdasd");
+
+        System.out.println(asdasd);
 
     }
 }
@@ -42,4 +58,27 @@ class JPlus10 implements Function<Integer, Integer> {
     public Integer apply(Integer integer) {
         return integer + 10;
     }
+}
+
+
+class Greeting {
+
+    private String name;
+
+    public Greeting() {
+    }
+
+    public Greeting(String name) {
+        this.name = name;
+    }
+
+    public String hello(String name) {
+        return "hello" + name;
+    }
+
+    public static String hi(String name) {
+        return "hi" + name;
+    }
+
+
 }
