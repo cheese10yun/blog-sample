@@ -5,10 +5,11 @@ import org.springframework.boot.runApplication
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toMono
 import java.util.concurrent.ConcurrentHashMap
 
 @SpringBootApplication
@@ -24,16 +25,16 @@ class CustomerController(
 ) {
 
     @GetMapping("/customer/{id}")
-    fun getCustomer(@PathVariable id: Int): ResponseEntity<Customer> {
-        return ResponseEntity(customerService.getCustomer(id), HttpStatus.OK)
-    }
+    fun getCustomer(@PathVariable id: Int): ResponseEntity<Mono<Customer>> =
+        ResponseEntity(customerService.getCustomer(id), HttpStatus.OK)
 
     @GetMapping("/customer")
-    fun getCustomers(@RequestParam(required = false, defaultValue = "") nameFilter: String): ResponseEntity<List<Customer>> {
-        return ResponseEntity(customerService.searchCustomers(nameFilter), HttpStatus.OK)
-    }
+    fun getCustomers(@RequestParam(required = false, defaultValue = "") nameFilter: String) =
+        ResponseEntity(customerService.searchCustomers(nameFilter), HttpStatus.OK)
 
-
+    @PostMapping("/customer")
+    fun createCustomer(@RequestBody customerMono: Mono<Customer>) =
+        ResponseEntity(customerService.createCustomer(customerMono), HttpStatus.CREATED)
 }
 
 data class Customer(
@@ -48,8 +49,9 @@ data class Telephone(
 )
 
 interface CustomerService {
-    fun getCustomer(id: Int): Customer?
-    fun searchCustomers(nameFilter: String): List<Customer>
+    fun getCustomer(id: Int): Mono<Customer>?
+    fun searchCustomers(nameFilter: String): Flux<Customer>
+    fun createCustomer(customerMono: Mono<Customer>): Mono<*>
 
 }
 
@@ -66,13 +68,18 @@ class CustomerServiceImpl : CustomerService {
         val customers = ConcurrentHashMap<Int, Customer>(initialCustomers.associateBy(Customer::id))
     }
 
-    override fun getCustomer(id: Int) = customers[id]
+    override fun getCustomer(id: Int) = customers[id]?.toMono()
 
-    override fun searchCustomers(nameFilter: String): List<Customer> {
+    override fun searchCustomers(nameFilter: String): Flux<Customer> {
         return customers.filter {
             it.value.name.contains(nameFilter, true)
-        }.map(Map.Entry<Int, Customer>::value).toList()
+        }.map(Map.Entry<Int, Customer>::value).toFlux()
     }
 
-
+    override fun createCustomer(customerMono: Mono<Customer>): Mono<*> {
+        return customerMono.map {
+            customers[it.id] = it
+            Mono.empty<Any>()
+        }
+    }
 }
