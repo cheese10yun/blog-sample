@@ -47,7 +47,7 @@ Content-Type: application/json
 ###
 
 POST http://localhost:8080/functional/customer/1
-Content-Type: application/json
+Content-Type: application/jsonk
 
 {
   "name": "Microservice",
