@@ -1,9 +1,12 @@
 package com.example.webflux
 
+import com.example.webflux.CustomerServiceImpl.Companion.initialCustomers
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.data.mongodb.core.ReactiveMongoOperations
+import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
@@ -47,6 +50,7 @@ class CustomerController(
         ResponseEntity(customerService.createCustomer(customerMono), HttpStatus.CREATED)
 }
 
+@Document
 data class Customer(
     var id: Int = 0,
     var name: String = "",
@@ -58,6 +62,8 @@ data class Telephone(
     var telephoneNumber: String = ""
 )
 
+interface CustomerRepository : ReactiveCrudRepository<Customer, Int>
+
 interface CustomerService {
     fun getCustomer(id: Int): Mono<Customer>
     fun searchCustomers(nameFilter: String): Flux<Customer>
@@ -68,7 +74,6 @@ interface CustomerService {
 class CustomerServiceImpl : CustomerService {
     companion object {
         val initialCustomers = listOf(
-            Customer(1, "kotlin"),
             Customer(2, "Spring"),
             Customer(3, "Microservice", Telephone("+82", "01029333211111"))
         )
@@ -163,7 +168,8 @@ class CustomerExistException(override val message: String) : Exception(message)
 
 @Component
 class DatabaseInitializer(
-    private val reactiveMongoOperations: ReactiveMongoOperations
+    private val reactiveMongoOperations: ReactiveMongoOperations,
+    private val customerRepository: CustomerRepository
 ) {
     @PostConstruct
     fun initData() {
@@ -173,7 +179,12 @@ class DatabaseInitializer(
                 it.not() -> reactiveMongoOperations.createCollection("Customers").subscribe {
                     println("Customers collections created")
                 }
-                else -> println("Customers collections already exist")
+                else -> {
+                    println("Customers collections already exist")
+                    customerRepository.saveAll(initialCustomers).subscribe {
+                        println("Default customer created")
+                    }
+                }
             }
         }
     }
