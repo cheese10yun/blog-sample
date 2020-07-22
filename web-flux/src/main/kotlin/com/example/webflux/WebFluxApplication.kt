@@ -3,6 +3,7 @@ package com.example.webflux
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.data.mongodb.core.ReactiveMongoOperations
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
@@ -19,6 +20,7 @@ import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.util.concurrent.ConcurrentHashMap
+import javax.annotation.PostConstruct
 
 @SpringBootApplication
 class WebFluxApplication
@@ -157,3 +159,22 @@ class CustomerHandler(
 }
 
 class CustomerExistException(override val message: String) : Exception(message)
+
+
+@Component
+class DatabaseInitializer(
+    private val reactiveMongoOperations: ReactiveMongoOperations
+) {
+    @PostConstruct
+    fun initData() {
+
+        reactiveMongoOperations.collectionExists("Customers").subscribe {
+            when {
+                it.not() -> reactiveMongoOperations.createCollection("Customers").subscribe {
+                    println("Customers collections created")
+                }
+                else -> println("Customers collections already exist")
+            }
+        }
+    }
+}
