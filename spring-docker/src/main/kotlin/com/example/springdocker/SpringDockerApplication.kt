@@ -17,5 +17,4 @@ class GreetingsController {
 
     @GetMapping("/greetings")
     fun greetings() = "hello form docker"
-
 }
