@@ -32,5 +32,4 @@ hello form docker
 $ docker login
 $ docker build . t <your docker hub ID>/spring-docker
 $ docker push <your docker hub ID>/spring-docker
-
 ```
