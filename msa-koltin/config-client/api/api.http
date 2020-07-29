@@ -1,0 +1,16 @@
+POST http://localhost:8080/licenses?page=0&size=2
+Content-Type: application/json
+
+{}
+
+###
+
+GET http://localhost:8080/licenses
+Accept: application/json
+
+###
+
+GET http://localhost:8080/licenses/property
+Accept: application/json
+
+###

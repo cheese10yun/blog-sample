@@ -1,0 +1,9 @@
+### GET request with a header
+GET http://localhost:8888/licensingservice/default
+Accept: application/json
+
+
+
+### GET request with a header
+GET http://localhost:8888/licensingservice/native
+Accept: application/json

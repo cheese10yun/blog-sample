@@ -1,0 +1,13 @@
+example.property: "default"
+spring.jpa.database: "mysql"
+spring.jpa.hibernate.ddl-auto: create
+spring.jpa.show-sql: "true"
+spring.database.driverClassName: "com.mysql.cj.jdbc.Driver"
+spring.datasource.url: "jdbc:mysql://localhost:3366/sample?useSSL=false&serverTimezone=UTC&autoReconnect=true"
+spring.datasource.username: "root"
+spring.datasource.password: ""
+spring.datasource.testWhileIdle: "true"
+spring.datasource.validationQuery: "SELECT 1"
+redis.server: "redis"
+redis.port: "6379"
+signing.key: "345345fsdfsf5345"
