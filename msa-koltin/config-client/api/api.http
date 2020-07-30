@@ -14,3 +14,6 @@ GET http://localhost:8080/licenses/property
 Accept: application/json
 
 ###
+
+POST http://localhost:8080/actuator/refresh
+Accept: application/json

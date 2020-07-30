@@ -2,14 +2,14 @@ server:
     port: 8888
 
 spring:
-    profiles:
-        active: native
+#    profiles:
+#        active: native
 
     cloud:
         config:
             server:
-                encrypt.enabled: false
+                encrypt.enabled: true
                 git:
                     uri: https://github.com/cheese10yun/msa-study-sample
                     search-paths:
-                        - licensingservice
+                        - "licensingservice"

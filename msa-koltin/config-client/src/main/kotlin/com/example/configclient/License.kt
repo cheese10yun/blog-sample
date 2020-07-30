@@ -3,6 +3,7 @@ package com.example.configclient
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cloud.context.config.annotation.RefreshScope
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import org.springframework.data.jpa.repository.JpaRepository
@@ -51,6 +52,7 @@ class LicenseApi(
 }
 
 @Component
+@RefreshScope
 class ServiceConfig {
     @Value("\${example.property}")
     lateinit var exampleProperty: String
