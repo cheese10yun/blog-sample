@@ -8,5 +8,8 @@ spring:
     cloud:
         config:
             server:
-                native:
-                    search-locations: file:///Users/yun.cheese/yun/blog-sample/msa-koltin/config-server/src/main/resources/config/licensingservice
+                encrypt.enabled: false
+                git:
+                    uri: https://github.com/cheese10yun/msa-study-sample
+                    search-paths:
+                        - licensingservice
