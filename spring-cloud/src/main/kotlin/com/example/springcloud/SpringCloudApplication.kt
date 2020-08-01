@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class SpringCloudApplication
 
 fun main(args: Array<String>) {
-    runApplication<SpringCloudApplication>(*args)
+	runApplication<SpringCloudApplication>(*args)
 }
