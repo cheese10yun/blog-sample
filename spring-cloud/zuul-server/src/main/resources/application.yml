@@ -1,14 +1,14 @@
 server:
-    port: 8082
+    port: 5555
+
 spring:
     application:
-        name: licensing-service
-    profiles:
-        active: default
-
-    cloud:
-        config:
-            uri: http://localhost:8888
+        name: zuul-server
+zuul:
+    ignored-services: "organization-service"
+    prefix: "/api"
+    routes:
+        organization-service: "/organization/**"
 
 eureka:
     instance:
@@ -26,11 +26,7 @@ management:
                 include:
                     - "info"
                     - "health"
-                    - "refresh"
-                    - "hystrix.stream"
+                    - "routes"
     endpoint:
-        refresh:
+        routes:
             enabled: true
-        hystrix:
-            stream:
-                enabled: true

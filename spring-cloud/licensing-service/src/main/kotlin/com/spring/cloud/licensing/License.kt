@@ -66,7 +66,12 @@ class LicenseApi(
 
     @GetMapping("/{id}")
     @HystrixCommand(
-        fallbackMethod = "buildFallbackLicense"
+        fallbackMethod = "buildFallbackLicense",
+        threadPoolKey = "licenseThreadPool",
+        threadPoolProperties = [
+            HystrixProperty(name = "coreSize", value = "30"),
+            HystrixProperty(name = "maxQueueSize", value = "10")
+        ]
     )
     fun getBy(@PathVariable id: Long): LicenseResponse {
         randomSleep()

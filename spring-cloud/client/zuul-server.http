@@ -1,0 +1,19 @@
+GET {{zuul-server}}/api/licensing-service/licenses/1
+Accept: application/json
+
+###
+
+GET {{zuul-server}}/api/organization/organizations/1
+Accept: application/json
+
+###
+
+GET {{zuul-server}}/actuator
+Accept: application/json
+
+###
+
+GET {{zuul-server}}/actuator/routes
+Accept: application/json
+
+###
