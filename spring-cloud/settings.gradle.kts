@@ -2,6 +2,7 @@ rootProject.name = "spring-cloud"
 
 include("config-server")
 include("eureka-server")
+include("hystrix-server")
 
 include("licensing-service")
 include("organization-service")

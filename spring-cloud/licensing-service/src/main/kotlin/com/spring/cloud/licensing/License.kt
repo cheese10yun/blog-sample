@@ -41,9 +41,9 @@ class LicenseApi(
 
     @GetMapping
     @HystrixCommand(
-        commandProperties = [
-            HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "12000")
-        ]
+//        commandProperties = [
+//            HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "12000")
+//        ]
     )
 
     fun getByPage(pageable: Pageable): Page<License> {

@@ -1,0 +1,18 @@
+server:
+    port: 8989
+
+spring:
+    application:
+        name: hystrix-server
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include:
+                    - "info"
+                    - "health"
+                    - "refresh"
+    endpoint:
+        refresh:
+            enabled: true

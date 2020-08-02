@@ -27,6 +27,10 @@ management:
                     - "info"
                     - "health"
                     - "refresh"
+                    - "hystrix.stream"
     endpoint:
         refresh:
             enabled: true
+        hystrix:
+            stream:
+                enabled: true
