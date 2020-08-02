@@ -1,0 +1,4 @@
+GET {{organization-service}}/organizations/1
+Accept: application/json
+
+###

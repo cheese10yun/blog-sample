@@ -31,22 +31,28 @@ interface LicenseRepository : JpaRepository<License, Long>
 @RequestMapping("/licenses")
 class LicenseApi(
     private val licenseRepository: LicenseRepository,
-    private val serviceConfig: ServiceConfig
+    private val serviceConfig: ServiceConfig,
+    private val organizationClient: OrganizationClient
 ) {
 
     @GetMapping
     fun getByPage(pageable: Pageable) =
         licenseRepository.findAll(pageable)
 
-
     @PostMapping
     fun create() {
         licenseRepository.save(License(UUID.randomUUID().toString(), "name"))
     }
 
+    @GetMapping("/organizations/{organizationId}")
+    fun getOrganizationId(@PathVariable organizationId: Long) =
+        organizationClient.getOrganization(organizationId)
+
+
     @GetMapping("/property")
     fun getProperty() =
         serviceConfig.exampleProperty
+
 }
 
 @Component
@@ -60,7 +66,14 @@ class ServiceConfig {
 interface OrganizationClient {
 
     @GetMapping("/organizations/{organizationId}")
-    fun getOrganization(@PathVariable organizationId: String)
+    fun getOrganization(@PathVariable organizationId: Long): OrganizationResponse
+
+    data class OrganizationResponse(
+        val name: String,
+        val contactName: String,
+        val contactEmail: String,
+        val contactPhone: String
+    )
 }
 
 

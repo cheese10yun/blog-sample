@@ -12,3 +12,8 @@ POST {{licensing-service}}/actuator/refresh
 Accept: application/json
 
 ###
+
+GET {{licensing-service}}/licenses/organizations/1
+Accept: application/json
+
+###
