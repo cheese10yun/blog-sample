@@ -4,11 +4,20 @@ spring:
     application:
         name: licensing-service
     profiles:
-        active: dev
+        active: default
 
     cloud:
         config:
             uri: http://localhost:8888
+
+eureka:
+    instance:
+        prefer-ip-address: true
+    client:
+        register-with-eureka: true
+        fetch-registry: true
+        service-url:
+            default-zone: http://localhost:8761/eureka/
 
 management:
     endpoints:

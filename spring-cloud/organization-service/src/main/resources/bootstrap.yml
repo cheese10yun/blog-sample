@@ -3,10 +3,13 @@ server:
 
 spring:
     application:
-        name: organizationservice
+        name: organization-service
     profiles:
         active: default
 
+    cloud:
+        config:
+            uri: http://localhost:8888
 
 
 eureka:
