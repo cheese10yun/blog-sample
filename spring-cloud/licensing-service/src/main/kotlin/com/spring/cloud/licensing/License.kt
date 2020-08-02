@@ -25,9 +25,7 @@ data class License(
     @Column(name = "product_name", nullable = false)
     var productName: String
 
-) : EntityAuditing() {
-
-}
+) : EntityAuditing()
 
 interface LicenseRepository : JpaRepository<License, Long>
 

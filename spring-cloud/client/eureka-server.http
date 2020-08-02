@@ -1,0 +1,5 @@
+# Eureka Server
+GET {{eureka-server}}/eureka/apps/organization-service
+Accept: application/json
+
+###
