@@ -1,10 +1,14 @@
 package com.spring.cloud.licensing
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.context.config.annotation.RefreshScope
+import org.springframework.cloud.netflix.ribbon.RibbonClient
 import org.springframework.cloud.openfeign.FeignClient
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import org.springframework.data.jpa.repository.JpaRepository
@@ -36,8 +40,19 @@ class LicenseApi(
 ) {
 
     @GetMapping
-    fun getByPage(pageable: Pageable) =
-        licenseRepository.findAll(pageable)
+    @HystrixCommand(
+        commandProperties = [
+            HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "12000")
+        ]
+    )
+
+    fun getByPage(pageable: Pageable): Page<License> {
+        if (Random().nextInt((3 - 1) + 1) + 1 == 3) {
+            Thread.sleep(11000)
+        }
+
+        return licenseRepository.findAll(pageable)
+    }
 
     @PostMapping
     fun create() {
@@ -45,6 +60,7 @@ class LicenseApi(
     }
 
     @GetMapping("/organizations/{organizationId}")
+    @HystrixCommand
     fun getOrganizationId(@PathVariable organizationId: Long) =
         organizationClient.getOrganization(organizationId)
 
@@ -63,6 +79,7 @@ class ServiceConfig {
 }
 
 @FeignClient("organization-service")
+@RibbonClient("organization-service")
 interface OrganizationClient {
 
     @GetMapping("/organizations/{organizationId}")
