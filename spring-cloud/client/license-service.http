@@ -1,3 +1,8 @@
+GET {{licensing-service}}/licenses/1
+Content-Type: application/json
+
+###
+
 GET {{licensing-service}}/licenses?page=0&size=2
 Content-Type: application/json
 

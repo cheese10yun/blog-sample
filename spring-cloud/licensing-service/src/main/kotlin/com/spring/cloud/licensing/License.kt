@@ -41,15 +41,15 @@ class LicenseApi(
 
     @GetMapping
     @HystrixCommand(
-//        commandProperties = [
+        //        commandProperties = [
 //            HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "12000")
-//        ]
+//        ],
+        commandProperties = [
+            HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "10000")
+        ]
     )
-
     fun getByPage(pageable: Pageable): Page<License> {
-        if (Random().nextInt((3 - 1) + 1) + 1 == 3) {
-            Thread.sleep(11000)
-        }
+        randomSleep()
 
         return licenseRepository.findAll(pageable)
     }
@@ -60,15 +60,36 @@ class LicenseApi(
     }
 
     @GetMapping("/organizations/{organizationId}")
-    @HystrixCommand
-    fun getOrganizationId(@PathVariable organizationId: Long) =
-        organizationClient.getOrganization(organizationId)
+    fun getOrganizationId(@PathVariable organizationId: Long): OrganizationClient.OrganizationResponse {
+        return organizationClient.getOrganization(organizationId)
+    }
 
+    @GetMapping("/{id}")
+    @HystrixCommand(
+        fallbackMethod = "buildFallbackLicense"
+    )
+    fun getBy(@PathVariable id: Long): LicenseResponse {
+        randomSleep()
+        return LicenseResponse(licenseRepository.findById(id).orElseThrow { IllegalArgumentException("$id is not found") })
+    }
+
+    class LicenseResponse constructor(license: License) {
+        val organizationId = license.organizationId
+        val productName = license.productName
+    }
+
+    private fun buildFallbackLicense(id: Long) =
+        LicenseResponse(License("default value $id ", "default value"))
+
+    private fun randomSleep() {
+        if (Random().nextInt((3 - 1) + 1) + 1 == 3) {
+            Thread.sleep(11000)
+        }
+    }
 
     @GetMapping("/property")
     fun getProperty() =
         serviceConfig.exampleProperty
-
 }
 
 @Component
@@ -86,6 +107,7 @@ interface OrganizationClient {
     fun getOrganization(@PathVariable organizationId: Long): OrganizationResponse
 
     data class OrganizationResponse(
+        val id: Long,
         val name: String,
         val contactName: String,
         val contactEmail: String,
