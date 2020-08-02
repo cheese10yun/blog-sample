@@ -9,9 +9,7 @@ plugins {
     kotlin("plugin.jpa") apply false
 }
 
-group = "com.example"
-version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+
 
 extra["springCloudVersion"] = "Hoxton.SR6"
 
@@ -34,11 +32,7 @@ allprojects{
 //    }
 //}
 //
-//dependencyManagement {
-//    imports {
-//        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
-//    }
-//}
+
 
 subprojects {
     apply(plugin = "java")
@@ -70,9 +64,12 @@ subprojects {
         kapt("org.springframework.boot:spring-boot-configuration-processor")
         compileOnly("org.springframework.boot:spring-boot-configuration-processor")
 
-        implementation("com.google.guava:guava:$guavaVersion")
-        implementation("org.apache.commons:commons-lang3")
-        implementation("org.slf4j:slf4j-api")
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+        }
     }
 
     tasks.bootJar {
@@ -110,6 +107,10 @@ subprojects {
         systemProperty("spring.profiles.active", "test")
         maxHeapSize = "1g"
     }
+
+    group = "com.example"
+    version = "0.0.1-SNAPSHOT"
+    java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 }
 
