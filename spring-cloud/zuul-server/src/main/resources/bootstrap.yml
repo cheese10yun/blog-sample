@@ -5,10 +5,11 @@ spring:
     application:
         name: zuul-server
 zuul:
-    ignored-services: "organization-service"
+    ignored-services: "*"
     prefix: "/api"
     routes:
         organization-service: "/organization/**"
+        licensing-service: "/licensing/**"
 
 eureka:
     instance:
@@ -27,6 +28,3 @@ management:
                     - "info"
                     - "health"
                     - "routes"
-    endpoint:
-        routes:
-            enabled: true
