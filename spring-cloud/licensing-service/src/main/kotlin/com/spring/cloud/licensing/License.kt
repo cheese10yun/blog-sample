@@ -4,14 +4,12 @@ import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.context.config.annotation.RefreshScope
+import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Component
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
@@ -56,6 +54,13 @@ class LicenseApi(
 class ServiceConfig {
     @Value("\${example.property}")
     lateinit var exampleProperty: String
+}
+
+@FeignClient("organization-service")
+interface OrganizationClient {
+
+    @GetMapping("/organizations/{organizationId}")
+    fun getOrganization(@PathVariable organizationId: String)
 }
 
 

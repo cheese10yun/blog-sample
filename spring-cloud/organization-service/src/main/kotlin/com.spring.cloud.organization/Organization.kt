@@ -2,13 +2,19 @@ package com.spring.cloud.organization
 
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 import javax.persistence.*
 
 
 @Entity
-@Table(name = "organizations")
+@Table(name = "organization")
 class Organization(
     @Column(name = "name", nullable = false)
     var name: String,
@@ -23,10 +29,26 @@ class Organization(
     var contactPhone: String
 ) : EntityAuditing()
 
+interface OrganizationRepository : JpaRepository<Organization, Long>
+
+@RestController
+@RequestMapping("/organizations")
+class OrganizationApi(
+    private val organizationRepository: OrganizationRepository
+) {
+    @GetMapping
+    fun getByPage(pageable: Pageable) =
+        organizationRepository.findAll(pageable)
+
+    @GetMapping("/{organizationId}")
+    fun getById(@PathVariable organizationId: Long) =
+        organizationRepository.findById(organizationId).orElseThrow { IllegalArgumentException("$organizationId is not found") }
+}
+
+
 @EntityListeners(value = [AuditingEntityListener::class])
 @MappedSuperclass
 abstract class EntityAuditing {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
