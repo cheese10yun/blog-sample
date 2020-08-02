@@ -48,8 +48,11 @@ class LicenseApi(
             HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "10000")
         ]
     )
-    fun getByPage(pageable: Pageable): Page<License> {
-        randomSleep()
+    fun getByPage(pageable: Pageable, @RequestParam sleep: Long?): Page<License> {
+
+        sleep?.let {
+            Thread.sleep(it)
+        }
 
         return licenseRepository.findAll(pageable)
     }

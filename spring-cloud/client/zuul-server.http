@@ -1,4 +1,4 @@
-GET {{zuul-server}}/api/licensing/licenses
+GET {{zuul-server}}/api/licensing/licenses?size=10&page=10&sleep=1000
 Accept: application/json
 
 ###

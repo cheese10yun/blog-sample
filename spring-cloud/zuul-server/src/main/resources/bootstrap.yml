@@ -4,12 +4,13 @@ server:
 spring:
     application:
         name: zuul-server
-#zuul:
-#    ignored-services: "*"
-#    prefix: "/api"
-#    routes:
-#        organization-service: "/organization/**"
-#        licensing-service: "/licensing/**"
+
+zuul:
+    ignored-services: "*"
+    prefix: "/api"
+    routes:
+        organization-service: "/organization/**"
+        licensing-service: "/licensing/**"
 
 eureka:
     instance:
@@ -19,6 +20,12 @@ eureka:
         fetch-registry: true
         service-url:
             default-zone: http://localhost:8761/eureka/
+
+hystrix:
+    command:
+        default.execution.isolation.thread.timeoutInMilliseconds: 2500
+        license-service.execution.isolation.thread.timeoutInMilliseconds: 7000
+
 
 management:
     endpoints:
