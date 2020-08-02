@@ -12,3 +12,4 @@ spring:
                     uri: https://github.com/cheese10yun/msa-study-sample
                     search-paths:
                         - "licensing-service"
+                        - "organization-service"
