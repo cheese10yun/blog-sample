@@ -23,9 +23,12 @@ eureka:
 
 hystrix:
     command:
-        default.execution.isolation.thread.timeoutInMilliseconds: 2500
-        license-service.execution.isolation.thread.timeoutInMilliseconds: 7000
+        default.execution.isolation.thread.timeoutInMilliseconds: 5000
+        licensing-service.execution.isolation.thread.timeoutInMilliseconds: 5000
 
+licensing-service:
+    ribbon:
+        ReadTimeout: 4000
 
 management:
     endpoints:
