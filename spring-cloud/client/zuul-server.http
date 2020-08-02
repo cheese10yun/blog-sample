@@ -1,4 +1,4 @@
-GET {{zuul-server}}/api/licensing-service/licenses/1
+GET {{zuul-server}}/api/licensing/licenses
 Accept: application/json
 
 ###
@@ -14,6 +14,11 @@ Accept: application/json
 ###
 
 GET {{zuul-server}}/actuator/routes
+Accept: application/json
+
+###
+
+POST {{zuul-server}}/actuator/refresh
 Accept: application/json
 
 ###
