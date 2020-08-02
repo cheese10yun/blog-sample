@@ -61,6 +61,7 @@ subprojects {
         implementation(kotlin("reflect"))
 
         implementation("org.springframework.boot:spring-boot-starter")
+        implementation("org.springframework.boot:spring-boot-starter-actuator")
         kapt("org.springframework.boot:spring-boot-configuration-processor")
         compileOnly("org.springframework.boot:spring-boot-configuration-processor")
 
@@ -108,7 +109,7 @@ subprojects {
         maxHeapSize = "1g"
     }
 
-    group = "com.example"
+    group = "com.spring.cloud"
     version = "0.0.1-SNAPSHOT"
     java.sourceCompatibility = JavaVersion.VERSION_1_8
 

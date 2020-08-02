@@ -1,5 +1,8 @@
 rootProject.name = "spring-cloud"
 
+include("config-server")
+include("eureka-server")
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
