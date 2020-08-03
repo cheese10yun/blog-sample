@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+    rabbitmq:
+        container_name: spring.cloud.rabbitmq
+        image: rabbitmq:3.7-management
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        environment:
+            - RABBITMQ_DEFAULT_USER = user
+            - RABBITMQ_DEFAULT_PASS = user
+        hostname: bus
+        volumes:
+            - ./volumes/bus-rabbitmq:/var/lib/rabbitmq
+
+    mysql_member:
+        container_name: spring.cloud.mysql
+        image: mysql/mysql-server:5.7
+        environment:
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_DATABASE: 'spring-cloud'
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        ports:
+            - '3377:3306'
+        volumes:
+            - './volumes/mysql/default:/var/lib/mysql'
+        command:
+            - 'mysqld'
+            - '--character-set-server=utf8mb4'
+            - '--collation-server=utf8mb4_unicode_ci'
+            - --sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+
