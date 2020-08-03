@@ -25,6 +25,10 @@ eureka:
         service-url:
             default-zone: http://localhost:8761/eureka/
 
+logging:
+    level:
+        ROOT: info
+
 
 management:
     endpoints:

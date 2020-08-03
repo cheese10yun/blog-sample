@@ -1,6 +1,11 @@
 # licenses
 
-GET {{zuul-server}}/api/licensing/licenses?size=10&page=10&sleep=3500
+GET {{zuul-server}}/api/licensing/licenses?size=10&page=10&sleep=1
+Accept: application/json
+
+###
+
+GET {{zuul-server}}/api/licensing/licenses/organizations/1
 Accept: application/json
 
 ###
