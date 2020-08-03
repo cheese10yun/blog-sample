@@ -23,12 +23,17 @@ eureka:
 
 hystrix:
     command:
-        default.execution.isolation.thread.timeoutInMilliseconds: 5000
-        licensing-service.execution.isolation.thread.timeoutInMilliseconds: 5000
+        default.execution.isolation.thread.timeoutInMilliseconds: 30000
+        licensing-service.execution.isolation.thread.timeoutInMilliseconds: 30000
+        organization-service.execution.isolation.thread.timeoutInMilliseconds: 30000
 
 licensing-service:
     ribbon:
-        ReadTimeout: 4000
+        ReadTimeout: 30000
+
+organization-service:
+    ribbon:
+        ReadTimeout: 30000
 
 management:
     endpoints:
@@ -38,3 +43,4 @@ management:
                     - "info"
                     - "health"
                     - "routes"
+                    - "bus-refresh"

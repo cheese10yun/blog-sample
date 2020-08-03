@@ -15,6 +15,7 @@ Accept: application/json
 
 ###
 
+# organization
 
 GET {{zuul-server}}/api/organization/organizations/1
 Accept: application/json
