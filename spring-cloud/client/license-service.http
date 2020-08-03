@@ -13,7 +13,17 @@ Accept: application/json
 
 ###
 
+GET {{licensing-service-1}}/licenses/property
+Accept: application/json
+
+###
+
 POST {{licensing-service}}/actuator/refresh
+Accept: application/json
+
+###
+
+POST {{licensing-service}}/actuator/bus-refresh
 Accept: application/json
 
 ###

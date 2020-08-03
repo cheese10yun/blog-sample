@@ -10,14 +10,10 @@ Accept: application/json
 
 ###
 
+POST {{zuul-server}}/api/licensing/actuator/bus-refresh
+Accept: application/json
 
-
-
-#
-
-
-
-
+###
 
 
 GET {{zuul-server}}/api/organization/organizations/1
