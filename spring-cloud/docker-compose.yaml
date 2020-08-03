@@ -8,8 +8,8 @@ services:
             - "5672:5672"
             - "15672:15672"
         environment:
-            - RABBITMQ_DEFAULT_USER = user
-            - RABBITMQ_DEFAULT_PASS = user
+            - RABBITMQ_DEFAULT_USER=user
+            - RABBITMQ_DEFAULT_PASS=user
         hostname: bus
         volumes:
             - ./volumes/bus-rabbitmq:/var/lib/rabbitmq
