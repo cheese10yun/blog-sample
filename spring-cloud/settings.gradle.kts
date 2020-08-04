@@ -4,6 +4,7 @@ include("config-server")
 include("eureka-server")
 include("hystrix-server")
 include("zuul-server")
+include("zipkin-server")
 
 include("licensing-service")
 include("organization-service")

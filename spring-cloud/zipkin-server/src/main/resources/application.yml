@@ -1,0 +1,13 @@
+server:
+    port: 9411
+
+spring:
+    application:
+        name: "zipkin-server"
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include:
+                    - "*"
