@@ -13,3 +13,8 @@ Accept: text/plain
 legendaiwjgnz;6icnzl1
 
 ###
+
+GET {{config-server}}/licensing-service/default
+Accept: application/json
+
+###

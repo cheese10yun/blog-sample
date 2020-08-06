@@ -5,7 +5,7 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: true
-    database-platform: com.example.querydsl.config.MysqlCustomDialect
+#    database-platform: com.example.querydsl.config.MysqlCustomDialect
     properties:
       hibernate:
         format_sql: true

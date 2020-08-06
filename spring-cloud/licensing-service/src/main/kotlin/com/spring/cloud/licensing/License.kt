@@ -96,8 +96,11 @@ class LicenseApi(
     }
 
     @GetMapping("/property")
-    fun getProperty() =
-        serviceConfig.exampleProperty
+    fun getProperty(): String {
+        val exampleProperty = serviceConfig.exampleProperty
+        println("exampleProperty: $exampleProperty")
+        return exampleProperty
+    }
 }
 
 @Component
