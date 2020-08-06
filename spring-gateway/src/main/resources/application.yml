@@ -1,0 +1,17 @@
+server:
+    port: 8081
+
+spring:
+    application:
+        name: spring-gateway
+    profiles:
+        active: default
+
+
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include:
+                    - "*"
