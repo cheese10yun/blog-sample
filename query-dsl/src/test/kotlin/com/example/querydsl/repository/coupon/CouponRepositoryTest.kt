@@ -1,7 +1,7 @@
 package com.example.querydsl.repository.coupon
 
 import com.example.querydsl.SpringBootTestSupport
-import com.example.querydsl.domain.Coupon
+import com.example.querydsl.service.Coupon
 import org.junit.jupiter.api.Test
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal

@@ -1,10 +1,9 @@
 package com.example.querydsl.repository.payment
 
 import com.example.querydsl.SpringBootTestSupport
-import com.example.querydsl.domain.Coupon
 import com.example.querydsl.domain.Payment
-import com.example.querydsl.repository.coupon.CouponRepository
 import com.example.querydsl.repository.member.MemberRepository
+import com.example.querydsl.service.Coupon
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 
