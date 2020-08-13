@@ -6,7 +6,7 @@ import javax.persistence.Entity
 import javax.persistence.Table
 
 @Entity
-@Table(name = "orders")
+@Table(name = "cart")
 class Cart(
     @Column(name = "product_id", nullable = false)
     var productId: Long,

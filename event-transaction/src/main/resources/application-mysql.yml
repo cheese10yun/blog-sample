@@ -4,20 +4,10 @@ spring:
         generate-ddl: true
         hibernate:
             ddl-auto: create
-        show-sql: true
-        database-platform: com.example.querydsl.config.MysqlCustomDialect
-        properties:
-            hibernate:
-                format_sql: true
+
     datasource:
         url: jdbc:mysql://localhost:3366/event_transaction?useSSL=false&serverTimezone=UTC&autoReconnect=true
         username: root
         password:
         driver-class-name: com.mysql.cj.jdbc.Driver
         initialization-mode: never
-
-
-logging:
-    level:
-        ROOT: info
-        org.hibernate.type.descriptor.sql.BasicBinder: trace
