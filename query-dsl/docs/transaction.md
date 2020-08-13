@@ -113,9 +113,7 @@ class SimpleService(
 2. payment insert
 3. coupon insert 진행하다 RuntimeException() 발생
 
-`savePayment()`메서드에서 `@Transactional(propagation = Propagation.REQUIRES_NEW)`설정을 했기 때문에 `1`, `3`은 Rollback이 진행되고 `2` payment는 성공적으로 commit이 진행될것이라고 판단될 수 있습니다.
-
-하지만 결과는 모두 Rollback 진행됩니다.
+`savePayment()`메서드에서 `@Transactional(propagation = Propagation.REQUIRES_NEW)`설정을 했기 때문에 `1`, `3`은 Rollback이 진행되고 `2` payment는 성공적으로 commit이 진행될것이라고 판단될 수 있습니다. 하지만 결과는 모두 Rollback 진행됩니다.
 
 ![](images/result-6.png)
 
