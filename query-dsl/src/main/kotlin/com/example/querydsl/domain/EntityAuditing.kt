@@ -24,5 +24,4 @@ abstract class EntityAuditing {
     @Column(name = "updated_at", nullable = false)
     lateinit var updatedAt: LocalDateTime
         private set
-
 }

@@ -73,6 +73,58 @@ public class SimpleJpaRepository<T, ID> implements JpaRepositoryImplementation<T
 
 `TransactionSynchronizationManager.getCurrentTransactionName()` 메서드를 통해서 현재 트랜잭션을 확인해 보면 두 메서드 모두 `null`이라는 것은`this.save()` 메서드에 있는 `@Transactional`이 동작하지 않았다는 것입니다.
 
+그렇다면 외부에서 Bean 호출시 `@Transactional`으로 시작하고 동일한 Bean(Class)에서 `this.xxx()`으로 호출시 `@Transactional` 동작을 살펴보겠습니다.
+
+```kotlin
+@Service
+class SimpleService(
+    private val couponRepository: CouponRepository,
+    private val paymentRepository: PaymentRepository,
+    private val orderRepository: OrderRepository
+) {
+
+    @Transactional
+    fun saveOrder() {
+        println("saveOrder CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        orderRepository.save(Order(
+            amount = 10.toBigDecimal(),
+            orderer = Orderer(1L, "test@test.com")
+        ))
+        this.savePayment()
+        this.saveCoupon()
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun savePayment() {
+        println("savePayment CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        paymentRepository.save(Payment(10.toBigDecimal()))
+    }
+
+    @Transactional
+    fun saveCoupon() {
+        println("saveCoupon CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        couponRepository.save(Coupon(10.toBigDecimal()))
+        throw RuntimeException()
+    }
+}
+```
+코드의 흐름은 다음과 같습니다.
+1. order insert
+2. payment insert
+3. coupon insert 진행하다 RuntimeException() 발생
+
+`savePayment()`메서드에서 `@Transactional(propagation = Propagation.REQUIRES_NEW)`설정을 했기 때문에 `1`, `3`은 Rollback이 진행되고 `2` payment는 성공적으로 commit이 진행될것이라고 판단될 수 있습니다.
+
+하지만 결과는 모두 Rollback 진행됩니다.
+
+![](images/result-6.png)
+
+`TransactionSynchronizationManager.getCurrentTransactionName()`을 통해서 현재 트랜잭션을 확인해보면 모두 동일하다는 것을 확인할 수 있습니다. 즉 전체 트랜잭션이 한 트랜잭션으로 묶이게 되어 `RuntimeException` 발생시 전체 Rollback이 진행된것입니다.
+
+다시 정리하면 Bean 내부에서 `this.xxxx()`메서드 호출시에는 Proxy를 통해서 `@Transactional`설정이 동작하지 않는다는 것입니다.
+
+
+
 ## 원인
 
 > [Spring Document](https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#transaction-declarative-annotations)
@@ -83,6 +135,8 @@ public class SimpleJpaRepository<T, ID> implements JpaRepositoryImplementation<T
 ![](images/result-3.png)
 
 즉, 위 그림처럼 CGBLIB Proxy를 통해서 `save()` 메서드가 Proxy 기반으로 `@Transactional`이 추가가 될 것을 기대했지만 호출하는 곳이 외부 Bean이 아닌 경우에는 Proxy가 인터셉트가 되지 않기 때문에 `@Transactional`이 동작하지 않게 되는 것입니다.
+
+또 `order`, `payment`, `coupon` 코드에서 확인 했듯이 외부에서 Bean을 호출 하여 Proxy가 인터럽트 했더라도 동일한 Bean에서 `this.xxxx()`(Self 호출)에서는 Proxy가 동작하지 않게 됩니다.
 
 ## 해결 방법
 
@@ -122,3 +176,51 @@ class SaveService(
 ![](images/result-4.png)
 
 `save()` 메서드에서 트랜잭션이 생겼으며 해당 아래의 작업은 동일한 트랜잭션을 묶이게 됩니다. 즉 Proxy 기반으로 `@Transactional`이 동작했으며 예외가 발생하면 모두 Rollback을 진행하게 됩니다.
+
+```kotlin
+@Service
+class SimpleService(
+    private val orderRepository: OrderRepository,
+    private val paymentSaveService: PaymentSaveService,
+    private val couponSaveService: CouponSaveService
+) {
+
+    @Transactional
+    fun saveOrder() {
+        println("saveOrder CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        orderRepository.save(Order(
+            amount = 10.toBigDecimal(),
+            orderer = Orderer(1L, "test@test.com")
+        ))
+
+        paymentSaveService.savePayment()
+        couponSaveService.saveCoupon()
+    }
+}
+
+@Service
+class PaymentSaveService(
+    private val paymentRepository: PaymentRepository
+){
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun savePayment() {
+        println("savePayment CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        paymentRepository.save(Payment(10.toBigDecimal()))
+    }
+}
+
+@Service
+class CouponSaveService(
+    private val couponRepository: CouponRepository
+){
+    @Transactional
+    fun saveCoupon() {
+        println("saveCoupon CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        couponRepository.save(Coupon(10.toBigDecimal()))
+        throw RuntimeException()
+    }
+}
+```
+![](images/result-5.png)
+
+`savePayment()` 메서드에서 현재 트랜잭션이 `savePayment`, `saveOrder`, `saveCoupon`은 트랜잭션이 `saveOrder`인것을 확인할 수 있습니다. 결과는 `@Transactional(propagation = Propagation.REQUIRES_NEW)`이 정상적으로 동작해서 `savePayment()`만 트랜잭션이 Commit하게 됩니다.

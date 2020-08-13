@@ -24,7 +24,7 @@ class CouponService(
 class SaveService(
     private val couponRepository: CouponRepository
 ) {
-    @Transactional
+//    @Transactional
     fun save(i: Int) {
         println("save CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
         (1..i).map {
