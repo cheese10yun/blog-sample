@@ -1,7 +1,15 @@
 package com.example.eventtransaction.order
 
 import com.example.eventtransaction.EntityAuditing
+import com.example.eventtransaction.cart.CartRepository
+import com.example.eventtransaction.cart.CartService
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import java.math.BigDecimal
 import javax.persistence.*
 
@@ -28,3 +36,40 @@ data class Orderer(
 )
 
 interface OrderRepository : JpaRepository<Order, Long>
+
+@RestController
+@RequestMapping("orders")
+class OrderApi(
+    private val orderService: OrderService
+) {
+
+    @PostMapping
+    fun doOrder(@RequestBody req: OrderRequest) {
+        orderService.doOrder(req)
+    }
+}
+
+@Service
+class OrderService(
+    private val orderRepository: OrderRepository,
+    private val cartService: CartService
+) {
+
+    @Transactional
+    fun doOrder(dto: OrderRequest) {
+        val order = orderRepository.save(dto.toEntity())
+        cartService.deleteCartWithOrder(order)
+    }
+}
+
+class OrderRequest(
+    val productAmount: BigDecimal,
+    val productId: Long,
+    val orderer: Orderer
+) {
+    fun toEntity() = Order(
+        productAmount = productAmount,
+        productId = productId,
+        orderer = orderer
+    )
+}
