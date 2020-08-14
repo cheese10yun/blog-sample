@@ -1,6 +1,7 @@
 package com.example.eventtransaction.cart
 
 import com.example.eventtransaction.EntityAuditing
+import org.springframework.data.jpa.repository.JpaRepository
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Table
@@ -14,3 +15,5 @@ class Cart(
     @Column(name = "member_id", nullable = false, updatable = false)
     var memberId: Long
 ) : EntityAuditing()
+
+interface CartRepository : JpaRepository<Cart, Long>

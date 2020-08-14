@@ -1,6 +1,7 @@
 package com.example.eventtransaction.order
 
 import com.example.eventtransaction.EntityAuditing
+import org.springframework.data.jpa.repository.JpaRepository
 import java.math.BigDecimal
 import javax.persistence.*
 
@@ -25,3 +26,5 @@ data class Orderer(
     @Column(name = "email", nullable = false, updatable = false)
     var email: String
 )
+
+interface OrderRepository : JpaRepository<Order, Long>
