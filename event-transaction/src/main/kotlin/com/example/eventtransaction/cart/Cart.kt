@@ -20,7 +20,6 @@ class Cart(
 ) : EntityAuditing()
 
 interface CartRepository : JpaRepository<Cart, Long> {
-
     fun deleteByProductId(productId: Long)
 }
 

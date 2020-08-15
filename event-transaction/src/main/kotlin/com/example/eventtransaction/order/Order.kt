@@ -1,7 +1,6 @@
 package com.example.eventtransaction.order
 
 import com.example.eventtransaction.EntityAuditing
-import com.example.eventtransaction.cart.CartRepository
 import com.example.eventtransaction.cart.CartService
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Service
@@ -52,13 +51,28 @@ class OrderApi(
 @Service
 class OrderService(
     private val orderRepository: OrderRepository,
-    private val cartService: CartService
+    private val cartService: CartService,
+    private val emailSender: EmailSender
 ) {
 
     @Transactional
     fun doOrder(dto: OrderRequest) {
         val order = orderRepository.save(dto.toEntity())
+        emailSender.sendOrderEmail(order)
         cartService.deleteCartWithOrder(order)
+    }
+}
+
+@Service
+class EmailSender() {
+
+    fun sendOrderEmail(order: Order) {
+        println(
+            """
+            주문자 이메일 : ${order.orderer.email}
+            주문 가격 : ${order.productAmount}
+            """.trimIndent()
+        )
     }
 }
 
