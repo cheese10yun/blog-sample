@@ -17,9 +17,7 @@ class Coupon(
 
     @Column(name = "member_id", nullable = false)
     var memberId: Long
-) : EntityAuditing() {
-
-}
+) : EntityAuditing()
 
 interface CouponRepository : JpaRepository<Coupon, Long>
 

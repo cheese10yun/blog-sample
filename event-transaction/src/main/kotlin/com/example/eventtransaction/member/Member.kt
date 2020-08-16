@@ -25,25 +25,25 @@ interface MemberRepository : JpaRepository<Member, Long>
 @RestController
 @RequestMapping("/members")
 class MemberApi(
-    private val memberSignUpService: MemberSignUpService,
-    private val emailSenderService: EmailSenderService
+    private val memberSignUpService: MemberSignUpService
 ) {
 
     fun signUp(@RequestBody dto: MemberSignUpRequest) {
         memberSignUpService.signUp(dto)
-        emailSenderService.sendSignUp(dto.toEntity())
     }
 }
 
 @Service
 class MemberSignUpService(
     private val memberRepository: MemberRepository,
-    private val couponIssueService: CouponIssueService
+    private val couponIssueService: CouponIssueService,
+    private val emailSenderService: EmailSenderService
 ) {
 
     @Transactional
     fun signUp(dto: MemberSignUpRequest) {
         val member = createMember(dto.toEntity())
+        emailSenderService.sendSignUp(member)
         couponIssueService.issueSignUpCoupon(member.id!!)
     }
 
