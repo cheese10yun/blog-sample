@@ -5,6 +5,7 @@ import com.example.eventtransaction.order.Order
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Table
@@ -29,6 +30,8 @@ class CartService(
 ) {
     @Transactional
     fun deleteCartWithOrder(order: Order) {
+        println("deleteCartWithOrder CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
         cartRepository.deleteByProductId(order.productId)
+        throw RuntimeException("runtime exception ....") // 예외 발생
     }
 }

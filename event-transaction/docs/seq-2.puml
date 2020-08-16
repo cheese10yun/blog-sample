@@ -1,0 +1,6 @@
+@startuml
+Client -> Server: 주문 요청
+Server -> Server: 1. order 엔티티 영속화
+Server -> Server: 2. 해당 주문의 장바구니 제거
+Server -> Client: 주문 요청 응답
+@enduml

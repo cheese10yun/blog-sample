@@ -1,8 +1,8 @@
 package com.example.eventtransaction.order
 
+import com.example.eventtransaction.EmailSenderService
 import com.example.eventtransaction.EntityAuditing
 import com.example.eventtransaction.cart.CartService
-import com.example.eventtransaction.member.Member
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.event.EventListener
 import org.springframework.data.jpa.repository.JpaRepository
@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -63,37 +64,11 @@ class OrderService(
 
     @Transactional
     fun doOrder(dto: OrderRequest) {
-        val order = orderRepository.save(dto.toEntity())
-        eventPublisher.publishEvent(OrderCompletedEvent(order))
+        println("doOrder CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        val order = orderRepository.save(dto.toEntity()) // 1. order 엔티티 영속화
+        eventPublisher.publishEvent(OrderCompletedEvent(order)) // 2. 해당상품의 장바구니 제거
 //        emailSender.sendOrderEmail(order)
-//        cartService.deleteCartWithOrder(order)
-    }
-}
-
-@Service
-class EmailSenderService {
-
-    /**
-     * 외부 인프라 서비스를 호출한다고 가정한다
-     */
-    fun sendOrderEmail(order: Order) {
-        println(
-            """
-            주문자 이메일 : ${order.orderer.email}
-            주문 가격 : ${order.productAmount}
-            """.trimIndent()
-        )
-    }
-
-    /**
-     * 외부 인프라 서비스를 호출한다고 가정한다
-     */
-    fun sendSignUpEmail(member: Member) {
-        println(
-            """
-                ${member.name} + " 님 회원가입을 축하드립니다."
-            """.trimIndent()
-        )
+//        cartService.deleteCartWithOrder(order) // 2. 주문 완료 이벤트 발행
     }
 }
 
@@ -115,16 +90,14 @@ class OrderCompletedEvent(
 
 @Component
 class OrderEventHandler(
-    private val cartService: CartService,
-    private val emailSenderService: EmailSenderService
+    private val cartService: CartService
 ) {
 
     //    @TransactionalEventListener
     @Async
     @EventListener
     fun orderCompletedEventListener(event: OrderCompletedEvent) {
-        emailSenderService.sendOrderEmail(event.order)
+        println("orderCompletedEventListener CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
         cartService.deleteCartWithOrder(event.order)
-        throw RuntimeException("runtime exception ....")
     }
 }

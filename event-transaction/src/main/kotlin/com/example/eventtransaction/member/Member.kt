@@ -2,7 +2,7 @@ package com.example.eventtransaction.member
 
 import com.example.eventtransaction.EntityAuditing
 import com.example.eventtransaction.coupon.CouponIssueService
-import com.example.eventtransaction.order.EmailSenderService
+import com.example.eventtransaction.EmailSenderService
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.event.EventListener
 import org.springframework.data.jpa.repository.JpaRepository
@@ -49,10 +49,10 @@ class MemberSignUpService(
 
     @Transactional
     fun signUp(dto: MemberSignUpRequest) {
-        val member = createMember(dto.toEntity())
-//        emailSenderService.sendSignUpEmail(member)
-        eventPublisher.publishEvent(MemberSignedUpEvent(member))
-        couponIssueService.issueSignUpCoupon(member.id!!)
+        val member = createMember(dto.toEntity()) // 1. member 엔티티 영속화
+//        emailSenderService.sendSignUpEmail(member) // 2. 외부 시스템 이메일 호출
+        eventPublisher.publishEvent(MemberSignedUpEvent(member)) //2. 회원 가입 완료 이벤트 발행
+        couponIssueService.issueSignUpCoupon(member.id!!) // 3. 회원가입 쿠폰 발급
     }
 
     private fun createMember(member: Member): Member {
@@ -77,6 +77,7 @@ class MemberEventHandler(
     private val emailSenderService: EmailSenderService
 ) {
 
+    // 회원가입 완료 이벤트 리스너 Bean 등록
     @TransactionalEventListener
 //    @EventListener
     fun memberSignedUpEventListener(event: MemberSignedUpEvent) {

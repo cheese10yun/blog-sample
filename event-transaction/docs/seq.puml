@@ -1,0 +1,7 @@
+@startuml
+Client -> Server: 회원 가입 요청
+Server -> Server: 1. member 엔티티 영속화
+Server -> Server: 2. 외부 시스템 이메일 호출
+Server -> Server: 3. 회원가입 쿠폰 발급
+Server -> Client: 회원 가입 응답
+@enduml

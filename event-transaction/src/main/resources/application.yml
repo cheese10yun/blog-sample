@@ -1,7 +1,7 @@
 spring:
     main.allow-bean-definition-overriding: true
     jpa:
-        show-sql: true
+#        show-sql: true
         open-in-view: false
         properties:
             hibernate:
@@ -10,4 +10,4 @@ spring:
 logging:
     level:
         ROOT: info
-        org.hibernate.type.descriptor.sql.BasicBinder: trace
+#        org.hibernate.type.descriptor.sql.BasicBinder: trace
