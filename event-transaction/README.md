@@ -1,4 +1,4 @@
-# Event 기반으로 강결합 및 트랜잭션 문제 해결
+# ApplicationEventPublisher 기반으로 강결합 및 트랜잭션 문제 해결
 
 ## 회원 가입 시나리오
 
