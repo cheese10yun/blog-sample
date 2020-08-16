@@ -1,6 +1,7 @@
 package com.example.eventtransaction.member
 
 import com.example.eventtransaction.EntityAuditing
+import com.example.eventtransaction.coupon.CouponIssueService
 import com.example.eventtransaction.order.EmailSenderService
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Service
@@ -36,16 +37,18 @@ class MemberApi(
 
 @Service
 class MemberSignUpService(
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
+    private val couponIssueService: CouponIssueService
 ) {
 
     @Transactional
     fun signUp(dto: MemberSignUpRequest) {
-        createMember(dto.toEntity())
+        val member = createMember(dto.toEntity())
+        couponIssueService.issueSignUpCoupon(member.id!!)
     }
 
-    fun createMember(member: Member) {
-        memberRepository.save(member)
+    private fun createMember(member: Member): Member {
+        return memberRepository.save(member)
     }
 }
 
