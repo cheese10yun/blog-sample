@@ -73,6 +73,9 @@ class OrderService(
 @Service
 class EmailSenderService {
 
+    /**
+     * 외부 인프라 서비스를 호출한다고 가정한다
+     */
     fun sendOrderEmail(order: Order) {
         println(
             """
@@ -82,7 +85,10 @@ class EmailSenderService {
         )
     }
 
-    fun sendSignUp(member: Member) {
+    /**
+     * 외부 인프라 서비스를 호출한다고 가정한다
+     */
+    fun sendSignUpEmail(member: Member) {
         println(
             """
                 ${member.name} + " 님 회원가입을 축하드립니다."

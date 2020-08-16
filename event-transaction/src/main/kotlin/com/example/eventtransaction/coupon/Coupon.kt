@@ -29,5 +29,6 @@ class CouponIssueService(
     @Transactional
     fun issueSignUpCoupon(memberId: Long) {
         couponRepository.save(Coupon(100.toBigDecimal(), memberId))
+        throw RuntimeException("RuntimeException....")
     }
 }

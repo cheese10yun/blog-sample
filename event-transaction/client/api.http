@@ -9,3 +9,11 @@ Content-Type: application/json
     "email": "test@test.com"
   }
 }
+
+###
+POST http://localhost:8080/members
+Content-Type: application/json
+
+{
+  "name": "tester"
+}
