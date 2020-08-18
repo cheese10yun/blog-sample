@@ -10,12 +10,6 @@ include("licensing-service")
 include("organization-service")
 
 pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        maven(url = "http://repo.kakaopay.com/repository/kakaopay-public") {
-            this.isAllowInsecureProtocol = true
-        }
-    }
 
     val pluginVersions = mapOf(
         "org.jetbrains.kotlin" to "1.3.72",
