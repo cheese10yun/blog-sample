@@ -55,8 +55,6 @@ subprojects {
     }
 
     dependencies {
-        val guavaVersion = "29.0-jre"
-
         implementation(kotlin("stdlib-jdk8"))
         implementation(kotlin("reflect"))
 
