@@ -1,11 +1,20 @@
 server:
-    port: 8081
+    port: 8080
 
 spring:
     application:
-        name: spring-gateway
-    profiles:
-        active: default
+        name: gateway-service
+
+
+    cloud:
+        gateway:
+            routes:
+                -   id: licensing-service
+                    uri: http://localhost:8082
+                    predicates:
+                        - Path=/licensing/**
+                    filters:
+                        - RewritePath=/licensing/(?<path>.*),/$\{path}
 
 
 

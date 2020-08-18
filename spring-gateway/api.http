@@ -1,0 +1,4 @@
+GET http://localhost:8080/licensing/licenses/1
+Accept: application/json
+
+###
