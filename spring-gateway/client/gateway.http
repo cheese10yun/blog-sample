@@ -2,3 +2,8 @@ GET {{gateway-server}}/order/orders
 Accept: application/json
 
 ###
+
+GET {{gateway-server}}/order/orders/carts
+Accept: application/json
+
+###

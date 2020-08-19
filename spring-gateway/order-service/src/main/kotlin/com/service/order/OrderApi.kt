@@ -2,6 +2,8 @@ package com.service.order
 
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
+import org.springframework.cloud.netflix.ribbon.RibbonClient
+import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -12,13 +14,18 @@ import javax.persistence.*
 
 @RestController
 @RequestMapping("/orders")
-class OrderApi {
+class OrderApi(
+    private val cartClient: CartClient
+) {
 
     @GetMapping
     fun getOrder(): Order {
-        Thread.sleep(1000)
+//        Thread.sleep(1000)
         return Order()
     }
+
+    @GetMapping("/carts")
+    fun getCart() = cartClient.getCart()
 }
 
 
@@ -26,8 +33,20 @@ class OrderApi {
 //@Table(name = "orders")
 class Order() {
 
-//    @Column(name = "order_number", nullable = false)
+    //    @Column(name = "order_number", nullable = false)
     val orderNumber: String = UUID.randomUUID().toString()
+}
+
+@FeignClient("cart-service")
+@RibbonClient("cart-service")
+interface CartClient {
+
+    @GetMapping("/carts")
+    fun getCart(): CartResponse
+
+    data class CartResponse(
+        val memberId: Long
+    )
 }
 
 
