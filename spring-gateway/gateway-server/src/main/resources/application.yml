@@ -25,6 +25,14 @@ spring:
                 connect-timeout: 20000
                 response-timeout: 1s
 
+eureka:
+    instance:
+        prefer-ip-address: true
+    client:
+        register-with-eureka: true
+        fetch-registry: true
+        service-url:
+            default-zone: http://localhost:8761/eureka/
 logging:
     level:
         root: INFO
@@ -38,6 +46,7 @@ management:
                     - "info"
                     - "health"
                     - "gateway"
+                    - "bus-refresh"
     endpoint:
         gateway:
             enabled: true
