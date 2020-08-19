@@ -12,12 +12,32 @@ spring:
                     uri: http://localhost:8181
                     predicates:
                         - Path=/order/**
+                    #                        - Between=2017-01-20T17:42:47.789-07:00[America/Denver], 2017-01-21T17:42:47.789-07:00[America/Denver]
                     filters:
                         - RewritePath=/order/(?<path>.*),/$\{path}
+                        - AddRequestParameter=red, blue
+                        - AddRequestHeader=X-Request-red, blue
+                    metadata:
+                        response-timeout: 200
+                        connect-timeout: 200
+
+            httpclient:
+                connect-timeout: 20000
+                response-timeout: 1s
+
+logging:
+    level:
+        root: INFO
+        reactor.netty.http.server.AccessLog: INFO
 
 management:
     endpoints:
         web:
             exposure:
                 include:
-                    - "*"
+                    - "info"
+                    - "health"
+                    - "gateway"
+    endpoint:
+        gateway:
+            enabled: true

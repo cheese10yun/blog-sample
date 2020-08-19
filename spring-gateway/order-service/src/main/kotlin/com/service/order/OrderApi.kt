@@ -16,6 +16,7 @@ class OrderApi {
 
     @GetMapping
     fun getOrder(): Order {
+        Thread.sleep(1000)
         return Order()
     }
 }
