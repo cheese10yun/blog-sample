@@ -1,11 +1,11 @@
-package com.example.springgateway
+package com.server.gateway
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class SpringGatewayApplication
+class GatewayServer
 
 fun main(args: Array<String>) {
-    runApplication<SpringGatewayApplication>(*args)
+    runApplication<GatewayServer>(*args)
 }

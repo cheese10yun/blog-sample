@@ -1,22 +1,19 @@
 server:
-    port: 8080
+    port: 5555
 
 spring:
     application:
-        name: gateway-service
-
+        name: gateway-server
 
     cloud:
         gateway:
             routes:
-                -   id: licensing-service
-                    uri: http://localhost:8082
+                -   id: order-service
+                    uri: http://localhost:8181
                     predicates:
-                        - Path=/licensing/**
+                        - Path=/order/**
                     filters:
-                        - RewritePath=/licensing/(?<path>.*),/$\{path}
-
-
+                        - RewritePath=/order/(?<path>.*),/$\{path}
 
 management:
     endpoints:
