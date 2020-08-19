@@ -4,8 +4,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class GatewayServer
+class GatewayServerApplication
 
 fun main(args: Array<String>) {
-    runApplication<GatewayServer>(*args)
+    runApplication<GatewayServerApplication>(*args)
 }

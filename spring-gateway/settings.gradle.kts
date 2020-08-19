@@ -3,11 +3,12 @@ rootProject.name = "spring-gateway"
 
 include("order-service")
 include("cart-service")
+include("eureka-server")
 include("gateway-server")
+include("config-server")
 
 
 pluginManagement {
-
     val pluginVersions = mapOf(
         "org.jetbrains.kotlin" to "1.3.72",
         "org.jetbrains.kotlin.plugin" to "1.3.72",

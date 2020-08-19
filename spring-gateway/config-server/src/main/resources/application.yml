@@ -1,0 +1,23 @@
+server:
+    port: 8888
+
+spring:
+    application:
+        name: config-server
+    cloud:
+        config:
+            server:
+                encrypt.enabled: true
+                git:
+                    uri: https://github.com/cheese10yun/msa-study-sample
+                    search-paths:
+                        - "order-service"
+                        - "cart-service"
+eureka:
+    instance:
+        prefer-ip-address: true
+    client:
+        register-with-eureka: true
+        fetch-registry: true
+        service-url:
+            default-zone: http://localhost:8761/eureka/
