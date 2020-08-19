@@ -1,6 +1,0 @@
-server:
-    port: 8282
-
-spring:
-    application:
-        name: cart-service
