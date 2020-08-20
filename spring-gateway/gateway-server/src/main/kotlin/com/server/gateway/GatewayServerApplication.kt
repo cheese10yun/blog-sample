@@ -11,5 +11,6 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient
 class GatewayServerApplication
 
 fun main(args: Array<String>) {
+    System.setProperty("reactor.netty.http.server.accessLogEnabled", "true")
     runApplication<GatewayServerApplication>(*args)
 }

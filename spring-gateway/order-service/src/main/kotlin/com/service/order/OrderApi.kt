@@ -20,7 +20,7 @@ class OrderApi(
 
     @GetMapping
     fun getOrder(): Order {
-//        Thread.sleep(1000)
+        Thread.sleep(12000)
         return Order()
     }
 

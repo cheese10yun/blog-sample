@@ -20,6 +20,16 @@ spring:
                         - RewritePath=/order/(?<path>.*),/$\{path}
                         - AddRequestParameter=red, blue
                         - AddRequestHeader=X-Request-red, blue
+                        -   name: Retry
+                            args:
+                                retries: 3
+                                statuses: BAD_GATEWAY
+                                methods: GET,POST
+                                backoff:
+                                    firstBackoff: 10ms
+                                    maxBackoff: 50ms
+                                    factor: 2
+                                    basedOnPreviousValue: false
                     metadata:
                         connect-timeout: 10000
                         response-timeout: 10000
