@@ -1,6 +1,18 @@
 # Spring Cloud Gateway
 
-## 용어
+---
+layout: post
+title: Spring Cloud Gateway
+catalog: true
+header-img: 'https://i.imgur.com/avC1Xor.jpg'
+tags:
+  - Gateway
+  - Cloud
+date: 2020-08-23
+subtitle: Getting Started
+---
+
+# 용어
 
 | 명칭               | 설명                                                                                                                                            |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -8,7 +20,7 @@
 | 조건자(Predicates) | 각 요청을 처리하기 전에 실행되는 로직, 헤더와 입력돤값 등 다양한 HTTP 요청이 정의된 기준에 맞는지를 찾는다.                                     |
 | 필터(Filters)      | HTTP 요청 또는 나가는 HTTP 응답을 수정할 수 있게한다. 다운스트림 요청을 보내기전이나 후에 수정할 수 있다. 라우트 필터는 특정 라우트에 한정된다. |
 
-## Getting Started
+# Getting Started
 
 ```
 implementation("org.springframework.cloud:spring-cloud-starter-gateway")
@@ -26,7 +38,7 @@ fun main(args: Array<String>) {
 필요한 의존성만 추가하면 빠르게 Srping Cloud Gateway를 만들 수 있습니다.
 
 
-### Gateway Route 노출
+## Gateway Route 노출
 ```yml
 management:
     endpoints:
@@ -40,7 +52,7 @@ management:
 ```
 위에서 추가한 `actuator`의존성으로 `gateway`를 노출하면 아래처럼 url mapping 정보를 확인할 수 있습니다.
 
-![](images/../docs/images/result-1.png)
+![](https://github.com/cheese10yun/blog-sample/raw/master/spring-gateway/docs/images/result-1.png)
 
 현재 아무것도 설정하지 않은 상태이기 때문에 `/actuator/gateway/routes`를 호출하면 아래와 같은 결과를 확인할 수 있습니다.
 
@@ -56,7 +68,7 @@ Content-Type: application/json
 Response code: 200 (OK); Time: 321ms; Content length: 2 bytes
 ```
 
-### Route 설정
+## Route 설정
 
 API를 서버를 만들고 게이트웨이와 연결해 보겠습니다.
 
@@ -81,15 +93,15 @@ API를 서버를 만들고 게이트웨이와 연결해 보겠습니다.
 * id: 해당 라우트의 고유 식별자를 나타냅니다.
 * uri: 해당 라우터의 주소를 나타냅니다.
 * predicates: 해당 라우터의 조건을 작성, `/order/**`으로 시작하는 요청의 경우 해당 라우터로 요청을 보냄
-* filters: 해당 라우터의 필터로, RewritePath는 강제로 Patch를 다시 작성합니다. `/order/orders` -> `/order/orders`으로 재작성합니다.
+* filters: 해당 라우터의 필터로, RewritePath는 강제로 Patch를 다시 작성합니다.
 
 
 
-### 연결할 API Server
+## 연결할 API Server
 
 `cart-service`, `order-service` 2 개의 API 서버를 구성합니다. 각 포트의 설정은 `cloud.gateway.routes`에 등록된 포트를 설정합니다.
 
-#### order-service
+## order-service
 ```kotlin
 @RestController
 @RequestMapping("/orders")
@@ -111,7 +123,7 @@ class Order(
     val orderNumber: String = UUID.randomUUID().toString()
 }
 ```
-#### cart-service
+## cart-service
 
 ```kotlin
 @RestController
@@ -131,7 +143,7 @@ class Cart(
 ) : EntityAuditing()
 ```
 
-### Router 확인
+## Router 확인
 `actuator/gateway/routes` 확인을 해보면 위에서 설정한 라우터를 확인할 수 있습니다.
 
 ```
@@ -164,7 +176,8 @@ Content-Type: application/json
 
 Response code: 200 (OK); Time: 207ms; Content length: 404 bytes
 ```
-### 연결된 서비스 확인
+## 연결된 서비스 확인
+
 ```
 GET http://localhost:5555/order/orders?page=0&size=5
 
@@ -197,7 +210,7 @@ Response code: 200 (OK); Time: 168ms; Content length: 1075 bytes
 
 게이트웨이 `/order/orders?page=0&size=5`를 호출하면 `filters.RewritePath`에 의해서 `orders?page=0&size=5`를 호출하게 됩니다. 즉 라우터에 등록된 `order-service`를 호출하게 됩니다.
 
-## Predicates
+# Predicates
 
 Predicates는 조건으로서 해당 라우터에 라우팅 될 조건을 표시합니다. 위 예제에서는 `Path=/order/**`, `Path=/cart/**`으로 해당 path로 들어오는 경우 해당 라우터로 라우팅 됩니다. 그 밖에도 여러 가지를 지원합니다. 대표적인 몇 개를 정리해보았습니다. 날짜 관련 매개변수는 `ZonedDateTime`를 사용해야 합니다.
 
@@ -233,7 +246,7 @@ Response code: 404 (Not Found); Time: 28ms; Content length: 141 bytes
 ```
 현재 시각 `2020-08-22T19:25:19.126+09:00[Asia/Seoul]` 이라면 `HTTP/1.1 404 Not Found`을 응답 받게됩니다.
 
-### Befroe
+### Before
 ```yml
 routes:
     -   id: order-service
@@ -256,7 +269,7 @@ routes:
 `Between`는 특정 날짜 사이에만 호출이 가능합니다. 특정 기간에만 사용하는 이벤트 API 등에 사용하면 유용합니다.
 
 
-#### Weighthigh
+### Weight
 
 ```yml
 routes:
@@ -278,76 +291,27 @@ routes:
 ```
 `grpup`, `weight`를 기반으로 그룹별로 가중치를 계산하게 됩니다. 위 설정은 70% `order-service-high`, 30% `order-service-low`으로 라우팅을 분배합니다.
 
-### HTTP Timeout 설정
+## Filters
 
-#### 글로벌 설정
-```yml
-spring:
-    cloud:
-        gateway:
-            httpclient:
-                connect-timeout: 10000
-                response-timeout: 10s
-```
+HTTP Request, Reponse에 대한 수정을 할 수 있습니다. 특정 라우터에에서 안에서 동작하게 됩니다.
 
-`connect-timeout` 밀리 초 단위로 지정, `response-timeout` Duration으로 지정 해야 합니다.
 
-```kotlin
+### RewritePath
 
-@RestController
-@RequestMapping("/orders")
-class OrderApi(
-    private val orderRepository: OrderRepository
-) {
-
-    @GetMapping
-    fun getOrders(pageable: Pageable): Page<Order> {
-        Thread.sleep(1100) // timeout 발생
-        return orderRepository.findAll(pageable)
-    }
-
-```
-클라이언트 응답시간이 1초로 설정했기 때문에 1초를 넘어가면 아래와 같이 `HTTP/1.1 504 Gateway Timeout`응답을 확인할 수 있습니다.
-
-```
-GET http://localhost:5555/order/orders?page=0&size=5
-
-HTTP/1.1 504 Gateway Timeout
-Content-Type: application/json
-Content-Length: 145
-
-{
-  "timestamp": "2020-08-22T14:05:09.267+00:00",
-  "path": "/order/orders",
-  "status": 504,
-  "error": "Gateway Timeout",
-  "message": "",
-  "requestId": "0d492aaf-1"
-}
-
-Response code: 504 (Gateway Timeout); Time: 4798ms; Content length: 145 bytes
-```
-
-#### 라우터별 설정
+RewritePath는 HTTP Request를 수정하여 특정 Server에 전달하게 됩니다. 정규표현식을 사용해서 유연하게 HTTP Request Path를 변경합니다.
 
 ```yml
-spring:
-    cloud:
-        gateway:
-            routes:
-                -   id: order-service
-                    uri: lb://order-service
-                    predicates:
-                        - Path=/order/**
-                    filters:
-                        - RewritePath=/order/(?<path>.*),/$\{path}
-                    metadata:
-                        connect-timeout: 1000
-                        response-timeout: 1000
-```
-`metadata`설정을 통해서 라우터별 설정을 진행할 수 있습니다. 여기서 중요한 점은 `metadata` 설정 시 `connect-timeout`, `response-timeout` 모두 밀리 초 단위로 지정해야 합니다. Global 설정과는 차이가 있습니다.
+routes:
+    -   id: order-service
+        uri: http://localhost:8181    
+        filters:
+            - RewritePath=/order/(?<path>.*),/$\{path}
+``` 
 
-### 재시도
+`RewritePath`를 통해서 `/order/orders` -> `/order/orders`으로 재작성합니다. 즉, `/order/orders?page=0&size=5` 요청이 오면 `/order/`를제거하고 `orders?page=0&size=5`를 기반으로 `order-service`를 호출하게 됩니다. 
+
+
+### Retry
 
 | name       | 설명                                                                              | 기본값                            |
 | ---------- | --------------------------------------------------------------------------------- | --------------------------------- |
@@ -496,9 +460,78 @@ Response code: 200 (OK); Time: 3034ms; Content length: 1075 bytes
 ```
 3번의 응답시간을 기다려야 하기 때문에 `3034ms` 정도 걸리는 걸 확인할 수 있습니다. 재시도는 단순 조회만 하는 GET 요청에 외에는 신중하게 선택해야 합니다. 게이트웨이에서 재시도를 진행하기 때문에 각 서비스 간의 통신에서 생성, 삭제, 수정 등 조회 조건 외에 동작이 있다면 문제가 생길 가능성이 높습니다. 또 `HTTP Status 5XX` 응답은 재시도를 하는 것은 바람직하지만, `HTTP Status 4XXX`에서는 동일한 요청이면 동일한 이유로 실패하기 때문에 재시도를 안 하는 게 더 효율적입니다. 단순 조회 용이 아니면 신중하게 사용해야 합니다.
 
-## Logging Sleuth
+## HTTP Timeout 설정
 
-### Gateway Logging
+### 글로벌 설정
+```yml
+spring:
+    cloud:
+        gateway:
+            httpclient:
+                connect-timeout: 10000
+                response-timeout: 10s
+```
+
+`connect-timeout` 밀리 초 단위로 지정, `response-timeout` Duration으로 지정 해야 합니다.
+
+```kotlin
+
+@RestController
+@RequestMapping("/orders")
+class OrderApi(
+    private val orderRepository: OrderRepository
+) {
+
+    @GetMapping
+    fun getOrders(pageable: Pageable): Page<Order> {
+        Thread.sleep(1100) // timeout 발생
+        return orderRepository.findAll(pageable)
+    }
+
+```
+클라이언트 응답시간이 1초로 설정했기 때문에 1초를 넘어가면 아래와 같이 `HTTP/1.1 504 Gateway Timeout`응답을 확인할 수 있습니다.
+
+```
+GET http://localhost:5555/order/orders?page=0&size=5
+
+HTTP/1.1 504 Gateway Timeout
+Content-Type: application/json
+Content-Length: 145
+
+{
+  "timestamp": "2020-08-22T14:05:09.267+00:00",
+  "path": "/order/orders",
+  "status": 504,
+  "error": "Gateway Timeout",
+  "message": "",
+  "requestId": "0d492aaf-1"
+}
+
+Response code: 504 (Gateway Timeout); Time: 4798ms; Content length: 145 bytes
+```
+
+### 라우터별 설정
+
+```yml
+spring:
+    cloud:
+        gateway:
+            routes:
+                -   id: order-service
+                    uri: lb://order-service
+                    predicates:
+                        - Path=/order/**
+                    filters:
+                        - RewritePath=/order/(?<path>.*),/$\{path}
+                    metadata:
+                        connect-timeout: 1000
+                        response-timeout: 1000
+```
+`metadata`설정을 통해서 라우터별 설정을 진행할 수 있습니다. 여기서 중요한 점은 `metadata` 설정 시 `connect-timeout`, `response-timeout` 모두 밀리 초 단위로 지정해야 합니다. Global 설정과는 차이가 있습니다.
+
+# Logging Sleuth
+
+## Gateway Logging
 
 ```kotlin
 class GatewayServerApplication
@@ -510,15 +543,15 @@ fun main(args: Array<String>) {
 ```
 Reactor Netty 액세스 로그를 활성화하려면 `System.setProperty("reactor.netty.http.server.accessLogEnabled", "true")`을 설정해야 합니다. 공식 문서에 따르면 Spring Boot 설정이 아니기 때문에 yml으로 설정하지 않고 위처럼 설정해야 한다고 합니다.
 
-![](images/../docs/images/result-2.png)
+![](https://github.com/cheese10yun/blog-sample/raw/master/spring-gateway/docs/images/result-2.png)
 
 정상적으로 로킹이 되는 것을 확인할 수 있습니다.
 
-### Sleuth
+## Sleuth
 
 스프링 클라우드 슬루스(Sleuth)는 마이크로 서비스 환경에서 서로 다른 시스템의 요청을 연결하여 로깅을 해줄 수 있게 해주는 도구입니다. 이런 경우 슬루스를 이용해서 쉽게 요청에 대한 로깅을 연결해서 볼 수 있습니다. 또 RestTemplate, 페인 클라이언트, 메시지 채널 등등 다양한 플랫폼과 연결하기 쉽습니다. 아래 예제에서는 폐인 클라이언트와 연결해서 로깅하는 방법을 설명하겠습니다.
 
-### 의존성 추가
+## 의존성 추가
 ```
 implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
 ```
@@ -566,10 +599,10 @@ cloud:
 로그를 보면 `gateway-server`에서 `traceId: d1905ab24f0b5d1a`발급하고 `order-service`에게 전달할 때 header 정보에 `x-b3-traceid: d1905ab24f0b5d1a`를 추가하고, `cart-service`도 마찬가지로 `traceId`를 전달받고 자신의 고유한 ID `x-b3-parentspanid: ba6672843cb90f99(order-service에서 전달받은)` 발급합니다. 결국 `d1905ab24f0b5d1a` 값 하나로 연결된 하나의 요청을 추적할 수 있습니다.
 
 
-## Eureka & Feign & Ribbon
+# Eureka & Feign & Ribbon
 Spring Cloud Gateway는 유레카 연동도 손쉽게 가능합니다. 본 포스팅은 Spring Cloud Gateway에 대한 포스팅이므로 유레카에 대한 설정은 다루지 않겠습니다. 해당 내용은 실제 코드를 확인해 주세요.
 
-![](images/../docs/images/result-3.png)
+![](https://github.com/cheese10yun/blog-sample/raw/master/spring-gateway/docs/images/result-3.png)
 
 `order-service`, `cart-service` 서비스를 유레카에 등록 시켰습니다. 이제 라우터에 uri를 연결하기만 하면 손쉽게 연결이 가능합니다.
 
@@ -639,5 +672,5 @@ CUSTOM-RESPONSE-HEADER: It worked
 Response code: 200 (OK); Time: 109ms; Content length: 15 bytes
 ```
 
-## 출처
+# 출처
 * [Spring Cloud Gateway  Reference](https://cloud.spring.io/spring-cloud-gateway/reference/html/)
