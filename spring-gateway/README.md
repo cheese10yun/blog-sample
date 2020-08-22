@@ -1,17 +1,5 @@
 # Spring Cloud Gateway
 
----
-layout: post
-title: Spring Cloud Gateway
-catalog: true
-header-img: 'https://i.imgur.com/avC1Xor.jpg'
-tags:
-  - Gateway
-  - Cloud
-date: 2020-08-23
-subtitle: Getting Started
----
-
 # 용어
 
 | 명칭               | 설명                                                                                                                                            |
