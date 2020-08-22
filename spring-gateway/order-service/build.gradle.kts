@@ -1,3 +1,7 @@
+plugins {
+    kotlin("plugin.jpa")
+}
+
 dependencies {
 //    implementation("org.springframework.cloud:spring-cloud-starter-netflix-hystrix")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")

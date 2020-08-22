@@ -1,14 +1,23 @@
-GET {{gateway-server}}/order/orders
+GET {{gateway-server}}/order/orders?page=0&size=5
 Accept: application/json
 
 ###
 
-GET {{gateway-server}}/order/orders/carts
+GET {{gateway-server}}/order/orders/carts?page=0&size=5
 Accept: application/json
 
 ###
 
-GET {{gateway-server}}/cart/carts
+GET {{gateway-server}}/cart/carts?page=0&size=5
 Accept: application/json
+
+###
+
+GET {{order-service}}/orders
+Accept: application/json
+
+###
+
+GET {{cart-service}}/carts
 
 ###
