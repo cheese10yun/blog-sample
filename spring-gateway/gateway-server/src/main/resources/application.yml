@@ -40,9 +40,9 @@ spring:
                         - Path=/cart/**
                     filters:
                         - RewritePath=/cart/(?<path>.*),/$\{path}
-            #                    metadata:
-            #                        connect-timeout: 10000
-            #                        response-timeout: 10000
+                    metadata:
+                        connect-timeout: 10000
+                        response-timeout: 10000
 
             httpclient:
                 connect-timeout: 10000
