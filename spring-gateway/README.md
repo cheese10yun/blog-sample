@@ -202,7 +202,7 @@ Response code: 200 (OK); Time: 168ms; Content length: 1075 bytes
 
 Predicates는 조건으로서 해당 라우터에 라우팅 될 조건을 표시합니다. 위 예제에서는 `Path=/order/**`, `Path=/cart/**`으로 해당 path로 들어오는 경우 해당 라우터로 라우팅 됩니다. 그 밖에도 여러 가지를 지원합니다. 대표적인 몇 개를 정리해보았습니다. 날짜 관련 매개변수는 `ZonedDateTime`를 사용해야 합니다.
 
-### After
+## After
 ```yml
 routes:
     -   id: order-service
@@ -234,7 +234,7 @@ Response code: 404 (Not Found); Time: 28ms; Content length: 141 bytes
 ```
 현재 시각 `2020-08-22T19:25:19.126+09:00[Asia/Seoul]` 이라면 `HTTP/1.1 404 Not Found`을 응답 받게됩니다.
 
-### Before
+## Before
 ```yml
 routes:
     -   id: order-service
@@ -245,7 +245,7 @@ routes:
 ```
 `Befroe`는 특정 날짜 이전 호출이 가능합니다. 현재 날짜가 `Befroe`에서 지정한 날짜 보다 이전 이어야 합니다. 특정 API가 deprecate가 되는 경우 유용합니다.
 
-### Between
+## Between
 ```yml
 routes:
     -   id: order-service
@@ -257,7 +257,7 @@ routes:
 `Between`는 특정 날짜 사이에만 호출이 가능합니다. 특정 기간에만 사용하는 이벤트 API 등에 사용하면 유용합니다.
 
 
-### Weight
+## Weight
 
 ```yml
 routes:
@@ -279,27 +279,27 @@ routes:
 ```
 `grpup`, `weight`를 기반으로 그룹별로 가중치를 계산하게 됩니다. 위 설정은 70% `order-service-high`, 30% `order-service-low`으로 라우팅을 분배합니다.
 
-## Filters
+# Filters
 
 HTTP Request, Reponse에 대한 수정을 할 수 있습니다. 특정 라우터에에서 안에서 동작하게 됩니다.
 
 
-### RewritePath
+## RewritePath
 
 RewritePath는 HTTP Request를 수정하여 특정 Server에 전달하게 됩니다. 정규표현식을 사용해서 유연하게 HTTP Request Path를 변경합니다.
 
 ```yml
-routes:
-    -   id: order-service
-        uri: http://localhost:8181    
-        filters:
-            - RewritePath=/order/(?<path>.*),/$\{path}
-``` 
+ routes:
+     -   id: order-service
+         uri: http://localhost:8181    
+         filters:
+             - RewritePath=/order/(?<path>.*),/$\{path}
+```
+ 
+`RewritePath`를 통해서 `/order/orders` -> `/order/orders`으로 재작성합니다. 즉, `/order/orders?page=0&size=5` 요청이 오면 `/order/`를제거하고 `orders?page=0&size=5`를 기반으로 `order-service`를 호출하게 됩니다.
 
-`RewritePath`를 통해서 `/order/orders` -> `/order/orders`으로 재작성합니다. 즉, `/order/orders?page=0&size=5` 요청이 오면 `/order/`를제거하고 `orders?page=0&size=5`를 기반으로 `order-service`를 호출하게 됩니다. 
 
-
-### Retry
+## Retry
 
 | name       | 설명                                                                              | 기본값                            |
 | ---------- | --------------------------------------------------------------------------------- | --------------------------------- |
@@ -448,9 +448,9 @@ Response code: 200 (OK); Time: 3034ms; Content length: 1075 bytes
 ```
 3번의 응답시간을 기다려야 하기 때문에 `3034ms` 정도 걸리는 걸 확인할 수 있습니다. 재시도는 단순 조회만 하는 GET 요청에 외에는 신중하게 선택해야 합니다. 게이트웨이에서 재시도를 진행하기 때문에 각 서비스 간의 통신에서 생성, 삭제, 수정 등 조회 조건 외에 동작이 있다면 문제가 생길 가능성이 높습니다. 또 `HTTP Status 5XX` 응답은 재시도를 하는 것은 바람직하지만, `HTTP Status 4XXX`에서는 동일한 요청이면 동일한 이유로 실패하기 때문에 재시도를 안 하는 게 더 효율적입니다. 단순 조회 용이 아니면 신중하게 사용해야 합니다.
 
-## HTTP Timeout 설정
+# HTTP Timeout 설정
 
-### 글로벌 설정
+## 글로벌 설정
 ```yml
 spring:
     cloud:
@@ -498,7 +498,7 @@ Content-Length: 145
 Response code: 504 (Gateway Timeout); Time: 4798ms; Content length: 145 bytes
 ```
 
-### 라우터별 설정
+## 라우터별 설정
 
 ```yml
 spring:
