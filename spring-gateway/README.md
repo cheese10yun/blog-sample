@@ -40,7 +40,7 @@ management:
 ```
 위에서 추가한 `actuator`의존성으로 `gateway`를 노출하면 아래처럼 url mapping 정보를 확인할 수 있습니다.
 
-![](images/result-1.png)
+![](images/../docs/images/result-1.png)
 
 현재 아무것도 설정하지 않은 상태이기 때문에 `/actuator/gateway/routes`를 호출하면 아래와 같은 결과를 확인할 수 있습니다.
 
@@ -510,7 +510,7 @@ fun main(args: Array<String>) {
 ```
 Reactor Netty 액세스 로그를 활성화하려면 `System.setProperty("reactor.netty.http.server.accessLogEnabled", "true")`을 설정해야 합니다. 공식 문서에 따르면 Spring Boot 설정이 아니기 때문에 yml으로 설정하지 않고 위처럼 설정해야 한다고 합니다.
 
-![](images/result-2.png)
+![](images/../docs/images/result-2.png)
 
 정상적으로 로킹이 되는 것을 확인할 수 있습니다.
 
@@ -569,7 +569,7 @@ cloud:
 ## Eureka & Feign & Ribbon
 Spring Cloud Gateway는 유레카 연동도 손쉽게 가능합니다. 본 포스팅은 Spring Cloud Gateway에 대한 포스팅이므로 유레카에 대한 설정은 다루지 않겠습니다. 해당 내용은 실제 코드를 확인해 주세요.
 
-![](images/result-3.png)
+![](images/../docs/images/result-3.png)
 
 `order-service`, `cart-service` 서비스를 유레카에 등록 시켰습니다. 이제 라우터에 uri를 연결하기만 하면 손쉽게 연결이 가능합니다.
 
