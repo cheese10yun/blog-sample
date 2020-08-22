@@ -4,10 +4,12 @@ import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.cloud.netflix.ribbon.RibbonClient
 import org.springframework.cloud.openfeign.FeignClient
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
@@ -21,11 +23,22 @@ class OrderApi(
     private val cartClient: CartClient
 ) {
 
-    @GetMapping
-    fun getOrders(pageable: Pageable) = orderRepository.findAll(pageable)
+    var errorCount = 0
 
-    @GetMapping("/carts")
-    fun getCarts() = cartClient.getCart()
+    @GetMapping
+    fun getOrders(pageable: Pageable): Page<Order> {
+        println("getOrders 호출")
+        if (errorCount < 2) {
+            println("예외발생 $errorCount 1증가")
+            errorCount++
+            throw RuntimeException("Error")
+        }
+        errorCount = 0 // 초기화
+        return orderRepository.findAll(pageable)
+    }
+
+    @GetMapping("/carts/{id}")
+    fun getCarts(@PathVariable id: Long) = cartClient.getCart(id)
 }
 
 
@@ -45,11 +58,11 @@ interface OrderRepository : JpaRepository<Order, Long>
 @RibbonClient("cart-service")
 interface CartClient {
 
-    @GetMapping("/carts")
-    fun getCart(): CartResponse
+    @GetMapping("/carts/{id}")
+    fun getCart(@PathVariable id: Long): CartResponse
 
     data class CartResponse(
-        val memberId: Long
+        val productId: Long
     )
 }
 

@@ -3,7 +3,7 @@ Accept: application/json
 
 ###
 
-GET {{gateway-server}}/order/orders/carts?page=0&size=5
+GET {{gateway-server}}/order/orders/carts/2
 Accept: application/json
 
 ###
@@ -13,7 +13,7 @@ Accept: application/json
 
 ###
 
-GET {{order-service}}/orders
+GET {{order-service}}/orders?page=0&size=5
 Accept: application/json
 
 ###

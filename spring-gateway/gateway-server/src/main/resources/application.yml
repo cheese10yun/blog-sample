@@ -7,46 +7,46 @@ spring:
 
     cloud:
         gateway:
-#            discovery:
-#                locator:
-#                    enabled: true
+            discovery:
+                locator:
+                    enabled: true
             routes:
                 -   id: order-service
-                    uri: http://localhost:8181
-#                    uri: lb://order-service
+                    #                    uri: http://localhost:8181
+                    uri: lb://order-service
                     predicates:
                         - Path=/order/**
                     filters:
                         - RewritePath=/order/(?<path>.*),/$\{path}
-#                        - AddRequestParameter=red, blue
-#                        - AddRequestHeader=X-Request-red, blue
-#                        -   name: Retry
-#                            args:
-#                                retries: 3
-#                                statuses: BAD_GATEWAY
-#                                methods: GET,POST
-#                                backoff:
-#                                    firstBackoff: 10ms
-#                                    maxBackoff: 50ms
-#                                    factor: 2
-#                                    basedOnPreviousValue: false
-#                    metadata:
-#                        connect-timeout: 10000
-#                        response-timeout: 10000
+                        #                        - AddRequestParameter=red, blue
+                        #                        - AddRequestHeader=X-Request-red, blue
+                        -   name: Retry
+                            args:
+                                retries: 3
+                                statuses: INTERNAL_SERVER_ERROR
+                                methods: GET
+                                backoff:
+                                    firstBackoff: 1000ms
+                                    maxBackoff: 6000ms
+                                    factor: 2
+                                    basedOnPreviousValue: false
+                    metadata:
+                        connect-timeout: 1000
+                        response-timeout: 1000
                 -   id: cart-service
-                    uri: http://localhost:8181
-#                    uri: lb://cart-service
+                    #                    uri: http://localhost:8181
+                    uri: lb://cart-service
                     predicates:
                         - Path=/cart/**
                     filters:
                         - RewritePath=/cart/(?<path>.*),/$\{path}
-#                    metadata:
-#                        connect-timeout: 10000
-#                        response-timeout: 10000
+            #                    metadata:
+            #                        connect-timeout: 10000
+            #                        response-timeout: 10000
 
-#            httpclient:
-#                connect-timeout: 20000
-#                response-timeout: 10s
+            httpclient:
+                connect-timeout: 10000
+                response-timeout: 10s
 eureka:
     instance:
         prefer-ip-address: true
@@ -57,8 +57,8 @@ eureka:
             default-zone: http://localhost:8761/eureka/
 logging:
     level:
-        root: INFO
-        reactor.netty.http.server.AccessLog: INFO
+        root: info
+        reactor.netty.http.server.AccessLog: debug
 
 management:
     endpoints:

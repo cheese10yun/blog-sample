@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
@@ -18,6 +19,9 @@ class CartApi(
 ) {
     @GetMapping
     fun getCarts(pageable: Pageable) = cartRepository.findAll(pageable)
+
+    @GetMapping("/{id}")
+    fun getCart(@PathVariable id: Long) = cartRepository.findById(id).orElseThrow { IllegalArgumentException("$id is not found") }
 }
 
 @Entity

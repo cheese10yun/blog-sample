@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServletResponse
  */
 @Configuration
 class FilterConfig {
-    @Bean
-    fun httpLoggingFilter(): Filter = HttpLoggingFilter()
+//    @Bean
+//    fun httpLoggingFilter(): Filter = HttpLoggingFilter()
 }
 
 /**

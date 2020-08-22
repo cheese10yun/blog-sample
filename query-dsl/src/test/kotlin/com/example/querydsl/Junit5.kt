@@ -2,6 +2,9 @@ package com.example.querydsl
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import java.time.ZoneId
+import java.time.ZonedDateTime
+
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class Junit5 {
@@ -22,5 +25,16 @@ internal class Junit5 {
 
         println("value : $value")
         println("Junit5 : $this")
+    }
+
+    @Test
+    internal fun name() {
+
+        val now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"))
+
+        println(now)
+
+
+
     }
 }

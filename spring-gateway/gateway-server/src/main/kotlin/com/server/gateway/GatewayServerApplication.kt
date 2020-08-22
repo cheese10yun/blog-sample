@@ -21,6 +21,7 @@ class GatewayServerApplication
 
 fun main(args: Array<String>) {
     System.setProperty("reactor.netty.http.server.accessLogEnabled", "true")
+    HttpStatus.Series.CLIENT_ERROR
     runApplication<GatewayServerApplication>(*args)
 }
 
