@@ -29,12 +29,8 @@ internal class Junit5 {
 
     @Test
     internal fun name() {
-
         val now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"))
-
         println(now)
-
-
-
     }
+
 }
