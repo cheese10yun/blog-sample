@@ -1,11 +1,11 @@
-package com.example.koltinjava8
+package com.example.kotlinjava8
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class KoltinJava8Application
+class KotlinJava8Application
 
 fun main(args: Array<String>) {
-    runApplication<KoltinJava8Application>(*args)
+    runApplication<KotlinJava8Application>(*args)
 }
