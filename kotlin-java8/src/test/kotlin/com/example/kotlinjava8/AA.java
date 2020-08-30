@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,48 @@ public class AA {
             Arrays.asList(1, 2, 3, 4, 5),
             (Integer i) -> System.out.println(i)
         );
+    }
 
+    @Test
+    void asddd() {
+        final List<String> map = map(
+            Arrays.asList(1, 2, 3, 4),
+            (Integer i) -> i.toString()
+        );
+    }
+
+    @Test
+    void asdddasdsad() {
+        final Function<String, Integer> stringIntegerFunction = (String s) -> Integer.parseInt(s);
+        final Function<String, Integer> str1 = (Integer::parseInt);
+        final Function<String, Integer> str2 = Integer::new;
+        final Function<Integer, Integer> str3 = Integer::new;
+    }
+
+    @Test
+    void asdasdasd() {
+        final List<Integer> integers = Arrays.asList(1, 2, 3, 4, 5);
+    }
+
+    @Test
+    void aaaaaaa() {
+
+        final List<String> listOf = Arrays.asList("1", "2");
+
+        listOf.stream()
+            .map(a-> a.split(""))
+            .flatMap(Arrays::stream)
+            .distinct()
+            .collect(Collectors.toList());
+
+    }
+
+    @Test
+    void wdkdjd() {
+        final List<Integer> listOf = Arrays.asList(1,2);
+
+        listOf.stream()
+            .reduce(Integer::max);
     }
 
     public <T> List<T> filter(List<T> list, Predicate<T> p) {
@@ -44,6 +86,14 @@ public class AA {
         for (T t : list) {
             c.accept(t);
         }
+    }
+
+    public <T, R> List<R> map(List<T> list, Function<T, R> f) {
+        final List<R> result = new ArrayList<>();
+        for (T t : list) {
+            result.add(f.apply(t));
+        }
+        return result;
     }
 
 
