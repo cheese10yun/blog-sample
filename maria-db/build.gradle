@@ -15,10 +15,12 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-//    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'
 
-    testCompile("ch.vorburger.mariaDB4j:mariaDB4j-springboot:2.4.0")
+//    testCompile("ch.vorburger.mariaDB4j:mariaDB4j-springboot:2.4.0")
+//    testCompile("ch.vorburger.mariaDB4j:mariaDB4j:2.4.0")
+
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

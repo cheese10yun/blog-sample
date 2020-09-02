@@ -39,9 +39,9 @@ internal class MemberTest2(
 
         Thread.sleep(100_000)
 
-        val privilegedMode = mysqlTestContainer.isPrivilegedMode
+//        val privilegedMode = mysqlTestContainer.isPrivilegedMode
         println("=======================")
-        println(privilegedMode)
+//        println(privilegedMode)
         println("=======================")
 
         val members = query

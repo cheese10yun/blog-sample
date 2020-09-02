@@ -42,9 +42,9 @@ dependencies {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
 
-    testImplementation("org.testcontainers:testcontainers:1.14.3")
-    testImplementation("org.testcontainers:junit-jupiter:1.14.3")
-    testImplementation("org.testcontainers:mysql:1.14.3")
+//    testImplementation("org.testcontainers:testcontainers:1.14.3")
+//    testImplementation("org.testcontainers:junit-jupiter:1.14.3")
+//    testImplementation("org.testcontainers:mysql:1.14.3")
 
     kapt("com.querydsl:querydsl-apt:4.2.1:jpa")
 }

@@ -1,0 +1,17 @@
+spring:
+    jpa:
+        generate-ddl: true
+        database: h2
+        #        properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        hibernate:
+            ddl-auto: create
+        show-sql: true
+
+
+
+logging:
+    level:
+        root: info
+        org.hibernate:
+            SQL: DEBUG
+            type.descriptor.sql.BasicBinder: TRACE
