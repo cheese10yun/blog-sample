@@ -1,6 +1,8 @@
 package com.example.reactorstudy;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 import java.text.MessageFormat;
 import java.time.Duration;
@@ -79,8 +81,27 @@ class ReactorStudyApplicationTests {
 //        Thread.sleep(500);
     }
 
-    public static void main(String[] args) {
+    @Test
+    void Cold_Publisher_Example() {
+        Flowable<Integer> flowable = Flowable.just(1, 3, 4, 7);
 
+        flowable.subscribe(data -> System.out.println("구독자1: " + data));
+        flowable.subscribe(data -> System.out.println("구독자2: " + data));
+    }
+
+    @Test
+    void Hot_Publisher_Example() {
+        PublishProcessor<Integer> processor = PublishProcessor.create();
+
+        processor.subscribe(data -> System.out.println("구독자1: " + data));
+        processor.onNext(1);
+        processor.onNext(3);
+
+        processor.subscribe(data -> System.out.println("구독자2: " + data));
+        processor.onNext(4);
+        processor.onNext(7);
+
+        processor.onComplete();
     }
 
     private static String getThreadNAme() {

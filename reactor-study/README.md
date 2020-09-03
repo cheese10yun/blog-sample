@@ -188,3 +188,63 @@ Publisher <-- Subscriber: 전달 받을 통지 데이터 개수를 요청한다.
 Publisher --> Subscriber: 요청 받은 개수만큼 데이터를 통지한다. OnNext
 Publisher --> Subscriber: 데이터 통지가 완료 되었음을 알린다. OnComplete
 ```
+
+## Cold Publisher & Hot Publisher
+
+### Cold Publisher
+![](image/cold-publisher.png)
+
+* 생산자는 소비자가 구독 할떄마다 데이터를 처음부터 새로 통지한다.
+* 데이터를 통지하는 새로운 타임 라인이 생성된다.
+* 소비자는 구독 시점과 상관없이 통지된 데이터를 처음부더 전달 받을 수 있다.
+
+```java
+@Test
+void Cold_Publisher_Example() {
+    Flowable<Integer> flowable = Flowable.just(1, 3, 4, 7);
+
+    flowable.subscribe(data -> System.out.println("구독자1: " + data));
+    flowable.subscribe(data -> System.out.println("구독자2: " + data));
+}
+
+// 구독자1: 1
+// 구독자1: 3
+// 구독자1: 4
+// 구독자1: 7
+// 구독자2: 1
+// 구독자2: 3
+// 구독자2: 4
+// 구독자2: 7
+```
+* 구독 순서와 상관 없이 
+
+### Hot Publisher
+![](image/hot-publisher.png)
+
+* 생상자는 소비자 수와 상관없이 데이터를 한번만 통지한다
+* 즉, 데이터를 통지하는 타임 라인은 하나이다.
+* 소비자는 발행된 데이터를 처음부터 전달 받은게 아니라 구독한 시점에 통지된 데이터들만 전달 받을 수있다.
+
+```java
+@Test
+void Hot_Publisher_Example() {
+    PublishProcessor<Integer> processor = PublishProcessor.create();
+
+    processor.subscribe(data -> System.out.println("구독자1: " + data));
+    processor.onNext(1);
+    processor.onNext(3);
+
+    processor.subscribe(data -> System.out.println("구독자2: " + data));
+    processor.onNext(4);
+    processor.onNext(7);
+
+    processor.onComplete();
+
+//   구독자1: 1
+//   구독자1: 3
+//   구독자1: 4
+//   구독자2: 4
+//   구독자1: 7
+//   구독자2: 7
+}
+```
