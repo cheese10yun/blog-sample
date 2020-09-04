@@ -1,5 +1,9 @@
 package com.example.reactorstudy;
 
+import com.example.reactorstudy.util.LogType;
+import com.example.reactorstudy.util.Logger;
+import com.example.reactorstudy.util.TimeUtil;
+import io.reactivex.BackpressureOverflowStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.processors.PublishProcessor;
@@ -8,6 +12,7 @@ import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
@@ -81,6 +86,11 @@ class ReactorStudyApplicationTests {
 //        Thread.sleep(500);
     }
 
+    private static String getThreadNAme() {
+        return Thread.currentThread().getName();
+    }
+
+
     @Test
     void Cold_Publisher_Example() {
         Flowable<Integer> flowable = Flowable.just(1, 3, 4, 7);
@@ -104,7 +114,96 @@ class ReactorStudyApplicationTests {
         processor.onComplete();
     }
 
-    private static String getThreadNAme() {
-        return Thread.currentThread().getName();
+    @Test
+    void missing_back_pressure() throws InterruptedException {
+        Flowable.interval(1L, TimeUnit.MILLISECONDS)
+            .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+            .observeOn(Schedulers.computation())
+            .subscribe(
+                data -> {
+                    Logger.log(LogType.PRINT, "# 소비자 처리 대기 중..");
+                    TimeUtil.sleep(1000L);
+                    Logger.log(LogType.ON_NEXT, data);
+                },
+                error -> Logger.log(LogType.ON_ERROR, error),
+                () -> Logger.log(LogType.ON_COMPLETE)
+            );
+
+        Thread.sleep(2000L);
+    }
+
+    @Test
+    void back_pressure_drop_latest() {
+        Flowable.interval(1L, TimeUnit.MILLISECONDS)
+            .onBackpressureBuffer(
+                128,
+                () -> Logger.log(LogType.PRINT, "# Overflow 발생!"),
+                BackpressureOverflowStrategy.DROP_LATEST
+            )
+            .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+            .observeOn(Schedulers.computation())
+            .subscribe(
+                data -> {
+                    TimeUtil.sleep(5L);
+                    Logger.log(LogType.ON_NEXT, data);
+                },
+                error -> Logger.log(LogType.ON_ERROR, error)
+            );
+
+        TimeUtil.sleep(1000L);
+    }
+
+    @Test
+    void back_pressure_drop_oldest() {
+        Flowable.interval(1L, TimeUnit.MILLISECONDS)
+            .onBackpressureBuffer(
+                128,
+                () -> Logger.log(LogType.PRINT, "# Overflow 발생!"),
+                BackpressureOverflowStrategy.DROP_OLDEST
+            )
+            .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+            .observeOn(Schedulers.computation())
+            .subscribe(
+                data -> {
+                    TimeUtil.sleep(5L);
+                    Logger.log(LogType.ON_NEXT, data);
+                },
+                error -> Logger.log(LogType.ON_ERROR, error)
+            );
+
+        TimeUtil.sleep(1000L);
+    }
+
+    @Test
+    void back_pressure_drop() {
+        Flowable.interval(1L, TimeUnit.MILLISECONDS)
+            .onBackpressureDrop(dropData -> Logger.log(LogType.PRINT, "오버플로우 발생! - " + dropData + " Drop!"))
+            .doOnNext(data -> Logger.log(LogType.ON_NEXT, data))
+            .observeOn(Schedulers.computation())
+            .subscribe(
+                data -> {
+                    TimeUtil.sleep(5L);
+                    Logger.log(LogType.ON_NEXT, data);
+                }
+            );
+
+        TimeUtil.sleep(1000L);
+    }
+
+    @Test
+    void back_pressure_latest() {
+        Flowable.interval(1L, TimeUnit.MILLISECONDS)
+            .onBackpressureLatest()
+            .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+            .observeOn(Schedulers.computation())
+            .subscribe(
+                data -> {
+                    TimeUtil.sleep(5L);
+                    Logger.log(LogType.ON_NEXT, data);
+                },
+                error -> Logger.log(LogType.ON_ERROR, error)
+            );
+
+        TimeUtil.sleep(1000L);
     }
 }
