@@ -1,20 +1,45 @@
 package com.example.reactorstudy;
 
+import com.example.reactorstudy.common.CarMaker;
+import com.example.reactorstudy.common.SampleData;
+import com.example.reactorstudy.util.DateUtil;
 import com.example.reactorstudy.util.LogType;
 import com.example.reactorstudy.util.Logger;
 import com.example.reactorstudy.util.TimeUtil;
 import io.reactivex.BackpressureOverflowStrategy;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Completable;
+import io.reactivex.CompletableEmitter;
+import io.reactivex.CompletableObserver;
+import io.reactivex.CompletableOnSubscribe;
 import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
+import io.reactivex.Maybe;
+import io.reactivex.MaybeEmitter;
+import io.reactivex.MaybeObserver;
+import io.reactivex.MaybeOnSubscribe;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleObserver;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 import java.text.MessageFormat;
-import java.time.Duration;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
-import reactor.core.Disposable;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import reactor.core.publisher.Flux;
 
 
@@ -35,16 +60,16 @@ class ReactorStudyApplicationTests {
         ;
     }
 
-    @Test
-    void test01() throws InterruptedException {
-        final Disposable disposable = Flux.interval(Duration.ofMillis(50))
-            .subscribe(
-                data -> System.out.println(MessageFormat.format("onNext:'{'{0}'}'", data))
-            );
-
-        Thread.sleep(200);
-        disposable.dispose();
-    }
+//    @Test
+//    void test01() throws InterruptedException {
+//        final Disposable disposable = Flux.interval(Duration.ofMillis(50))
+//            .subscribe(
+//                data -> System.out.println(MessageFormat.format("onNext:'{'{0}'}'", data))
+//            );
+//
+//        Thread.sleep(200);
+//        disposable.dispose();
+//    }
 
     @Test
     void 선언형프로그래밍() {
@@ -205,5 +230,324 @@ class ReactorStudyApplicationTests {
             );
 
         TimeUtil.sleep(1000L);
+    }
+
+    @Test
+    void flow_able_example() throws InterruptedException {
+        Flowable<String> flowable = Flowable.create(
+            new FlowableOnSubscribe<String>() {
+                @Override
+                public void subscribe(FlowableEmitter<String> emitter) throws Exception {
+                    String[] datas = {"Hello", "RxJava"};
+                    for (final String data : datas) {
+                        // 구독이 해지되면 처리 중단
+                        if (emitter.isCancelled()) {
+                            return;
+                        }
+                        // 데이터 통지
+                        emitter.onNext(data);
+                    }
+                    emitter.onComplete();
+                }
+            },
+            BackpressureStrategy.BUFFER
+        );
+
+        flowable.observeOn(Schedulers.computation())
+            .subscribe(new Subscriber<String>() {
+                // 데이터 개수 요청 및 구독을 취소하기 위한 객체
+                private Subscription subscription;
+
+                @Override
+                public void onSubscribe(Subscription subscription) {
+                    this.subscription = subscription;
+                    this.subscription.request(Long.MAX_VALUE);
+                }
+
+                @Override
+                public void onNext(String data) {
+                    Logger.log(LogType.ON_NEXT, data);
+                }
+
+                @Override
+                public void onError(Throwable error) {
+                    Logger.log(LogType.ON_ERROR);
+                }
+
+                @Override
+                public void onComplete() {
+                    Logger.log(LogType.ON_COMPLETE);
+                }
+            });
+    }
+
+    @Test
+    void observable_example() throws InterruptedException {
+        Observable<String> observable = Observable.create(
+            new ObservableOnSubscribe<String>() {
+                @Override
+                public void subscribe(ObservableEmitter<String> emitter) throws Exception {
+                    String[] datas = {"Hello", "RxJava"};
+                    for (final String data : datas) {
+                        // 구독 해지가 돠면 처리 중단
+                        if (emitter.isDisposed()) {
+                            return;
+                        }
+                        emitter.onNext(data);
+                    }
+                    emitter.onComplete();
+                }
+            }
+        );
+
+        observable.observeOn(Schedulers.computation())
+            .subscribe(new Observer<String>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+                    // 이무것도 처리하지 않음
+                }
+
+                @Override
+                public void onNext(String data) {
+                    Logger.log(LogType.ON_NEXT, data);
+                }
+
+                @Override
+                public void onError(Throwable error) {
+                    Logger.log(LogType.ON_ERROR, error);
+                }
+
+                @Override
+                public void onComplete() {
+                    Logger.log(LogType.ON_COMPLETE);
+                }
+            });
+
+        Thread.sleep(500L);
+    }
+
+    @Test
+    void single_example() {
+        Single<String> single = Single.create(
+            new SingleOnSubscribe<String>() {
+                @Override
+                public void subscribe(SingleEmitter<String> emitter) throws Exception {
+                    emitter.onSuccess(DateUtil.getNowDate());
+                }
+            }
+        );
+
+        single.subscribe(new SingleObserver<String>() {
+            @Override
+            public void onSubscribe(Disposable disposable) {
+                // 아무것도하지 않음
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                Logger.log(LogType.ON_SUBSCRIBE, "# 날짜시각: " + data);
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                Logger.log(LogType.ON_ERROR, error);
+            }
+        });
+    }
+
+    @Test
+    void single_just_example() {
+
+        Single.just(DateUtil.getNowDate())
+            .subscribe(
+                data -> Logger.log(LogType.ON_SUBSCRIBE, "# 날짜시각: " + data),
+                error -> Logger.log(LogType.ON_ERROR, error)
+            );
+    }
+
+    @Test
+    void maybe_example() {
+        final Maybe<String> maybe = Maybe.create(
+            new MaybeOnSubscribe<String>() {
+                @Override
+                public void subscribe(MaybeEmitter<String> emitter) throws Exception {
+//                    emitter.onSuccess(DateUtil.getNowDate());
+                    emitter.onComplete();
+                }
+            }
+        );
+
+        maybe.subscribe(
+            new MaybeObserver<String>() {
+                @Override
+                public void onSubscribe(Disposable disposable) {
+                    // 아무것도하지 않음
+                }
+
+                @Override
+                public void onSuccess(String data) {
+                    Logger.log(LogType.ON_SUCCESS, data);
+                }
+
+                @Override
+                public void onError(Throwable error) {
+                    Logger.log(LogType.ON_ERROR, error);
+                }
+
+                @Override
+                public void onComplete() {
+                    Logger.log(LogType.ON_COMPLETE);
+                }
+            }
+        );
+    }
+
+    @Test
+    void completable_example() {
+        final Completable completable = Completable.create(
+            new CompletableOnSubscribe() {
+                @Override
+                public void subscribe(CompletableEmitter emitter) throws Exception {
+                    int sum = 0;
+
+                    for (int i = 0; i < 100; i++) {
+                        sum = sum + 1;
+                    }
+                    Logger.log(LogType.PRINT, "# 합계: " + sum);
+                    emitter.onComplete();
+                }
+            }
+        );
+
+        completable.subscribe(
+            new CompletableObserver() {
+                @Override
+                public void onSubscribe(final Disposable disposable) {
+                    // 아무것도 하지 않음
+                }
+
+                @Override
+                public void onComplete() {
+                    Logger.log(LogType.ON_COMPLETE);
+                }
+
+                @Override
+                public void onError(final Throwable error) {
+                    Logger.log(LogType.ON_ERROR, error);
+                }
+            }
+        );
+    }
+
+    @Test
+    void observable_interval() {
+        Observable.interval(0, 1000L, TimeUnit.MILLISECONDS)
+            .map(num -> num + "count")
+            .subscribe(data -> Logger.log(LogType.ON_NEXT, data))
+        ;
+
+        TimeUtil.sleep(3000L);
+    }
+
+    @Test
+    void observable_range() {
+        Observable.range(0, 5)
+            .subscribe(num -> Logger.log(LogType.ON_NEXT, num))
+        ;
+    }
+
+    @Test
+    void observable_timer() {
+        Logger.log(LogType.PRINT, "# Start");
+        final Observable<String> observable = Observable.timer(2000, TimeUnit.MILLISECONDS)
+            .map(count -> "Do work");
+
+        observable.subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+        TimeUtil.sleep(3000L);
+    }
+
+    @Test
+    void observable_defer() {
+        final Observable<LocalTime> observable = Observable.defer(() -> Observable.just(LocalTime.now()));
+        final Observable<LocalTime> observableJust = Observable.just(LocalTime.now());
+
+        observable.subscribe(timer -> Logger.log(LogType.PRINT, "# defer() 구독1의 구독 시간:" + timer));
+        observableJust.subscribe(timer -> Logger.log(LogType.PRINT, "# just() 구독1의 구독 시간:" + timer));
+
+        TimeUtil.sleep(3000L);
+
+        observable.subscribe(timer -> Logger.log(LogType.PRINT, "# defer() 구독2의 구독 시간:" + timer));
+        observableJust.subscribe(timer -> Logger.log(LogType.PRINT, "# just() 구독2의 구독 시간:" + timer));
+    }
+
+    @Test
+    void observable_iterable() {
+        final List<String> countries = Arrays.asList("Korea", "Canada", "USA", "Italy");
+
+        Observable.fromIterable(countries)
+            .subscribe(country -> Logger.log(LogType.ON_NEXT, country));
+    }
+
+    @Test
+    void observable_fromFuture() {
+        Logger.log(LogType.PRINT, "# Start time");
+
+        // 긴 처리 시간이 걸리는 작업
+        Future<Double> future = longTimeWork();
+
+        // 짭은 처리 시간이 걸리는 작업
+        shortTimeWork();
+
+        Observable.fromFuture(future)
+            .subscribe(data -> Logger.log(LogType.PRINT, "# 긴 처리 시간 자업 결과" + data));
+
+        Logger.log(LogType.PRINT, "# End time");
+    }
+
+    public static CompletableFuture<Double> longTimeWork() {
+        return CompletableFuture.supplyAsync(() -> calculate());
+    }
+
+    private static Double calculate() {
+        Logger.log(LogType.PRINT, "# 긴 처리 시간이 걸리는 작업 중.........");
+        TimeUtil.sleep(6000L);
+        return 100000000000000000.0;
+    }
+
+    private static void shortTimeWork() {
+        TimeUtil.sleep(3000L);
+        Logger.log(LogType.PRINT, "# 짧은 처리 시간 작업 완료!");
+    }
+
+    @Test
+    void observable_filter() {
+        Observable.fromIterable(SampleData.carList)
+            .filter(car -> car.getCarMaker() == CarMaker.CHEVROLET)
+            .subscribe(car -> Logger.log(LogType.ON_NEXT, car.getCarMaker() + " : " + car.getCarName()));
+    }
+
+    @Test
+    void observable_distinct() {
+        Observable.fromArray(SampleData.carMakersDuplicated)
+            .distinct()
+            .subscribe(carMaker -> Logger.log(LogType.ON_NEXT, carMaker));
+    }
+
+    @Test
+    void observable_take_개수만큼() {
+        Observable.just("a", "b", "c", "d")
+            .take(2)
+            .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+    }
+
+    @Test
+    void observable_take_지정한_시간() {
+        // 1초 간격으로 interval 진행
+        Observable.interval(1000L, TimeUnit.MILLISECONDS)
+            .take(3500L, TimeUnit.MILLISECONDS)
+            .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+        // 3.5초 스레드 슬립이기 때문에, 0 ~ 2 까지 소비한다.
+        TimeUtil.sleep(3500L);
     }
 }

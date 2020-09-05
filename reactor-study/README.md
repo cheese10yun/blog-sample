@@ -513,3 +513,512 @@ doOnNext() | RxComputationThreadPool-1 | 01:55:34.288 | 579
 * `127`까지 통지하게 되면 버퍼가 가득차게됨
 * 소비자 측에서는 `95`까지 전달 받은 데이터를 처리 하고 버퍼가 지워지게
 * 버퍼가 지워지는 시점에 가장 마지막에 통지된 데이터가 `579`이기 때문에 처리
+
+## Flowable
+
+```java
+@Test
+void flow_able_example() throws InterruptedException {
+    Flowable<String> flowable = Flowable.create(
+        new FlowableOnSubscribe<String>() {
+            @Override
+            public void subscribe(FlowableEmitter<String> emitter) throws Exception {
+                String[] datas = {"Hello", "RxJava"};
+                for (final String data : datas) {
+                    // 구독이 해지되면 처리 중단
+                    if (emitter.isCancelled()) {
+                        return;
+                    }
+                    // 데이터 통지
+                    emitter.onNext(data);
+                }
+                emitter.onComplete();
+            }
+        },
+        BackpressureStrategy.BUFFER
+    );
+
+    flowable.observeOn(Schedulers.computation())
+        .subscribe(new Subscriber<String>() {
+            // 데이터 개수 요청 및 구독을 취소하기 위한 객체 
+            private Subscription subscription;
+
+            @Override
+            public void onSubscribe(Subscription subscription) {
+                this.subscription = subscription;
+                this.subscription.request(Long.MAX_VALUE);
+            }
+
+            @Override
+            public void onNext(String data) {
+                Logger.log(LogType.ON_NEXT, data);
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                Logger.log(LogType.ON_ERROR);
+            }
+
+            @Override
+            public void onComplete() {
+                Logger.log(LogType.ON_COMPLETE);
+            }
+        });
+}
+```
+### 생산자
+* 첫 번째 파라미터는 `FlowableOnSubscribe`의 익명 클래스로(함수형 인터페이스)을 람다형식으로 작성
+    * `void subscribe(@NonNull FlowableEmitter<T> emitter)` 메서드를 구현
+    * `FlowableEmitter` 가 실제적으러 데이터를 통제하는 역항을 진행한다.
+* 두 번째 `Flowable` 배얍을 지원하기 떄문에 배압 전략을 전달 받는다.
+
+### 소비자
+* `subscribe()` 메서드를 통해 데이터를 구독한다. 구독하게 되면 생산자쪽에서 데이터 통지할 준비가 되었음을 알려주기 위해 생산자 쪽에 요청을 하게된다. 이때 생산자 쪽에  `void subscribe(@NonNull FlowableEmitter<T> emitter)` 메서드가 호출된다.
+    *  생산자의 `subscribe`메서드에서는 데이터를 통지 할떄 `emitter.onNext(data);` 메서드를 사용한다. 이때 소비자의 `subscribe` 메서드의 `onNext` 메서드가 호출된다.
+* 데이터를 모두 발행하게 되면 `emitter.onComplete();` 메서드를 통해 데이터 발행 완료를 알린다. 이 때 `onComplete`메서드를 호출한다.
+
+## Observable
+
+```java
+@Test
+void observable_example() throws InterruptedException {
+    Observable<String> observable = Observable.create(
+        new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(ObservableEmitter<String> emitter) throws Exception {
+                String[] datas = {"Hello", "RxJava"};
+                for (final String data : datas) {
+                    // 구독 해지가 돠면 처리 중단
+                    if (emitter.isDisposed()) {
+                        return;
+                    }
+                    emitter.onNext(data);
+                }
+                emitter.onComplete();
+            }
+        }
+    );
+
+    observable.observeOn(Schedulers.computation())
+        .subscribe(new Observer<String>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                // 배압 기능이 없기 떄문에 이무것도 처리하지 않음
+            }
+
+            @Override
+            public void onNext(String data) {
+                Logger.log(LogType.ON_NEXT, data);
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                Logger.log(LogType.ON_ERROR, error);
+            }
+
+            @Override
+            public void onComplete() {
+                Logger.log(LogType.ON_COMPLETE);
+            }
+        });
+
+    Thread.sleep(500L);
+}
+```
+
+### 생산자
+* subscribe 메서드를 통해서 데이터를 통제함
+
+
+### 소비
+* onSubscribe 배압 기능이 없기 때문에 아무것도 처리하지 않음
+* subscribe 메서드가 호출하게되면 생산자 onNext 메서드가 호출됨
+
+# Single
+* 데이터를 1건만 통지하거나 에러를 통지한다.
+* 데이터 통지 자체가 완료를 의미하기 때문에 완료 통지는 하지 않는다.
+* 데이터 1건만 통지하므로 데이터개수를 요청할 필요가 없다.
+* `onNext()`, `onComplete()`가 없으며 이 둘을 합한 `onSuccess()`를 제공한다.
+* `Single`의 대표적인 소비자는 `SingleObserver`이다.
+* 클라이언트 요청에 대응하는 서버의 응답이 `Single`을 사용하기 좋은 대표적인 예다
+
+
+```java
+@Test
+void single_example() {
+    Single<String> single = Single.create(
+        new SingleOnSubscribe<String>() {
+            @Override
+            public void subscribe(SingleEmitter<String> emitter) throws Exception {
+                emitter.onSuccess(DateUtil.getNowDate());
+            }
+        }
+    );
+
+    single.subscribe(new SingleObserver<String>() {
+        @Override
+        public void onSubscribe(Disposable disposable) {
+            // 아무것도하지 않음
+        }
+
+        @Override
+        public void onSuccess(String data) {
+            Logger.log(LogType.ON_SUBSCRIBE, "# 날짜시각: " + data);
+        }
+
+        @Override
+        public void onError(Throwable error) {
+            Logger.log(LogType.ON_ERROR, error);
+        }
+    });
+}
+```
+### 생산자
+* `onSuccess()` 메서드를 통해 소비자의 `onSuccess()` 메서드를 호출한다.
+
+### 소비자
+* `onSuccess()`생산자에서 발행한 데이터를 해당 메서드에서 소비한다.
+
+## Maybe
+* 데이터를 1건만 통지하거나 1건도 통지하지 않고 완료 또는 에러를 통지한다.
+* 데이터 통지 자체가 완료를 의미하기 때문에 완료 통지하지 않는다.
+* 단, 데이터 1건도 통지하지 않고 처리가 종료될 경우는 완료 통지를 한다.
+* Myabe의 대표적인 소비자는 MaybeObserver이다.
+
+
+```java
+@Test
+void maybe_example() {
+    final Maybe<String> maybe = Maybe.create(
+        new MaybeOnSubscribe<String>() {
+            @Override
+            public void subscribe(MaybeEmitter<String> emitter) throws Exception {
+//                emitter.onSuccess(DateUtil.getNowDate());
+                    emitter.onComplete();
+            }
+        }
+    );
+
+    maybe.subscribe(
+        new MaybeObserver<String>() {
+            @Override
+            public void onSubscribe(Disposable disposable) {
+                // 아무것도하지 않음
+            }
+
+            @Override
+            public void onSuccess(String data) {
+                Logger.log(LogType.ON_SUCCESS, data);
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                Logger.log(LogType.ON_ERROR, error);
+            }
+
+            @Override
+            public void onComplete() {
+                Logger.log(LogType.ON_COMPLETE);
+            }
+        }
+    );
+}
+
+```
+
+* 데이터를 1건 이라도 통지하기 떄문에 `onSuccess()` 메서드가 호출되면  `onSuccess() | Test worker | 19:18:15.965 | 2020-09-05 19:18:15` 출력이 된다.
+* `emitter.onSuccess(DateUtil.getNowDate());`을 주석하고, `emitter.onComplete();`을 주석 해제하면 데이터 통제 없이 완료를 통지하면 `onComplete()`메서드가 호출되며 `onComplete() | Test worker | 19:21:11.959` 출력이 된다.
+
+# Completable
+* 데이터 생상자이지만 데이터를 1건도 통지하지 않고 완료 또는 에러를 통지한다.
+* 데이터 톶지의 역할 대신에 Completable 내에서 특정 작업을 수행한 후, 해당 처리가 끝났음을 통지하는 역할을 한다.
+* Completable의 대표적인 소비자는 CompletableObserver이다
+
+```java
+@Test
+void completable_example() {
+    final Completable completable = Completable.create(
+        new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(CompletableEmitter emitter) throws Exception {
+                int sum = 0;
+
+                for (int i = 0; i < 100; i++) {
+                    sum = sum + 1;
+                }
+                Logger.log(LogType.PRINT, "# 합계: " + sum);
+                emitter.onComplete();
+            }
+        }
+    );
+
+    completable.subscribe(
+        new CompletableObserver() {
+            @Override
+            public void onSubscribe(final Disposable disposable) {
+                // 아무것도 하지 않음
+            }
+
+            @Override
+            public void onComplete() {
+                Logger.log(LogType.ON_COMPLETE);
+            }
+
+            @Override
+            public void onError(final Throwable error) {
+                Logger.log(LogType.ON_ERROR, error);
+            }
+        }
+    );
+}
+```
+
+# 리액티브 연산자 개요 및 생성 연산자
+
+## RxJava의 연사자(Operator)란?
+* RxJava에서의 연산자는 메서드다.
+* 연산자를 이용하여 데이터를 생성하고 통지하는 Flowable이나 Observable 등의 생산자를 생성할 수있다.
+* Flowable이나 Observable에서 통지한 데이터를 다양한 연산자를 사용하여 가공 처리하여 결과값을 만들어 낸다.
+* 연산자의 특성에 따라 카테고리로 분류되며, 본 강의에서는 아래 분류에 속하는 연산자들을 살펴 본다.
+    * Flowable, Observable 생성 연산자
+    * 통지된 데이터를 필터링 해주는 연산자
+    * 통지된 데이터를 변환 해주는 연산자 
+    * 여러 개의 Flowable/Observable을 결합하는 연산자
+    * 에러 처리 연산자
+    * 유틸리티 연산자
+    * 조건가 불린 연산자
+    * 통지된 데이터를 집계 해주는 연산자
+    
+## interval
+
+![](http://reactivex.io/documentation/operators/images/interval.c.png)
+
+* 지정한 시간 간격 마다 0부터 시작하는 숫자 Long 타입을 통지한다.
+* initialDelay 파라미터 이용해서 최초 통지에 대한 대기 시간을 지정할 수 있다.  
+* 완료 없이 계속 통지한다.
+* 호출한 스레드와는 별도의 스레드에서 실행된다.
+* Polling 용도의 작업을 수행할 때 활용할 수 있다.
+
+```java
+@Test
+void observable_interval() {
+    Observable.interval(0, 1000L, TimeUnit.MILLISECONDS)
+        .map(num -> num + "count")
+        .subscribe(data -> Logger.log(LogType.ON_NEXT, data))
+    ;
+
+    TimeUtil.sleep(3000L);
+}
+
+//onNext() | RxComputationThreadPool-1 | 19:55:18.760 | 0count
+//onNext() | RxComputationThreadPool-1 | 19:55:19.750 | 1count
+//onNext() | RxComputationThreadPool-1 | 19:55:20.750 | 2count
+//onNext() | RxComputationThreadPool-1 | 19:55:21.751 | 3count
+```
+
+* `interval`은 별도의 스레드에서 진행되기 때문에 main 스레드의 sleep이 필요하다.
+* `interval(0, 1000L, TimeUnit.MILLISECONDS)`
+    * `0`: interval 발동 간격을 0으로 주어 바로 interval이 발동된다
+    * `1000L`, interval의 간격의 값을 지정한다.
+    * `TimeUnit.MILLISECONDS`: interval의 간격의 단위를 결정한다. `1000 MILLISECONDS` 으로 지정되었으니 1초 간격을 갖는다.
+    
+## range
+
+![](http://reactivex.io/documentation/operators/images/range.c.png)
+
+* 지정한 값(n) 부터 m 개의 숫자(Integer)를 통지한다.
+* `for`, `while` 문 등의 반복을 대체할 수 있다.
+
+```java
+@Test
+void observable_range() {
+    Observable.range(0, 5)
+        .subscribe(num -> Logger.log(LogType.ON_NEXT, num))
+    ;
+}
+
+//onNext() | Test worker | 20:02:09.435 | 0
+//onNext() | Test worker | 20:02:09.438 | 1
+//onNext() | Test worker | 20:02:09.438 | 2
+//onNext() | Test worker | 20:02:09.438 | 3
+//onNext() | Test worker | 20:02:09.438 | 4
+```
+
+## timer
+![](http://reactivex.io/documentation/operators/images/timer.c.png)
+
+* 지정한 시간이 지나면 0(Long)을 통지한다.
+* 0을 통지하고 `onComplete()` 이벤트가 발생하여 종료한다.
+* 호출한 스레드와는 별도의 스레드에서 실행된다.
+* 특정 시간을 대기한 후에 어떤 처리를 하고자 할 때 활용 할 수 있다.
+
+```java
+@Test
+void observable_timer() {
+    Logger.log(LogType.PRINT, "# Start");
+    final Observable<String> observable = Observable.timer(2000, TimeUnit.MILLISECONDS)
+        .map(count -> "Do work");
+
+    observable.subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+    TimeUtil.sleep(3000L);
+
+//print() | Test worker | 20:09:10.890 | # Start
+//onNext() | RxComputationThreadPool-1 | 20:09:12.937 | Do work
+
+}
+```
+
+## defer
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/defer.png)
+
+* 구독이 발생할 때 마다 즉, `subscribe()`가 호출될 때마다 새로운 `Observable`을 생성한다.
+* 선언한 시점의 데이터를 통지하는 것이 아니라 호출 시점의 데이터를 통지한다.
+* 데이터 생성을 미루는 효과 있기 때문에 최신 데이터를 얻고자할 떄 활용 할 수 있다.
+
+```java
+@Test
+void observable_defer() {
+    final Observable<LocalTime> observable = Observable.defer(() -> Observable.just(LocalTime.now()));
+    final Observable<LocalTime> observableJust = Observable.just(LocalTime.now());
+
+    observable.subscribe(timer -> Logger.log(LogType.PRINT, "# defer() 구독1의 구독 시간:" + timer));
+    observableJust.subscribe(timer -> Logger.log(LogType.PRINT, "# just() 구독1의 구독 시간:" + timer));
+
+    TimeUtil.sleep(3000L);
+
+    observable.subscribe(timer -> Logger.log(LogType.PRINT, "# defer() 구독2의 구독 시간:" + timer));
+    observableJust.subscribe(timer -> Logger.log(LogType.PRINT, "# just() 구독2의 구독 시간:" + timer));
+}
+
+// print() | Test worker | 20:17:10.016 | # defer() 구독1의 구독 시간:20:17:10.011
+// print() | Test worker | 20:17:10.019 | # just() 구독1의 구독 시간:20:17:10.007
+// print() | Test worker | 20:17:13.024 | # defer() 구독2의 구독 시간:20:17:13.024
+// print() | Test worker | 20:17:13.024 | # just() 구독2의 구독 시간:20:17:10.007
+```
+* `just`는 스레드 sleep 3초가 적용되지 않갔고, `defer`는 sleep 3초가 적용된 것을 확인 할 수 있다. 
+* `just` 선언 시점의 시간이 출력되지만, `defer`는 구독한 시점의 시간이 출력된다.
+* `defer`는 `subscribe()`가 호출될 때마다 새로운 `Observable`을 생성하기 때문에 `subscribe` 시점에 새로운 데이터 통지가 시작되는 것이다.
+
+## fromIterable
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/fromIterable.png)
+
+* Iterable 인터페이스를 구현한 클래스를 파라미터로 받는다.
+* Iterable에 담긴 데이터를 순서대로 통지한다.
+
+```java
+@Test
+void observable_iterable() {
+    final List<String> countries = Arrays.asList("Korea", "Canada", "USA", "Italy");
+
+    Observable.fromIterable(countries)
+        .subscribe(country -> Logger.log(LogType.ON_NEXT, country));
+}
+
+//onNext() | Test worker | 20:25:05.306 | Korea
+//onNext() | Test worker | 20:25:05.310 | Canada
+//onNext() | Test worker | 20:25:05.310 | USA
+//onNext() | Test worker | 20:25:05.310 | Italy
+```
+
+## fromFuture
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/fromFuture.noarg.png)
+
+* Future 인터페이스는 자바 5에서 비동기 처리를 위해 추가된 동시성 API
+* 시간이 오래 걸리는 작업은 Future를 반환하는 ExecutorService에게 맡기고 비동기로 다른 작업을 수행할 수 있다.
+* Java 8에서는 CompletableFuture 클래스를 통해 구현이 간결해 졌다.
+
+```java
+@Test
+void observable_fromFuture() {
+    Logger.log(LogType.PRINT, "# Start time");
+
+    // 긴 처리 시간이 걸리는 작업
+    Future<Double> future = longTimeWork();
+
+    // 짭은 처리 시간이 걸리는 작업
+    shortTimeWork();
+
+    Observable.fromFuture(future)
+        .subscribe(data -> Logger.log(LogType.PRINT, "# 긴 처리 시간 자업 결과" + data));
+
+    Logger.log(LogType.PRINT, "# End time");
+
+//print() | Test worker | 20:40:56.466 | # Start time
+//print() | ForkJoinPool.commonPool-worker-9 | 20:40:56.473 | # 긴 처리 시간이 걸리는 작업 중.........
+//print() | Test worker | 20:40:59.475 | # 짧은 처리 시간 작업 완료!
+//print() | Test worker | 20:41:02.478 | # 긴 처리 시간 자업 결과1.0E17
+//print() | Test worker | 20:41:02.478 | # End time
+}
+```
+
+# 데이터 필터링 연산자
+
+## filter
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/filter.png)
+
+* 전달 받은 데이터가 조건에 맞는지 확인 한 후, 결과가 ture인 데이터만 통지한다.
+* 파라미터로 받는 Predicate 함수형 인터페이스에서 조건을 확인한다.
+
+```java
+@Test
+void observable_filter() {
+    Observable.fromIterable(SampleData.carList)
+        .filter(car -> car.getCarMaker() == CarMaker.CHEVROLET)
+        .subscribe(car -> Logger.log(LogType.ON_NEXT, car.getCarMaker() + " : " + car.getCarName()));
+}
+```
+
+## distinct
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/distinct.png)
+
+* 이미 통지된 동일한 데이터가 있다면 이후의 동일한 데이터는 통지 하지 않는다.
+
+```java
+@Test
+void observable_distinct() {
+    Observable.fromArray(SampleData.carMakersDuplicated)
+        .distinct()
+        .subscribe(carMaker -> Logger.log(LogType.ON_NEXT, carMaker));
+}
+
+//onNext() | Test worker | 21:28:04.523 | CHEVROLET
+//onNext() | Test worker | 21:28:04.527 | HYUNDAE
+//onNext() | Test worker | 21:28:04.527 | SAMSUNG
+//onNext() | Test worker | 21:28:04.527 | SSANGYOUNG
+//onNext() | Test worker | 21:28:04.527 | KIA
+```
+
+## take
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/take.png)
+
+* 파라미터로 지정한 개수나 기간이 될 때까지 데이터를 통지한다.
+* 지정한 범위가 통지 데이터보다 클 겨웅 데이터를 모두 통지하고 완료한다. 
+
+```java
+@Test
+void observable_take_개수만큼() {
+    Observable.just("a", "b", "c", "d")
+        .take(2)
+        .subscribeOn(data -> Logger.log(LogType.ON_NEXT, data));
+}
+
+@Test
+void observable_take_지정한_시간() {
+    // 1초 간격으로 interval 진행
+    Observable.interval(1000L, TimeUnit.MILLISECONDS)
+        .take(3500L, TimeUnit.MILLISECONDS)
+        .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+    // 3.5초 스레드 슬립이기 때문에, 0 ~ 2 까지 소비한다.
+    TimeUtil.sleep(3500L);
+}
+
+//onNext() | RxComputationThreadPool-2 | 21:37:49.051 | 0
+//onNext() | RxComputationThreadPool-2 | 21:37:50.045 | 1
+//onNext() | RxComputationThreadPool-2 | 21:37:51.045 | 2
+```
