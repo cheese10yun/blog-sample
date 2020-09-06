@@ -1022,3 +1022,143 @@ void observable_take_지정한_시간() {
 //onNext() | RxComputationThreadPool-2 | 21:37:50.045 | 1
 //onNext() | RxComputationThreadPool-2 | 21:37:51.045 | 2
 ```
+
+# 데이터 변환 연산자
+
+## map
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/map.png)
+
+* 원본 Observable에서 통지하는 데이터를 원하는 값으로 변환한다.
+* 변환 전,후 데이터 타입은 달라도 상관 없다.
+* null을 반환하면 NullPointException이 발생하므로 null이 아닌 데이터 하나를 반드시 반환해야한다.
+
+```java
+@Test
+void observable_map() {
+    final List<Integer> numbers = Arrays.asList(1, 3, 5, 7);
+    Observable.fromIterable(numbers)
+        .map(num -> "1을 더한 결과"+ (num +1))
+        .subscribe(num -> System.out.println(num));
+}
+```
+
+## flatMap
+### 유형 1
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/flatMap.png)
+
+* 원본 데이터를 원하는 값으로 변환 후 통지하는 것은 map과 같다
+* map이 `1 대 1` 변환인 것과 달리 flatMap은 `1 대 다` 변환이므로 데이터 한개로 여러 데이터를 통지할 수 있다.
+* map은 변환된 데이터를 변환하지만 **flatMap은 변환 된 여러개의 데이터를 담고 있는 새로운 Observable을 반환한다.**
+* **데이터 통지의 순서를 보장하지 않는다.** 
+
+```java
+@Test
+void observable_flat_map() {
+    Observable.just("Hello")
+        .flatMap(hello -> Observable.just("JAVA", "Kotlin", "Spring").map(lang -> hello + ", " + lang))
+        .subscribe(data -> System.out.println(data));
+
+//Hello, JAVA
+//Hello, Kotlin
+//Hello, Spring
+}
+```
+
+### 유형 2
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/mergeMap.r.png)
+* 원본 데이터와 변환된 데이터를 조합해서 새로운 데이터를 통지한다.
+* 즉, **Observable에 원본 데이터 + 뱐환된 데이터 = 최종 데이터를 실어서 반환한다.**
+
+```java
+@Test
+void observable_flat_map_3() {
+    Observable.range(2, 1)
+        .flatMap(
+            data -> Observable.range(1, 9),
+            (sourceData, transformedData) -> sourceData + " * " + transformedData + " = "
+                + sourceData * transformedData
+        )
+        .subscribe(System.out::println);
+}
+```
+* 최종적으로 한번더 람다 표현식으로 데이터를 가공한(2차 가공) 이후 보낸다.
+
+## concat_map
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/concatMap.png)
+
+* flatMap과 마찬가지로 받은 데이터를 변환하여 새로운 Observable로 변환한다.
+* 반환된 새로운 Observable을 하나씩 순서대로 실행하는 것이 FlatMap과 다르다.
+* 즉, **데이터의 처리 순서는 보장하지만 처리중인 Observable의 처리가 끝나야 다음 Observable이 실행되므로 처리 성능에 영향을 줄 수 있다.**
+
+```java
+@Test
+void observable_concat_map() {
+    TimeUtil.start();
+    Observable.interval(100L, TimeUnit.MILLISECONDS)
+        .take(4)
+        .skip(2)
+        .concatMap(
+            num -> Observable.interval(200L, TimeUnit.MILLISECONDS)
+                .take(10)
+                .skip(1)
+                .map(row -> num + " * " + row + " = " + num * row)
+        )
+        .subscribe(
+            data -> Logger.log(LogType.ON_NEXT, data),
+            error -> {
+            },
+            () -> {
+                TimeUtil.end();
+                TimeUtil.takeTime();
+            }
+        );
+    TimeUtil.sleep(5000L);
+}
+```
+
+## switchMap
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/switchMap.png)
+
+* 데이터를 변환하여 새로운 Observable로 변환한다.
+* concatMap과 다른 점은 switchMap은 순서를 보장하지만 새로운 데이터가 동지되면 현재 처리중이던 작업을 바로 중단한다.
+
+```java
+@Test
+void void_observable_switch_map() {
+    TimeUtil.start();
+
+    Observable.interval(100L, TimeUnit.MILLISECONDS)
+        .take(4)
+        .skip(2)
+        .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+        .switchMap(
+            num -> Observable.interval(300L, TimeUnit.MILLISECONDS)
+                .take(10)
+                .skip(1)
+                .map(row -> num + " * " + row + " = " + num * row)
+        )
+        .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+    TimeUtil.sleep(5000L);
+}
+
+//doOnNext() | RxComputationThreadPool-1 | 23:10:34.990 | 2
+//doOnNext() | RxComputationThreadPool-1 | 23:10:35.085 | 3
+//onNext() | RxComputationThreadPool-3 | 23:10:35.690 | 3 * 1 = 3
+//onNext() | RxComputationThreadPool-3 | 23:10:35.990 | 3 * 2 = 6
+//onNext() | RxComputationThreadPool-3 | 23:10:36.290 | 3 * 3 = 9
+//onNext() | RxComputationThreadPool-3 | 23:10:36.589 | 3 * 4 = 12
+//onNext() | RxComputationThreadPool-3 | 23:10:36.890 | 3 * 5 = 15
+//onNext() | RxComputationThreadPool-3 | 23:10:37.186 | 3 * 6 = 18
+//onNext() | RxComputationThreadPool-3 | 23:10:37.490 | 3 * 7 = 21
+//onNext() | RxComputationThreadPool-3 | 23:10:37.787 | 3 * 8 = 24
+//onNext() | RxComputationThreadPool-3 | 23:10:38.091 | 3 * 9 = 27
+```
+1. `doOnNext :2, doOnNext: 3`이 출력되었다
+2. `switchMap` 2를 전달받지만 `interval`에서 0.3초가 지나지 않아 통지를 하지 않고 있다.
+3. 그 와중에 밖안쪽 `interval`에서 다시 0.1초 뒤에 3을 전달 받게된다.
+4. switchMap은 새로운 데이터가 동지되면 현재 처리중이던 작업을 바로 중단한다. 그래서 3단만 출력을 진행한다.

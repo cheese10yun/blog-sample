@@ -550,4 +550,107 @@ class ReactorStudyApplicationTests {
         // 3.5초 스레드 슬립이기 때문에, 0 ~ 2 까지 소비한다.
         TimeUtil.sleep(3500L);
     }
+
+    @Test
+    void observable_map() {
+        final List<Integer> numbers = Arrays.asList(1, 3, 5, 7);
+        Observable.fromIterable(numbers)
+            .map(num -> "1을 더한 결과" + (num + 1))
+            .subscribe(num -> System.out.println(num));
+    }
+
+    @Test
+    void observable_flat_map() {
+        Observable.just("Hello")
+            .flatMap(hello -> Observable.just("JAVA", "Kotlin", "Spring").map(lang -> hello + ", " + lang))
+            .subscribe(data -> System.out.println(data));
+    }
+
+    @Test
+    void observable_flat_map_2() {
+        Observable.range(2, 1)
+            .flatMap(
+                num -> Observable.range(1, 9)
+                    .map(row -> num + " * " + row + " = " + num * row)
+            )
+            .subscribe(System.out::println);
+    }
+
+    @Test
+    void observable_flat_map_3() {
+        Observable.range(2, 1)
+            .flatMap(
+                data -> Observable.range(1, 9),
+                (sourceData, transformedData) -> sourceData + " * " + transformedData + " = "
+                    + sourceData * transformedData
+            )
+            .subscribe(System.out::println);
+    }
+
+    @Test
+    void observable_concat_map() {
+        TimeUtil.start();
+        Observable.interval(100L, TimeUnit.MILLISECONDS)
+            .take(4)
+            .skip(2)
+            .concatMap(
+                num -> Observable.interval(200L, TimeUnit.MILLISECONDS)
+                    .take(10)
+                    .skip(1)
+                    .map(row -> num + " * " + row + " = " + num * row)
+            )
+            .subscribe(
+                data -> Logger.log(LogType.ON_NEXT, data),
+                error -> {
+                },
+                () -> {
+                    TimeUtil.end();
+                    TimeUtil.takeTime();
+                }
+            );
+        TimeUtil.sleep(5000L);
+    }
+
+    @Test
+    void observable_flat_map_4() {
+        TimeUtil.start();
+        Observable.interval(100L, TimeUnit.MILLISECONDS)
+            .take(4)
+            .skip(2)
+            .flatMap(
+                num -> Observable.interval(200L, TimeUnit.MILLISECONDS)
+                    .take(10)
+                    .skip(1)
+                    .map(row -> num + " * " + row + " = " + num * row)
+            )
+            .subscribe(
+                data -> Logger.log(LogType.ON_NEXT, data),
+                error -> {
+                },
+                () -> {
+                    TimeUtil.end();
+                    TimeUtil.takeTime();
+                }
+            );
+        TimeUtil.sleep(5000L);
+    }
+
+    @Test
+    void void_observable_switch_map() {
+        TimeUtil.start();
+
+        Observable.interval(100L, TimeUnit.MILLISECONDS)
+            .take(4)
+            .skip(2)
+            .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+            .switchMap(
+                num -> Observable.interval(300L, TimeUnit.MILLISECONDS)
+                    .take(10)
+                    .skip(1)
+                    .map(row -> num + " * " + row + " = " + num * row)
+            )
+            .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+        TimeUtil.sleep(5000L);
+    }
 }
