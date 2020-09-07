@@ -650,7 +650,7 @@ class ReactorStudyApplicationTests {
                     .map(row -> num + " * " + row + " = " + num * row)
             )
             .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
-
+        
         TimeUtil.sleep(5000L);
     }
 }

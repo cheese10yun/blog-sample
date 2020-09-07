@@ -4,7 +4,7 @@
 ## 정의
 **변화의 전파**와 **데이터 흐름**과 관련된 **선언적 프로그래밍** 패러다임이다.
 
-* 변화의 전파와 데이터 흐름: 데이터가 변경 될 떄마다 이벤트를 발생시켜 데이터를 계속적으로 전달 한다
+* 변화의 전파와 데이터 흐름: 데이터가 변경 될 때마다 이벤트를 발생시켜 데이터를 계속적으로 전달 한다
 * 선언적 프로그래밍: 실행할 동작을 구체적으로 명시하는 프로그래밍과 달리 선언형 프로그래밍은 단순히 목표를 선언한다.
 
 ```java
@@ -108,7 +108,7 @@ void 리액티브프로그래밍() throws InterruptedException {
 }
 ```
 * 동일하게 `Test worker` 스레드에서 실
-* `doOnNext()` 데이터가 발행될 떄마다 실행된다.
+* `doOnNext()` 데이터가 발행될 때마다 실행된다.
 
 ```java
 @Test
@@ -173,7 +173,7 @@ void 리액티브프로그래밍() throws InterruptedException {
     * Publisher: 데이터를 생성하고 통지한다.
     * Subscriber: 통지된 데이터를 전달받아서 처리한다.
     * Subscription: 전달 받을 데이터의 개수를 요청하고 구독을 해지한다.
-    * Processor: Publisher, Subscriber의 기능이 모두 있
+    * Processor: Publisher, Subscriber의 기능이 모두 있다.
 
 ## Publisher와 Subscriber간의 프로세스 흐름
 ```plantuml
@@ -194,7 +194,7 @@ Publisher --> Subscriber: 데이터 통지가 완료 되었음을 알린다. OnC
 ### Cold Publisher
 ![](image/cold-publisher.png)
 
-* 생산자는 소비자가 구독 할떄마다 데이터를 처음부터 새로 통지한다.
+* 생산자는 소비자가 구독 할때마다 데이터를 처음부터 새로 통지한다.
 * 데이터를 통지하는 새로운 타임 라인이 생성된다.
 * 소비자는 구독 시점과 상관없이 통지된 데이터를 처음부더 전달 받을 수 있다.
 * Flowable, Observable이 대표적인 Cold Publisher
@@ -257,7 +257,7 @@ void Hot_Publisher_Example() {
 | Reactive Streams 인터페이스를 구현함                     | Reactive Streams 인터페이스를 구현하지 않음           |
 | Subscriber에서 데이터츷 처리한다.                        | Observer에서 데이터를 처리한다.                       |
 | 데이터 개수를 제어하는 배압이 가능이 있음                | 데이터 개수를 제어하는 배압이 기능이 없음             |
-| Subscription으로 전달 받은 데이터 개수를 제어할 수 있다. | 배갑 기능이 없기 떄문에 데이터 개수를 제어할 수 없다. |
+| Subscription으로 전달 받은 데이터 개수를 제어할 수 있다. | 배갑 기능이 없기 때문에 데이터 개수를 제어할 수 없다. |
 | Subscription으로 구독을 해지한다.                        | Disposable로 구독을해지한다                           |
 
 ## 배압(Back Pressure)이란?
@@ -307,7 +307,7 @@ RxJava에서는 BackpressureStrategy를 통해서 Flowable이 통지 대기 중 
 
 ### Error 전략
 * 통지된 데이터가 버퍼의 크기를 초과하면 `MissingBackpressureException` 에러를 통지한다.
-* 즉, 소비자가 생산자의 ㅗㅇ지 속도를 따라 잡지 못할 떄 발생한다.
+* 즉, 소비자가 생산자의 ㅗㅇ지 속도를 따라 잡지 못할 때 발생한다.
 
 ### Buffer 전략
 
@@ -345,7 +345,7 @@ void back_pressure_drop() {
     * 버퍼가 가득 찼을때 사용할 전략 
 * `subscribe()`
     * 구독하는 소비자 쪽에서는 `5 MILLISECONDS` 대기 시간을 갖으면서, 생산자 쪽에서 전달받은 데이터를 처리를 진행한다.
-    * 속도의 차이가 있기 떄문에 배압 전략이 필요하다
+    * 속도의 차이가 있기 때문에 배압 전략이 필요하다
     
 ```
 doOnNext() | RxComputationThreadPool-2 | 00:43:25.340 | 0
@@ -420,7 +420,7 @@ doOnNext() | RxComputationThreadPool-1 | 01:17:57.152 | 430
 1. 통지한 데이터를 출력
 2. 버퍼 사이즈를 128으로 지정했기 때문에 `0 ~ 127`까지 버퍼에 채워짐
 3. `128` 부터 Overflow가 계속 발 `95`까지 데이터를 통지한 데이터를 구독해서 처리
-4. `Drop Oldest`전략이기 떄문에 가장 마지막에 발생한 `Overflow 발생!` 이후 통지한 데이터 `428` 부터 차례대로 버퍼에 쌓기 시작함
+4. `Drop Oldest`전략이기 때문에 가장 마지막에 발생한 `Overflow 발생!` 이후 통지한 데이터 `428` 부터 차례대로 버퍼에 쌓기 시작함
 5. `127 ~ 427` 통지한 데이터는 유실이 발생
 
 ### Drop
@@ -429,7 +429,7 @@ doOnNext() | RxComputationThreadPool-1 | 01:17:57.152 | 430
 * 버퍼에 데이터가 모두 채워진 상태가 되면 이후에 생성되는 데이터를 버리고(Drop), 버퍼가 비워지는 시점에 Drop되지 않은 데이터 부터 다시 버퍼에 담는다.
 * `1 ~ 10` 버퍼 크기가 가득 찼다면, 통지된 데이터들은 뒤에 쌓이게 된다.
 * 버퍼가 비워질때 까지 기다리다가 버퍼가 비워지면 Drop이 데이터는 모두 버리 Drop이 되지 않은 데이터 부터 버퍼에 채운다.
-* `Drop Oldest`같은 경우 마지막에 Drop된 데이터 `14`부터 들어가게 되기 떄문에 차이가 있다.
+* `Drop Oldest`같은 경우 마지막에 Drop된 데이터 `14`부터 들어가게 되기 때문에 차이가 있다.
 
 ```java
 @Test
@@ -469,7 +469,7 @@ onNext() | RxComputationThreadPool-2 | 01:44:51.097 | 561
 1. 통지한 데이터를 출력
 2. 버퍼 사이즈를 128으로 지정했기 때문에 `0 ~ 127`까지 버퍼에 채워짐
 3. `128` 부터 Overflow가 계속 발생 `95`까지 데이터를 통지한 데이터를 구독해서 처리
-4. `Drop`전략이기 떄문에 Drop된 데이터는 제거 이후 통지된 데이터 `540` 부터 버퍼에 차례대로 쌓기 시작함
+4. `Drop`전략이기 때문에 Drop된 데이터는 제거 이후 통지된 데이터 `540` 부터 버퍼에 차례대로 쌓기 시작함
 
 ### Latest 전략
 
@@ -570,11 +570,11 @@ void flow_able_example() throws InterruptedException {
 * 첫 번째 파라미터는 `FlowableOnSubscribe`의 익명 클래스로(함수형 인터페이스)을 람다형식으로 작성
     * `void subscribe(@NonNull FlowableEmitter<T> emitter)` 메서드를 구현
     * `FlowableEmitter` 가 실제적으러 데이터를 통제하는 역항을 진행한다.
-* 두 번째 `Flowable` 배얍을 지원하기 떄문에 배압 전략을 전달 받는다.
+* 두 번째 `Flowable` 배얍을 지원하기 때문에 배압 전략을 전달 받는다.
 
 ### 소비자
 * `subscribe()` 메서드를 통해 데이터를 구독한다. 구독하게 되면 생산자쪽에서 데이터 통지할 준비가 되었음을 알려주기 위해 생산자 쪽에 요청을 하게된다. 이때 생산자 쪽에  `void subscribe(@NonNull FlowableEmitter<T> emitter)` 메서드가 호출된다.
-    *  생산자의 `subscribe`메서드에서는 데이터를 통지 할떄 `emitter.onNext(data);` 메서드를 사용한다. 이때 소비자의 `subscribe` 메서드의 `onNext` 메서드가 호출된다.
+    *  생산자의 `subscribe`메서드에서는 데이터를 통지 할때 `emitter.onNext(data);` 메서드를 사용한다. 이때 소비자의 `subscribe` 메서드의 `onNext` 메서드가 호출된다.
 * 데이터를 모두 발행하게 되면 `emitter.onComplete();` 메서드를 통해 데이터 발행 완료를 알린다. 이 때 `onComplete`메서드를 호출한다.
 
 ## Observable
@@ -603,7 +603,7 @@ void observable_example() throws InterruptedException {
         .subscribe(new Observer<String>() {
             @Override
             public void onSubscribe(Disposable d) {
-                // 배압 기능이 없기 떄문에 이무것도 처리하지 않음
+                // 배압 기능이 없기 때문에 이무것도 처리하지 않음
             }
 
             @Override
@@ -726,7 +726,7 @@ void maybe_example() {
 
 ```
 
-* 데이터를 1건 이라도 통지하기 떄문에 `onSuccess()` 메서드가 호출되면  `onSuccess() | Test worker | 19:18:15.965 | 2020-09-05 19:18:15` 출력이 된다.
+* 데이터를 1건 이라도 통지하기 때문에 `onSuccess()` 메서드가 호출되면  `onSuccess() | Test worker | 19:18:15.965 | 2020-09-05 19:18:15` 출력이 된다.
 * `emitter.onSuccess(DateUtil.getNowDate());`을 주석하고, `emitter.onComplete();`을 주석 해제하면 데이터 통제 없이 완료를 통지하면 `onComplete()`메서드가 호출되며 `onComplete() | Test worker | 19:21:11.959` 출력이 된다.
 
 # Completable
@@ -874,7 +874,7 @@ void observable_timer() {
 
 * 구독이 발생할 때 마다 즉, `subscribe()`가 호출될 때마다 새로운 `Observable`을 생성한다.
 * 선언한 시점의 데이터를 통지하는 것이 아니라 호출 시점의 데이터를 통지한다.
-* 데이터 생성을 미루는 효과 있기 때문에 최신 데이터를 얻고자할 떄 활용 할 수 있다.
+* 데이터 생성을 미루는 효과 있기 때문에 최신 데이터를 얻고자할 때 활용 할 수 있다.
 
 ```java
 @Test
