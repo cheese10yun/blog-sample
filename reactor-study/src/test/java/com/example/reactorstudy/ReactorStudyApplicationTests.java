@@ -1,5 +1,6 @@
 package com.example.reactorstudy;
 
+import com.example.reactorstudy.common.Car;
 import com.example.reactorstudy.common.CarMaker;
 import com.example.reactorstudy.common.SampleData;
 import com.example.reactorstudy.util.DateUtil;
@@ -28,12 +29,14 @@ import io.reactivex.SingleEmitter;
 import io.reactivex.SingleObserver;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.observables.GroupedObservable;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 import java.text.MessageFormat;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -650,7 +653,36 @@ class ReactorStudyApplicationTests {
                     .map(row -> num + " * " + row + " = " + num * row)
             )
             .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
-        
+
         TimeUtil.sleep(5000L);
+    }
+
+    @Test
+    void observable_group_by() {
+        Observable<GroupedObservable<CarMaker, Car>> observable = Observable.fromIterable(SampleData.carList)
+            .groupBy(car -> car.getCarMaker());
+
+        observable.subscribe(
+            groupedObservable -> groupedObservable.subscribe(
+                car -> Logger.log(
+                    LogType.ON_NEXT,
+                    "Group: " + groupedObservable.getKey() + "\t Car name: " + car.getCarName()
+                )
+            )
+        );
+    }
+
+    @Test
+    void observable_to_list() {
+        final Single<List<Integer>> single = Observable.just(1, 3, 5, 7, 9).toList();
+        single.subscribe(System.out::println);
+    }
+
+    @Test
+    void observable_to_map() {
+        final Single<Map<String, String>> single = Observable.just("a-1", "b-1", "c-1", "d-1")
+            .toMap(data -> data.split("-")[0]);
+
+        single.subscribe(System.out::println);
     }
 }

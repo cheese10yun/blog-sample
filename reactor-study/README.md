@@ -1162,3 +1162,60 @@ void void_observable_switch_map() {
 2. `switchMap` 2를 전달받지만 `interval`에서 0.3초가 지나지 않아 통지를 하지 않고 있다.
 3. 그 와중에 밖안쪽 `interval`에서 다시 0.1초 뒤에 3을 전달 받게된다.
 4. switchMap은 새로운 데이터가 동지되면 현재 처리중이던 작업을 바로 중단한다. 그래서 3단만 출력을 진행한다.
+
+## groupBy
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/groupBy.pn)
+
+* 하나의 Observable을 여러개의 새로운 GroupedByObservable로 만든다.
+* 원본 Observable의 데이터를 그룹별로 묶는다기보다는 각각의 데이터들이 그룹에 해당하는 key를 가지게 된다.
+* GroupedByOservable은 getKey()를 통해 구분된 그룹을 알 수 있게 해준다.
+
+```java
+@Test
+void observable_group_by() {
+    Observable<GroupedObservable<CarMaker, Car>> observable = Observable.fromIterable(SampleData.carList)
+        .groupBy(car -> car.getCarMaker());
+
+    observable.subscribe(
+        groupedObservable -> groupedObservable.subscribe(
+            car -> Logger.log(
+                LogType.ON_NEXT,
+                "Group: " + groupedObservable.getKey() + "\t Car name: " + car.getCarName()
+            )
+        )
+    );
+}
+```
+
+## toList
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/toList.2.png)
+
+* 통지 되는 데이터를 모두 List에 담아 통지한다.
+* 원본 Observable 에서 완료 통지를 받는 즉시 리스트를 통지한다.
+* 통지되는 데이터는 원본 **데이터를 담은 리스트 하나이므로 Single로 반환된다.**
+
+```java
+@Test
+void observable_to_list() {
+    final Single<List<Integer>> single = Observable.just(1, 3, 5, 7, 9).toList();
+    single.subscribe(System.out::println);
+}
+```
+
+## toMap
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/toMap.2.png)
+* 통지 되는 데이터를 모두 Map에 담아 통지한다.
+* 원본 Observable 에서 완료 통지를 받는 즉시 Map을 통지한다.
+* 이미 사용중인 key를 또 생성하면 기존에 있던 key와 value를 덮어 쓴다.
+* 통지되는 데이터는 원본 데이터를 담은 Map 하나 이므로 Single로 반환된다.
+
+
+```java
+@Test
+void observable_to_map() {
+    final Single<Map<String, String>> single = Observable.just("a-1", "b-1", "c-1", "d-1")
+        .toMap(data -> data.split("-")[0]);
+
+    single.subscribe(System.out::println);
+}
+```
