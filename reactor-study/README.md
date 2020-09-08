@@ -1219,3 +1219,9 @@ void observable_to_map() {
     single.subscribe(System.out::println);
 }
 ```
+
+# 데이터 결합 연산자
+
+## merge
+* 다수의 Observable에서 통지된 데이터를 받아 다시 하나의 Observable로 통지한다.
+* 통지 시점이 빠른 Observable의 데이터부터 순차적으로 통지되고 통지 시점이 같을 경우에는 merge() 함수의 파라미터로 먼저 지정된 Observable의 데이터부터 통지된다.

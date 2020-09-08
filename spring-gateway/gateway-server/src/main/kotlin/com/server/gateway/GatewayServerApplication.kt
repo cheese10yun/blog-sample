@@ -5,7 +5,7 @@ import org.springframework.boot.runApplication
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient
 import org.springframework.cloud.gateway.filter.GatewayFilterChain
 import org.springframework.cloud.gateway.filter.GlobalFilter
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient
+//import org.springframework.cloud.netflix.eureka.EnableEurekaClient
 import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -15,8 +15,8 @@ import java.security.Principal
 
 
 @SpringBootApplication
-@EnableDiscoveryClient
-@EnableEurekaClient
+//@EnableDiscoveryClient
+//@EnableEurekaClient
 class GatewayServerApplication
 
 fun main(args: Array<String>) {

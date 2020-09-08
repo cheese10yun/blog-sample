@@ -8,7 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Component
 
 @SpringBootApplication
-@EnableFeignClients
+//@EnableFeignClients
 class OrderApplication
 
 fun main(args: Array<String>) {
