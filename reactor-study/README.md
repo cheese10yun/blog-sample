@@ -1439,6 +1439,8 @@ void onErrorReturn() {
 
 ## onErrorResumeNext
 
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/onErrorResumeNext.png)
+
 * 에러가 발생했을 때 에러를 의미하는 Observable로 대체할 수 이싿.
 * Observable로 대체할 수 있으므로 데이터 교체와 더불어 에러 처리를 위한 추가 작업을 할 수 있다.
 
@@ -1470,6 +1472,8 @@ void observable_onErrorResumeNext() {
 * `.skip(1)`를 통해서 에러가 발생하면 skip을 진행한다.
 
 ## retry
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/retry.o.n.png)
 
 * 데이터 통지 중에 에러가 발생했을 때, 데이터 통지를 재시도 한다.
 * 즉, onError 이벤트가 발생하면 subscribe() 재시도한다.
