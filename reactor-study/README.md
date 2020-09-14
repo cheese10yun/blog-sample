@@ -1222,6 +1222,137 @@ void observable_to_map() {
 
 # 데이터 결합 연산자
 
+
 ## merge
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/merge.png)
+
+![](image/merge.png)
+
 * 다수의 Observable에서 통지된 데이터를 받아 다시 하나의 Observable로 통지한다.
 * 통지 시점이 빠른 Observable의 데이터부터 순차적으로 통지되고 통지 시점이 같을 경우에는 merge() 함수의 파라미터로 먼저 지정된 Observable의 데이터부터 통지된다.
+
+```java
+@Test
+void observable_merge() {
+    final Observable<Long> observable1 = Observable.interval(200L, TimeUnit.MILLISECONDS)
+        .take(5);
+
+    final Observable<Long> observable2 = Observable.interval(400L, TimeUnit.MILLISECONDS)
+        .take(5)
+        .map(num -> num + 1000);
+
+    Observable.merge(observable1, observable2)
+        .subscribe(data -> System.out.println(data));
+
+    TimeUtil.sleep(4000);
+
+//onNext() | RxComputationThreadPool-1 | 23:02:46.424 | 0
+//onNext() | RxComputationThreadPool-1 | 23:02:46.619 | 1
+//onNext() | RxComputationThreadPool-2 | 23:02:46.620 | 1000
+//onNext() | RxComputationThreadPool-1 | 23:02:46.817 | 2
+//onNext() | RxComputationThreadPool-1 | 23:02:47.016 | 3
+//onNext() | RxComputationThreadPool-1 | 23:02:47.017 | 1001
+//onNext() | RxComputationThreadPool-1 | 23:02:47.219 | 4
+//onNext() | RxComputationThreadPool-2 | 23:02:47.419 | 1002
+//onNext() | RxComputationThreadPool-2 | 23:02:47.816 | 1003
+//onNext() | RxComputationThreadPool-2 | 23:02:48.219 | 1004
+}
+```
+
+## concat
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/concat.png)
+
+* 다수의 Observable에서 통지된 데이터를 받아서 다시 하나의 Observable로 통지한다.
+* 하나의 Observable에서 통지가 끝나면 다음 Observable에서 연이어 통지가 된다.
+* 각 Observable의 통지 시점과는 상관 없이 `concat()` 함수의 파라미터로 먼저 입력된 Observable의 데이터부터 모두 통지 된 후, 다음 Observable의 데이터가 통지된다.
+
+```java
+@Test
+void observable_concat() {
+    final Observable<Long> observable1 = Observable.interval(500L, TimeUnit.MILLISECONDS)
+        .take(5);
+
+    final Observable<Long> observable2 = Observable.interval(300L, TimeUnit.MILLISECONDS)
+        .take(5)
+        .map(num -> num + 1000);
+
+    Observable.concat(observable1, observable2)
+        .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+    TimeUtil.sleep(4000);
+
+//onNext() | RxComputationThreadPool-1 | 23:07:29.037 | 0
+//onNext() | RxComputationThreadPool-1 | 23:07:29.528 | 1
+//onNext() | RxComputationThreadPool-1 | 23:07:30.031 | 2
+//onNext() | RxComputationThreadPool-1 | 23:07:30.529 | 3
+//onNext() | RxComputationThreadPool-1 | 23:07:31.031 | 4
+//onNext() | RxComputationThreadPool-2 | 23:07:31.333 | 1000
+//onNext() | RxComputationThreadPool-2 | 23:07:31.634 | 1001
+//onNext() | RxComputationThreadPool-2 | 23:07:31.936 | 1002
+//onNext() | RxComputationThreadPool-2 | 23:07:32.236 | 1003
+//onNext() | RxComputationThreadPool-2 | 23:07:32.533 | 1004
+}
+```
+
+## zip
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/zip.png)
+
+* 다수의 Observable에서 통지된 데이터를 받아서 다시 하나의 Observable로 통지한다.
+* 각 Observable에서 통지된 데이터가 모두 모이면 각 Observable에서 동일한 index의 데이터로 새로운 데이터를 생성한 후 통지한다. 
+* 통지하는 데이터 개수가 가장 적은 Observable의 통지 시점에 완료 통지 시점을 맞춘다.
+
+```java
+
+@Test
+void obserable_zip() {
+    final Observable<Long> observable1 = Observable.interval(200L, TimeUnit.MILLISECONDS)
+        .take(4);
+
+    final Observable<Long> observable2 = Observable.interval(400L, TimeUnit.MILLISECONDS)
+        .take(6);
+
+    Observable.zip(observable1, observable2, (data1, data2) -> data1 + data2)
+        .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+    TimeUtil.sleep(4000);
+
+//onNext() | RxComputationThreadPool-1 | 23:13:03.795 | 0
+//onNext() | RxComputationThreadPool-2 | 23:13:04.189 | 2
+//onNext() | RxComputationThreadPool-2 | 23:13:04.589 | 4
+//onNext() | RxComputationThreadPool-2 | 23:13:04.989 | 6
+}
+```
+
+## combineLatest
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/combineLatest.png)
+
+* 다수의 Observable에서 통지된 데이터를 받아서 하나의 Observable로 통지한다.
+* 각 Observable에서 데이터를 통지할 때마다 모든 Observable에서 마지막으로 통지한 각 데이터를 함수형 인터페이스에 전달하고, 새로운 데이터를 통지한다.
+
+```java
+
+@Test
+void observable_combineLatest() {
+    final Observable<Long> observable1 = Observable.interval(500L, TimeUnit.MILLISECONDS)
+        .take(4);
+
+    final Observable<Long> observable2 = Observable.interval(700L, TimeUnit.MILLISECONDS)
+        .take(4);
+
+    Observable.combineLatest(observable1, observable2, (data1, data2) -> "data1: " + data1 + "\tdata2: " + data2)
+        .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+    TimeUtil.sleep(4000);
+//onNext() | RxComputationThreadPool-2 | 00:03:19.345 | data1: 0	data2: 0
+//onNext() | RxComputationThreadPool-1 | 00:03:19.639 | data1: 1	data2: 0
+//onNext() | RxComputationThreadPool-2 | 00:03:20.037 | data1: 1	data2: 1
+//onNext() | RxComputationThreadPool-1 | 00:03:20.139 | data1: 2	data2: 1
+//onNext() | RxComputationThreadPool-1 | 00:03:20.639 | data1: 3	data2: 1
+//onNext() | RxComputationThreadPool-2 | 00:03:20.739 | data1: 3	data2: 2
+//onNext() | RxComputationThreadPool-2 | 00:03:21.439 | data1: 3	data2: 3
+}
+```

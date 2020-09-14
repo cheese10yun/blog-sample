@@ -685,4 +685,62 @@ class ReactorStudyApplicationTests {
 
         single.subscribe(System.out::println);
     }
+
+    @Test
+    void observable_merge() {
+        final Observable<Long> observable1 = Observable.interval(200L, TimeUnit.MILLISECONDS)
+            .take(5);
+
+        final Observable<Long> observable2 = Observable.interval(400L, TimeUnit.MILLISECONDS)
+            .take(5)
+            .map(num -> num + 1000);
+
+        Observable.merge(observable1, observable2)
+            .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+        TimeUtil.sleep(4000);
+    }
+
+    @Test
+    void observable_concat() {
+        final Observable<Long> observable1 = Observable.interval(500L, TimeUnit.MILLISECONDS)
+            .take(5);
+
+        final Observable<Long> observable2 = Observable.interval(300L, TimeUnit.MILLISECONDS)
+            .take(5)
+            .map(num -> num + 1000);
+
+        Observable.concat(observable1, observable2)
+            .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+        TimeUtil.sleep(4000);
+    }
+
+    @Test
+    void obserable_zip() {
+        final Observable<Long> observable1 = Observable.interval(200L, TimeUnit.MILLISECONDS)
+            .take(4);
+
+        final Observable<Long> observable2 = Observable.interval(400L, TimeUnit.MILLISECONDS)
+            .take(6);
+
+        Observable.zip(observable1, observable2, (data1, data2) -> data1 + data2)
+            .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+        TimeUtil.sleep(4000);
+    }
+
+    @Test
+    void observable_combineLatest() {
+        final Observable<Long> observable1 = Observable.interval(500L, TimeUnit.MILLISECONDS)
+            .take(4);
+
+        final Observable<Long> observable2 = Observable.interval(700L, TimeUnit.MILLISECONDS)
+            .take(4);
+
+        Observable.combineLatest(observable1, observable2, (data1, data2) -> "data1: " + data1 + "\tdata2: " + data2)
+            .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+        TimeUtil.sleep(4000);
+    }
 }

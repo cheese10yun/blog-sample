@@ -12,7 +12,11 @@ import java.io.IOException
 import java.nio.charset.Charset
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import javax.servlet.*
+import javax.servlet.Filter
+import javax.servlet.FilterChain
+import javax.servlet.ReadListener
+import javax.servlet.ServletException
+import javax.servlet.ServletInputStream
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -21,8 +25,8 @@ import javax.servlet.http.HttpServletResponse
  */
 @Configuration
 class FilterConfig {
-//    @Bean
-//    fun httpLoggingFilter(): Filter = HttpLoggingFilter()
+    @Bean
+    fun httpLoggingFilter(): Filter = HttpLoggingFilter()
 }
 
 /**
