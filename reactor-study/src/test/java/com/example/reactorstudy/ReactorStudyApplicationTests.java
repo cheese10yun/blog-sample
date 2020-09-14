@@ -285,8 +285,8 @@ class ReactorStudyApplicationTests {
     }
 
     @Test
-    void observable_example() throws InterruptedException {
-        Observable<String> observable = Observable.create(
+    void observablee_example() throws InterruptedException {
+        Observable<String> observablee = Observable.create(
             new ObservableOnSubscribe<String>() {
                 @Override
                 public void subscribe(ObservableEmitter<String> emitter) throws Exception {
@@ -303,7 +303,7 @@ class ReactorStudyApplicationTests {
             }
         );
 
-        observable.observeOn(Schedulers.computation())
+        observablee.observeOn(Schedulers.computation())
             .subscribe(new Observer<String>() {
                 @Override
                 public void onSubscribe(Disposable d) {
@@ -443,7 +443,7 @@ class ReactorStudyApplicationTests {
     }
 
     @Test
-    void observable_interval() {
+    void observablee_interval() {
         Observable.interval(0, 1000L, TimeUnit.MILLISECONDS)
             .map(num -> num + "count")
             .subscribe(data -> Logger.log(LogType.ON_NEXT, data))
@@ -453,38 +453,38 @@ class ReactorStudyApplicationTests {
     }
 
     @Test
-    void observable_range() {
+    void observablee_range() {
         Observable.range(0, 5)
             .subscribe(num -> Logger.log(LogType.ON_NEXT, num))
         ;
     }
 
     @Test
-    void observable_timer() {
+    void observablee_timer() {
         Logger.log(LogType.PRINT, "# Start");
-        final Observable<String> observable = Observable.timer(2000, TimeUnit.MILLISECONDS)
+        final Observable<String> observablee = Observable.timer(2000, TimeUnit.MILLISECONDS)
             .map(count -> "Do work");
 
-        observable.subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+        observablee.subscribe(data -> Logger.log(LogType.ON_NEXT, data));
         TimeUtil.sleep(3000L);
     }
 
     @Test
-    void observable_defer() {
-        final Observable<LocalTime> observable = Observable.defer(() -> Observable.just(LocalTime.now()));
-        final Observable<LocalTime> observableJust = Observable.just(LocalTime.now());
+    void observablee_defer() {
+        final Observable<LocalTime> observablee = Observable.defer(() -> Observable.just(LocalTime.now()));
+        final Observable<LocalTime> observableeJust = Observable.just(LocalTime.now());
 
-        observable.subscribe(timer -> Logger.log(LogType.PRINT, "# defer() 구독1의 구독 시간:" + timer));
-        observableJust.subscribe(timer -> Logger.log(LogType.PRINT, "# just() 구독1의 구독 시간:" + timer));
+        observablee.subscribe(timer -> Logger.log(LogType.PRINT, "# defer() 구독1의 구독 시간:" + timer));
+        observableeJust.subscribe(timer -> Logger.log(LogType.PRINT, "# just() 구독1의 구독 시간:" + timer));
 
         TimeUtil.sleep(3000L);
 
-        observable.subscribe(timer -> Logger.log(LogType.PRINT, "# defer() 구독2의 구독 시간:" + timer));
-        observableJust.subscribe(timer -> Logger.log(LogType.PRINT, "# just() 구독2의 구독 시간:" + timer));
+        observablee.subscribe(timer -> Logger.log(LogType.PRINT, "# defer() 구독2의 구독 시간:" + timer));
+        observableeJust.subscribe(timer -> Logger.log(LogType.PRINT, "# just() 구독2의 구독 시간:" + timer));
     }
 
     @Test
-    void observable_iterable() {
+    void observablee_iterable() {
         final List<String> countries = Arrays.asList("Korea", "Canada", "USA", "Italy");
 
         Observable.fromIterable(countries)
@@ -492,7 +492,7 @@ class ReactorStudyApplicationTests {
     }
 
     @Test
-    void observable_fromFuture() {
+    void observablee_fromFuture() {
         Logger.log(LogType.PRINT, "# Start time");
 
         // 긴 처리 시간이 걸리는 작업
@@ -523,28 +523,28 @@ class ReactorStudyApplicationTests {
     }
 
     @Test
-    void observable_filter() {
+    void observablee_filter() {
         Observable.fromIterable(SampleData.carList)
             .filter(car -> car.getCarMaker() == CarMaker.CHEVROLET)
             .subscribe(car -> Logger.log(LogType.ON_NEXT, car.getCarMaker() + " : " + car.getCarName()));
     }
 
     @Test
-    void observable_distinct() {
+    void observablee_distinct() {
         Observable.fromArray(SampleData.carMakersDuplicated)
             .distinct()
             .subscribe(carMaker -> Logger.log(LogType.ON_NEXT, carMaker));
     }
 
     @Test
-    void observable_take_개수만큼() {
+    void observablee_take_개수만큼() {
         Observable.just("a", "b", "c", "d")
             .take(2)
             .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
     }
 
     @Test
-    void observable_take_지정한_시간() {
+    void observablee_take_지정한_시간() {
         // 1초 간격으로 interval 진행
         Observable.interval(1000L, TimeUnit.MILLISECONDS)
             .take(3500L, TimeUnit.MILLISECONDS)
@@ -555,7 +555,7 @@ class ReactorStudyApplicationTests {
     }
 
     @Test
-    void observable_map() {
+    void observablee_map() {
         final List<Integer> numbers = Arrays.asList(1, 3, 5, 7);
         Observable.fromIterable(numbers)
             .map(num -> "1을 더한 결과" + (num + 1))
@@ -563,14 +563,14 @@ class ReactorStudyApplicationTests {
     }
 
     @Test
-    void observable_flat_map() {
+    void observablee_flat_map() {
         Observable.just("Hello")
             .flatMap(hello -> Observable.just("JAVA", "Kotlin", "Spring").map(lang -> hello + ", " + lang))
             .subscribe(data -> System.out.println(data));
     }
 
     @Test
-    void observable_flat_map_2() {
+    void observablee_flat_map_2() {
         Observable.range(2, 1)
             .flatMap(
                 num -> Observable.range(1, 9)
@@ -580,7 +580,7 @@ class ReactorStudyApplicationTests {
     }
 
     @Test
-    void observable_flat_map_3() {
+    void observablee_flat_map_3() {
         Observable.range(2, 1)
             .flatMap(
                 data -> Observable.range(1, 9),
@@ -591,7 +591,7 @@ class ReactorStudyApplicationTests {
     }
 
     @Test
-    void observable_concat_map() {
+    void observablee_concat_map() {
         TimeUtil.start();
         Observable.interval(100L, TimeUnit.MILLISECONDS)
             .take(4)
@@ -615,7 +615,7 @@ class ReactorStudyApplicationTests {
     }
 
     @Test
-    void observable_flat_map_4() {
+    void observablee_flat_map_4() {
         TimeUtil.start();
         Observable.interval(100L, TimeUnit.MILLISECONDS)
             .take(4)
@@ -639,7 +639,7 @@ class ReactorStudyApplicationTests {
     }
 
     @Test
-    void void_observable_switch_map() {
+    void void_observablee_switch_map() {
         TimeUtil.start();
 
         Observable.interval(100L, TimeUnit.MILLISECONDS)
@@ -658,11 +658,11 @@ class ReactorStudyApplicationTests {
     }
 
     @Test
-    void observable_group_by() {
-        Observable<GroupedObservable<CarMaker, Car>> observable = Observable.fromIterable(SampleData.carList)
+    void observablee_group_by() {
+        Observable<GroupedObservable<CarMaker, Car>> observablee = Observable.fromIterable(SampleData.carList)
             .groupBy(car -> car.getCarMaker());
 
-        observable.subscribe(
+        observablee.subscribe(
             groupedObservable -> groupedObservable.subscribe(
                 car -> Logger.log(
                     LogType.ON_NEXT,
@@ -673,13 +673,13 @@ class ReactorStudyApplicationTests {
     }
 
     @Test
-    void observable_to_list() {
+    void observablee_to_list() {
         final Single<List<Integer>> single = Observable.just(1, 3, 5, 7, 9).toList();
         single.subscribe(System.out::println);
     }
 
     @Test
-    void observable_to_map() {
+    void observablee_to_map() {
         final Single<Map<String, String>> single = Observable.just("a-1", "b-1", "c-1", "d-1")
             .toMap(data -> data.split("-")[0]);
 
@@ -687,60 +687,159 @@ class ReactorStudyApplicationTests {
     }
 
     @Test
-    void observable_merge() {
-        final Observable<Long> observable1 = Observable.interval(200L, TimeUnit.MILLISECONDS)
+    void observablee_merge() {
+        final Observable<Long> observablee1 = Observable.interval(200L, TimeUnit.MILLISECONDS)
             .take(5);
 
-        final Observable<Long> observable2 = Observable.interval(400L, TimeUnit.MILLISECONDS)
+        final Observable<Long> observablee2 = Observable.interval(400L, TimeUnit.MILLISECONDS)
             .take(5)
             .map(num -> num + 1000);
 
-        Observable.merge(observable1, observable2)
+        Observable.merge(observablee1, observablee2)
             .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
 
         TimeUtil.sleep(4000);
     }
 
     @Test
-    void observable_concat() {
-        final Observable<Long> observable1 = Observable.interval(500L, TimeUnit.MILLISECONDS)
+    void observablee_concat() {
+        final Observable<Long> observablee1 = Observable.interval(500L, TimeUnit.MILLISECONDS)
             .take(5);
 
-        final Observable<Long> observable2 = Observable.interval(300L, TimeUnit.MILLISECONDS)
+        final Observable<Long> observablee2 = Observable.interval(300L, TimeUnit.MILLISECONDS)
             .take(5)
             .map(num -> num + 1000);
 
-        Observable.concat(observable1, observable2)
+        Observable.concat(observablee1, observablee2)
             .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
 
         TimeUtil.sleep(4000);
     }
 
     @Test
-    void obserable_zip() {
-        final Observable<Long> observable1 = Observable.interval(200L, TimeUnit.MILLISECONDS)
+    void observable_zip() {
+        final Observable<Long> observablee1 = Observable.interval(200L, TimeUnit.MILLISECONDS)
             .take(4);
 
-        final Observable<Long> observable2 = Observable.interval(400L, TimeUnit.MILLISECONDS)
+        final Observable<Long> observablee2 = Observable.interval(400L, TimeUnit.MILLISECONDS)
             .take(6);
 
-        Observable.zip(observable1, observable2, (data1, data2) -> data1 + data2)
+        Observable.zip(observablee1, observablee2, (data1, data2) -> data1 + data2)
             .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
 
         TimeUtil.sleep(4000);
     }
 
     @Test
-    void observable_combineLatest() {
-        final Observable<Long> observable1 = Observable.interval(500L, TimeUnit.MILLISECONDS)
+    void observablee_combineLatest() {
+        final Observable<Long> observablee1 = Observable.interval(500L, TimeUnit.MILLISECONDS)
             .take(4);
 
-        final Observable<Long> observable2 = Observable.interval(700L, TimeUnit.MILLISECONDS)
+        final Observable<Long> observablee2 = Observable.interval(700L, TimeUnit.MILLISECONDS)
             .take(4);
 
-        Observable.combineLatest(observable1, observable2, (data1, data2) -> "data1: " + data1 + "\tdata2: " + data2)
+        Observable.combineLatest(observablee1, observablee2, (data1, data2) -> "data1: " + data1 + "\tdata2: " + data2)
             .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
 
         TimeUtil.sleep(4000);
+    }
+
+    @Test
+    void try_catch_사용하지_못한다() {
+        try {
+            Observable.just(2)
+                .map(num -> num / 0)
+                .subscribe(System.out::println);
+        } catch (Exception e) {
+            System.out.println("error logging...");
+        }
+    }
+
+    @Test
+    void error_handle() {
+        Observable.just(5)
+            .flatMap(num -> Observable.interval(200L, TimeUnit.MILLISECONDS)
+                .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+                .take(5)
+                .map(i -> num / i))
+            .subscribe(
+                data -> Logger.log(LogType.ON_NEXT, data),
+                error -> Logger.log(LogType.ON_ERROR, error),
+                () -> Logger.log(LogType.ON_COMPLETE)
+            );
+
+        TimeUtil.sleep(1000L);
+    }
+
+    @Test
+    void observable_onErrorReturn() {
+        Observable.just(5)
+            .flatMap(num -> Observable.interval(200L, TimeUnit.MILLISECONDS)
+                .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+                .take(5)
+                .map(i -> num / i)
+                .onErrorReturn(ex -> {
+                    if (ex instanceof ArithmeticException) {
+                        Logger.log(LogType.PRINT, "게산 처리 에러 발생" + ex.getMessage());
+                    }
+                    return -1L;
+                })
+            )
+            .subscribe(
+                data -> {
+                    if (data < 0) {
+                        Logger.log(LogType.PRINT, "예외를 알리는 데이터: " + data);
+                    } else {
+                        Logger.log(LogType.ON_NEXT, data);
+                    }
+                },
+                error -> Logger.log(LogType.ON_ERROR, error),
+                () -> Logger.log(LogType.ON_COMPLETE)
+            );
+
+        TimeUtil.sleep(1000L);
+    }
+
+    @Test
+    void observable_onErrorResumeNext() {
+        Observable.just(5)
+            .flatMap(num -> Observable.interval(200L, TimeUnit.MILLISECONDS)
+                .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+                .take(5)
+                .map(i -> num / i)
+                .onErrorResumeNext(throwable -> {
+                    Logger.log(LogType.PRINT, "운영제에게 이메일 발송 " + throwable.getMessage());
+                    return Observable.interval(200L, TimeUnit.MILLISECONDS).take(5).skip(1).map(i -> num / i);
+                })
+            ).subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+        TimeUtil.sleep(2000L);
+    }
+
+    @Test
+    void observable_retry() {
+        Observable.just(5)
+            .flatMap(num -> Observable.interval(200L, TimeUnit.MILLISECONDS)
+                .map(i -> {
+                    long result;
+                    try {
+                        result = num / i;
+                    } catch (ArithmeticException e) {
+                        Logger.log(LogType.PRINT, "error: " + e.getMessage());
+                        throw e;
+                    }
+                    return result;
+                })
+                .retry(5)
+                .onErrorReturn(throwable -> -1L)
+            )
+            .subscribe(
+                data -> Logger.log(LogType.ON_NEXT, data),
+                error -> Logger.log(LogType.ON_ERROR, error),
+                () -> Logger.log(LogType.ON_COMPLETE)
+            );
+
+        TimeUtil.sleep(5000L);
+
     }
 }

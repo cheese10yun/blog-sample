@@ -1356,3 +1356,158 @@ void observable_combineLatest() {
 //onNext() | RxComputationThreadPool-2 | 00:03:21.439 | data1: 3	data2: 3
 }
 ```
+
+# 에러 처리 연산자
+
+```java
+@Test
+void try_catch_사용하지_못한다() {
+    try {
+        Observable.just(2)
+            .map(num -> num / 0)
+            .subscribe(System.out::println);
+    } catch (Exception e) {
+        System.out.println("error logging..."); // 로긍 출력안됨
+    }
+// Exception in thread "Test worker" io.reactivex.exceptions.OnErrorNotImplementedException: The exception was not handled due to missing onError handler in the subscribe() method call. Further reading: https://github.com/ReactiveX/RxJava/wiki/Error-Handling | java.lang.ArithmeticException: / by zero
+}
+
+```
+* 리액티브 프로그래밍에서 일반적인 `try-catch` 방식으로 에러를 해결 할 수 없고, `onError()`에서 해당 `error` 를 받아서 처리하는 구조를 가져야한다.
+
+```java
+@Test
+void error_handle() {
+    Observable.just(5)
+        .flatMap(num -> Observable.interval(200L, TimeUnit.MILLISECONDS)
+            .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+            .take(5)
+            .map(i -> num / i))
+        .subscribe(
+            data -> Logger.log(LogType.ON_NEXT, data),
+            error -> Logger.log(LogType.ON_ERROR, error),
+            () -> Logger.log(LogType.ON_COMPLETE)
+        );
+
+    TimeUtil.sleep(1000L);
+
+//doOnNext() | RxComputationThreadPool-1 | 00:15:06.325 | 0
+//onERROR() | RxComputationThreadPool-1 | 00:15:06.330 | java.lang.ArithmeticException: / by zero
+}
+```
+* 일반적으로 `onError()`에서 해당 `error`를 위 처럼 처리할 수 있다.
+
+## onErrorReturn
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/onErrorReturn.o.png  )
+
+* 에러가 발생했을 때 에러를 의미하는 데이터로 대체할 수 있다.
+* `onErrorReturn()`을 호출하면 `onError` 이벤트는 발생하지 않는다.
+
+```java
+@Test
+void onErrorReturn() {
+   Observable.just(5)
+       .flatMap(num -> Observable.interval(200L, TimeUnit.MILLISECONDS)
+           .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+           .take(5)
+           .map(i -> num / i)
+           .onErrorReturn(ex -> {
+               if (ex instanceof ArithmeticException) {
+                   Logger.log(LogType.PRINT, "게산 처리 에러 발생" + ex.getMessage());
+               }
+               return -1L;
+           })
+       )
+       .subscribe(
+           data -> {
+               if (data < 0) {
+                   Logger.log(LogType.PRINT, "예외를 알리는 데이터: " + data);
+               } else {
+                   Logger.log(LogType.ON_NEXT, data);
+               }
+           },
+           error -> Logger.log(LogType.ON_ERROR, error),
+           () -> Logger.log(LogType.ON_COMPLETE)
+       );
+
+   TimeUtil.sleep(1000L);
+}
+```
+* `onErrorReturn`를 이용하면 소비자의 `onError`에 통지되지 않고, `onNext`에 통지된다. 즉 에러가 발생하기 전에 사전에 처리 가능하다. 모든 에러를 소비자쪽에서 할 수 없다.
+* 에러로 통지된 `onNext`에서 구분 가능한 값으로 분기를 처리해서 에러를 처리한다.
+
+## onErrorResumeNext
+
+* 에러가 발생했을 때 에러를 의미하는 Observable로 대체할 수 이싿.
+* Observable로 대체할 수 있으므로 데이터 교체와 더불어 에러 처리를 위한 추가 작업을 할 수 있다.
+
+```java
+@Test
+void observable_onErrorResumeNext() {
+    Observable.just(5)
+        .flatMap(num -> Observable.interval(200L, TimeUnit.MILLISECONDS)
+            .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+            .take(5)
+            .map(i -> num / i)
+            .onErrorResumeNext(throwable -> {
+                Logger.log(LogType.PRINT, "운영제에게 이메일 발송 " + throwable.getMessage());
+                return Observable.interval(200L, TimeUnit.MILLISECONDS).take(5).skip(1).map(i -> num / i);
+            })
+        ).subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+    TimeUtil.sleep(2000L);
+
+//doOnNext() | RxComputationThreadPool-1 | 00:33:20.607 | 0
+//print() | RxComputationThreadPool-1 | 00:33:20.610 | 운영제에게 이메일 발송 / by zero
+//onNext() | RxComputationThreadPool-2 | 00:33:21.015 | 5
+//onNext() | RxComputationThreadPool-2 | 00:33:21.212 | 2
+//onNext() | RxComputationThreadPool-2 | 00:33:21.416 | 1
+//onNext() | RxComputationThreadPool-2 | 00:33:21.613 | 1
+}
+```
+* 에러가 발생하면 `onErrorResumeNext`에서 새로운 데이터를 통지한다.
+* `.skip(1)`를 통해서 에러가 발생하면 skip을 진행한다.
+
+## retry
+
+* 데이터 통지 중에 에러가 발생했을 때, 데이터 통지를 재시도 한다.
+* 즉, onError 이벤트가 발생하면 subscribe() 재시도한다.
+
+```java
+
+@Test
+void observable_retry() {
+    Observable.just(5)
+        .flatMap(num -> Observable.interval(200L, TimeUnit.MILLISECONDS)
+            .map(i -> {
+                long result;
+                try {
+                    result = num / i;
+                } catch (ArithmeticException e) {
+                    Logger.log(LogType.PRINT, "error: " + e.getMessage());
+                    throw e;
+                }
+                return result;
+            })
+            .retry(5)
+            .onErrorReturn(throwable -> -1L)
+        )
+        .subscribe(
+            data -> Logger.log(LogType.ON_NEXT, data),
+            error -> Logger.log(LogType.ON_ERROR, error),
+            () -> Logger.log(LogType.ON_COMPLETE)
+        );
+
+    TimeUtil.sleep(5000L);
+//print() | RxComputationThreadPool-1 | 00:41:50.215 | error: / by zero
+//print() | RxComputationThreadPool-2 | 00:41:50.422 | error: / by zero
+//print() | RxComputationThreadPool-3 | 00:41:50.625 | error: / by zero
+//print() | RxComputationThreadPool-4 | 00:41:50.826 | error: / by zero
+//print() | RxComputationThreadPool-5 | 00:41:51.028 | error: / by zero
+//print() | RxComputationThreadPool-6 | 00:41:51.231 | error: / by zero
+//onNext() | RxComputationThreadPool-6 | 00:41:51.232 | -1
+//onComplete() | RxComputationThreadPool-6 | 00:41:51.232
+}
+```
+* 두 번째 `error: / by zero` 부터는 `retry()`메서를 통해서 재시도를 진행한다. 
