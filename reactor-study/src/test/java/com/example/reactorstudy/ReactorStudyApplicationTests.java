@@ -6,6 +6,7 @@ import com.example.reactorstudy.common.SampleData;
 import com.example.reactorstudy.util.DateUtil;
 import com.example.reactorstudy.util.LogType;
 import com.example.reactorstudy.util.Logger;
+import com.example.reactorstudy.util.NumberUtil;
 import com.example.reactorstudy.util.TimeUtil;
 import io.reactivex.BackpressureOverflowStrategy;
 import io.reactivex.BackpressureStrategy;
@@ -840,6 +841,64 @@ class ReactorStudyApplicationTests {
             );
 
         TimeUtil.sleep(5000L);
-
     }
+
+    @Test
+    void observable_delay() {
+        Logger.log(LogType.PRINT, "실행 시간: " + TimeUtil.getCurrentTimeFormatted());
+
+        Observable.just(1, 3, 4, 6)
+            .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+            .delay(200, TimeUnit.MILLISECONDS)
+            .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+        TimeUtil.sleep(2500L);
+    }
+
+    @Test
+    void observable_delaySubscription() {
+        Logger.log(LogType.PRINT, "실행 시간: " + TimeUtil.getCurrentTimeFormatted());
+
+        Observable.just(1, 3, 4, 6)
+            .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+            .delaySubscription(200, TimeUnit.MILLISECONDS)
+            .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+
+        TimeUtil.sleep(2500L);
+    }
+
+    @Test
+    void observable_timeout() {
+        Observable.range(1, 5)
+            .map(num -> {
+                long time = 1000L;
+                if (num == 4) {
+                    time = 1500L;
+                }
+                TimeUtil.sleep(time);
+                return num;
+            })
+            .timeout(1200L, TimeUnit.MICROSECONDS)
+            .subscribe(
+                data -> Logger.log(LogType.ON_NEXT, data),
+                error -> Logger.log(LogType.ON_ERROR, error)
+            );
+
+        TimeUtil.sleep(4000L);
+    }
+
+    @Test
+    void observable_timeInterval() {
+        Observable.just(1, 3, 5, 6, 9)
+            .delay(item -> {
+                TimeUtil.sleep(NumberUtil.randomRange(100, 1000));
+                return Observable.just(item);
+            })
+            .timeInterval()
+            .subscribe(
+                timed -> Logger
+                    .log(LogType.ON_NEXT, "통지하는데 걸리는 시간: " + timed.toString() + "\t 통지된 데이터: " + timed.value())
+            );
+    }
+
 }

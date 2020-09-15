@@ -23,10 +23,29 @@ import javax.persistence.EntityTransaction
 abstract class SpringBootTestSupport {
 
     @Autowired
-    protected lateinit var entityManagerFactory: EntityManagerFactory
+    private lateinit var entityManager: EntityManager
 
     @Autowired
     protected lateinit var query: JPAQueryFactory
+
+    protected fun <T> save(entity: T): T {
+        entityManager.persist(entity)
+        flushAndClearPersistentContext()
+        return entity
+    }
+
+    protected fun <T> saveAll(entities: Iterable<T>): Iterable<T> {
+        for (entity in entities) {
+            entityManager.persist(entity)
+        }
+        flushAndClearPersistentContext()
+        return entities
+    }
+
+    private fun flushAndClearPersistentContext() {
+        entityManager.flush()
+        entityManager.clear()
+    }
 
 //    @Container
 //    protected val mysqlTestContainer = MySQLContainer<Nothing>()

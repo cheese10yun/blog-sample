@@ -1399,7 +1399,7 @@ void error_handle() {
 
 ## onErrorReturn
 
-![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/onErrorReturn.o.png  )
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/onErrorReturn.o.png)
 
 * 에러가 발생했을 때 에러를 의미하는 데이터로 대체할 수 있다.
 * `onErrorReturn()`을 호출하면 `onError` 이벤트는 발생하지 않는다.
@@ -1514,4 +1514,94 @@ void observable_retry() {
 //onComplete() | RxComputationThreadPool-6 | 00:41:51.232
 }
 ```
-* 두 번째 `error: / by zero` 부터는 `retry()`메서를 통해서 재시도를 진행한다. 
+* 두 번째 `error: / by zero` 부터는 `retry()`메서를 통해서 재시도를 진행한다.
+
+# 유틸리티 연산자
+
+## delay
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/delay.png)
+
+* 생산자가 데이터를 생성 및 통지를 하지 설정한 시간만큼 소비자쪽의 데이터 전달을 지연시킨다.
+
+ ```java
+@Test
+void observable_delay() {
+    Logger.log(LogType.PRINT, "실행 시간: " + TimeUtil.getCurrentTimeFormatted());
+
+    Observable.just(1, 3, 4, 6)
+        .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+        .delay(200, TimeUnit.MILLISECONDS)
+        .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+}
+```
+
+## delaySubscription
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/delaySubscription.png)
+
+* 생산자가 데이터의 생성 및 통지 자체를 설정한 시간만큼 지연시킨다.
+* 죽, 소비자가 구독을 해도 구독 시점 자체가 지연된다. 
+
+```java
+@Test
+void obsesrvable_delaySubscription() {
+    Logger.log(LogType.PRINT, "실행 시간: " + TimeUtil.getCurrentTimeFormatted());
+
+    Observable.just(1, 3, 4, 6)
+        .doOnNext(data -> Logger.log(LogType.DO_ON_NEXT, data))
+        .delaySubscription(200, TimeUnit.MILLISECONDS)
+        .subscribe(data -> Logger.log(LogType.ON_NEXT, data));
+}
+```
+## timeout
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/timeout.1.png)
+
+* 각각의 데이터 통지 시, 지정된 시간안에 통지가 되지 않으면 에러를 통지한다.
+* 에러 통지 시 전달되는 에러 객체는 TimeoutException이다.
+
+```java
+@Test
+void observable_timeout() {
+    Observable.range(1, 5)
+        .map(num -> {
+            long time = 1000L;
+            if (num == 4) {
+                time = 1500L;
+            }
+            TimeUtil.sleep(time);
+            return num;
+        })
+        .timeout(1200L, TimeUnit.MICROSECONDS)
+        .subscribe(
+            data -> Logger.log(LogType.ON_NEXT, data),
+            error -> Logger.log(LogType.ON_ERROR, error)
+        );
+
+    TimeUtil.sleep(4000L);
+}
+```
+
+## timeInterval
+
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/timeInterval.png)
+
+* 각각의 데이터가 통지된느데 걸리는 시간을 통지한다.
+* 통지된 데ㅣㅇ터와 데이터가 통지되는데 걸리는 시간을 소비자쪽에서 모두 처리할 수 있다.
+
+```java
+@Test
+void observable_timeInterval() {
+    Observable.just(1, 3, 5, 6, 9)
+        .delay(item -> {
+            TimeUtil.sleep(NumberUtil.randomRange(100, 1000));
+            return Observable.just(item);
+        })
+        .timeInterval()
+        .subscribe(
+            timed -> Logger
+                .log(LogType.ON_NEXT, "통지하는데 걸리는 시간: " + timed.toString() + "\t 통지된 데이터: " + timed.value())
+        );
+}
+```
