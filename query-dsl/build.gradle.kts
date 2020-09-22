@@ -47,6 +47,8 @@ dependencies {
 //    testImplementation("org.testcontainers:mysql:1.14.3")
 
     kapt("com.querydsl:querydsl-apt:4.2.1:jpa")
+
+    implementation ("io.github.serpro69:kotlin-faker:1.5.0")
 }
 
 tasks.withType<Test> {
