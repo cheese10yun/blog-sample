@@ -1,4 +1,4 @@
-# Mockserver Netty 사용해서 HTTP 통신 Mocking 하기
+# Mockserver Netty 사용해서 Http 통신 Mocking 하기
 
 테스트 코드를 작성할 할 때 외부 서비스와 통신하는 구간은 Mocking 해서 해서 테스트를 진행하게 됩니다. 대표적으로 HTTP 외부 통신이 있습니다. 이와 비슷한 내용으로 [RestTemplate Mock 기반 테스트하기](https://cheese10yun.github.io/rest-template-mock-test/)을 포스팅을 했었습니다. 그와 비슷한 주제로 Mockserver Netty 기반으로 Mock Test를 진행하는 방법에 대해서 다루어보겠습니다.
 
@@ -119,4 +119,8 @@ internal class FuelClientTest {
 * (4): HTTP 통신하는 클라이언트 객체 `FuelClient` 생성합니다. 스프링 Bean이 아니기 때문에 직접 객체를 생성합니다.
 * (5): Mock HTTP Request를 지정합니다. `GET` 메서드로 `/sample`을 호출합니다.
 * (6): Mock HTTP Response를 지정합니다. 응답받을 HTTP Status Code, Response Body를 작성합니다.
-* (7): Mo
+* (7): Mock HTTP를 호출하고 나온 결과를 바인딩 합니다.
+* (8): `responseBody` 변수에 바인딩 된 값과 일치하는지 검증합니다.
+
+![](img/result.png)
+실제 테스트가 통과를 확인할 수 있습니다.
