@@ -1,4 +1,4 @@
-# Mockserver Netty 사용해서 Http 통신 Mocking 하기
+# Mockserver Netty 사용해서 HTTP 통신 Mocking 하기
 
 테스트 코드를 작성할 할 때 외부 서비스와 통신하는 구간은 Mocking 해서 해서 테스트를 진행하게 됩니다. 대표적으로 HTTP 외부 통신이 있습니다. 이와 비슷한 내용으로 [RestTemplate Mock 기반 테스트하기](https://cheese10yun.github.io/rest-template-mock-test/)을 포스팅을 했었습니다. 그와 비슷한 주제로 Mockserver Netty 기반으로 Mock Test를 진행하는 방법에 대해서 다루어보겠습니다.
 
