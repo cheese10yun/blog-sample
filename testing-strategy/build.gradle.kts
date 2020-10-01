@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.precompile.PrecompiledProjectScript.NullPluginDependencySpec.version
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -9,7 +10,7 @@ plugins {
     kotlin("plugin.jpa") version "1.3.72"
 }
 
-group = "com.teting"
+group = "com.testing"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -23,7 +24,7 @@ repositories {
     mavenCentral()
 }
 
-extra["snippetsDir"] = file("build/generated-snippets")
+val snippetsDir by extra { file("build/generated-snippets") }
 extra["testcontainersVersion"] = "1.14.3"
 
 dependencies {
@@ -65,6 +66,7 @@ tasks.test {
 }
 
 tasks.asciidoctor {
+    val test by tasks
     inputs.dir(snippetsDir)
     dependsOn(test)
 }
