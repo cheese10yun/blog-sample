@@ -68,6 +68,7 @@
 * [ApplicationEventPublisher 기반으로 강결합 및 트랜잭션 문제 해결](https://github.com/cheese10yun/blog-sample/tree/master/event-transaction)
 * [Spring Cloud Gateway](https://github.com/cheese10yun/blog-sample/blob/master/spring-gateway/README.md)
 * [Mockserver Netty 사용해서 HTTP 통신 Mocking 하기](https://github.com/cheese10yun/blog-sample/blob/master/mockserver-netty/README.md)
+* [JPA @Where 사용법](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/docs/jpa-where.md)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
