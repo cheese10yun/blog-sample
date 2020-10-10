@@ -13,6 +13,12 @@ group = "com.example"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
+allOpen {
+    annotation("javax.persistence.Entity")
+    annotation("javax.persistence.MappedSuperclass")
+    annotation("javax.persistence.Embeddable")
+}
+
 configurations {
     compileOnly {
         extendsFrom(configurations.annotationProcessor.get())
@@ -48,7 +54,7 @@ dependencies {
 
     kapt("com.querydsl:querydsl-apt:4.2.1:jpa")
 
-    implementation ("io.github.serpro69:kotlin-faker:1.5.0")
+    implementation("io.github.serpro69:kotlin-faker:1.5.0")
 }
 
 tasks.withType<Test> {

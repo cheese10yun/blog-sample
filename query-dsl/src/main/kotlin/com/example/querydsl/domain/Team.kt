@@ -2,6 +2,7 @@ package com.example.querydsl.domain
 
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.FetchType
 import javax.persistence.OneToMany
 import javax.persistence.Table
 
@@ -12,7 +13,6 @@ data class Team(
     var name: String
 ) : EntityAuditing() {
 
-    @OneToMany(mappedBy = "team")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "team")
     var members: MutableList<Member> = mutableListOf()
-
 }
