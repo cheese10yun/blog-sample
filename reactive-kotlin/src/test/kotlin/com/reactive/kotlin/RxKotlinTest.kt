@@ -2,6 +2,8 @@ package com.reactive.kotlin
 
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.toObservable
+import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.Subject
 import org.junit.jupiter.api.Test
 
 internal class RxKotlinTest {
@@ -43,7 +45,19 @@ internal class RxKotlinTest {
             onError = { it.printStackTrace() },
             onComplete = { println("Done!") }
         )
-        println("asdasd")
-
     }
+
+    @Test
+    internal fun `evn odd`() {
+        val subject: Subject<Int> = PublishSubject.create()
+
+        subject
+            .map { isEven(it) }
+            .subscribe { println("This number is ${((if (it) "Even" else "Odd"))}") }
+
+        subject.onNext(4)
+        subject.onNext(9)
+    }
+
+    fun isEven(n: Int): Boolean = ((n % 2) == 0)
 }
