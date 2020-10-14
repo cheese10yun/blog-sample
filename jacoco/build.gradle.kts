@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
+    id("jacoco")
     kotlin("jvm")
     kotlin("plugin.spring")
     kotlin("plugin.jpa")
@@ -25,6 +26,7 @@ subprojects {
     apply(plugin = "maven-publish")
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
+    apply(plugin = "jacoco")
 
     allOpen {
         annotation("javax.persistence.Entity")

@@ -1,5 +1,7 @@
 rootProject.name = "jacoco"
 
+include("domain")
+include("service")
 
 pluginManagement {
     val pluginVersions = mapOf(
