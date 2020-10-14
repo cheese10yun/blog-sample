@@ -92,6 +92,22 @@ subprojects {
         maxHeapSize = "1g"
     }
 
+    tasks.register("testReport") {
+        val test by tasks
+        val jacocoTestReport by tasks
+
+        dependsOn(test, jacocoTestReport)
+    }
+
+    tasks.jacocoTestReport {
+        reports {
+            isEnabled = true
+            xml.isEnabled = true
+            csv.isEnabled = true
+            html.destination = file("$buildDir/reports/jacoco")
+        }
+    }
+
     group = "com.example"
     version = "0.0.1-SNAPSHOT"
     java.sourceCompatibility = JavaVersion.VERSION_1_8
