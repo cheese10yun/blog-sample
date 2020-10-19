@@ -89,8 +89,6 @@ internal class RxKotlinTest {
 
     @Test
     internal fun `observer`() {
-
-
         val observer: Observer<Any> = object : Observer<Any> {
             override fun onComplete() {
                 println("onComplete")
@@ -100,13 +98,12 @@ internal class RxKotlinTest {
                 println("onSubscribe: $d")
             }
 
-
             override fun onError(e: Throwable) {
                 println("onError: $e")
             }
 
-            override fun onNext(t: Any) {
-                println("onNext: ")
+            override fun onNext(item: Any) {
+                println("onNext: $item")
             }
         }
 
@@ -114,11 +111,35 @@ internal class RxKotlinTest {
 
         observable.subscribe(observer)//7
 
-        val observableOnList: Observable<List<Any>> = Observable.just(listOf("One", 2, "Three", "Four", 4.5, "Five", 6.0f),
+        val observableOnList: Observable<List<Any>> = Observable.just(
+            listOf("One", 2, "Three", "Four", 4.5, "Five", 6.0f),
             listOf("List with Single Item"),
-            listOf(1, 2, 3, 4, 5, 6))//8
+            listOf(1, 2, 3, 4, 5, 6)
+        )//8
 
         observableOnList.subscribe(observer)//9
+    }
+
+    @Test
+    internal fun `Observable create 메서드 이해`() {
+        // Observer 생성
+        val observer: Observer<Any> = object : Observer<Any> {
+            override fun onComplete() {
+                println("onComplete")
+            }
+
+            override fun onSubscribe(d: Disposable) {
+                println("onSubscribe: $d")
+            }
+
+            override fun onError(e: Throwable) {
+                println("onError: $e")
+            }
+
+            override fun onNext(item: Any) {
+                println("onNext: $item")
+            }
+        }
 
     }
 }
