@@ -9,6 +9,9 @@ import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import org.junit.jupiter.api.Test
 import java.util.Random
+import java.util.concurrent.Callable
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
 
 internal class RxKotlinTest {
 
@@ -121,9 +124,9 @@ internal class RxKotlinTest {
     }
 
     @Test
-    internal fun `Observable create 메서드 이해`() {
+    fun `Observable create 메서드 이해`() {
         // Observer 생성
-        val observer: Observer<Any> = object : Observer<Any> {
+        val observable = object : Observer<Any> {
             override fun onComplete() {
                 println("onComplete")
             }
@@ -141,6 +144,107 @@ internal class RxKotlinTest {
             }
         }
 
+        val observable1 = Observable.create<String> {
+            it.onNext("Emit 1")
+            it.onNext("Emit 2")
+            it.onNext("Emit 3")
+            it.onNext("Emit 4")
+            it.onComplete()
+        }
+
+        observable1.subscribe(observable)
+
+        val observable2 = Observable.create<String> {
+            it.onNext("Emit 1")
+            it.onNext("Emit 2")
+            it.onNext("Emit 3")
+            it.onNext("Emit 4")
+            it.onError(Exception("Custom Exception"))
+        }
+
+        observable2.subscribe(observable)
+    }
+
+    @Test
+    fun `Observable from 메서드 이해`() {
+        // Observer 생성
+        val observer = object : Observer<Any> {
+            override fun onComplete() {
+                println("onComplete")
+            }
+
+            override fun onSubscribe(d: Disposable) {
+                println("onSubscribe: $d")
+            }
+
+            override fun onError(e: Throwable) {
+                println("onError: $e")
+            }
+
+            override fun onNext(item: Any) {
+                println("onNext: $item")
+            }
+        }
+
+        val list = listOf("string 1", "string 2", "string 3", "string 4")
+
+        val fromIterable = Observable.fromIterable(list)
+
+        fromIterable.subscribe(observer)
+
+
+        val callable = object : Callable<String> {
+            override fun call(): String {
+                return "From Callable"
+            }
+        }
+
+        val fromCallable = Observable.fromCallable(callable)
+        fromCallable.subscribe(observer)
+
+
+        val future = object : Future<String> {
+            override fun isDone(): Boolean = true
+
+            override fun get(): String = "Hello From Future"
+
+            override fun get(timeout: Long, unit: TimeUnit): String = "Hello From Future"
+
+            override fun cancel(mayInterruptIfRunning: Boolean): Boolean = false
+
+            override fun isCancelled(): Boolean = false
+        }
+
+        val fromFuture = Observable.fromFuture(future)
+        fromFuture.subscribe(observer)
+    }
+
+    @Test
+    fun `toObserverable 확장 함수의 이해`() {
+        // Observer 생성
+        val observer = object : Observer<Any> {
+            override fun onComplete() {
+                println("onComplete")
+            }
+
+            override fun onSubscribe(d: Disposable) {
+                println("onSubscribe: $d")
+            }
+
+            override fun onError(e: Throwable) {
+                println("onError: $e")
+            }
+
+            override fun onNext(item: Any) {
+                println("onNext: $item")
+            }
+        }
+
+        val list = listOf("string 1", "string 2", "string 3", "string 4")
+
+        val observable = list.toObservable()
+
+        observable.subscribe(observer)
     }
 }
 

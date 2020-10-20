@@ -65,3 +65,51 @@ internal fun `observer`() {
 * onSubscribe() 메서드는 옵저버가 옵저버블을 구독할 떄 마다 호출된다 .
 
 #### Observable.create 메서드 이해
+
+```kotlin
+@Test
+fun `Observable create 메서드 이해`() {
+    // Observer 생성
+    val observable = object : Observer<Any> {
+        override fun onComplete() {
+            println("onComplete")
+        }
+
+        override fun onSubscribe(d: Disposable) {
+            println("onSubscribe: $d")
+        }
+
+        override fun onError(e: Throwable) {
+            println("onError: $e")
+        }
+
+        override fun onNext(item: Any) {
+            println("onNext: $item")
+        }
+    }
+
+    val observable1 = Observable.create<String> {
+        it.onNext("Emit 1")
+        it.onNext("Emit 2")
+        it.onNext("Emit 3")
+        it.onNext("Emit 4")
+        it.onComplete() // 완료 한다
+    }
+
+    observable1.subscribe(observable)
+
+    val observable2 = Observable.create<String> {
+        it.onNext("Emit 1")
+        it.onNext("Emit 2")
+        it.onNext("Emit 3")
+        it.onNext("Emit 4")
+        it.onError(Exception("Custom Exception")) // 예외를 발생시킨다
+    }
+
+    observable2.subscribe(observable)
+}
+```
+Observable.create 메서드는 사용자가 지정한 데이터 구조를 사용하거나 내보내는 값을 제어하려고 할 떄 유용하다.
+
+#### Observable.from 메서드 이해
+ 
