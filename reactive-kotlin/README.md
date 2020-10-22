@@ -112,4 +112,59 @@ fun `Observable create 메서드 이해`() {
 Observable.create 메서드는 사용자가 지정한 데이터 구조를 사용하거나 내보내는 값을 제어하려고 할 떄 유용하다.
 
 #### Observable.from 메서드 이해
- 
+
+```kotlin
+@Test
+fun `Observable from 메서드 이해`() {
+    // Observer 생성
+    val observer = object : Observer<Any> {
+        override fun onComplete() {
+            println("onComplete")
+        }
+
+        override fun onSubscribe(d: Disposable) {
+            println("onSubscribe: $d")
+        }
+
+        override fun onError(e: Throwable) {
+            println("onError: $e")
+        }
+
+        override fun onNext(item: Any) {
+            println("onNext: $item")
+        }
+    }
+
+    val list = listOf("string 1", "string 2", "string 3", "string 4")
+
+    val fromIterable = Observable.fromIterable(list)
+
+    fromIterable.subscribe(observer)
+
+
+    val callable = object : Callable<String> {
+        override fun call(): String {
+            return "From Callable"
+        }
+    }
+
+    val fromCallable = Observable.fromCallable(callable)
+    fromCallable.subscribe(observer)
+
+
+    val future = object : Future<String> {
+        override fun isDone(): Boolean = true
+
+        override fun get(): String = "Hello From Future"
+
+        override fun get(timeout: Long, unit: TimeUnit): String = "Hello From Future"
+
+        override fun cancel(mayInterruptIfRunning: Boolean): Boolean = false
+
+        override fun isCancelled(): Boolean = false
+    }
+
+    val fromFuture = Observable.fromFuture(future)
+    fromFuture.subscribe(observer)
+}
+```
