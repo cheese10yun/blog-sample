@@ -24,6 +24,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+
+
     runtimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")

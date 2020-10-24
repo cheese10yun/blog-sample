@@ -11,7 +11,7 @@
 
 ## 옵저버블
 
-리액티브 프로그래밍에서 옵저버블은 **그 컨슈머가 소비할 수 있는 값을 산출해 내는 기본 계산 작업을 갖고 있다.** 여기서 중요한 것은 컨슈머가 값을 풀 방식으로 접근하지 않는다는 점이다. 오히려 **옵저버블은 선슈머에게 값을 푸쉬하는 역할을 한다. 따라서 옵저버블은 인련의 연산자를 거친 아이템을 최종 옵저버로 보내는 푸시 기반의 조합 가능한 이터레이터다.**
+리액티브 프로그래밍에서 옵저버블은 **그 컨슈머가 소비할 수 있는 값을 산출해 내는 기본 계산 작업을 갖고 있다.** 여기서 중요한 것은 컨슈머가 값을 풀 방식으로 접근하지 않는다는 점이다. 오히려 **옵저버블은 컨슈머에게 값을 푸쉬하는 역할을 한다. 따라서 옵저버블은 인련의 연산자를 거친 아이템을 최종 옵저버로 보내는 푸시 기반의 조합 가능한 이터레이터다.**
 
 * 옵저버는 옵저버블을 구독한다.
 * 옵저버블이 그 내부의 아이템들을 내보내기 시작한다.
@@ -168,3 +168,114 @@ fun `Observable from 메서드 이해`() {
     fromFuture.subscribe(observer)
 }
 ```
+
+#### Observable.just 메서드 이해
+```kotlin
+@Test
+fun `observerable just 함수의 이해`() {
+    val observer = object : Observer<Any> {
+        override fun onComplete() {
+            println("onComplete")
+        }
+
+        override fun onSubscribe(d: Disposable) {
+            println("onSubscribe: $d")
+        }
+
+        override fun onError(e: Throwable) {
+            println("onError: $e")
+        }
+
+        override fun onNext(item: Any) {
+            println("onNext: $item")
+        }
+    }
+
+    Observable.just("A String").subscribe(observer)
+    Observable.just(54).subscribe(observer)
+    Observable.just(listOf("string 1", "string 2", "string 3", "string 4")).subscribe(observer)
+    Observable.just(
+        mapOf(
+            Pair("Key 1", "Value1"),
+            Pair("Key 2", "Value2"),
+            Pair("Key 3", "Value3")
+        )
+    ).subscribe(observer)
+    Observable.just("string 1", "string 2", "string 3", "string 4").subscribe(observer) // (1)
+
+
+//onSubscribe: 0
+//onNext: A String
+//onComplete
+//onSubscribe: 0
+//onNext: 54
+//onComplete
+//onSubscribe: 0
+//onNext: [string 1, string 2, string 3, string 4]
+//onComplete
+//onSubscribe: 0
+//onNext: {Key 1=Value1, Key 2=Value2, Key 3=Value3}
+//onComplete
+//onSubscribe: io.reactivex.internal.operators.observable.ObservableFromArray$FromArrayDisposable@75bfb235
+//onNext: string 1
+//onNext: string 2
+//onNext: string 3
+//onNext: string 4
+//onComplete
+}
+```
+Iterable 인스턴스를 Observable.just에 단일 인로 넘기면 전체 목록을 하나의 아이템으로 배출하는데, 이는 Iterable 내부의 각각의 아이템을 Observable로 생성하는 Observable.from과는 다르다.
+
+
+* 인자와 함께 Observable.just를 호출
+* Observable.just는 옵저버블을 생성
+* onNext 알림을 통해 각각의 아이템을 내보냄
+* 모든 인자의 제출이 완료되면 onComplete 알림을 실행
+
+**위 결과에서 확인할 수 있듯이 리스트와 맵도 단일 아이템으로 취급한다.** 하지만 문자열을 여러개 보내는 (1) 코드의 결과를 보면 인자를 별개의 아이템으로 받아들여 내보내고 있다.
+
+
+### Observable의 다른 팩토리 메서드
+
+```kotlin
+@Test
+fun `Observable의 다른팩토리 메서드`() {
+    val observer = object : Observer<Any> {
+        override fun onComplete() {
+            println("onComplete")
+        }
+
+        override fun onSubscribe(d: Disposable) {
+            println("onSubscribe: $d")
+        }
+
+        override fun onError(e: Throwable) {
+            println("onError: $e")
+        }
+
+        override fun onNext(item: Any) {
+            println("onNext: $item")
+        }
+    }
+
+    Observable.range(0, 10).subscribe(observer) // (1)
+    Observable.empty<String>().subscribe(observer) // (2)
+
+    runBlocking {
+        Observable.interval(300, TimeUnit.MILLISECONDS).subscribe(observer) // (3)
+        delay(900)
+
+        Observable.timer(400, TimeUnit.MILLISECONDS).subscribe(observer) // (4)
+        delay(450)
+    }
+}
+```
+
+* Observable.range() 메서드로 옵저버블을 생성하고 제공된 start부터 시작해서 count 만큼 정수를 내보낸다
+* Observable.empty() 메서드는 onNext()으로 보내지 않고 즉시 onComplete() 메서드를 발생시킨다.
+* Observable.interval() 메서드는 지정된 간격만큼 순차적으로 보내는데, 구독을 취소하거나 프로그램이 종료될 때까지 이어진다.
+* Observable.timer() 메서드는 지정된 시간이 경과한 후에 한 번만 실행된다.
+
+### 구독과 해지
+ 
+Observable(관찰돼야 하는 대상)과 Observer(관찰해야 하는 주체)가 있다. 어떻게 이 둘을 연결할까 ? Observable과 Observer는 키보드 처럼 입력 장치와 컴퓨터를 연결할 때처럼 매개체가 필요하다. Subscribe 연산자에 대해 1개에서 3개의 메서드(onNext, onComplete, onError)로 전달 할 수 있다.

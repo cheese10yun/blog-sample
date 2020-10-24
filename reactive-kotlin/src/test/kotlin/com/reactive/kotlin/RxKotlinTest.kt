@@ -7,6 +7,8 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.toObservable
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import java.util.Random
 import java.util.concurrent.Callable
@@ -245,6 +247,110 @@ internal class RxKotlinTest {
         val observable = list.toObservable()
 
         observable.subscribe(observer)
+    }
+
+    @Test
+    fun `observerable just 함수의 이해`() {
+        val observer = object : Observer<Any> {
+            override fun onComplete() {
+                println("onComplete")
+            }
+
+            override fun onSubscribe(d: Disposable) {
+                println("onSubscribe: $d")
+            }
+
+            override fun onError(e: Throwable) {
+                println("onError: $e")
+            }
+
+            override fun onNext(item: Any) {
+                println("onNext: $item")
+            }
+        }
+
+        Observable.just("A String").subscribe(observer)
+        Observable.just(54).subscribe(observer)
+        Observable.just(listOf("string 1", "string 2", "string 3", "string 4")).subscribe(observer)
+        Observable.just(
+            mapOf(
+                Pair("Key 1", "Value1"),
+                Pair("Key 2", "Value2"),
+                Pair("Key 3", "Value3")
+            )
+        ).subscribe(observer)
+
+        Observable.just("string 1", "string 2", "string 3", "string 4").subscribe(observer)
+    }
+
+    @Test
+    fun `Observable의 다른팩토리 메서드`() {
+        val observer = object : Observer<Any> {
+            override fun onComplete() {
+                println("onComplete")
+            }
+
+            override fun onSubscribe(d: Disposable) {
+                println("onSubscribe: $d")
+            }
+
+            override fun onError(e: Throwable) {
+                println("onError: $e")
+            }
+
+            override fun onNext(item: Any) {
+                println("onNext: $item")
+            }
+        }
+
+        Observable.range(0, 10).subscribe(observer) // (1)
+        Observable.empty<String>().subscribe(observer) // (2)
+
+        runBlocking {
+            Observable.interval(300, TimeUnit.MILLISECONDS).subscribe(observer) // (3)
+            delay(900)
+
+            Observable.timer(400, TimeUnit.MILLISECONDS).subscribe(observer) // (4)
+            delay(450)
+        }
+    }
+
+    @Test
+    fun `구독과 해지`() {
+
+        val observable = Observable.range(1, 5)
+
+        observable.subscribe(
+            {
+                println("Next $it")
+            },
+            {
+                println("Error ${it.message}")
+            },
+            {
+                println("Done")
+            }
+        )
+
+        object : Observer<Int> {
+            override fun onComplete() {
+                println("onComplete")
+            }
+
+            override fun onSubscribe(d: Disposable) {
+                println("onSubscribe")
+            }
+
+            override fun onNext(t: Int) {
+                println("onNext: $Int")
+            }
+
+            override fun onError(e: Throwable) {
+                println("onError: ${e.message}")
+            }
+        }
+
+
     }
 }
 
