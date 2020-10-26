@@ -341,7 +341,7 @@ internal class RxKotlinTest {
             }
 
             override fun onNext(t: Int) {
-                println("onNext: $Int")
+                println("onNext: $t")
             }
 
             override fun onError(e: Throwable) {
