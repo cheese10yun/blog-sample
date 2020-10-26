@@ -317,7 +317,6 @@ internal class RxKotlinTest {
 
     @Test
     fun `구독과 해지`() {
-
         val observable = Observable.range(1, 5)
 
         observable.subscribe(
@@ -332,7 +331,7 @@ internal class RxKotlinTest {
             }
         )
 
-        object : Observer<Int> {
+        val observer = object : Observer<Int> {
             override fun onComplete() {
                 println("onComplete")
             }
@@ -350,7 +349,7 @@ internal class RxKotlinTest {
             }
         }
 
-
+        observable.subscribe(observer)
     }
 }
 
