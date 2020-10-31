@@ -341,7 +341,7 @@ internal class RxKotlinTest {
             }
 
             override fun onNext(t: Int) {
-                println("onNext: $t")
+                println("onNext: $Int")
             }
 
             override fun onError(e: Throwable) {
@@ -351,5 +351,40 @@ internal class RxKotlinTest {
 
         observable.subscribe(observer)
     }
+
+    @Test
+    fun `구독과 해지2`() {
+        runBlocking {
+            val observable = Observable.interval(100, TimeUnit.MILLISECONDS)
+            val observer = object : Observer<Long> {
+                lateinit var disposable: Disposable
+
+                override fun onComplete() {
+                    println("onComplete")
+                }
+
+                override fun onSubscribe(d: Disposable) {
+                    println("onSubscribe")
+                    disposable = d
+                }
+
+                override fun onNext(item: Long) {
+                    println("onNext: $item")
+                    if (item >= 10 && disposable.isDisposed.not()) {
+                        disposable.dispose()
+                        println("dispose")
+                    }
+                }
+
+                override fun onError(e: Throwable) {
+                    println("onError: ${e.message}")
+                }
+            }
+
+            observable.subscribe(observer)
+            delay(1500L)
+        }
+    }
+
 }
 

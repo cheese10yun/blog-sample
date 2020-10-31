@@ -279,3 +279,94 @@ fun `Observable의 다른팩토리 메서드`() {
 ### 구독과 해지
  
 Observable(관찰돼야 하는 대상)과 Observer(관찰해야 하는 주체)가 있다. 어떻게 이 둘을 연결할까 ? Observable과 Observer는 키보드 처럼 입력 장치와 컴퓨터를 연결할 때처럼 매개체가 필요하다. Subscribe 연산자에 대해 1개에서 3개의 메서드(onNext, onComplete, onError)로 전달 할 수 있다.
+
+
+```kotlin
+@Test
+fun `구독과 해지`() {
+    val observable = Observable.range(1, 5)
+
+    observable.subscribe(
+        {
+            println("Next $it")
+        },
+        {
+            println("Error ${it.message}")
+        },
+        {
+            println("Done")
+        }
+    )
+
+    val observer = object : Observer<Int> {
+        override fun onComplete() {
+            println("onComplete")
+        }
+
+        override fun onSubscribe(d: Disposable) {
+            println("onSubscribe")
+        }
+
+        override fun onNext(t: Int) {
+            println("onNext: $t")
+        }
+
+        override fun onError(e: Throwable) {
+            println("onError: ${e.message}")
+        }
+    }
+
+    observable.subscribe(observer)
+    //Next 1
+    //Next 2
+    //Next 3
+    //Next 4
+    //Next 5
+    //Done
+    //onSubscribe
+    //onNext: 1
+    //onNext: 2
+    //onNext: 3
+    //onNext: 4
+    //onNext: 5
+    //onComplete
+}
+```
+
+```kotlin
+
+@Test
+fun `구독과 해지2`() {
+    runBlocking {
+        val observable = Observable.interval(100, TimeUnit.MILLISECONDS)
+        val observer = object : Observer<Long> {
+            lateinit var disposable: Disposable
+            
+            override fun onComplete() {
+                println("onComplete")
+            }
+
+            override fun onSubscribe(d: Disposable) {
+                println("onSubscribe")
+                disposable = d
+            }
+
+            override fun onNext(item: Long) {
+                println("onNext: $item")
+                if (item >= 10 && disposable.isDisposed.not()) {
+                    disposable.dispose()
+                    println("dispose")
+                }
+            }
+
+            override fun onError(e: Throwable) {
+                println("onError: ${e.message}")
+            }
+        }
+
+        observable.subscribe(observer)
+        delay(1500L)
+    }
+}
+```
+* Disposable 를 통해서 구독을 멈출 수가 있다.
