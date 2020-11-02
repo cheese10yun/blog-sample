@@ -5,6 +5,7 @@ import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.toObservable
+import io.reactivex.subjects.AsyncSubject
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import kotlinx.coroutines.delay
@@ -386,5 +387,132 @@ internal class RxKotlinTest {
         }
     }
 
-}
+    @Test
+    fun `콜드 옵저버블`() {
+        val observable = listOf("string1", "string2", "string3", "string4").toObservable()
 
+        observable.subscribe(
+            {
+                println("Received $it")
+            },
+            {
+                println("Error ${it.message}")
+            },
+            {
+                println("Done")
+            }
+        )
+
+        observable.subscribe(
+            {
+                println("Received $it")
+            },
+            {
+                println("Error ${it.message}")
+            },
+            {
+                println("Done")
+            }
+        )
+
+    }
+
+    @Test
+    fun `핫 옵저버블`() {
+        val connectableObservable = listOf("string1", "string2", "string3", "string4", "string5").toObservable().publish()
+
+        connectableObservable.subscribe { println("Subscription 1: $it") } // 콜드 옵저버블
+        connectableObservable.map(String::reversed).subscribe { println("Subscription 2: $it") } // 콜드 옵저버블
+        connectableObservable.connect() // connect를 사용하여 콜드 옵저저블을 핫 옵저저블로 변경한다.
+        connectableObservable.subscribe { println("Subscription 3: $it") }
+    }
+
+    @Test
+    fun `핫 옵저버블2`() {
+        val connectableObservable = Observable.interval(100, TimeUnit.MILLISECONDS).publish()
+
+        connectableObservable.subscribe { println("Subscription 1: $it") } // 콜드 옵저버블
+        connectableObservable.subscribe { println("Subscription 2: $it") }
+        connectableObservable.connect() // connect를 사용하여 콜드 옵저저블을 핫 옵저저블로 변경한다.
+        runBlocking { delay(500) }
+
+        connectableObservable.subscribe { println("Subscription 3: $it") }
+        runBlocking { delay(500) }
+    }
+
+    @Test
+    fun subject() {
+        val observable = Observable.interval(100, TimeUnit.MILLISECONDS)
+        val subject = PublishSubject.create<Long>()
+        observable.subscribe(subject)
+
+        subject.subscribe { println("Received $it") }
+        runBlocking { delay(1100) }
+    }
+
+    @Test
+    fun subject2() {
+        val observable = Observable.interval(100, TimeUnit.MILLISECONDS)
+        val subject = PublishSubject.create<Long>()
+        observable.subscribe(subject)
+
+        subject.subscribe { println("Subscription 1 Received $it") }
+        runBlocking { delay(1100) }
+
+        subject.subscribe { println("Subscription 2 Received $it") }
+        runBlocking { delay(1100) }
+    }
+
+    @Test
+    fun subject3() {
+//        val observable = listOf(1L, 2L, 3L, 4L, 5L).toObservable().publish()
+        val observable = Observable.just(1L, 2L, 3L, 4L).publish()
+//        val observable = Observable.interval(100, TimeUnit.MILLISECONDS)
+        val subject = PublishSubject.create<Long>()
+        observable.subscribe(subject)
+
+        subject.subscribe { println("Subscription 1 Received $it") }
+        runBlocking { delay(1100) }
+
+        subject.subscribe { println("Subscription 2 Received $it") }
+        runBlocking { delay(1100) }
+    }
+
+    @Test
+    fun `AsyncSubject 이해`() {
+        val observable = Observable.just(1, 2, 3, 4)
+        val subject = AsyncSubject.create<Int>()
+
+        observable.subscribe(subject)
+        subject.subscribe(
+            {
+                println("Received $it")
+            },
+            {
+                it.printStackTrace()
+            },
+            {
+                println("Done")
+            }
+        )
+    }
+
+    @Test
+    fun `AsyncSubject 이해2`() {
+        val observable = Observable.just(1, 2, 3, 4)
+        val subject = AsyncSubject.create<Int>()
+
+        observable.subscribe(subject)
+        subject.subscribe(
+            {
+                println("Received $it")
+            },
+            {
+                it.printStackTrace()
+            },
+            {
+                println("Done")
+            }
+        )
+    }
+}

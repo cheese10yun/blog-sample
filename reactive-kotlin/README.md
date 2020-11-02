@@ -334,7 +334,6 @@ fun `구독과 해지`() {
 ```
 
 ```kotlin
-
 @Test
 fun `구독과 해지2`() {
     runBlocking {
@@ -370,3 +369,184 @@ fun `구독과 해지2`() {
 }
 ```
 * Disposable 를 통해서 구독을 멈출 수가 있다.
+* onNext 메서드 내부에 검사 로직을 위치시켰는데 제출된 값이 10보다 크거나 같은지 확인하거, 배출이 이미 중단괴거나 해지되지 않은 경우 5번에 그것을 해지한다.
+
+## 핫, 콜드 옵저버블
+
+### 콜드 옵저버블
+```kotlin
+@Test
+fun `콜드 옵저버블`() {
+    val observable = listOf("string1", "string2", "string3", "string4").toObservable()
+    
+    observable.subscribe(
+        {
+            println("Received $it")
+        },
+        {
+            println("Error ${it.message}")
+        },
+        {
+            println("Done")
+        }
+    )
+
+    observable.subscribe(
+        {
+            println("Received $it")
+        },
+        {
+            println("Error ${it.message}")
+        },
+        {
+            println("Done")
+        }
+    )
+//Received string1
+//Received string2
+//Received string3
+//Received string4
+//Done
+//Received string1
+//Received string2
+//Received string3
+//Received string4
+//Done
+}
+```
+동일한 옵저버블을 여러 번 구독해도 모든 구독의 새로운 배출을 얻을 수 있다. 옵저버블은 특징적인 기능을 갖고 있는데 **각 구독마다 처음부터 아이템을 배출하는 것을 콜드 옵저버블이라고 한다. 구체적으로 설명하면 콜드 옵저블은 구독 시에 실행을 시작하고 subscribe가 호출되면 아이템을 푸시하기 시작하는데 각 구독에서 아이템의 동일한 순서를 푸시한다.**
+
+### 핫 옵저버블
+
+콜드 옵저블은 수동적이며 구독이 호출될 때까지 아무것도 보내지 않는다. 핫 옵저버블은 콜드 옵저버블과 반대로, 배출을 시작하기 위해 수독할 필요가 없다. 콜드 옵저버블을 CD/DVD 레코딩으로 본다면 핫 옵저버블은 TV 채널과 비슷하다. **핫 옵저버블은 시청자가 시청하는지 여부에 관계없이 콘텐츠를 계속 브로드캐스팅 한다. 핫 옵저저블은 데이터 보다는 이벤트와 유사하다.**
+
+```kotlin
+@Test
+fun `핫 옵저버블`() {
+    val connectableObservable = listOf("string1", "string2", "string3", "string4", "string5").toObservable().publish()
+
+    connectableObservable.subscribe { println("Subscription 1: $it") } // 콜드 옵저버블
+    connectableObservable.map(String::reversed).subscribe { println("Subscription 2: $it") } // 콜드 옵저버블
+    connectableObservable.connect() // connect를 사용하여 콜드 옵저저블을 핫 옵저저블로 변경한다.
+    connectableObservable.subscribe { println("Subscription 3: $it") }
+}
+``` 
+
+```kotlin
+@Test
+fun `핫 옵저버블2`() {
+    val connectableObservable = Observable.interval(100, TimeUnit.MILLISECONDS).publish()
+
+    connectableObservable.subscribe { println("Subscription 1: $it") } // 콜드 옵저버블
+    connectableObservable.subscribe { println("Subscription 2: $it") }
+    connectableObservable.connect() // connect를 사용하여 콜드 옵저저블을 핫 옵저저블로 변경한다.
+    runBlocking { delay(500) }
+
+    connectableObservable.subscribe { println("Subscription 3: $it") }
+    runBlocking { delay(500) }
+//Subscription 1: 0
+//Subscription 2: 0
+//Subscription 1: 1
+//Subscription 2: 1
+//Subscription 1: 2
+//Subscription 2: 2
+//Subscription 1: 3
+//Subscription 2: 3
+//Subscription 1: 4
+//Subscription 2: 4
+//Subscription 1: 5
+//Subscription 2: 5
+//Subscription 3: 5
+//Subscription 1: 6
+//Subscription 2: 6
+//Subscription 3: 6
+//Subscription 1: 7
+//Subscription 2: 7
+//Subscription 3: 7
+//Subscription 1: 8
+//Subscription 2: 8
+//Subscription 3: 8
+//Subscription 1: 9
+//Subscription 2: 9
+//Subscription 3: 9
+}
+```
+세 번째 구독이 5번째 배출을 받았고 이전의 구독을 모두 놓쳤다는 것을 확인 할 수있다.
+
+#### Subject
+
+Hot Observables를 구현하는 또 다른 좋은 방법은 Subject이다. 
+
+```kotlin
+@Test
+fun subject() {
+    val observable = Observable.interval(100, TimeUnit.MILLISECONDS)
+    val subject = PublishSubject.create<Long>()
+    observable.subscribe(subject)
+
+    subject.subscribe { println("Received $it") }
+    runBlocking { delay(1100) }
+//Received 0
+//Received 1
+//Received 2
+//Received 3
+//Received 4
+//Received 5
+//Received 6
+//Received 7
+//Received 8
+//Received 9
+//Received 10
+}
+```
+* 옵저저블이 가져야 하는 모든 연산자를 갖고 있다.
+* 옵저버와 마찬가지로 배출된 모든 값에 접근할 수 있다.
+* Subject가 완료(completed)/오류(errored)구독 해지(unsubscribed)된 후에는 재사용할 수 없다.
+* 가장 흥미로운 점은 그 자체로 가치를 전달한다는 것이다. onNext를 사용해서 값을 Subject(Observer) 측에 전달하면 Observable에서 접근이 가능하게 된다.
+
+```kotlin
+@Test
+fun subject2() {
+    val observable = Observable.interval(100, TimeUnit.MILLISECONDS)
+    val subject = PublishSubject.create<Long>()
+    observable.subscribe(subject)
+
+    subject.subscribe { println("Subscription 1 Received $it") }
+    runBlocking { delay(1100) }
+
+    subject.subscribe { println("Subscription 2 Received $it") }
+    runBlocking { delay(1100) }
+}
+```
+## 다양한 구독자
+* AsyncSubject
+* PublishSubject
+* BehaviorSubject
+* ReplaySubject
+
+### AsyncSubject 이해
+
+```kotlin
+@Test
+fun `AsyncSubject 이해`() {
+    val observable = Observable.just(1, 2, 3, 4)
+    val subject = AsyncSubject.create<Int>()
+
+    observable.subscribe(subject)
+    subject.subscribe(
+        {
+            println("Received $it")
+        },
+        {
+            it.printStackTrace()
+        },
+        {
+            println("Done")
+        }
+    )
+//Received 4
+//Done
+}
+```
+
+AsyncSubject는 수신 대기 중인 소스 옵저버블의 마지막 값을 한 번 만 배출한다.
