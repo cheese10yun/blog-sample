@@ -550,3 +550,199 @@ fun `AsyncSubject 이해`() {
 ```
 
 AsyncSubject는 수신 대기 중인 소스 옵저버블의 마지막 값을 한 번 만 배출한다.
+
+### BehaviorSubject 이해
+
+```kotlin
+@Test
+fun `BehaviorSubject 이해`() {
+    val subject = BehaviorSubject.create<Int>()
+    subject.onNext(1)
+    subject.onNext(2)
+    subject.onNext(3)
+    subject.onNext(4) // 마지막 아이템
+    subject.subscribe(
+        {
+            println("S1 Received $it")
+        },
+        {
+            it.printStackTrace()
+        },
+        {
+            println("S1 Completed")
+        }
+    )
+    subject.onNext(5) // 마지막 아이템
+    subject.subscribe(
+        {
+            println("S2 Received $it")
+        },
+        {
+            it.printStackTrace()
+        },
+        {
+            println("S2 Completed")
+        }
+    )
+    subject.onComplete()
+// S1 Received 4
+// S1 Received 5
+// S2 Received 5
+// S1 Completed
+// S2 Completed
+}
+```
+**BehaviorSubject는 멀티캐스팅으로 동작하는데 구독 전의 마지막 아이템과 구독 후 모든 아이템을 배출한다.**
+
+
+### ReplaySubject 이해
+
+```kotlin
+@Test
+fun `ReplaySubject 이해`() {
+    val subject = ReplaySubject.create<Int>()
+    subject.onNext(1)
+    subject.onNext(2)
+    subject.onNext(3)
+    subject.onNext(4)
+    subject.subscribe(
+        {
+            println("S1 Received $it")
+        },
+        {
+            it.printStackTrace()
+        },
+        {
+            println("S1 Completed")
+        }
+    )
+    subject.onNext(5)
+    subject.subscribe(
+        {
+            println("S2 Received $it")
+        },
+        {
+            it.printStackTrace()
+        },
+        {
+            println("S2 Completed")
+        }
+    )
+    subject.onComplete()
+}
+//S1 Received 1
+//S1 Received 2
+//S1 Received 3
+//S1 Received 4
+//S1 Received 5
+//S2 Received 1
+//S2 Received 2
+//S2 Received 3
+//S2 Received 4
+//S2 Received 5
+//S1 Completed
+//S2 Completed
+```
+
+# 4장 백프레셔와 플로어블 소개
+옵저버블은 추가 처리를 위해 옵저버가 소비할 항목을 배출한다. 그러나 옵저버블이 옵저버 소비할 수의 처리량보다 더 빨리 아이템이 배출되는 상황에서 문제가 발생한다. 4장에서는 디음을 중점으로 살펴본다.
+
+* 백프레셔 이해하기
+* 플로어블 및 가입자
+* Flowable.create() 플로어블 생성하기
+* 옵저저블과 플로어블 동시에 사용하기
+* 백프레셔 연산자
+* Flowable.generate() 연산자
+
+## 백프레셔 이해
+
+옵저저블의 유일한 문제 상황은 옵저버가 옵저저블 속도에 대처할 수 없는 경우다. 옵저저블은 기본적으로 아이템을 동기적으로 옵저버에 하나씩 푸시해 동작한다. 그러나 옵저버가 시간을 필요로 하는 작업을 처리해야 한다면 그 시간이 옵저저블이 각 항목을 배출하는 간격보다 길어질수 있다.
+
+```kotlin
+@Test
+fun `백프레셔 이해`() {
+    val observable = Observable.just(1, 2, 3, 4, 5, 6, 7, 9) // (1)
+    val subject = BehaviorSubject.create<Int>()
+
+    subject.observeOn(Schedulers.computation()) // (2)
+        .subscribe {
+            println("Sub 1 Received $it")
+            runBlocking { delay(200) } // (4)
+        }
+
+    subject.observeOn(Schedulers.computation()) // (5)
+        .subscribe {// (6)
+            println("Sub 2 Received $it")
+        }
+
+    observable.subscribe(subject) // (7)
+    runBlocking { delay(200) } // (8)
+}
+```
+
+* (1): 옵저저블을 생성한다
+* (2),(3): 구독한다
+* (7): BehaviorSubject를 구독한 후에 BehaviorSubject를 사용해 옵저저블을 구독하면 BehaviorSubject의 모든 배출을 받을 수 있게 된다.
+* (4): 첫 번쨰 구독 내에서 시간이 오래 걸리게 하기 위해서 delay 메서드를 사용한다
+* `subject.observeOn(Schedulers.computation())`메서드는 `observeOn`에서 구독을 실행하는 스레드를 지정하도록 해주고 `Schedulers.computation()`은 계산을 수행할 스레드를 제공한다.
+* (8): 실행은 백그라운드(다른 스레드)에서 수행하기 때문에 코드를 확인 하기 위해서 delay를 진행 
+
+```
+Sub 2 Received 1
+Sub 1 Received 1
+Sub 2 Received 2
+Sub 2 Received 3
+Sub 2 Received 4
+Sub 2 Received 5
+Sub 2 Received 6
+Sub 2 Received 7
+Sub 2 Received 9
+Sub 1 Received 2
+```
+해당 출력은 구독을 번갈아가면서 1~9 까지 모든 순자를 출력하지 않는다. 이 프로그램은 **두 옵저버에 한 번만 배출하는 subject인 핫 옵저버블로서의 행동을 멈춘것은 아니다. 그러나 첫 번쨰 옵저버에서 각 계산이 오래 걸렸기 때문에 각 배출들은 대기열로 들어가게 된것이다.** 이것은 OutOfMemoryError 예뢰를 포함해 많은 문제를 일으킬 수 있으므로 좋지 않은 행동이다.
+
+
+```kotlin
+@Test
+    fun `백프레셔 이해 2`() {
+        val observable = Observable.just(1, 2, 3, 4, 5, 6, 7, 9) // (1)
+
+        observable
+            .map { MyItem(it) } // (2)
+            .observeOn(Schedulers.computation()) // (3)
+            .subscribe { // (4)
+                println("Received $it")
+                runBlocking { delay(200) } // (5)
+            }
+
+        runBlocking { delay(2000) } // (6)
+
+    }
+
+    data class MyItem(val id: Int) {
+        init {
+            println("MyItem Created $id") // (7)
+        }
+    }
+```
+`(2)`에서 사용한 map 연산자를 사용해 Int 항목을 MyItem 객체로 변환했다. 예제에서 map은 배출 아이템을 추적하는데 사용 했다. 배출이 발생할 때 마다 즉시 map 연산자로 전달돼 MyItem 클래스의 객체를 생성한다.
+
+```
+MyItem Created 1
+MyItem Created 2
+MyItem Created 3
+MyItem Created 4
+MyItem Created 5
+MyItem Created 6
+Received MyItem(id=1)
+MyItem Created 7
+MyItem Created 9
+Received MyItem(id=2)
+Received MyItem(id=3)
+Received MyItem(id=4)
+Received MyItem(id=5)
+Received MyItem(id=6)
+Received MyItem(id=7)
+Received MyItem(id=9)
+```
+**배출의 출력에서 볼 수 있듯이 MyItem의 생성은 매우 빠르며 컨슈머로 알려진 옵저버가 인쇄를 시작도 하기 전에 완료되었다. 여기서 볼 수 있듯이 문제는 배출이 대기열에 쌓이고 있는데 컨슈머는 이 전의 배출량을 처리하고 있다는 것이다.** 

@@ -5,8 +5,11 @@ import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.toObservable
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.AsyncSubject
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.ReplaySubject
 import io.reactivex.subjects.Subject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -514,5 +517,113 @@ internal class RxKotlinTest {
                 println("Done")
             }
         )
+    }
+
+    @Test
+    fun `BehaviorSubject 이해`() {
+        val subject = BehaviorSubject.create<Int>()
+        subject.onNext(1)
+        subject.onNext(2)
+        subject.onNext(3)
+        subject.onNext(4)
+        subject.subscribe(
+            {
+                println("S1 Received $it")
+            },
+            {
+                it.printStackTrace()
+            },
+            {
+                println("S1 Completed")
+            }
+        )
+        subject.onNext(5)
+        subject.subscribe(
+            {
+                println("S2 Received $it")
+            },
+            {
+                it.printStackTrace()
+            },
+            {
+                println("S2 Completed")
+            }
+        )
+        subject.onComplete()
+    }
+
+    @Test
+    fun `ReplaySubject 이해`() {
+        val subject = ReplaySubject.create<Int>()
+        subject.onNext(1)
+        subject.onNext(2)
+        subject.onNext(3)
+        subject.onNext(4)
+        subject.subscribe(
+            {
+                println("S1 Received $it")
+            },
+            {
+                it.printStackTrace()
+            },
+            {
+                println("S1 Completed")
+            }
+        )
+        subject.onNext(5)
+        subject.subscribe(
+            {
+                println("S2 Received $it")
+            },
+            {
+                it.printStackTrace()
+            },
+            {
+                println("S2 Completed")
+            }
+        )
+        subject.onComplete()
+    }
+
+    @Test
+    fun `백프레셔 이해`() {
+        val observable = Observable.just(1, 2, 3, 4, 5, 6, 7, 9) // (1)
+        val subject = BehaviorSubject.create<Int>()
+
+        subject.observeOn(Schedulers.computation()) // (2)
+            .subscribe {
+                println("Sub 1 Received $it")
+                runBlocking { delay(200) } // (4)
+            }
+
+        subject.observeOn(Schedulers.computation()) // (5)
+            .subscribe {// (6)
+                println("Sub 2 Received $it")
+            }
+
+        observable.subscribe(subject) // (7)
+        runBlocking { delay(200) } // (8)
+    }
+
+    @Test
+    fun `백프레셔 이해 2`() {
+        val observable = Observable.just(1, 2, 3, 4, 5, 6, 7, 9) // (1)
+
+        observable
+            .map { MyItem(it) }
+            .observeOn(Schedulers.computation())
+            .subscribe {
+                println("Received $it")
+                runBlocking { delay(200) }
+            }
+
+        runBlocking { delay(2000) }
+
+    }
+
+    data class MyItem(val id: Int) {
+        init {
+            println("MyItem Created $id")
+        }
     }
 }
