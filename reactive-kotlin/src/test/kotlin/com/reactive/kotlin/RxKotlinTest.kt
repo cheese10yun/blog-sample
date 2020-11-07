@@ -618,7 +618,23 @@ internal class RxKotlinTest {
             }
 
         runBlocking { delay(2000) }
+    }
 
+    @Test
+     fun `풀로어블`() {
+        Observable.just(1, 1000)
+            .map { MyItem(it) }
+            .observeOn(Schedulers.computation())
+            .subscribe(
+                {
+                    println("Recevied $it")
+                    runBlocking { delay(50) }
+                },
+                {
+                    it.printStackTrace()
+                }
+            )
+        runBlocking { delay(6000) }
     }
 
     data class MyItem(val id: Int) {
