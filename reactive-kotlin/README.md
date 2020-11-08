@@ -704,26 +704,26 @@ Sub 1 Received 2
 
 ```kotlin
 @Test
-    fun `백프레셔 이해 2`() {
-        val observable = Observable.just(1, 2, 3, 4, 5, 6, 7, 9) // (1)
+fun `백프레셔 이해 2`() {
+    val observable = Observable.just(1, 2, 3, 4, 5, 6, 7, 9) // (1)
 
-        observable
-            .map { MyItem(it) } // (2)
-            .observeOn(Schedulers.computation()) // (3)
-            .subscribe { // (4)
-                println("Received $it")
-                runBlocking { delay(200) } // (5)
-            }
-
-        runBlocking { delay(2000) } // (6)
-
-    }
-
-    data class MyItem(val id: Int) {
-        init {
-            println("MyItem Created $id") // (7)
+    observable
+        .map { MyItem(it) } // (2)
+        .observeOn(Schedulers.computation()) // (3)
+        .subscribe { // (4)
+            println("Received $it")
+            runBlocking { delay(200) } // (5)
         }
+
+    runBlocking { delay(2000) } // (6)
+
+}
+
+data class MyItem(val id: Int) {
+    init {
+        println("MyItem Created $id") // (7)
     }
+}
 ```
 `(2)`에서 사용한 map 연산자를 사용해 Int 항목을 MyItem 객체로 변환했다. 예제에서 map은 배출 아이템을 추적하는데 사용 했다. 배출이 발생할 때 마다 즉시 map 연산자로 전달돼 MyItem 클래스의 객체를 생성한다.
 
@@ -842,11 +842,11 @@ Receivbed MyItem(id=114)
 
 **플오어블은 모든 아이템을 한 번에 배출하지 않고 컨슈머가 처리를 시작할 수 있을 때까지 기다렸다가 다시 배출을 전달하며, 완료될 때까지 이 동작을 반복한다.**
 
-### 플로어블과 옵저버블 사용 구분
+## 플로어블과 옵저버블 사용 구분
 
 지금쯤 플로어블을 사용하기 편리한 도구라고 생각하고 모든 옵저버블은 대체할 수도 있다. **그러나 항상 플로어블이 옵저버블보다 나은 것은아니다. 플로어블은 백프레셔 전략을 제공하지만 옵저버블이 존재하는 데는 이유가 있으며 둘 다 장단점이 있다.**
 
-#### 플로어블을 언제 사용할까
+### 플로어블을 언제 사용할까
 
 다음은 플로어블의 사용을 고려해야 할 상항이다. **플로어블은 옵저버블보다 느리다는 것을 기억하자.**
 
@@ -855,5 +855,66 @@ Receivbed MyItem(id=114)
 * 결과를 반환하는 동안 IO 소스의 양을 조절할 수 있는 블로킹을 지원하는 네티워크 IO 작업/스프리밍 API에서 배출할 때 사용한다.
 
 
+### 옵저저블은 언제 사용할까
+* 소량의 데이터(10,000개 미만의 배출)를 다룰 때
+* 오로지 동기 방식으로 작업하길 원하거나 또는 제한된 동시성을 가진 작업을 수행할 때
+* UI 이벤트를 발생 시킬 때
+
+## 플로어블과 구독자
+플로어블은 옵저버 대신 백프레셔 호환이 가능한 구독자를 사용한다. 그러나 람다식을 사용한다면 차이점을 발견 할 수 없을 것이다. 그렇다면 옵저버 대신 구독자를 사용해야 하는 이유는 무엇일까? 왜냐하면 구독자가 일부 추가 기능과 빽프레셔를 동시에 지원하기 때문이다. 예를 들어 얼마나 많은 아이템을 받기를 원하는지 메시지로 전당할 수 있다. 아니면 구독자를 사용하는 동안 업스트림에서 수신하고자 하는 항목의 수를 지정하도록 할 수 있는데 아무값도 지정하지 안흥면 어떤 배출도 수신하리 못할 것이다.
+
+코드에서 원하는 배출량을 지정하지 않았지만 내부적으로 배출량을 무제한으로 요청했기 때문에 배출된 모든 아이템을 수신할 수 있었다.
 
 
+```kotlin
+@Test
+fun subscriber() {
+
+    Flowable.range(1, 15)
+        .map { MyItem(it) }
+        .observeOn(Schedulers.io())
+        .subscribe(object : Subscriber<MyItem> {
+            lateinit var subscription: Subscription
+
+            override fun onSubscribe(subscription: Subscription) {
+                this.subscription = subscription
+                subscription.request(5)
+            }
+
+            override fun onNext(t: MyItem?) {
+                runBlocking { delay(50) }
+                println("Subscriber received $t")
+
+                if (t!!.id == 5) {
+                    println("Request two more")
+                    subscription.request(2)
+                }
+            }
+
+            override fun onError(t: Throwable) = t.printStackTrace()
+
+            override fun onComplete() = println("Done")
+        })
+
+    runBlocking { delay(10000) }
+}
+
+```
+
+```
+MyItem Created 1
+MyItem Created 2
+...
+MyItem Created 15
+Subscriber received MyItem(id=1)
+Subscriber received MyItem(id=2)
+Subscriber received MyItem(id=3)
+Subscriber received MyItem(id=4)
+Subscriber received MyItem(id=5)
+Request two more
+Subscriber received MyItem(id=6)
+Subscriber received MyItem(id=7)
+BUILD SUCCESSFUL in 13s
+```
+
+subscription의 구독을 초기에는 5로 서정했고 5게 이상 부터는 2개식 구독을 진행하는 것으로 수정했다. 걀과를 보면 해당 설정을 이해할 수 있다.

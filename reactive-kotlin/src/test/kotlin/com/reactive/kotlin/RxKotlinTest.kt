@@ -15,6 +15,8 @@ import io.reactivex.subjects.Subject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
+import org.reactivestreams.Subscriber
+import org.reactivestreams.Subscription
 import java.util.Random
 import java.util.concurrent.Callable
 import java.util.concurrent.Future
@@ -625,7 +627,7 @@ class RxKotlinTest {
     fun `풀로어블`() {
         Observable.range(1, 1000) //(1)
             .map { MyItem(it) } //(2)
-            .observeOn(Schedulers.computation())
+            .observeOn(Schedulers.io())
             .subscribe( //(3)
                 {
                     println("Received $it")
@@ -653,6 +655,38 @@ class RxKotlinTest {
                 }
             )
         runBlocking { delay(6000) }
+    }
+
+    @Test
+    fun subscriber() {
+
+        Flowable.range(1, 15)
+            .map { MyItem(it) }
+            .observeOn(Schedulers.io())
+            .subscribe(object : Subscriber<MyItem> {
+                lateinit var subscription: Subscription
+
+                override fun onSubscribe(subscription: Subscription) {
+                    this.subscription = subscription
+                    subscription.request(5)
+                }
+
+                override fun onNext(t: MyItem?) {
+                    runBlocking { delay(50) }
+                    println("Subscriber received $t")
+
+                    if (t!!.id == 5) {
+                        println("Request two more")
+                        subscription.request(2)
+                    }
+                }
+
+                override fun onError(t: Throwable) = t.printStackTrace()
+
+                override fun onComplete() = println("Done")
+            })
+
+        runBlocking { delay(10000) }
     }
 
     data class MyItem(val id: Int) {
