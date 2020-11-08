@@ -621,17 +621,17 @@ internal class RxKotlinTest {
     }
 
     @Test
-     fun `풀로어블`() {
-        Observable.just(1, 1000)
-            .map { MyItem(it) }
+    fun `풀로어블`() {
+        Observable.range(1, 1000) //(1)
+            .map { MyItem(it) } //(2)
             .observeOn(Schedulers.computation())
-            .subscribe(
+            .subscribe( //(3)
                 {
-                    println("Recevied $it")
-                    runBlocking { delay(50) }
+                    println("Received $it")
+                    runBlocking { delay(50) } //(4)
                 },
                 {
-                    it.printStackTrace()
+                    it.printStackTrace() //(5)
                 }
             )
         runBlocking { delay(6000) }
