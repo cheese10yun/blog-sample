@@ -1,5 +1,6 @@
 package com.reactive.kotlin
 
+import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
@@ -19,10 +20,10 @@ import java.util.concurrent.Callable
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
-internal class RxKotlinTest {
+class RxKotlinTest {
 
     @Test
-    internal fun `pull 메커니즘`() {
+    fun `pull 메커니즘`() {
         val list = listOf(
             "one",
             2,
@@ -40,7 +41,7 @@ internal class RxKotlinTest {
     }
 
     @Test
-    internal fun `observable`() {
+    fun `observable`() {
         val list = listOf(
             "one",
             2,
@@ -61,7 +62,7 @@ internal class RxKotlinTest {
     }
 
     @Test
-    internal fun `evn odd`() {
+    fun `evn odd`() {
         val subject: Subject<Int> = PublishSubject.create()
 
         subject
@@ -75,7 +76,7 @@ internal class RxKotlinTest {
     fun Int.isEven(n: Int): Boolean = ((n % 2) == 0)
 
     @Test
-    internal fun `람다 표현식`() {
+    fun `람다 표현식`() {
         val sum = { x: Int, y: Int -> x + y }
         println("sum ${sum(12, 14)}")
 
@@ -84,7 +85,7 @@ internal class RxKotlinTest {
     }
 
     @Test
-    internal fun `highOrderFun test`() {
+    fun `highOrderFun test`() {
         highOrderFun(2, { a: Int -> a.isEven(2) })
     }
 
@@ -97,7 +98,7 @@ internal class RxKotlinTest {
     }
 
     @Test
-    internal fun `observer`() {
+    fun `observer`() {
         val observer: Observer<Any> = object : Observer<Any> {
             override fun onComplete() {
                 println("onComplete")
@@ -632,6 +633,23 @@ internal class RxKotlinTest {
                 },
                 {
                     it.printStackTrace() //(5)
+                }
+            )
+        runBlocking { delay(6000) }
+    }
+
+    @Test
+    fun `flowable`() {
+        Flowable.range(1, 1000)
+            .map { MyItem(it) }
+            .observeOn(Schedulers.io())
+            .subscribe(
+                {
+                    println("Receivbed $it")
+                    runBlocking { delay(50) }
+                },
+                {
+                    it.printStackTrace()
                 }
             )
         runBlocking { delay(6000) }
