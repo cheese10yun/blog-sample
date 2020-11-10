@@ -671,11 +671,11 @@ class RxKotlinTest {
                     subscription.request(5)
                 }
 
-                override fun onNext(t: MyItem?) {
+                override fun onNext(t: MyItem) {
                     runBlocking { delay(50) }
                     println("Subscriber received $t")
 
-                    if (t!!.id == 5) {
+                    if (t.id == 5) {
                         println("Request two more")
                         subscription.request(2)
                     }
