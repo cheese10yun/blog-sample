@@ -1,5 +1,6 @@
 package com.reactive.kotlin
 
+import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Observer
@@ -686,6 +687,75 @@ class RxKotlinTest {
                 override fun onComplete() = println("Done")
             })
 
+        runBlocking { delay(10000) }
+    }
+
+    @Test
+    fun `처음뿌터 플로어블 생성하기`() {
+        val observer = object : Observer<Int> {
+            override fun onSubscribe(d: Disposable) {
+                println("New Subscription")
+            }
+
+            override fun onNext(item: Int) {
+                println("item: $item")
+            }
+
+            override fun onError(e: Throwable) {
+                e.printStackTrace()
+            }
+
+            override fun onComplete() {
+                println("All Completed")
+            }
+        }
+
+        val observable = Observable.create<Int> {
+            for (i in 1..10) {
+                it.onNext(i)
+            }
+            it.onComplete()
+        }
+
+        observable.subscribe(observer)
+    }
+
+    @Test
+    internal fun `처음부터 플로어블 생성하기 2`() {
+        val observer = object : Subscriber<Int> {
+            override fun onNext(item: Int) {
+                println("item: $item")
+            }
+
+            override fun onError(e: Throwable) {
+                e.printStackTrace()
+            }
+
+            override fun onComplete() {
+                println("All Completed")
+            }
+
+            override fun onSubscribe(subscription: Subscription) {
+                println("New Subscription")
+                subscription.request(10)
+            }
+        }
+    }
+
+    @Test
+    fun `BackpressureStrategy ERROR`() {
+        val source = Observable.range(1, 500)
+
+        source.toFlowable(BackpressureStrategy.BUFFER)
+//            .onBackpressureDrop { println("Dropped $it") }
+            .onBackpressureBuffer()
+//            .onBackpressureLatest()
+            .map { MyItem(it) }
+            .observeOn(Schedulers.io())
+            .subscribe {
+                println(it)
+                runBlocking { delay(100) }
+            }
         runBlocking { delay(10000) }
     }
 

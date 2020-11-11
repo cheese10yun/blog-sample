@@ -918,3 +918,11 @@ BUILD SUCCESSFUL in 13s
 ```
 
 subscription의 구독을 초기에는 5로 서정했고 5게 이상 부터는 2개식 구독을 진행하는 것으로 수정했다. 걀과를 보면 해당 설정을 이해할 수 있다.
+
+## BackpressureStrategy.MISSING 와 onBackpressureXXX()
+
+BackpressureStrategy.MISSING은 backpressure 전략을 구현하지 않으므로 플로어블에게 어떤 전략을 따를지 명시적로 알려줄 필요가 있음을 의미한다. onBackpressureXXX() 연산자를 사용하면 동일한 결과를 얻을 수 있으며 몇 가지 추가 구성을 옵션이 제공된다.
+
+* onBackpressureBuffer() -> 해당 버퍼가 가득 차면 Subscription을 푸쉬를 제한, 버퍼 크기 할당 가능 
+* onBackpressureDrop() -> 해당 버퍼가 가득 차면 그 뒤로 부터 모두 Drop, Drop 람다로 캐치 가능
+* onBackpressureLatest() -> 해당 버퍼가 가득 차게되면 마지막 버퍼의는 구독 가능
