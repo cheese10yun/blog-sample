@@ -5,7 +5,9 @@ import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
+import io.reactivex.processors.PublishProcessor
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxkotlin.toFlowable
 import io.reactivex.rxkotlin.toObservable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.AsyncSubject
@@ -759,9 +761,53 @@ class RxKotlinTest {
         runBlocking { delay(10000) }
     }
 
+    @Test
+    fun `flowable generate`() {
+
+        val flowable = Flowable.generate<Int>() {
+            it.onNext(GenerateFlowableItem.item)
+        }
+
+        flowable
+            .map { MyItem(it) }
+            .subscribeOn(Schedulers.io())
+            .subscribe {
+                runBlocking { delay(10) }
+                println("Next $it")
+            }
+
+        runBlocking { delay(7000) }
+    }
+
+    @Test
+    fun `processor`() {
+        val flowable = listOf("stinrg 1", "stirng 2", "string 3", "string 4").toFlowable()
+        val processor = PublishProcessor.create<String>()
+
+        processor
+            .subscribe {
+                println("Subscription 1 : $it")
+                runBlocking { delay(1000) }
+                println("Subscription 1 delay")
+            }
+
+        processor
+            .subscribe { println("Subscription 2 : $it") }
+
+        flowable.subscribe(processor)
+    }
+
     data class MyItem(val id: Int) {
         init {
             println("MyItem Created $id")
         }
+    }
+
+    object GenerateFlowableItem {
+        var item: Int = 0
+            get() {
+                field += 1
+                return field
+            }
     }
 }
