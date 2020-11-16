@@ -23,7 +23,6 @@ import org.reactivestreams.Subscription
 import java.util.Optional
 import java.util.Random
 import java.util.concurrent.Callable
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
@@ -889,8 +888,7 @@ class RxKotlinTest {
             .orElseGet { Runtime.getRuntime().availableProcessors() }
 
 
-
-        val subscribe = (1..1_000)
+        val subscribe = (1..10_000)
             .map { it }
             .toFlowable()
             .parallel()
@@ -900,11 +898,12 @@ class RxKotlinTest {
                 return@map item
             }
             .sequential()
-            .subscribe (
-                {
-                    println("Received $it ${Thread.currentThread().name}")
-                }
-            )
+            .blockingSubscribe {
+                println("Received $it ${Thread.currentThread().name}")
+            }
+//            .subscribe {
+//                println("Received $it ${Thread.currentThread().name}")
+//            }
 
 
         println("111")
