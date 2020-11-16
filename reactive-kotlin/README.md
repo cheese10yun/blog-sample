@@ -784,14 +784,14 @@ data class MyItem(val id: Int) {
 ```
 MyItem Created 1
 MyItem Created 5
-Recevied MyItem(id=1)
+Recived MyItem(id=1)
 MyItem Created 6
 ...
 MyItem Created 1000
-Recevied MyItem(id=2)
+Recived MyItem(id=2)
 ...
-Recevied MyItem(id=113)
-Recevied MyItem(id=114)
+Recived MyItem(id=113)
+Recived MyItem(id=114)
 ```
 옵저버는 그것과 보조를 맞추지 않는다. 옵저저블이 모든 항목을 배출할 동안 옵저버는 첫 번째 항목만을 처리했다. 앞에서 설명한 것처럼 이런 현상은 OutOfMemory 오류를 비롯해 많은 문제를 발생 시킬 수 있다. Flowable로 변경해보자
 
@@ -926,3 +926,194 @@ BackpressureStrategy.MISSING은 backpressure 전략을 구현하지 않으므로
 * onBackpressureBuffer() -> 해당 버퍼가 가득 차면 Subscription을 푸쉬를 제한, 버퍼 크기 할당 가능 
 * onBackpressureDrop() -> 해당 버퍼가 가득 차면 그 뒤로 부터 모두 Drop, Drop 람다로 캐치 가능
 * onBackpressureLatest() -> 해당 버퍼가 가득 차게되면 마지막 버퍼의는 구독 가능
+
+# 07 RxKotlin의 스케줄러를 사용한 동시성과 병렬처리
+
+## 동시성 소개
+
+> 프로그래밍 패러다임으로서, 동시 컴퓨팅은 모듈화 프로그래밍의 한 형태다.즉 전체 계산을 작은 단위의 계산으로 분해해 동시적으로 실핼할 수 있다.
+
+동시성은 전체 작업을 작은 부분으로 나눠 동시에 실행하는 것이다.
+
+## 병렬 시행화 동시성
+
+결론은 동시성은 병렬화를 통해서 이뤄지지만 동일한 것은 아니다. 오히려 동시성을 당성할 수 있는 방법에 관한것이다.
+
+## 스케줄러는 무엇인가
+
+기본적으로 옵저버블과 이에 적영된 연산자 체인은 subscribe가 호출된 동일한 스레드에서 작업을 수행하며, 옵저버가 onComplete 또는 onError 알림을 수신할 때까지 스레드가 차단된다. 스케줄러를 사용하면 이것을 변경할 수 있다.
+
+스케줄러는 스레드 풀로 생각하면 된다. 스케줄러를 사용해 ReactiveX는 스레드풀을 생성하고 스레드를 실행할 수 있다. ReactiveX에서 이것을 기본적으로 멀티 스레딩과 동시성을 추상화한것으로 동시성 구현을 훨씬 쉽게 만들어준다.
+
+### 스케줄러의 종류
+
+#### Schedulers.io() : I/O 연관 스케줄러
+ 
+`Schedulers.io()`는 I/O 관련 스레드를 제공한다. 좀 더 정확하게 말하자면 Schedulers.io()는 I/O 관련 작업을 수행 할 수 있는 무제한의 워커 스레드를 생성하는 스레드풀을 제공한다.
+
+이 풀의 모든 스레드는 블로킹이고 I/O 작업을 더 많이 수행하도록 작성했기 때문에 계산 집약적인 작업보다 CPU 부하는 적지만 대기중인 I/O 작업으로 인해 조금 더 오래걸릴 수 있다. I/O 작업은 파일시스템, 데이터베이스, 서비스 또는 I/O 장치와의 상호작용을 의미한다. 
+
+메모리가 허용하는 무제한의 스레드를 생성해 OutOfMemory 오류를 일으킬 수 있이므로 이 시케줄러를 사용할 떄는 주의해야한다.
+
+#### Schedulers.computation() : CPU 연관 스케줄러
+
+`Schedulers.computation()`는 아마도 프로그래머에게 가장 쥬용한 스케줄러일것이다. 이것은 사용 가능한 CPU 코어와 동일한 수의 스레드를 가지는 제한된 스레드풀을 제공한다. 이 스케줄러는 CPU를 주로 사용하는 작업을 위한 것이다.
+
+`Schedulers.computation()`는 CPU 잡중적인 작업에만 사용해야하며 다른 종류의 작업에 사용해서는 안된다. 그 이유는 이 스케줄러의 스레드가 CPU 코어를 사용 중인 상태로 유지하는데, I/O 관련이나 계산과 관련되지 않은 작업에 사용되는 경우 전체 애플리케이션의 속도를 저하시킬 수 있기 때문이다.
+
+I/O에 관련된 작업에는 `Schedulers.io`를 사용하고 계산 목적에는 `Schedulers.computation()`을 고려해야 하는 주된 이유는 computational() 스레드가 프로세스를 더 잘 활용하며 사용 가능한 CPU 코어보다 더 많은 스레드를 생성하지 않고 스레드를 재사용하기 떄문이다. `Schedulers.io()`는 무제한 스레드를 제공하고 있는데 io 블럭에서 10,000개의 계산 작업을 병렬로 예약하는 경우 10,000 개의 작업은 각각 자체 스데를 가지게 되므로 CPU를 놓고 서로 경쟁하게 된다. 이는 컨텍스트 전환비용을 발생 시킨다.
+
+#### Schedulers.newThread()
+
+`Schedulers.newThread()`는 제공된 각 작업에 대해 새 스레드를 만드느 스케줄러를 제공한다. 언뜻 보기에는 `Schedulers.io()`와 비슷하게 보일 수 있지만 시제로 큰 차이가 있다.
+
+`Schedulers.io()`는 스레드 풀을 사용하고 새로운 작업을 할당 받을 때마다 먼저 스레드풀을 소사해 유휴 스레드가 해당 작업을 실행할 수 있는지를 확인한다. 작업을 시작하기위해 기존의 스레드를 사용할 수 없으므로 새로운 스레드를 생성한다.
+
+그러나 `Schedulers.newThread()`는 스레드 풀을 사용하지 않는다. 대신 모든 요총에 대해 새로운 스레드를 생성하고 그 사실을 잊어버린다.
+
+대부분의 경우 `Schedulers.computation()`을 사용하고 그렇지 않은 경우 `Schedulers.io()`를 고려해야하며 `Schedulers.newThread()`는 사용하지 않는 것이 좋다, 스레드는 매우 비싼 자원이므로 새 스레드를 가능한 많이 만들지 않도록 노력해야한다.
+
+#### Schedulers.single()
+
+`Schedulers.single()`는 하나의 스레드만 포함하는 스케줄러를 제공하고 모든 호출에 대해 단일 인스턴스를 반환한다. 반드시 순차적으로 작업을 실행해야 하는 상황에서 가장 유용한 옵션이다. 하나의 스레드만 제공하믈 여기에 대기죽인 모든 작업은 순차적으로 실행될 수 있다.
+
+#### Schedulers.trampoline()
+
+`Schedulers.single()`, `Schedulers.trampoline()` 두 개의 스케줄러는 모두 순차적으로 실행된다. `Schedulers.single()`는 모든 작업이 순차적으로 실행되도록 보장하지만 호출된 스레드와 병렬로 실행될 수 있다. 그 부분이 `Schedulers.trampoline()`와 다르다.
+
+#### Schedulers.from()
+
+애플리케이션을 개발하는 동안 사용자가 정의한 스케줄러를 원할 수 있다. 이런 경우 `Schedulers.from()`을 사용하면 된다.    
+
+
+## 스케줄러 사용법: subScribeOn, ObserveOn 연산자
+
+### 구독 시 시르데 변경: subscribeOn 연산자
+
+```kotlin
+@Test
+fun `subscribeOn 연산자`() {
+    listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+        .toObservable()
+        .map {
+            println("Mapping $it ${Thread.currentThread().name}")
+            return@map it.toInt()
+        }
+        .subscribe {
+            println("Recived $it ${Thread.currentThread().name}")
+        }
+}
+```
+```
+Mapping 1 Test worker
+Recived 1 Test worker
+Mapping 2 Test worker
+Recived 2 Test worker
+Mapping 3 Test worker
+Recived 3 Test worker
+Mapping 4 Test worker
+Recived 4 Test worker
+Mapping 5 Test worker
+Recived 5 Test worker
+Mapping 6 Test worker
+Recived 6 Test worker
+Mapping 7 Test worker
+Recived 7 Test worker
+Mapping 8 Test worker
+Recived 8 Test worker
+Mapping 9 Test worker
+Recived 9 Test worker
+Mapping 10 Test worker
+Recived 10 Test worker
+```
+출력을 확인 해보면 Test workcer 스레드가 전체 구독을 실행하는 것을 확인 할 수 있다.
+
+```kotlin
+@Test
+fun `subscribeOn 연산자`() {
+    listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+        .toObservable()
+        .map {
+            println("Mapping $it ${Thread.currentThread().name}")
+            return@map it.toInt()
+        }
+        .subscribeOn(Schedulers.computation())
+        .subscribe {
+            println("Received $it ${Thread.currentThread().name}")
+        }
+
+    runBlocking { delay(1000) }
+}
+
+```
+
+```
+Mapping 1 RxComputationThreadPool-1
+Received 1 RxComputationThreadPool-1
+Mapping 2 RxComputationThreadPool-1
+Received 2 RxComputationThreadPool-1
+Mapping 3 RxComputationThreadPool-1
+Received 3 RxComputationThreadPool-1
+Mapping 4 RxComputationThreadPool-1
+Received 4 RxComputationThreadPool-1
+Mapping 5 RxComputationThreadPool-1
+Received 5 RxComputationThreadPool-1
+Mapping 6 RxComputationThreadPool-1
+Received 6 RxComputationThreadPool-1
+Mapping 7 RxComputationThreadPool-1
+Received 7 RxComputationThreadPool-1
+Mapping 8 RxComputationThreadPool-1
+Received 8 RxComputationThreadPool-1
+Mapping 9 RxComputationThreadPool-1
+Received 9 RxComputationThreadPool-1
+Mapping 10 RxComputationThreadPool-1
+Received 10 RxComputationThreadPool-1
+```
+
+### 다른 스레드에서 관찰: observeOn 연산자
+```kotlin
+@Test
+fun `subscribeOn 연산자`() {
+    listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+        .toObservable()
+        .map { item ->
+            println("Mapping $item ${Thread.currentThread().name}")
+            return@map item.toInt()
+        }
+        .subscribeOn(Schedulers.computation())
+        .observeOn(Schedulers.io())
+        .subscribe { item ->
+            println("Received $item ${Thread.currentThread().name}")
+        }
+
+    runBlocking { delay(1000) }
+}
+```
+
+```
+Mapping 1 RxComputationThreadPool-1
+Mapping 2 RxComputationThreadPool-1
+Mapping 3 RxComputationThreadPool-1
+Mapping 4 RxComputationThreadPool-1
+Mapping 5 RxComputationThreadPool-1
+Received 1 RxCachedThreadScheduler-1
+Mapping 6 RxComputationThreadPool-1
+Received 2 RxCachedThreadScheduler-1
+Mapping 7 RxComputationThreadPool-1
+Received 3 RxCachedThreadScheduler-1
+Mapping 8 RxComputationThreadPool-1
+Received 4 RxCachedThreadScheduler-1
+Mapping 9 RxComputationThreadPool-1
+Received 5 RxCachedThreadScheduler-1
+Mapping 10 RxComputationThreadPool-1
+Received 6 RxCachedThreadScheduler-1
+Received 7 RxCachedThreadScheduler-1
+Received 8 RxCachedThreadScheduler-1
+Received 9 RxCachedThreadScheduler-1
+Received 10 RxCachedThreadScheduler-1
+```
+subscribeOn은 그 자체로 휼륭해 보이지만 어떤 경우엔느 접합하지 않을 수 있다. 예를들어 computation 스레드에서 계산을 수행하고 io 스레드에서 결과를 표시하도록 할 수 있다. subscribeOn 연산자는 이런 요구사항을 위해서 동료가 필요하다. 전체 구독에 대해서 스레드를 지정하지만 특연 연산자에 대한 스레드를 지정하려면 도움이 필요하다. 
+
+subscribeOn 연사자의 완벽한 동료는 observeOn 연산자아다. observeOn 연산자는 그 후에 호출되는 모든 연산자에 스케줄러를 지정한다. 
+
+위 예제는 `subscribeOn(Schedulers.computation())`를 호출해 computation 스레드를 지정했고, 그 결과를 받기 위해 `observeOn(Schedulers.io())`를 호출해 io 스레드로 전달했다.

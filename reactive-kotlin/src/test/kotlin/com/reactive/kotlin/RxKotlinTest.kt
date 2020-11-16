@@ -20,8 +20,10 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.reactivestreams.Subscriber
 import org.reactivestreams.Subscription
+import java.util.Optional
 import java.util.Random
 import java.util.concurrent.Callable
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 
@@ -809,5 +811,113 @@ class RxKotlinTest {
                 field += 1
                 return field
             }
+    }
+
+    @Test
+    fun `distinct`() {
+
+        val list = (1..300).map {
+            1L
+        }
+
+        list
+            .toFlowable()
+//            .toObservable()
+            .subscribeOn(Schedulers.io())
+//            .distinct()
+            .subscribe(
+                {
+                    println("Received $it")
+                },
+                {
+                    println(it.printStackTrace())
+                },
+                {
+                    println("completed")
+                },
+                {
+                    println("subscrition")
+                }
+            )
+
+        runBlocking { delay(7000) }
+    }
+
+    @Test
+    fun `스케줄러 종류`() {
+
+        Observable.range(1, 10)
+            .subscribeOn(Schedulers.computation())
+            .subscribe {
+                runBlocking { delay(200) }
+                println("Observable1 Item Received $it")
+            }
+
+        Observable.range(21, 10)
+            .subscribeOn(Schedulers.computation())
+            .subscribe {
+                runBlocking { delay(200) }
+                println("Observable2 Item Received $it")
+            }
+
+        runBlocking { delay(2100) }
+    }
+
+    @Test
+    fun `subscribeOn 연산자`() {
+        listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+            .toObservable()
+            .subscribeOn(Schedulers.io())
+            .map { item ->
+                println("Mapping $item ${Thread.currentThread().name}")
+                return@map item.toInt()
+            }
+            .observeOn(Schedulers.computation())
+            .subscribe { item ->
+                println("Received $item ${Thread.currentThread().name}")
+            }
+
+        runBlocking { delay(1000) }
+    }
+
+    @Test
+    fun `subscribeOn 연산자2`() {
+
+
+        val poolSize = Optional.ofNullable(System.getProperty("reactor.schedulers.defaultPoolSize"))
+            .map { s: String -> s.toInt() }
+            .orElseGet { Runtime.getRuntime().availableProcessors() }
+
+
+
+        val subscribe = (1..1_000)
+            .map { it }
+            .toFlowable()
+            .parallel()
+            .runOn(Schedulers.io())
+            .map { item ->
+                println("Mapping $item ${Thread.currentThread().name}")
+                return@map item
+            }
+            .sequential()
+            .subscribe (
+                {
+                    println("Received $it ${Thread.currentThread().name}")
+                }
+            )
+
+
+        println("111")
+    }
+
+    @Test
+    internal fun `current core count`() {
+        val orElseGet = Optional.ofNullable(System.getProperty("reactor.schedulers.defaultPoolSize"))
+            .map { s: String -> s.toInt() }
+            .orElseGet { Runtime.getRuntime().availableProcessors() }
+
+        println("===============")
+        println(orElseGet)
+        println("===============")
     }
 }
