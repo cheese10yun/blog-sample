@@ -8,18 +8,20 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestConstructor
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.StopWatch
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-internal class ReactiveTest(
+@Transactional
+class ReactiveTest(
     private val orderRepository: OrderRepository
 ) {
 
     val sampleApi = SampleApi()
 
     @Test
-    internal fun name() {
+    fun `비동기 작업`() {
         val stopWatch = StopWatch()
         stopWatch.start()
 
@@ -33,10 +35,9 @@ internal class ReactiveTest(
             }
             .sequential()
             .blockingSubscribe {
-
                 when {
-                    it -> Order(OrderStatus.COMPLETED)
-                    else -> Order(OrderStatus.FAILED)
+                    it -> orderRepository.save(Order(OrderStatus.COMPLETED))
+                    else -> orderRepository.save(Order(OrderStatus.FAILED))
                 }
             }
 
@@ -45,10 +46,14 @@ internal class ReactiveTest(
         println(stopWatch.prettyPrint())
         println(stopWatch.totalTimeSeconds)
         println(stopWatch.totalTimeMillis)
+
+        val findAll = orderRepository.findAll()
+        val count = findAll.count()
+        println(count)
     }
 
     @Test
-    internal fun `동기적인 작업`() {
+    fun `동기적인 작업`() {
 
         val stopWatch = StopWatch()
 
@@ -73,7 +78,7 @@ internal class ReactiveTest(
     }
 
     @Test
-    internal fun asdasd() {
+    fun asdasd() {
         (1..10_000)
             .toObservable()
             .subscribeOn(Schedulers.io())

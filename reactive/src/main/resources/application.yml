@@ -1,9 +1,21 @@
 spring:
     jpa:
+        database: h2
         hibernate:
             ddl-auto: create
-        show-sql: true
+        show-sql: false
+        open-in-view: false
+        properties:
+            hibernate.format_sql: false
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include:
+                    - "*"
 
 logging:
     level:
-        ROOT: info
+        root: info
+#        org.hibernate.type.descriptor.sql.BasicBinder: trace
