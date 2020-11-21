@@ -1164,7 +1164,7 @@ void void_observable_switch_map() {
 4. switchMap은 새로운 데이터가 동지되면 현재 처리중이던 작업을 바로 중단한다. 그래서 3단만 출력을 진행한다.
 
 ## groupBy
-![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/groupBy.pn)
+![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/groupBy.png)
 
 * 하나의 Observable을 여러개의 새로운 GroupedByObservable로 만든다.
 * 원본 Observable의 데이터를 그룹별로 묶는다기보다는 각각의 데이터들이 그룹에 해당하는 key를 가지게 된다.
