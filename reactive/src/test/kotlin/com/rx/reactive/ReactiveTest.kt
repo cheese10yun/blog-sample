@@ -10,81 +10,143 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestConstructor
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.StopWatch
+import javax.persistence.EntityManager
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @Transactional
 class ReactiveTest(
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
+    private val orderService: OrderService,
+    private val entityManager: EntityManager
 ) {
 
     val sampleApi = SampleApi()
 
     @Test
-    fun `멀티 스레드 작업`() {
+    fun `단일 스레드 작업`() {
         val stopWatch = StopWatch()
+        val orders = givenOrders(1_000)
         stopWatch.start()
-        val orders = givenOrders()
+
+        orders
+            .forEach {
+                val result = sampleApi.doSomething(it.id!!)
+                when {
+                    result -> it.status = OrderStatus.COMPLETED
+                    else -> it.status = OrderStatus.FAILED
+                }
+            }
+
+        stopWatch.stop()
+        printResult(stopWatch)
+    }
+
+    @Test
+    fun `멀티 스레드 작업`() {
+        // 1m 32s 679
+        val stopWatch = StopWatch()
+        val orders = givenOrders(1_000)
+        stopWatch.start()
 
         orders
             .toFlowable()
             .parallel()
             .runOn(Schedulers.io())
             .map {
-                val result = sampleApi.doSomething()
-                result
+                val result = sampleApi.doSomething(it.id!!)
+                Pair(result, it)
             }
             .sequential()
-            .blockingSubscribe {
-                when {
-                    it -> orderRepository.save(Order(OrderStatus.COMPLETED))
-                    else -> orderRepository.save(Order(OrderStatus.FAILED))
+            .subscribe(
+                {
+
+                    when {
+                        it.first -> it.second.status = OrderStatus.COMPLETED
+                        else -> it.second.status = OrderStatus.FAILED
+                    }
+                },
+                {
+
+                },
+                {
+                    println("Completed")
                 }
-            }
+            )
+
+
+        entityManager.flush()
+        entityManager.clear()
 
         stopWatch.stop()
-
-        println(stopWatch.prettyPrint())
-        println(stopWatch.totalTimeSeconds)
-        println(stopWatch.totalTimeMillis)
-
-        val findAll = orderRepository.findAll()
-        val count = findAll.count()
-        println(count)
+        printResult(stopWatch)
+        runBlocking { delay(11_000) }
     }
 
     @Test
-    fun `단일 스레드 작업`() {
+    fun `멀티 스레드 작업2`() {
         val stopWatch = StopWatch()
+        val orders = givenOrders(1_000)
         stopWatch.start()
-        (1..1_000)
-            .forEach {
-                val result = sampleApi.doSomething()
 
-                when {
-                    result -> Order(OrderStatus.COMPLETED)
-                    else -> Order(OrderStatus.FAILED)
-                }
+
+        val completedId = mutableListOf<Long>()
+        val failedIds = mutableListOf<Long>()
+
+        orders
+            .toFlowable()
+            .parallel()
+            .runOn(Schedulers.io())
+            .map {
+//                println("Mapping ${Thread.currentThread().name}")
+                val result = sampleApi.doSomething(it.id!!)
+                Pair(result, it)
             }
+            .sequential()
+            .subscribe(
+                {
+//                    println("Received ${Thread.currentThread().name}")
+                    when {
+                        it.first -> completedId.add(it.second.id!!)
+                        else -> failedIds.add(it.second.id!!)
+                    }
+                },
+                {
+
+                },
+                {
+                    orderService.updateStatus(OrderStatus.COMPLETED, completedId)
+                    orderService.updateStatus(OrderStatus.FAILED, failedIds)
+                }
+            )
+
 
         stopWatch.stop()
+        printResult(stopWatch)
 
+        entityManager.flush()
+        entityManager.clear()
+
+        val findAll = orderRepository.findAll()
+        println()
+        runBlocking { delay(11_000) }
+    }
+
+    private fun printResult(stopWatch: StopWatch) {
         println(stopWatch.prettyPrint())
         println(stopWatch.totalTimeSeconds)
         println(stopWatch.totalTimeMillis)
-
     }
 
-    private fun givenOrders() = (1..1_00).map {
+    private fun givenOrders(end: Int) = (1..end).map {
         Order(OrderStatus.READY)
     }.also {
         orderRepository.saveAll(it)
-
     }
 
     @Test
     fun asdasd() {
-        (1..10_000)
+        (1..100)
             .toObservable()
             .subscribeOn(Schedulers.io())
             .map {
@@ -98,5 +160,4 @@ class ReactiveTest(
 
         runBlocking { delay(5000) }
     }
-
 }

@@ -4,9 +4,9 @@ spring:
         hibernate:
             ddl-auto: create
         open-in-view: true
-        properties:
-            hibernate.format_sql: true
-            hibernate.show_sql: true
+#        properties:
+#            hibernate.format_sql: true
+#            hibernate.show_sql: true
 
 management:
     endpoints:

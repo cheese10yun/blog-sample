@@ -11,7 +11,7 @@ class SampleApi {
      * block은 500 ms
      * 80% 성공한다
      */
-    fun doSomething(): Boolean {
+    fun doSomething(orderId: Long): Boolean {
         runBlocking {
             delay(100)
         }

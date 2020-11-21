@@ -1069,7 +1069,7 @@ void observable_flat_map() {
 
 ![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/mergeMap.r.png)
 * 원본 데이터와 변환된 데이터를 조합해서 새로운 데이터를 통지한다.
-* 즉, **Observable에 원본 데이터 + 뱐환된 데이터 = 최종 데이터를 실어서 반환한다.**
+* 즉, **Observable에 원본 데이터 + 반환된 데이터 = 최종 데이터를 실어서 반환한다.**
 
 ```java
 @Test
