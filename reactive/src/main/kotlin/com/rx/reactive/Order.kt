@@ -24,6 +24,7 @@ class Order(
 }
 
 enum class OrderStatus {
+    READY,
     COMPLETED,
     FAILED
 }

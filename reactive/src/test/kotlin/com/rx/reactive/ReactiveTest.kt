@@ -21,11 +21,12 @@ class ReactiveTest(
     val sampleApi = SampleApi()
 
     @Test
-    fun `비동기 작업`() {
+    fun `멀티 스레드 작업`() {
         val stopWatch = StopWatch()
         stopWatch.start()
+        val orders = givenOrders()
 
-        (1..1_000)
+        orders
             .toFlowable()
             .parallel()
             .runOn(Schedulers.io())
@@ -53,12 +54,9 @@ class ReactiveTest(
     }
 
     @Test
-    fun `동기적인 작업`() {
-
+    fun `단일 스레드 작업`() {
         val stopWatch = StopWatch()
-
         stopWatch.start()
-
         (1..1_000)
             .forEach {
                 val result = sampleApi.doSomething()
@@ -74,6 +72,13 @@ class ReactiveTest(
         println(stopWatch.prettyPrint())
         println(stopWatch.totalTimeSeconds)
         println(stopWatch.totalTimeMillis)
+
+    }
+
+    private fun givenOrders() = (1..1_00).map {
+        Order(OrderStatus.READY)
+    }.also {
+        orderRepository.saveAll(it)
 
     }
 
@@ -93,4 +98,5 @@ class ReactiveTest(
 
         runBlocking { delay(5000) }
     }
+
 }
