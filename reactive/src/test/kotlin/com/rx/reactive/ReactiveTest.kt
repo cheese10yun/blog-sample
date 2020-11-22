@@ -1,7 +1,6 @@
 package com.rx.reactive
 
 import io.reactivex.rxkotlin.toFlowable
-import io.reactivex.rxkotlin.toObservable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -21,12 +20,12 @@ class ReactiveTest(
     private val entityManager: EntityManager
 ) {
 
-    val sampleApi = SampleApi()
+    val sampleApi = OrderHttpClient()
 
     @Test
     fun `단일 스레드 작업`() {
         val stopWatch = StopWatch()
-        val orders = givenOrders(1_00)
+        val orders = givenOrders(1_000)
         stopWatch.start()
 
         orders
@@ -39,13 +38,13 @@ class ReactiveTest(
             }
 
         stopWatch.stop()
-        printResult(stopWatch)
+        println(stopWatch.totalTimeSeconds) // 1m 44s
     }
 
     @Test
     fun `멀티 스레드 작업`() {
         val stopWatch = StopWatch()
-        val orders = givenOrders(1_00)
+        val orders = givenOrders(1_000)
         stopWatch.start()
 
         orders
@@ -67,7 +66,7 @@ class ReactiveTest(
                 },
                 {
                     stopWatch.stop()
-                    printResult(stopWatch)
+                    println(stopWatch.totalTimeSeconds)
                 },
                 {
                     println("Completed")
@@ -80,9 +79,8 @@ class ReactiveTest(
     @Test
     fun `멀티 스레드 작업2`() {
         val stopWatch = StopWatch()
-        val orders = givenOrders(1_000)
+        val orders = givenOrders(100_000)
         stopWatch.start()
-
 
         val completedId = mutableListOf<Long>()
         val failedIds = mutableListOf<Long>()
@@ -92,14 +90,14 @@ class ReactiveTest(
             .parallel()
             .runOn(Schedulers.io())
             .map {
-                println("Mapping orderId :${it.id} ${Thread.currentThread().name}")
+//                println("Mapping orderId :${it.id} ${Thread.currentThread().name}")
                 val result = sampleApi.doSomething(it.id!!)
                 Pair(result, it)
             }
             .sequential()
             .subscribe(
                 {
-                    println("Received orderId :${it.second.id} ${Thread.currentThread().name}")
+//                    println("Received orderId :${it.second.id} ${Thread.currentThread().name}")
                     when {
                         it.first -> completedId.add(it.second.id!!)
                         else -> failedIds.add(it.second.id!!)
@@ -112,17 +110,11 @@ class ReactiveTest(
                     orderService.updateStatus(OrderStatus.COMPLETED, completedId)
                     orderService.updateStatus(OrderStatus.FAILED, failedIds)
                     stopWatch.stop()
-                    printResult(stopWatch)
+                    println(stopWatch.totalTimeSeconds)
                 }
             )
 
         runBlocking { delay(11_000) }
-    }
-
-    private fun printResult(stopWatch: StopWatch) {
-        println(stopWatch.prettyPrint())
-        println(stopWatch.totalTimeSeconds)
-        println(stopWatch.totalTimeMillis)
     }
 
     private fun givenOrders(end: Int) = (1..end).map {

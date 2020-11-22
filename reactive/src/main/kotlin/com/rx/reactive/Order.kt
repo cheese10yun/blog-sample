@@ -31,7 +31,6 @@ class Order(
         return "Order(status=$status, id=$id)"
     }
 
-
 }
 
 enum class OrderStatus {
