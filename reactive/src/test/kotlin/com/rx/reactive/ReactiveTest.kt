@@ -26,7 +26,7 @@ class ReactiveTest(
     @Test
     fun `단일 스레드 작업`() {
         val stopWatch = StopWatch()
-        val orders = givenOrders(1_000)
+        val orders = givenOrders(1_00)
         stopWatch.start()
 
         orders
@@ -44,9 +44,8 @@ class ReactiveTest(
 
     @Test
     fun `멀티 스레드 작업`() {
-        // 1m 32s 679
         val stopWatch = StopWatch()
-        val orders = givenOrders(1_000)
+        val orders = givenOrders(1_00)
         stopWatch.start()
 
         orders
@@ -67,19 +66,14 @@ class ReactiveTest(
                     }
                 },
                 {
-
+                    stopWatch.stop()
+                    printResult(stopWatch)
                 },
                 {
                     println("Completed")
                 }
             )
 
-
-        entityManager.flush()
-        entityManager.clear()
-
-        stopWatch.stop()
-        printResult(stopWatch)
         runBlocking { delay(11_000) }
     }
 
@@ -98,37 +92,30 @@ class ReactiveTest(
             .parallel()
             .runOn(Schedulers.io())
             .map {
-//                println("Mapping ${Thread.currentThread().name}")
+                println("Mapping orderId :${it.id} ${Thread.currentThread().name}")
                 val result = sampleApi.doSomething(it.id!!)
                 Pair(result, it)
             }
             .sequential()
             .subscribe(
                 {
-//                    println("Received ${Thread.currentThread().name}")
+                    println("Received orderId :${it.second.id} ${Thread.currentThread().name}")
                     when {
                         it.first -> completedId.add(it.second.id!!)
                         else -> failedIds.add(it.second.id!!)
                     }
                 },
                 {
-
+                    it.printStackTrace()
                 },
                 {
                     orderService.updateStatus(OrderStatus.COMPLETED, completedId)
                     orderService.updateStatus(OrderStatus.FAILED, failedIds)
+                    stopWatch.stop()
+                    printResult(stopWatch)
                 }
             )
 
-
-        stopWatch.stop()
-        printResult(stopWatch)
-
-        entityManager.flush()
-        entityManager.clear()
-
-        val findAll = orderRepository.findAll()
-        println()
         runBlocking { delay(11_000) }
     }
 
@@ -142,22 +129,5 @@ class ReactiveTest(
         Order(OrderStatus.READY)
     }.also {
         orderRepository.saveAll(it)
-    }
-
-    @Test
-    fun asdasd() {
-        (1..100)
-            .toObservable()
-            .subscribeOn(Schedulers.io())
-            .map {
-                println("Mapping $it ${Thread.currentThread().name}")
-                it
-            }
-            .observeOn(Schedulers.io())
-            .subscribe {
-                println("Received $it ${Thread.currentThread().name}")
-            }
-
-        runBlocking { delay(5000) }
     }
 }

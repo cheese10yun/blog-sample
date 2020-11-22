@@ -296,7 +296,7 @@ onERROR() | RxComputationThreadPool-1 | 00:24:15.796 | io.reactivex.exceptions.M
 ```
 `doOnNext()`는 `interval()`에서 통지하는 데이터를 처리하는 Callback 함수
 
-생산자 쪽에서 통지한 첫 번쨰 데이터만 처리 `onNext() | RxComputationThreadPool-1 | 00:24:15.796 | 0` 하고 `onERROR() | RxComputationThreadPool-1 | 00:24:15.796 | io.reactivex.exceptions.MissingBackpressureException: Can't deliver value 128 due to lack of requests`예외가 발생, 생사자 쪽에서 통지하는 속도가 소비자에서 처리하는 속도 보다 빠르기 때문에 예외가 발생한다. 이러한 불균형을 처리하기 위해서 배압전략을 지원한다
+생산자 쪽에서 통지한 첫 번째 데이터만 처리 `onNext() | RxComputationThreadPool-1 | 00:24:15.796 | 0` 하고 `onERROR() | RxComputationThreadPool-1 | 00:24:15.796 | io.reactivex.exceptions.MissingBackpressureException: Can't deliver value 128 due to lack of requests`예외가 발생, 생사자 쪽에서 통지하는 속도가 소비자에서 처리하는 속도 보다 빠르기 때문에 예외가 발생한다. 이러한 불균형을 처리하기 위해서 배압전략을 지원한다
 
 ## 배압 전략
 RxJava에서는 BackpressureStrategy를 통해서 Flowable이 통지 대기 중 데이터를 어떻게 다룰지에 대한 배압 전략을 제공한다.
