@@ -74,6 +74,8 @@ class ReactiveTest(
             )
 
         runBlocking { delay(11_000) }
+
+        val listOf = listOf("1", "2", "3")
     }
 
     @Test
