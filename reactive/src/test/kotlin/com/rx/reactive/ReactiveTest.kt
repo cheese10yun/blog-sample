@@ -92,14 +92,12 @@ class ReactiveTest(
             .parallel()
             .runOn(Schedulers.io())
             .map {
-//                println("Mapping orderId :${it.id} ${Thread.currentThread().name}")
                 val result = sampleApi.doSomething(it.id!!)
                 Pair(result, it)
             }
             .sequential()
             .subscribe(
                 {
-//                    println("Received orderId :${it.second.id} ${Thread.currentThread().name}")
                     when {
                         it.first -> completedId.add(it.second.id!!)
                         else -> failedIds.add(it.second.id!!)
