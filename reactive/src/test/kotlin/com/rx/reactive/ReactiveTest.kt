@@ -4,28 +4,29 @@ import io.reactivex.rxkotlin.toFlowable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestConstructor
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.StopWatch
-import javax.persistence.EntityManager
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @Transactional
 class ReactiveTest(
     private val orderRepository: OrderRepository,
-    private val orderService: OrderService,
-    private val entityManager: EntityManager
+    private val orderService: OrderService
 ) {
-
     val sampleApi = OrderHttpClient()
 
+    private val orderCount = 5_000
+
     @Test
+    @Disabled
     fun `단일 스레드 작업`() {
         val stopWatch = StopWatch()
-        val orders = givenOrders(1_000)
+        val orders = givenOrders(orderCount)
         stopWatch.start()
 
         orders
@@ -44,7 +45,7 @@ class ReactiveTest(
     @Test
     fun `멀티 스레드 작업`() {
         val stopWatch = StopWatch()
-        val orders = givenOrders(1_000)
+        val orders = givenOrders(orderCount)
         stopWatch.start()
 
         orders
@@ -52,36 +53,37 @@ class ReactiveTest(
             .parallel()
             .runOn(Schedulers.io())
             .map {
+                println("Mapping orderId :${it.id} ${Thread.currentThread().name}")
                 val result = sampleApi.doSomething(it.id!!)
                 Pair(result, it)
             }
             .sequential()
-            .subscribe(
+            .blockingSubscribe(
                 {
-
+                    println("Received orderId :${it.second.id} ${Thread.currentThread().name}")
                     when {
                         it.first -> it.second.status = OrderStatus.COMPLETED
                         else -> it.second.status = OrderStatus.FAILED
                     }
                 },
                 {
-                    stopWatch.stop()
-                    println(stopWatch.totalTimeSeconds)
+                    it.printStackTrace()
                 },
                 {
-                    println("Completed")
+                    stopWatch.stop()
+                    println(stopWatch.totalTimeSeconds)
                 }
             )
-
-        runBlocking { delay(11_000) }
-
-        val listOf = listOf("1", "2", "3")
+//            .subscribe(
+//
+//            )
+//        runBlocking { delay(5_000) }
     }
 
     @Test
     fun `멀티 스레드 작업2`() {
         val stopWatch = StopWatch()
-        val orders = givenOrders(100_000)
+        val orders = givenOrders(orderCount)
         stopWatch.start()
 
         val completedId = mutableListOf<Long>()
@@ -114,7 +116,7 @@ class ReactiveTest(
                 }
             )
 
-        runBlocking { delay(11_000) }
+        runBlocking { delay(5_000) }
     }
 
     private fun givenOrders(end: Int) = (1..end).map {
