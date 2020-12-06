@@ -39,7 +39,7 @@ class ReactiveTest(
             }
 
         stopWatch.stop()
-        println(stopWatch.totalTimeSeconds) // 1m 44s
+        println(stopWatch.totalTimeSeconds)
     }
 
     @Test
@@ -58,7 +58,7 @@ class ReactiveTest(
                 Pair(result, it)
             }
             .sequential()
-            .blockingSubscribe(
+            .subscribe(
                 {
                     println("Received orderId :${it.second.id} ${Thread.currentThread().name}")
                     when {
@@ -74,10 +74,7 @@ class ReactiveTest(
                     println(stopWatch.totalTimeSeconds)
                 }
             )
-//            .subscribe(
-//
-//            )
-//        runBlocking { delay(5_000) }
+        runBlocking { delay(50_000) }
     }
 
     @Test
@@ -115,7 +112,6 @@ class ReactiveTest(
                     println(stopWatch.totalTimeSeconds)
                 }
             )
-
         runBlocking { delay(5_000) }
     }
 
