@@ -9,13 +9,14 @@
 
 ItemProcessor로 크게 2가지 처리를 합니다.
 
-* 반환 
-  * `Reader`에서 읽은 데이터를 원하는 데이터 타입으로 변환해서 Writer에게 넘긴다.
+* 반환
+    * `Reader`에서 읽은 데이터를 원하는 데이터 타입으로 변환해서 Writer에게 넘긴다.
 * 필터
-  * `Reader`에서 넘겨준 데이터를 Writer로 넘겨 줄것인지를 결정
-  * **null을 반환하면 Writer에 전달되지 않습니다.**
+    * `Reader`에서 넘겨준 데이터를 Writer로 넘겨 줄것인지를 결정
+    * **null을 반환하면 Writer에 전달되지 않습니다.**
 
 ## 기본 사용법
+
 ```java
 public interface ItemProcessor<I, O> {
 
@@ -29,16 +30,17 @@ public interface ItemProcessor<I, O> {
 
 `Reader`에서 읽은 데이터가 `ItemProcessor`의 `processor` 를 통과해서 `Writer`에 전달됩니다.
 
-
 ```kotlin
 @Bean
 fun jpaItemProcessor(): ItemProcessor<Order, Order2> {
     return ItemProcessor { order: Order -> Order2(order.amount) }
 }
 ```
+
 익명 클래스 혹은 람다식을 사용하면 불필요한 코드가 없이 구현 코드 양이 적어 빠르게 구현이 가능합니다. 고정된 형태가 없어서 원하는 형태의 어떤 처리도 가능합니다.
 
 ## 변환
+
 변환이란 Reader에서 읽은 타입을 변환하여 Writer에 전달해주는 것을 의미합니다.
 
 ```kotlin
@@ -101,8 +103,8 @@ class ProcessorConvertJobConfiguration(
 }
 ```
 
-`ItemProcessor`에서는 Reader에서 읽어올 타입이 `Order`이며, Writer에서 넘겨줄 타입이 `String` 이기 때문에 제네릭 타입은 `<Teacher, String>`가 됩니다. 즉 `<Input, Output>`의 타입이 되는 것입니다.
-
+`ItemProcessor`에서는 Reader에서 읽어올 타입이 `Order`이며, Writer에서 넘겨줄 타입이 `String` 이기 때문에 제네릭 타입은 `<Teacher, String>`가 됩니다. 즉 `<Input, Output>`의 타입이
+되는 것입니다.
 
 ```kotlin
 @Bean
@@ -112,9 +114,11 @@ fun processor(): ItemProcessor<Order, String> {
     }
 }
 ```
+
 여기서 **ChunkSize 앞에 선언될 타입 역시 Reader와 Writer 타입을 따라가야하기 때문에 다음과 같이 선언됩니다.**
 
 ## 필터
+
 Writer에 값을 넘길지 말지를 `Processor`에서 판단하는 것을 판단 하는 필터의 역할을 합니다. `Order`의 amount가 짝수인 것을 필터링 하는 예제입니다.
 
 ```kotlin
@@ -175,6 +179,7 @@ class ProcessorFilterJobConfiguration(
     }
 }
 ```
+
 ```
 2020-01-24 04:42:04.439 DEBUG 25963 --- [           main] o.s.batch.repeat.support.RepeatTemplate  : Repeat operation about to start at count=2
 2020-01-24 04:42:04.439 DEBUG 25963 --- [           main] o.s.batch.repeat.support.RepeatTemplate  : Repeat operation about to start at count=3
@@ -201,6 +206,7 @@ class ProcessorFilterJobConfiguration(
 `ItemProcessor`에서는 Order Amount 짝수일 경우는 `return null`을 함으로써 Writer에 넘기지 않도록 합니다. 코틀린에서는 `return null` 하기 위해서는  `label@` 키워드를 추가 해야합니다.
 
 ## 트랜잭션 범위
+
 Spring Batch에서 **트랜잭션 범위는 Chunk단위 입니다.**  Reader에서 Entity를 반환해주었다면 **Entity간의 Lazy Loading이 가능합니다** 이는 Processor, Writer 모두 가능합니다.
 
 ### Processor
@@ -262,7 +268,7 @@ class ProcessorTransactionJobConfiguration(
 }
 ```
 
-`log.info("Item Processor order item size  ----------> ${it.items.size}")` 코드에서 Lazy Loading을 진행합니다. 아래 로그에서 확인 할 수 있습니다.
+`log.info("Item Processor order item size ----------> ${it.items.size}")` 코드에서 Lazy Loading을 진행합니다. 아래 로그에서 확인 할 수 있습니다.
 
 ```
 Hibernate: select items0_.order_id as order_id5_0_0_, items0_.id as id1_0_0_, items0_.id as id1_0_1_, items0_.created_at as created_2_0_1_, items0_.updated_at as updated_3_0_1_, items0_.item_code as item_cod4_0_1_, items0_.order_id as order_id5_0_1_ from order_item items0_ where items0_.order_id=?
@@ -337,6 +343,7 @@ fun writer(): ItemWriter<Order> {
     }
 }
 ```
+
 위 코드는 Processor 코드를 제거하여 read -> wirte으로 진행하며 `log.info("Item Writer Processor ----------> ${order.items.size}")` Lazy Loading을 진행합니다.
 
 ```

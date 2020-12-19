@@ -2,7 +2,8 @@
 
 # Job
 
-## Simple Job 
+## Simple Job
+
 간단한 Simple Job을 구성 합니다. Step1, Step2으로 구성하고 Step1에서 무조건 실패하게 구성했습니다.
 
 ```kotlin
@@ -50,12 +51,14 @@ class SimpleJobConfiguration(
 ```
 
 ## BATCH_JOB_EXECUTION
+
 STEP_EXECUTION_ID | VERSION | STEP_NAME | JOB_EXECUTION_ID | START_TIME | END_TIME | STATUS | COMMIT_COUNT | READ_COUNT | FILTER_COUNT | WRITE_COUNT | READ_SKIP_COUNT | WRITE_SKIP_COUNT | PROCESS_SKIP_COUNT | ROLLBACK_COUNT | EXIT_CODE | EXIT_MESSAGE | LAST_UPDATED
 ------------------|---------|-----------|------------------|------------|----------|--------|--------------|------------|--------------|-------------|-----------------|------------------|--------------------|----------------|-----------|--------------|-------------
 6 | 2 | simpleStep1 | 6 | 2020-01-14 16:35:24 | 2020-01-14 16:35:24 | FAILED | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | FAILED | java.lang.IllegalArgumentException: asd | 2020-01-14 16:35:24
 7 | 2 | simpleStep1 | 7 | 2020-01-14 16:40:39 | 2020-01-14 16:40:39 | FAILED | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | FAILED | java.lang.IllegalArgumentException: asd | 2020-01-14 16:40:39
 
-BATCH_JOB_EXECUTION 테이블을 보면 STATUS 칼럼이 FAILED인것을 확인 할 수 있습니다. 이제 다시 `throw IllegalArgumentException("asd")` 주석을 진행하고 정상적으로 Step1이 정상 동작하게 변경합니다.
+BATCH_JOB_EXECUTION 테이블을 보면 STATUS 칼럼이 FAILED인것을 확인 할 수 있습니다. 이제 다시 `throw IllegalArgumentException("asd")` 주석을 진행하고 정상적으로 Step1이 정상 동작하게
+변경합니다.
 
 STEP_EXECUTION_ID | VERSION | STEP_NAME | JOB_EXECUTION_ID | START_TIME | END_TIME | STATUS | COMMIT_COUNT | READ_COUNT | FILTER_COUNT | WRITE_COUNT | READ_SKIP_COUNT | WRITE_SKIP_COUNT | PROCESS_SKIP_COUNT | ROLLBACK_COUNT | EXIT_CODE | EXIT_MESSAGE | LAST_UPDATED
 ------------------|---------|-----------|------------------|------------|----------|--------|--------------|------------|--------------|-------------|-----------------|------------------|--------------------|----------------|-----------|--------------|-------------
@@ -115,6 +118,7 @@ class SimpleJobConfiguration(
     }
 }
 ```
+
 `next()` 순차적으로 Step들을 연결 시킬때 사용합니다. 해당 잡은 step1 -> step2 -> step3 으로 순차적으로 Job이 실행 됩니다.
 
 ## 지정된 Job만 실항
@@ -123,10 +127,15 @@ class SimpleJobConfiguration(
 spring:
   batch.job.names: ${job.name:NONE}
 ```
-Spring Batch가 실행될때 Program arguments로 `job.name` 값이 넘어오면 **해당 값과 일치하는 Job만 실행할 수 있게 합니다.** 해당 코드의 의미는 `job.name`이 있으면 `job.name`에 할당하고 없으면 `NONE`을 할당하라는 의미입니다. `job.names`가 `NONE`인 경우 어떠한 Job도 실행되지 않습니다. 실제 jar을 실행 시키는 운영환경에서는 `java -jar batch-application.jar --job.name=simpleJob` 으로 job.name을 지정하게 됩니다.
+
+Spring Batch가 실행될때 Program arguments로 `job.name` 값이 넘어오면 **해당 값과 일치하는 Job만 실행할 수 있게 합니다.** 해당 코드의 의미는 `job.name`이 있으면 `job.name`에 할당하고
+없으면 `NONE`을 할당하라는 의미입니다. `job.names`가 `NONE`인 경우 어떠한 Job도 실행되지 않습니다. 실제 jar을 실행 시키는
+운영환경에서는 `java -jar batch-application.jar --job.name=simpleJob` 으로 job.name을 지정하게 됩니다.
 
 ## 조건별 흐름제어 Flow
-Next가 순차적으로 Step의 순서를 제어할 수는 있지만 Step에서 오류가 나면 나머지 뒤에 있는 Step 들은 실행되지 못한다는 문제가 있습니다. **필요에 따라 정상일때는 Step B로, 오류가 발생했을 경우에는 Step C로 Step을 조정할 필요가 있습니다.**
+
+Next가 순차적으로 Step의 순서를 제어할 수는 있지만 Step에서 오류가 나면 나머지 뒤에 있는 Step 들은 실행되지 못한다는 문제가 있습니다. **필요에 따라 정상일때는 Step B로, 오류가 발생했을 경우에는 Step C로 Step을 조정할
+필요가 있습니다.**
 
 ![](https://github.com/cheese10yun/TIL/raw/master/assets/batch-flow.png)
 
@@ -191,6 +200,7 @@ class StepNextConditionJobConfiguration(
 
 }
 ```
+
 해당 코드의 시나리오는 다음과 같습니다.
 
 * Step1 실패시 : Step1 -> Step3
@@ -215,20 +225,21 @@ fun stepNextConditionalJob(): Job {
     //@formatter:on
 }
 ```
+
 * `.on()`
-  * 캐치할 ExitStatus 지정, 
-  * `*`일 경우 모든 ExitStatus가 지정된다.
+    * 캐치할 ExitStatus 지정,
+    * `*`일 경우 모든 ExitStatus가 지정된다.
 * `to()`
-  * 다음으로 이동할 Step 지정
+    * 다음으로 이동할 Step 지정
 * `from()`
-  * 일종의 이벤트 리스너 역할
-  * 상태값을 보고 일치하는 상태라면 `to()`에 포함된 Step을 호출한다.
-  * **Step1의 이벤트 캐치가 FAILED로 되어있는 상태에서 추가로 이벤트 캐치히려면 from을 써야만함**
+    * 일종의 이벤트 리스너 역할
+    * 상태값을 보고 일치하는 상태라면 `to()`에 포함된 Step을 호출한다.
+    * **Step1의 이벤트 캐치가 FAILED로 되어있는 상태에서 추가로 이벤트 캐치히려면 from을 써야만함**
 * `end()`
-  * end FlowBuilder를 반환하는 end와 FlowBuilder를 종료하는 end 2개가 있음
-  * `on(*)` 뒤에 있는 end는 FlowBuilder를 반환하는 end
-  * `build()` 앞에있는 end는 FlowBuilder를 종료하는 end
-  * FlowBuilder를 반환하는 end는 계속해서 `from`을 이어갈 수 있음
+    * end FlowBuilder를 반환하는 end와 FlowBuilder를 종료하는 end 2개가 있음
+    * `on(*)` 뒤에 있는 end는 FlowBuilder를 반환하는 end
+    * `build()` 앞에있는 end는 FlowBuilder를 종료하는 end
+    * FlowBuilder를 반환하는 end는 계속해서 `from`을 이어갈 수 있음
 
 중요한 부분은 `on`이 캐치하는 **상태값이 BatchStatus가 아닌 ExistStatus라는 점입니다.** 그래서 분기를 처리를 위하 상태값 조정이 필요하다면 ExitStatus를 조정해야합니다.
 
@@ -245,10 +256,10 @@ fun conditionalJobStep1(): Step {
             .build()
 }
 ```
+
 ExistStatus를 FAILED로 지정합니다. 해당 status를 보고 Flow가 진행됩니다.
 
 ### Step1 실패시 : Step1 -> Step3
-
 
 STEP_EXECUTION_ID | VERSION | STEP_NAME | JOB_EXECUTION_ID | START_TIME | END_TIME | STATUS | COMMIT_COUNT | READ_COUNT | FILTER_COUNT | WRITE_COUNT | READ_SKIP_COUNT | WRITE_SKIP_COUNT | PROCESS_SKIP_COUNT | ROLLBACK_COUNT | EXIT_CODE | EXIT_MESSAGE | LAST_UPDATED
 ------------------|---------|-----------|------------------|------------|----------|--------|--------------|------------|--------------|-------------|-----------------|------------------|--------------------|----------------|-----------|--------------|-------------
@@ -268,12 +279,15 @@ STEP_EXECUTION_ID | VERSION | STEP_NAME | JOB_EXECUTION_ID | START_TIME | END_TI
 `STEP_NAME`을 확인하면 성공 시라리오 `Step2 성공시 : Step1 -> Step2 -> Step3`이 실행된것을 확인 할 수 있습니다.
 
 ### Batch Status vs Exit Status
+
 Flow을 설명할때 **BatchStatus와 ExitStatus의 차이를 아는 것이 중요합니다.** BatchStatus는 Job 또는 Step 의 실행 결과를 Spring에서 기록할 때 사용하는 Enum입니다.
 
 ```
 .on("FAILED").to(stepB())
 ```
-해당 코드는 `on` 메서드가 참조하는 것이 BatchStatus으로 생각할 수 있지만 **실제 Step의 ExitStatus을 참조합니다.** ExitStatus는 **Step의 실행 후 상태를 이야기합니다.**(ExitStatus는 Enum이 아닙니다.)
+
+해당 코드는 `on` 메서드가 참조하는 것이 BatchStatus으로 생각할 수 있지만 **실제 Step의 ExitStatus을 참조합니다.** ExitStatus는 **Step의 실행 후 상태를 이야기합니다.**(ExitStatus는 Enum이
+아닙니다.)
 
 해당 코드의 의미는 exitCode가 FAILED로 끝나게되면 StepB로 가라는 뜻입니다. **Spring Batch는 기본적으로 ExitStatus의 exitCode는 Step의 BatchStatus와 같도록 설정이 되어 있습니다.**
 
@@ -292,19 +306,19 @@ Flow을 설명할때 **BatchStatus와 ExitStatus의 차이를 아는 것이 중�
     .to(step2())
     .end()
 ```
+
 * step이 실패하면 Job 실패
 * step이 성공하면 step2가 수행
 * step이 성공적으로 완려되며. `COMPLETED WITH SKIPS`의 exit 코드로 종료
 
-
-
 ## Decide
- Step의 결과에 따라 서로 다른 Step으로 이동하는 방법을 알아보았습니다. 이번 에는 다른 방식으로 분기 처리하는 방식입니다. 위에서 진행했던 방식에 2가지 문제가 있습니다.
 
- * Step이 담당하는 역할이 2개 이상이 됩니다.
-   * 실제 해당 Step이 처리해야할 로직외에도 분기를 시키기 위해 ExitStatus 조작이 필요합니다.
- * 다양한 분기 로직 처리의 어려움
-   * ExitStatus를 커스텀하게 고치기 위해서는 Listener를 생성하고 Job Flow에 등록하는 등 번거로움이 존재합니다.
+Step의 결과에 따라 서로 다른 Step으로 이동하는 방법을 알아보았습니다. 이번 에는 다른 방식으로 분기 처리하는 방식입니다. 위에서 진행했던 방식에 2가지 문제가 있습니다.
+
+* Step이 담당하는 역할이 2개 이상이 됩니다.
+    * 실제 해당 Step이 처리해야할 로직외에도 분기를 시키기 위해 ExitStatus 조작이 필요합니다.
+* 다양한 분기 로직 처리의 어려움
+    * ExitStatus를 커스텀하게 고치기 위해서는 Listener를 생성하고 Job Flow에 등록하는 등 번거로움이 존재합니다.
 
 **Spring Batch에서는 Step들의 Flow속에서 분기만 담당하는 타입이 있습니다.**
 
@@ -379,15 +393,14 @@ class OddDecider : JobExecutionDecider {
 ```
 
 * start()
-  * Job Flow의 첫번째 Step을 시작합니다.
+    * Job Flow의 첫번째 Step을 시작합니다.
 * next()
-  * startStep 이후에 decider를 실행합니다.
+    * startStep 이후에 decider를 실행합니다.
 * from()
-  * from은 이벤트 리스너 역할을 합니다.
-  * decider의 상태값을 보고 일치하는 상태라면 to()에 포함된 step 를 호출합니다.
+    * from은 이벤트 리스너 역할을 합니다.
+    * decider의 상태값을 보고 일치하는 상태라면 to()에 포함된 step 를 호출합니다.
 
- 분기 로직에 대한 모든 일은 `OddDecider`에서 전담하고 있습니다. 즉 분기에 대한 책임을 해당 객체에서 수행하고 Step 에서는 분기에 따른 책임을 가지게되지 않습니다.
-
+분기 로직에 대한 모든 일은 `OddDecider`에서 전담하고 있습니다. 즉 분기에 대한 책임을 해당 객체에서 수행하고 Step 에서는 분기에 따른 책임을 가지게되지 않습니다.
 
 STEP_EXECUTION_ID | VERSION | STEP_NAME | JOB_EXECUTION_ID | START_TIME | END_TIME | STATUS | COMMIT_COUNT | READ_COUNT | FILTER_COUNT | WRITE_COUNT | READ_SKIP_COUNT | WRITE_SKIP_COUNT | PROCESS_SKIP_COUNT | ROLLBACK_COUNT | EXIT_CODE | EXIT_MESSAGE | LAST_UPDATED
 ------------------|---------|-----------|------------------|------------|----------|--------|--------------|------------|--------------|-------------|-----------------|------------------|--------------------|----------------|-----------|--------------|-------------
@@ -397,8 +410,6 @@ STEP_EXECUTION_ID | VERSION | STEP_NAME | JOB_EXECUTION_ID | START_TIME | END_TI
 23 | 3 | oddStep | 14 | 2020-01-15 16:57:39 | 2020-01-15 16:57:39 | COMPLETED | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | COMPLETED |  | 2020-01-15 16:57:39
 
 evenStep, oddStep 홀수 짝수 Step들이 각각 실행된것을 확인 할 수 있씁니다.
-
-
 
  ```kotlin
  class OddDecider : JobExecutionDecider {
@@ -413,12 +424,12 @@ evenStep, oddStep 홀수 짝수 Step들이 각각 실행된것을 확인 할 수
     }
 }
  ```
- JobExecutionDecider 인터페이스를 구현한 OddDecider입니다. **주의하실 것은 Step으로 처리하는게 아니기 때문에 ExitStatus가 아닌 FlowExecutionStatus로 상태를 관리합니다.**
 
+JobExecutionDecider 인터페이스를 구현한 OddDecider입니다. **주의하실 것은 Step으로 처리하는게 아니기 때문에 ExitStatus가 아닌 FlowExecutionStatus로 상태를 관리합니다.**
 
- ### 간단하게 Flow 보기
+### 간단하게 Flow 보기
 
- Step의 가장 기본적인 흐름은 `읽기-처리-쓰기` 입니다. 여기서 세부적인 조건에 따라서 Step의 실행 여부를 정할 수 있습니다. 이런 흐름은 제어하는 것이 Flow입니다.
+Step의 가장 기본적인 흐름은 `읽기-처리-쓰기` 입니다. 여기서 세부적인 조건에 따라서 Step의 실행 여부를 정할 수 있습니다. 이런 흐름은 제어하는 것이 Flow입니다.
 
 ![](https://github.com/cheese10yun/TIL/raw/master/assets/batch-flow.png)
 
@@ -429,8 +440,9 @@ public interface JobExecutionDecider {
 	FlowExecutionStatus decide(JobExecution jobExecution, @Nullable StepExecution stepExecution);
 }
 ```
-`decide()` 메서드의 반환값으로 FlowExecutionStatus 객체를 반환하도록 명시되어 있습니다. FlowExecutionStatus 객체는 Statu의 값 `COMPLETED`, `STOPPED`, `FAILED`. `UNKOWN` 등을 제공합니다.
 
+`decide()` 메서드의 반환값으로 FlowExecutionStatus 객체를 반환하도록 명시되어 있습니다. FlowExecutionStatus 객체는 Statu의 값 `COMPLETED`, `STOPPED`, `FAILED`. `UNKOWN`
+등을 제공합니다.
 
 ```kotlin
 class InactiveJobExecutionDecider : JobExecutionDecider {
@@ -446,11 +458,10 @@ class InactiveJobExecutionDecider : JobExecutionDecider {
     }
 }
 ```
+
 * (1) Random 객체를 사용해 정수 여부에 따라 분기 처리
 * (2) 양수면 FlowExecutionStatus.COMPLETED 리턴
 * (3) 음수면 FlowExecutionStatus.FAILED 리턴
-
-
 
 ```kotlin
 
@@ -483,29 +494,27 @@ class OrderPaging(
     }
 }
 ```
-* (1) FlowBuilder를 통해서 Flow 객체 생성, 생성자의 Flow 이름을 String으로 넘길수 있습니다. 
+
+* (1) FlowBuilder를 통해서 Flow 객체 생성, 생성자의 Flow 이름을 String으로 넘길수 있습니다.
 * (2) InactiveJobExecutionDecider 객체를 star를 진행합니다.
-* (3) `FlowExecutionStatus.FAILED` 인 경우에는 바로 종료하게 `end()` 메서드를 호출하게 합니다. 
-* (4) `FlowExecutionStatus.COMPLETED` 인 경우에는 기존 Job을 실행 하도록 `to()` 메서드를 호출하게 합니다.  
+* (3) `FlowExecutionStatus.FAILED` 인 경우에는 바로 종료하게 `end()` 메서드를 호출하게 합니다.
+* (4) `FlowExecutionStatus.COMPLETED` 인 경우에는 기존 Job을 실행 하도록 `to()` 메서드를 호출하게 합니다.
 * (5) 기존 Job에서 새로운 `orderPagingJobFlow`을 DI 받아 `start()` 합니다.
 
+배치 흐름에서 전후 처리를 하는 Listener를 설정할 수 있습니다. 구체적으로 Job의 전후 처리, Step의 전후 처리, 각 청크 단위에서의 전후 처리 등 세세한 과정 실행 시 특정 로직을 할당해 제어할 수 있습니다.
 
- 
- 배치 흐름에서 전후 처리를 하는 Listener를 설정할 수 있습니다. 구체적으로 Job의 전후 처리, Step의 전후 처리, 각 청크 단위에서의 전후 처리 등 세세한 과정 실행 시 특정 로직을 할당해 제어할 수 있습니다.
- 
- ## Batch Listener
- 
- 인터페이스명               | 어노테이션                                                    | 설명
+## Batch Listener
+
+인터페이스명               | 어노테이션                                                    | 설명
  ---------------------|----------------------------------------------------------|------------------------------------------------
- JobExecutionListener | @BeforeJob  <br/> @AfterJob                              | Job 실행 전후 처리를 담당하는 Listener 설정
- ChunkListener        | @BeforeChunk  <br/> @AfterChunk <br/> @AfterChunkError   | Chunk 실행 전후 처리 및 에러 발생 시 처리를 담당하는 Listener 설정
- ItemReaderListener   | @BeforeRead <br/> @AfterRead <br/> @OnReadError          | Read 과정 전후 처리 및 에러 발생 시 처리를 담당하는 Listener 설정
- ItemProcessListener  | @BeforeProcess <br/> @AfterProcess <br/> @OnProcessError | Process 과정 전후 처리 및 에러 발생 시 처리를 담당하는 Listener 설정
- ItemWriterListener   | @BeforeWrite <br/> @AfterWrite <br/> @AOnWriterError     | Write 과정 전후 처리 및 에러 발생 시 처리를 담당하는 Listener 설정
- 
- 
- ## JobExecutionListener
- 
+JobExecutionListener | @BeforeJob  <br/> @AfterJob                              | Job 실행 전후 처리를 담당하는 Listener 설정
+ChunkListener        | @BeforeChunk  <br/> @AfterChunk <br/> @AfterChunkError   | Chunk 실행 전후 처리 및 에러 발생 시 처리를 담당하는 Listener 설정
+ItemReaderListener   | @BeforeRead <br/> @AfterRead <br/> @OnReadError          | Read 과정 전후 처리 및 에러 발생 시 처리를 담당하는 Listener 설정
+ItemProcessListener  | @BeforeProcess <br/> @AfterProcess <br/> @OnProcessError | Process 과정 전후 처리 및 에러 발생 시 처리를 담당하는 Listener 설정
+ItemWriterListener   | @BeforeWrite <br/> @AfterWrite <br/> @AOnWriterError     | Write 과정 전후 처리 및 에러 발생 시 처리를 담당하는 Listener 설정
+
+## JobExecutionListener
+
  ```kotlin
  @Component
  class InactiveJobListener : JobExecutionListener {
@@ -529,6 +538,7 @@ class OrderPaging(
              .build()
  }
  ```
- * JobExecutionListener 인터페이스 구현
- * orderPagingJob에서 Bean 주입받아서 리스너 처리
- * 인터페이스를 구현하지 않고 @BeforeSte, @AfterStep 어노테이션으로 간단하게 구현 가능
+
+* JobExecutionListener 인터페이스 구현
+* orderPagingJob에서 Bean 주입받아서 리스너 처리
+* 인터페이스를 구현하지 않고 @BeforeSte, @AfterStep 어노테이션으로 간단하게 구현 가능

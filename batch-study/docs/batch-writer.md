@@ -1,10 +1,10 @@
 > [Spring Batch 가이드 - 8. ItemWriter](https://github.com/jojoldu/spring-batch-in-action/blob/master/8_WRITER.md)을 보고 정리한 글입니다.
 
-Writer는 Reader, Processor와 함께 ChunkOrientedTasklet을 구성하는 3 요소입니다. 여기서 Processor가 아닌 Writer를 우선 선택한 이유는 **Processor는 선택이기 때문입니다. Processor가 없어도 ChunkOrientedTasklet을 구성할 수 있습니다. 반면 Reader, Writer는 ChunkOrientedTasklet에서 필수로 구성해야 합니다.**
+Writer는 Reader, Processor와 함께 ChunkOrientedTasklet을 구성하는 3 요소입니다. 여기서 Processor가 아닌 Writer를 우선 선택한 이유는 **Processor는 선택이기 때문입니다. Processor가
+없어도 ChunkOrientedTasklet을 구성할 수 있습니다. 반면 Reader, Writer는 ChunkOrientedTasklet에서 필수로 구성해야 합니다.**
 
-
-Spring Batch가 처음 나왔을 때, **ItemWriter는 ItemReader와 마찬가지로 item을 하나씩 다루었습니다.** 그러나 Spring Batch2와 Chunk 기반 처리의 도입으로 인해 ItemWriter의 큰 변경이 있었습니다. **ItemWriter는 item 하나를 작성하지 않고 Chunk 단위로 묶인 item List를 다룹니다.** 이 때문에 ItemWriter 인터페이스는 ItemReader 인터페이스와 약간 다릅니다.
-
+Spring Batch가 처음 나왔을 때, **ItemWriter는 ItemReader와 마찬가지로 item을 하나씩 다루었습니다.** 그러나 Spring Batch2와 Chunk 기반 처리의 도입으로 인해 ItemWriter의 큰 변경이
+있었습니다. **ItemWriter는 item 하나를 작성하지 않고 Chunk 단위로 묶인 item List를 다룹니다.** 이 때문에 ItemWriter 인터페이스는 ItemReader 인터페이스와 약간 다릅니다.
 
 ```java
 public interface ItemReader<T> {
@@ -26,7 +26,8 @@ public interface ItemWriter<T> {
 	void write(List<? extends T> items) throws Exception;
 }
 ```
-ItemReader는 `read()` 하나를 반환하는 반면, ItemWriter의 write()는 인자로 item list를 받습니다. 
+
+ItemReader는 `read()` 하나를 반환하는 반면, ItemWriter의 write()는 인자로 item list를 받습니다.
 
 ![](https://github.com/jojoldu/spring-batch-in-action/raw/master/images/8/write-process.png)
 
@@ -70,12 +71,14 @@ public void write(List<? extends T> items) {
 * JpaItemWriter
 
 ## JdbcBatchItemWriter
-ORM을 사용하지 않은 경우 Writer는 대부분 JdbcBatchItemWriter를 사용합니다. 이 JdbcBatchItemWriter는 아래 그림과 같이 JDBC의 Batch 기능을 사용하여 한 번에 Database로 전달하여 Database 내부에 쿼리를 실행되도록 합니다.
+
+ORM을 사용하지 않은 경우 Writer는 대부분 JdbcBatchItemWriter를 사용합니다. 이 JdbcBatchItemWriter는 아래 그림과 같이 JDBC의 Batch 기능을 사용하여 한 번에 Database로 전달하여 Database
+내부에 쿼리를 실행되도록 합니다.
 
 ![](https://github.com/cheese10yun/TIL/blob/master/assets/jdbc-batch-item-wirter.png?raw=true)
 
-**이렇게 ChunkSzie 만큼 쌓아 Query를 한번에 전송하기 때문에 애플리케이션과 데이터베이스 간의 데이터 통신의 최소화 시켜 성능을 향상 시킬수 있습니다.** 업데이트 쿼리 또한 마찬 가지입니다. 업데이트를 일괄 처리로 그룹화하면 데이터베이스와 어플리케이션간 왕복 횟수가 줄어들어 성능이 향상 됩니다.
-
+**이렇게 ChunkSzie 만큼 쌓아 Query를 한번에 전송하기 때문에 애플리케이션과 데이터베이스 간의 데이터 통신의 최소화 시켜 성능을 향상 시킬수 있습니다.** 업데이트 쿼리 또한 마찬 가지입니다. 업데이트를 일괄 처리로 그룹화하면
+데이터베이스와 어플리케이션간 왕복 횟수가 줄어들어 성능이 향상 됩니다.
 
 ```kotlin
 @Configuration
@@ -128,12 +131,10 @@ class JdbcBatchItemWriterJobConfiguration(
 }
 ```
 
-
-Spring Batch를 처음 쓰시는 분들이 자주 오해하시는게 이 부분입니다.
-위 코드에서도 나와있지만, Pay2 테이블에 데이터를 넣은 Writer이지만 선언된 제네릭 타입은 Reader/Processor에서 넘겨준 Pay클래스입니다.
-
+Spring Batch를 처음 쓰시는 분들이 자주 오해하시는게 이 부분입니다. 위 코드에서도 나와있지만, Pay2 테이블에 데이터를 넣은 Writer이지만 선언된 제네릭 타입은 Reader/Processor에서 넘겨준 Pay클래스입니다.
 
 ## JpaItemWriter
+
 Writer는 ORM을 사용할 수 있는 `JpaItemWriter`입니다.
 
 ```kotlin
@@ -188,7 +189,8 @@ class JpaItemWriterJobConfiguration(
 }
 ```
 
-JpaItemWriter는 JPA를 사용하기 때문에 영속성 관리를 위해 EntityManager를 할당해줘야 합니다. 여기서 processor가 추가되었습니다. Order Entity를 읽어서 Writer에는 Order2 Entity를 전달해주기 위함 입니다.
+JpaItemWriter는 JPA를 사용하기 때문에 영속성 관리를 위해 EntityManager를 할당해줘야 합니다. 여기서 processor가 추가되었습니다. Order Entity를 읽어서 Writer에는 Order2 Entity를 전달해주기 위함
+입니다.
 
 JpaItemWriter는 JdbcBatchItemWriter와 달리 **넘어온 Entity를 데이터베이스에 반영합니다.** 즉, JpaItemWriter는 Entity 클래스를 제네릭 타입으로 받아야만 합니다.
 
@@ -215,14 +217,15 @@ protected void doWrite(EntityManager entityManager, List<? extends T> items) {
 
 }
 ```
-당연한 이야기겠지만 JPA 에서는 영속성 컨텍스트에 저장하기 위해서는 해당 객체가 엔티티 클래스여야 하기 때문에 `entityManager.merge(item);` 으로 저장됩니다.
 
+당연한 이야기겠지만 JPA 에서는 영속성 컨텍스트에 저장하기 위해서는 해당 객체가 엔티티 클래스여야 하기 때문에 `entityManager.merge(item);` 으로 저장됩니다.
 
 ## Custom ItemWriter
 
-Reader와 달리 Writer의 경우 Custom하게 구현해야할 일이 많습니다. 물론 Reader 역시 Custom 할일이 많습니다. 
+Reader와 달리 Writer의 경우 Custom하게 구현해야할 일이 많습니다. 물론 Reader 역시 Custom 할일이 많습니다.
 
 예를 들어 다음과 같은 경우가 있습니다.
+
 * Reader에서 읽어온 데이터를 RestTemplate으로 외부 API로 전달해야할때
 * 임시저장을 하고 비교하기 위해 싱글톤 객체에 값을 넣어야할때
 * 여러 Entity를 동시에 save 해야할때
