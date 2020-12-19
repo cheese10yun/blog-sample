@@ -14,7 +14,6 @@ Spring Batch를 이용해서 데이터베이스에 저장되어 있는 정보를
 
 
 ## Batch Code
-를
 
 ```kotlin
 @Configuration
