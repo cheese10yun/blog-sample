@@ -125,7 +125,6 @@ class ExposedTest {
             PaymentTable.batchInsert(amounts) { amount ->
                 this[orderId] = amount.toLong()
                 this[PaymentTable.amount] = amount
-
             }
         }
 
