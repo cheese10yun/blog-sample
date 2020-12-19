@@ -12,3 +12,4 @@
 * [Batch Writer](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-writer.md)
 * [Batch Process](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-item-processor.md)
 * [Batch CustomItemReader](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-custom-item-reader.md)
+* [Batch CSV Writer](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-csv-wirter.md)
