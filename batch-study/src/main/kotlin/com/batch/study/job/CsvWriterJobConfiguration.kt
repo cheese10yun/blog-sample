@@ -61,7 +61,7 @@ class CsvWriterJobConfiguration(
     private val writer: FlatFileItemWriter<PaymentCsv> =
         FlatFileItemWriterBuilder<PaymentCsv>()
             .name("writerPayment")
-            .resource(FileSystemResource("_payment.csv"))
+            .resource(FileSystemResource("src/main/resources/payment.csv"))
             .append(true)
             .saveState(true)
             .lineAggregator(PaymentCsvMapper().delimitedLineAggregator())
