@@ -8,12 +8,11 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
 
 class PaymentBackTest {
 
     @Test
-     fun asd() {
+    fun asd() {
 
         val config = HikariConfig().apply {
             jdbcUrl =
@@ -23,8 +22,6 @@ class PaymentBackTest {
             password = ""
             maximumPoolSize = 20
         }
-
-
         val payments = (1..10)
             .map { Payment(it.toBigDecimal(), it.toLong()) }
 
@@ -36,8 +33,6 @@ class PaymentBackTest {
                 this[PaymentBack.amount] = payment.amount
             }
         }
-
-
     }
 }
 

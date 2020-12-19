@@ -25,7 +25,7 @@ import javax.sql.DataSource
 class BatchInsertExposedJobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
     private val jobDataSetUpListener: JobDataSetUpListener,
-    private val exposedDataSource: DataSource,
+    private val dataSource: DataSource,
     entityManagerFactory: EntityManagerFactory
 ) {
     private val CHUNK_SZIE = 1_000
@@ -49,7 +49,7 @@ class BatchInsertExposedJobConfiguration(
         stepBuilderFactory["batchInsertExposedStep"]
             .chunk<Payment, Payment>(CHUNK_SZIE)
             .reader(reader)
-            .writer(writerBatchExposed)
+            .writer(writer)
             .build()
 
     private val reader: JpaPagingItemReader<Payment> =
@@ -59,8 +59,8 @@ class BatchInsertExposedJobConfiguration(
             .name("readerPayment")
             .build()
 
-    private val writerBatchExposed: ItemWriter<Payment> = ItemWriter { payments ->
-        Database.connect(exposedDataSource)
+    private val writer: ItemWriter<Payment> = ItemWriter { payments ->
+        Database.connect(dataSource)
         transaction {
             PaymentBack.batchInsert(payments) { payment ->
                 this[PaymentBack.orderId] = payment.orderId

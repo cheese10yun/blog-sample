@@ -11,11 +11,9 @@ class JobDataSetUpListener(
     private val jpaSupport: JpaSupport
 ) : JobExecutionListener {
     override fun beforeJob(jobExecution: JobExecution) {
-
         (1..100)
             .map { Payment(it.toBigDecimal(), it.toLong()) }
             .also { jpaSupport.saveAll(it) }
-
     }
 
     override fun afterJob(jobExecution: JobExecution): Unit = Unit

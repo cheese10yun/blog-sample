@@ -18,34 +18,32 @@ import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilde
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import javax.persistence.EntityManagerFactory
-import javax.sql.DataSource
 
 @Configuration
 class JpaInsertJobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
     private val jobDataSetUpListener: JobDataSetUpListener,
-    private val exposedDataSource: DataSource,
     entityManagerFactory: EntityManagerFactory
 ) {
     private val CHUNK_SZIE = 1_000
 
     @Bean
-    fun batchInsertJob(
-        batchInsertExposedStep: Step
+    fun jpaInsertJob(
+        jpaInsertStep: Step
     ): Job =
-        jobBuilderFactory["batchInsertJob"]
+        jobBuilderFactory["jpaInsertJob"]
             .incrementer(RunIdIncrementer())
             .listener(JobReportListener())
             .listener(jobDataSetUpListener)
-            .start(batchInsertExposedStep)
+            .start(jpaInsertStep)
             .build()
 
     @Bean
     @JobScope
-    fun batchInsertExposedStep(
+    fun jpaInsertStep(
         stepBuilderFactory: StepBuilderFactory
     ): Step =
-        stepBuilderFactory["batchInsertExposedStep"]
+        stepBuilderFactory["jpaInsertStep"]
             .chunk<Payment, PaymentBackJpa>(CHUNK_SZIE)
             .reader(reader)
             .processor(processor)
