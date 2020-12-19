@@ -2,8 +2,8 @@ package com.batch.study.job
 
 import com.batch.study.core.CsvLineAggregator
 import com.batch.study.domain.payment.Payment
+import com.batch.study.listener.JobDataSetUpListener
 import com.batch.study.listener.JobReportListener
-import com.batch.study.logger
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
@@ -24,10 +24,9 @@ import javax.persistence.EntityManagerFactory
 @Configuration
 class CsvWriterJobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
+    private val jobDataSetUpListener: JobDataSetUpListener,
     entityManagerFactory: EntityManagerFactory
 ) {
-
-    private val log by logger()
     private val CHUNK_SZIE = 10
 
     @Bean
@@ -37,6 +36,7 @@ class CsvWriterJobConfiguration(
         jobBuilderFactory["csvWriterJob"]
             .incrementer(RunIdIncrementer())
             .listener(JobReportListener())
+            .listener(jobDataSetUpListener)
             .start(csvWriterStep)
             .build()
 

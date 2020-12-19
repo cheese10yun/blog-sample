@@ -8,12 +8,12 @@ spring:
         database: mysql
         properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         hibernate:
-            ddl-auto: none
+            ddl-auto: create
         show-sql: true
         properties:
 
     datasource:
-        url: jdbc:mysql://localhost:3366/batch_test?useSSL=false&serverTimezone=UTC&autoReconnect=true
+        url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=UTC&autoReconnect=true
         username: root
         password:
         driver-class-name: com.mysql.cj.jdbc.Driver
