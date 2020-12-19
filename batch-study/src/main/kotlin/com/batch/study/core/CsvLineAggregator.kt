@@ -4,7 +4,6 @@ import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator
 
 interface CsvLineAggregator<T> {
-
     val headerNames: Array<String>
 
     fun delimitedLineAggregator(

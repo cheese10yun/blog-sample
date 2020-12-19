@@ -63,8 +63,10 @@ class CsvWriterJobConfiguration(
             .name("writerPayment")
             .resource(FileSystemResource("src/main/resources/payment.csv"))
             .append(true)
-            .saveState(true)
             .lineAggregator(PaymentCsvMapper().delimitedLineAggregator())
+            .headerCallback {
+                it.write(PaymentCsvMapper().headerNames.joinToString(","))
+            }
             .encoding(StandardCharsets.UTF_8.name())
             .build()
 }
