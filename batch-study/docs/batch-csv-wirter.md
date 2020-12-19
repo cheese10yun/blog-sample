@@ -199,8 +199,6 @@ amount,orderId
 ```
 `amount, orderId` header 정보 및 데이터가 정상적으로 저장돼있는 것을 확인할 수 있습니다.
 
-![](img/csv-result.png)
-
 ## IntelliJ Plugins
 
 ![](img/csv-rainbow.png)
