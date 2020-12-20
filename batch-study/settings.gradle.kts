@@ -1,1 +1,1 @@
-rootProject.name = "study"
+rootProject.name = "batch-study"
