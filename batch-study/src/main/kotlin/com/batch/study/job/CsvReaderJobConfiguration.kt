@@ -1,6 +1,8 @@
 package com.batch.study.job
 
 import com.batch.study.domain.payment.Payment
+import com.batch.study.domain.payment.PaymentCsv
+import com.batch.study.domain.payment.PaymentCsvMapper
 import com.batch.study.listener.JobReportListener
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
@@ -56,6 +58,7 @@ class CsvReaderJobConfiguration(
             .name("paymentCsv")
             .resource(ClassPathResource("/payment.csv"))
             .linesToSkip(1)
+//            .lineMapper(PaymentCsvMapper().lineMapper(DelimitedLineTokenizer.DELIMITER_COMMA))
             .delimited()
             .delimiter(DelimitedLineTokenizer.DELIMITER_COMMA)
             .names("amount", "orderId")

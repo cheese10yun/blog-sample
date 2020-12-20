@@ -32,7 +32,7 @@ interface LineMapper<T> {
     fun fieldSetMapper(fs: FieldSet): T
     val headerNames: Array<String>
 
-    fun toLineMapper(delimiter: String = ","): LineMapper<T> {
+    fun lineMapper(delimiter: String = DelimitedLineTokenizer.DELIMITER_COMMA): LineMapper<T> {
         val lineMapper = DefaultLineMapper<T>()
         val lineTokenizer = DelimitedLineTokenizer(delimiter)
         lineTokenizer.setNames(*this.headerNames)

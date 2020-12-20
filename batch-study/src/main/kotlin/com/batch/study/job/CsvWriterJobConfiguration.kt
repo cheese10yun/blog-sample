@@ -1,8 +1,8 @@
 package com.batch.study.job
 
-import com.batch.study.core.LineMapper
-import com.batch.study.core.LineAggregator
 import com.batch.study.domain.payment.Payment
+import com.batch.study.domain.payment.PaymentCsv
+import com.batch.study.domain.payment.PaymentCsvMapper
 import com.batch.study.listener.JobDataSetUpListener
 import com.batch.study.listener.JobReportListener
 import org.springframework.batch.core.Job
@@ -15,11 +15,9 @@ import org.springframework.batch.item.database.JpaPagingItemReader
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder
-import org.springframework.batch.item.file.transform.FieldSet
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.FileSystemResource
-import java.math.BigDecimal
 import java.nio.charset.StandardCharsets
 import javax.persistence.EntityManagerFactory
 
@@ -71,25 +69,4 @@ class CsvWriterJobConfiguration(
             }
             .encoding(StandardCharsets.UTF_8.name())
             .build()
-}
-
-data class PaymentCsv(
-    val amount: BigDecimal,
-    val orderId: Long
-) {
-    fun toEntity() = Payment(amount, orderId)
-}
-
-class PaymentCsvMapper :
-    LineMapper<PaymentCsv>,
-    LineAggregator<PaymentCsv> {
-
-    override val headerNames: Array<String> = arrayOf(
-        "amount", "orderId"
-    )
-
-    override fun fieldSetMapper(fs: FieldSet) = PaymentCsv(
-        amount = fs.readBigDecimal("amount"),
-        orderId = fs.readLong("orderId")
-    )
 }

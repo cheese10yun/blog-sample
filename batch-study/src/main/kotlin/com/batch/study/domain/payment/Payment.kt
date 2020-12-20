@@ -1,6 +1,9 @@
 package com.batch.study.domain.payment
 
+import com.batch.study.core.LineAggregator
+import com.batch.study.core.LineMapper
 import com.batch.study.domain.EntityAuditing
+import org.springframework.batch.item.file.transform.FieldSet
 import org.springframework.data.jpa.repository.JpaRepository
 import java.math.BigDecimal
 import javax.persistence.Column
@@ -24,3 +27,24 @@ class Payment(
 }
 
 interface PaymentRepository : JpaRepository<Payment, Long>
+
+data class PaymentCsv(
+    val amount: BigDecimal,
+    val orderId: Long
+) {
+    fun toEntity() = Payment(amount, orderId)
+}
+
+class PaymentCsvMapper :
+    LineMapper<PaymentCsv>,
+    LineAggregator<PaymentCsv> {
+
+    override val headerNames: Array<String> = arrayOf(
+        "amount", "orderId"
+    )
+
+    override fun fieldSetMapper(fs: FieldSet) = PaymentCsv(
+        amount = fs.readBigDecimal("amount"),
+        orderId = fs.readLong("orderId")
+    )
+}
