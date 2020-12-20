@@ -115,6 +115,50 @@ class ReactiveTest(
         runBlocking { delay(5_000) }
     }
 
+    @Test
+    fun `멀티 스레드 작업3`() {
+        val stopWatch = StopWatch()
+        val orders = givenOrders(orderCount)
+        stopWatch.start()
+
+        orders
+            .toFlowable()
+            .parallel()
+            .runOn(Schedulers.io())
+            .map {
+                println("Mapping orderId :${it.id} ${Thread.currentThread().name}")
+                val result = sampleApi.doSomething(it.id!!)
+                Pair(result, it)
+            }
+            .sequential()
+            .toList()
+            .subscribe(
+                { orders ->
+                    for (order in orders) {
+                        println("Received orderId :${order.second.id} ${Thread.currentThread().name}")
+                        when {
+                            order.first -> order.second.status = OrderStatus.COMPLETED
+                            else -> order.second.status = OrderStatus.FAILED
+                        }
+
+                        if (order.second.id == 5_000L) {
+                            stopWatch.stop()
+                        }
+                    }
+                },
+                {
+                    it.printStackTrace()
+                },
+//                {
+//                    stopWatch.stop()
+//                    println(stopWatch.totalTimeSeconds)
+//                }
+            )
+        runBlocking { delay(50_000) }
+
+        println("12312312321")
+    }
+
     private fun givenOrders(end: Int) = (1..end).map {
         Order(OrderStatus.READY)
     }.also {

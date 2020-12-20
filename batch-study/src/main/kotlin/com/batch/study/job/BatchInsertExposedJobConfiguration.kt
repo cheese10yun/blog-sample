@@ -53,7 +53,7 @@ class BatchInsertExposedJobConfiguration(
         stepBuilderFactory["batchInsertExposedStep"]
             .chunk<Payment, Payment>(CHUNK_SZIE)
             .reader(reader)
-            .writer(writer)
+            .writer(writer2)
             .build()
 
     private val reader: JpaPagingItemReader<Payment> =
