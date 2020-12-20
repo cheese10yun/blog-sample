@@ -74,6 +74,7 @@ class BatchInsertExposedJobConfiguration(
             }
             .sequential()
             .toList()
+            .observeOn(Schedulers.computation())
             .subscribe(
                 {
                     println("Received : ${Thread.currentThread().name}")
