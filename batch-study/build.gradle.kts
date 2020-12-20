@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "2.4.1"
     id("io.spring.dependency-management") version "1.0.10.RELEASE"
+
     kotlin("jvm") version "1.4.21"
     kotlin("plugin.spring") version "1.4.21"
     kotlin("plugin.jpa") version "1.4.21"
@@ -33,6 +34,12 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:${properties["exposed_version"]}")
     implementation("org.jetbrains.exposed:exposed-jdbc:${properties["exposed_version"]}")
     implementation("org.jetbrains.exposed:exposed-java-time:${properties["exposed_version"]}")
+
+    implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
+    implementation("io.projectreactor:reactor-core")
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("mysql:mysql-connector-java")

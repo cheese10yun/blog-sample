@@ -16,6 +16,11 @@ class Payment(
     @Column(name = "order_id", nullable = false, updatable = false)
     val orderId: Long
 
-) : EntityAuditing()
+) : EntityAuditing() {
+
+    override fun toString(): String {
+        return "Payment(amount=$amount, orderId=$orderId)"
+    }
+}
 
 interface PaymentRepository : JpaRepository<Payment, Long>

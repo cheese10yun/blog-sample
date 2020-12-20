@@ -8,7 +8,7 @@ spring:
         properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         hibernate:
             ddl-auto: create
-        show-sql: true
+        show-sql: false
         properties:
 
     datasource:
@@ -18,7 +18,8 @@ spring:
         driver-class-name: com.mysql.cj.jdbc.Driver
         initialization-mode: never
         hikari:
-            maximum-pool-size: 20
+            maximum-pool-size: 50
+            minimum-idle: 25
         dbcp2:
             test-on-borrow: true
             validation-query: select 1

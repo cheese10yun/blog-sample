@@ -4,6 +4,9 @@ import com.batch.study.domain.payment.Payment
 import com.batch.study.domain.payment.PaymentBack
 import com.batch.study.listener.JobDataSetUpListener
 import com.batch.study.listener.JobReportListener
+import com.batch.study.logger
+import io.reactivex.rxkotlin.toFlowable
+import io.reactivex.schedulers.Schedulers
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -29,6 +32,7 @@ class BatchInsertExposedJobConfiguration(
     entityManagerFactory: EntityManagerFactory
 ) {
     private val CHUNK_SZIE = 1_000
+    private val log by logger()
 
     @Bean
     fun batchInsertJob(
@@ -60,6 +64,30 @@ class BatchInsertExposedJobConfiguration(
             .build()
 
     private val writer: ItemWriter<Payment> = ItemWriter { payments ->
+        payments
+            .toFlowable()
+            .parallel()
+            .runOn(Schedulers.io())
+            .map {
+                println("mapping : ${Thread.currentThread().name}")
+                it
+            }
+            .sequential()
+            .toList()
+            .subscribe(
+                {
+                    println("Received : ${Thread.currentThread().name}")
+                    insert(it)
+                },
+                {}
+            )
+    }
+
+    private val writer2: ItemWriter<Payment> = ItemWriter { payments ->
+        insert(payments)
+    }
+
+    private fun insert(payments: List<Payment>) {
         Database.connect(dataSource)
         transaction {
             PaymentBack.batchInsert(payments) { payment ->
