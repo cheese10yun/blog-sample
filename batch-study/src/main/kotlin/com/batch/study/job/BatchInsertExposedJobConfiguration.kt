@@ -17,6 +17,7 @@ import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.item.ItemWriter
+import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.JpaPagingItemReader
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.context.annotation.Bean
@@ -48,11 +49,12 @@ class BatchInsertExposedJobConfiguration(
     @Bean
     @JobScope
     fun batchInsertExposedStep(
-        stepBuilderFactory: StepBuilderFactory
+        stepBuilderFactory: StepBuilderFactory,
+        cursorItemReader: HibernateCursorItemReader<Payment>
     ): Step =
         stepBuilderFactory["batchInsertExposedStep"]
             .chunk<Payment, Payment>(CHUNK_SZIE)
-            .reader(reader)
+            .reader(cursorItemReader)
             .writer(writer2)
             .build()
 

@@ -11,6 +11,7 @@ import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.item.ItemProcessor
+import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.JpaItemWriter
 import org.springframework.batch.item.database.JpaPagingItemReader
 import org.springframework.batch.item.database.builder.JpaItemWriterBuilder
@@ -41,11 +42,12 @@ class JpaInsertJobConfiguration(
     @Bean
     @JobScope
     fun jpaInsertStep(
-        stepBuilderFactory: StepBuilderFactory
+        stepBuilderFactory: StepBuilderFactory,
+        cursorItemReader: HibernateCursorItemReader<Payment>
     ): Step =
         stepBuilderFactory["jpaInsertStep"]
             .chunk<Payment, PaymentBackJpa>(CHUNK_SZIE)
-            .reader(reader)
+            .reader(cursorItemReader)
             .processor(processor)
             .writer(writer)
             .build()
