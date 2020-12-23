@@ -1,15 +1,8 @@
 package com.batch.study.job
 
 import com.batch.study.domain.payment.Payment
-import com.batch.study.domain.payment.PaymentBack
 import com.batch.study.listener.JobDataSetUpListener
 import com.batch.study.listener.JobReportListener
-import com.batch.study.logger
-import io.reactivex.rxkotlin.toFlowable
-import io.reactivex.schedulers.Schedulers
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.batchInsert
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
@@ -21,39 +14,39 @@ import org.springframework.batch.item.database.JpaPagingItemReader
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.sql.Connection
 import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
 @Configuration
-class BatchInsertExposedJobConfiguration(
+class JdbcTemplateInsertJobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
     private val jobDataSetUpListener: JobDataSetUpListener,
     private val dataSource: DataSource,
     entityManagerFactory: EntityManagerFactory
 ) {
     private val CHUNK_SZIE = 1_000
-    private val log by logger()
 
     @Bean
-    fun batchInsertJob(
-        batchInsertExposedStep: Step
+    fun jdbcTemplateInsertJob(
+        jdbcTemplateInsertStep: Step
     ): Job =
-        jobBuilderFactory["batchInsertJob"]
+        jobBuilderFactory["jdbcTemplateInsertJob"]
             .incrementer(RunIdIncrementer())
             .listener(JobReportListener())
             .listener(jobDataSetUpListener)
-            .start(batchInsertExposedStep)
+            .start(jdbcTemplateInsertStep)
             .build()
 
     @Bean
     @JobScope
-    fun batchInsertExposedStep(
+    fun jdbcTemplateInsertStep(
         stepBuilderFactory: StepBuilderFactory
     ): Step =
-        stepBuilderFactory["batchInsertExposedStep"]
+        stepBuilderFactory["jdbcTemplateInsertStep"]
             .chunk<Payment, Payment>(CHUNK_SZIE)
             .reader(reader)
-            .writer(writer2)
+            .writer(writer)
             .build()
 
     private val reader: JpaPagingItemReader<Payment> =
@@ -63,38 +56,43 @@ class BatchInsertExposedJobConfiguration(
             .name("readerPayment")
             .build()
 
-    private val writer: ItemWriter<Payment> = ItemWriter { payments ->
-        payments
-            .toFlowable()
-            .parallel()
-            .runOn(Schedulers.io())
-            .map {
-                println("mapping : ${Thread.currentThread().name}")
-                it
-            }
-            .sequential()
-            .toList()
-            .observeOn(Schedulers.computation())
-            .subscribe(
-                {
-                    println("Received : ${Thread.currentThread().name}")
-                    insert(it)
-                },
-                {}
-            )
-    }
 
-    private val writer2: ItemWriter<Payment> = ItemWriter { payments ->
+    private val writer: ItemWriter<Payment> = ItemWriter { payments ->
         insert(payments)
     }
 
     private fun insert(payments: List<Payment>) {
-        val connect = Database.connect(dataSource)
-        transaction {
-            PaymentBack.batchInsert(payments) { payment ->
-                this[PaymentBack.orderId] = payment.orderId
-                this[PaymentBack.amount] = payment.amount
+        val connection = dataSource.connection
+        val batchStatement = BatchStatement(connection)
+
+        try {
+            for (payment in payments) {
+                batchStatement.addBatch(payment)
             }
+            batchStatement.statement.executeBatch()
+        } catch (ex: Exception) {
+            throw ex
+        } finally {
+            batchStatement.close()
+            if (connection.isClosed.not()) {
+                connection.close()
+            }
+        }
+    }
+
+    private class BatchStatement(connection: Connection) {
+        val sql = "insert into payment_back (amount, order_id) values (?, ?);"
+        val statement = connection.prepareStatement(sql)!!
+
+        fun addBatch(payment: Payment) = statement.apply {
+            this.setBigDecimal(1, payment.amount)
+            this.setLong(2, payment.orderId)
+            this.addBatch()
+        }
+
+        fun close() {
+            if (statement.isClosed.not())
+                statement.close()
         }
     }
 }
