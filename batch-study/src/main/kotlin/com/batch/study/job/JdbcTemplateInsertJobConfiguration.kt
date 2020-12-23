@@ -81,7 +81,7 @@ class JdbcTemplateInsertJobConfiguration(
     }
 
     private class BatchStatement(connection: Connection) {
-        val sql = "insert into payment_back (amount, order_id) values (?, ?);"
+        val sql = "insert into payment_back (amount, order_id) values (?, ?)"
         val statement = connection.prepareStatement(sql)!!
 
         fun addBatch(payment: Payment) = statement.apply {

@@ -12,7 +12,7 @@ Batch Insert 성능 개선기
 ## JDBC
 
 INSERT 방식       rows        ms      ?
-JDBC        
+JDBC        1000        680
 
 ## Exposed 
 
