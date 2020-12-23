@@ -1,10 +1,10 @@
 package com.batch.study.job
 
+import com.batch.study.GLOBAL_CHUNK_SIZE
 import com.batch.study.domain.payment.Payment
 import com.batch.study.domain.payment.PaymentBack
 import com.batch.study.listener.JobDataSetUpListener
 import com.batch.study.listener.JobReportListener
-import com.batch.study.logger
 import io.reactivex.rxkotlin.toFlowable
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.exposed.sql.Database
@@ -22,8 +22,8 @@ import org.springframework.batch.item.database.JpaPagingItemReader
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.sql.Connection.TRANSACTION_REPEATABLE_READ
 import javax.persistence.EntityManagerFactory
-import javax.sql.DataSource
 
 @Configuration
 class BatchInsertExposedJobConfiguration(
@@ -32,7 +32,6 @@ class BatchInsertExposedJobConfiguration(
     private val exposedDataBase: Database,
     entityManagerFactory: EntityManagerFactory
 ) {
-    private val CHUNK_SZIE = 1_000
 
     @Bean
     fun batchInsertJob(
@@ -52,7 +51,7 @@ class BatchInsertExposedJobConfiguration(
         cursorItemReader: HibernateCursorItemReader<Payment>
     ): Step =
         stepBuilderFactory["batchInsertExposedStep"]
-            .chunk<Payment, Payment>(CHUNK_SZIE)
+            .chunk<Payment, Payment>(GLOBAL_CHUNK_SIZE)
             .reader(cursorItemReader)
             .writer(writer2)
             .build()
@@ -90,10 +89,12 @@ class BatchInsertExposedJobConfiguration(
     }
 
     private fun insert(payments: List<Payment>) {
-        transaction(exposedDataBase) {
+        transaction(
+            exposedDataBase
+        ) {
             PaymentBack.batchInsert(
                 data = payments,
-                shouldReturnGeneratedValues = false
+                shouldReturnGeneratedValues = true
             ) { payment ->
                 this[PaymentBack.orderId] = payment.orderId
                 this[PaymentBack.amount] = payment.amount

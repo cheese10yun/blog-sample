@@ -1,5 +1,6 @@
 package com.batch.study.job
 
+import com.batch.study.GLOBAL_CHUNK_SIZE
 import com.batch.study.domain.payment.Payment
 import com.batch.study.listener.JobDataSetUpListener
 import com.batch.study.listener.JobReportListener
@@ -29,7 +30,6 @@ class JdbcTemplateInsertJobConfiguration(
     private val dataSource: DataSource,
     entityManagerFactory: EntityManagerFactory
 ) {
-    private val CHUNK_SZIE = 1_000
 
     @Bean
     fun jdbcTemplateInsertJob(
@@ -49,7 +49,7 @@ class JdbcTemplateInsertJobConfiguration(
         cursorItemReader: HibernateCursorItemReader<Payment>
     ): Step =
         stepBuilderFactory["jdbcTemplateInsertStep"]
-            .chunk<Payment, Payment>(CHUNK_SZIE)
+            .chunk<Payment, Payment>(GLOBAL_CHUNK_SIZE)
             .reader(cursorItemReader)
             .writer(writer)
             .build()

@@ -14,5 +14,7 @@ fun main(args: Array<String>) {
     runApplication<StudyApplication>(*args)
 }
 
+const val GLOBAL_CHUNK_SIZE =  10_000
+
 
 fun <A : Any> A.logger(): Lazy<Logger> = lazy { LoggerFactory.getLogger(this.javaClass) }

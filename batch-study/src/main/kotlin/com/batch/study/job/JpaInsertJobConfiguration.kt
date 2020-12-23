@@ -1,5 +1,6 @@
 package com.batch.study.job
 
+import com.batch.study.GLOBAL_CHUNK_SIZE
 import com.batch.study.domain.payment.Payment
 import com.batch.study.domain.payment.PaymentBackJpa
 import com.batch.study.listener.JobDataSetUpListener
@@ -26,7 +27,6 @@ class JpaInsertJobConfiguration(
     private val jobDataSetUpListener: JobDataSetUpListener,
     entityManagerFactory: EntityManagerFactory
 ) {
-    private val CHUNK_SZIE = 1_000
 
     @Bean
     fun jpaInsertJob(
@@ -46,7 +46,7 @@ class JpaInsertJobConfiguration(
         cursorItemReader: HibernateCursorItemReader<Payment>
     ): Step =
         stepBuilderFactory["jpaInsertStep"]
-            .chunk<Payment, PaymentBackJpa>(CHUNK_SZIE)
+            .chunk<Payment, PaymentBackJpa>(GLOBAL_CHUNK_SIZE)
             .reader(cursorItemReader)
             .processor(processor)
             .writer(writer)
