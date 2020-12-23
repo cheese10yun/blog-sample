@@ -29,11 +29,10 @@ import javax.sql.DataSource
 class BatchInsertExposedJobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
     private val jobDataSetUpListener: JobDataSetUpListener,
-    private val dataSource: DataSource,
+    private val exposedDataBase: Database,
     entityManagerFactory: EntityManagerFactory
 ) {
     private val CHUNK_SZIE = 1_000
-    private val log by logger()
 
     @Bean
     fun batchInsertJob(
@@ -91,9 +90,11 @@ class BatchInsertExposedJobConfiguration(
     }
 
     private fun insert(payments: List<Payment>) {
-        val connect = Database.connect(dataSource)
-        transaction {
-            PaymentBack.batchInsert(payments) { payment ->
+        transaction(exposedDataBase) {
+            PaymentBack.batchInsert(
+                data = payments,
+                shouldReturnGeneratedValues = false
+            ) { payment ->
                 this[PaymentBack.orderId] = payment.orderId
                 this[PaymentBack.amount] = payment.amount
             }
