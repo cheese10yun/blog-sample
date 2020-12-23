@@ -12,7 +12,7 @@ spring:
         properties:
 
     datasource:
-        url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true
+        url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&rewriteBatchedInserts=true
         username: root
         password:
         driver-class-name: com.mysql.cj.jdbc.Driver

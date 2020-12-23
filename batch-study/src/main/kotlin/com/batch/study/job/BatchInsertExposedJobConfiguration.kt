@@ -94,7 +94,7 @@ class BatchInsertExposedJobConfiguration(
         ) {
             PaymentBack.batchInsert(
                 data = payments,
-                shouldReturnGeneratedValues = true
+                shouldReturnGeneratedValues = false
             ) { payment ->
                 this[PaymentBack.orderId] = payment.orderId
                 this[PaymentBack.amount] = payment.amount
