@@ -3,6 +3,7 @@ package com.batch.study.job
 import com.batch.study.domain.payment.Payment
 import com.batch.study.listener.JobDataSetUpListener
 import com.batch.study.listener.JobReportListener
+import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
@@ -10,7 +11,9 @@ import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.item.ItemWriter
+import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.JpaPagingItemReader
+import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -23,6 +26,7 @@ class JdbcTemplateInsertJobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
     private val jobDataSetUpListener: JobDataSetUpListener,
     private val dataSource: DataSource,
+    private val sessionFactory: SessionFactory,
     entityManagerFactory: EntityManagerFactory
 ) {
     private val CHUNK_SZIE = 1_000
@@ -45,7 +49,7 @@ class JdbcTemplateInsertJobConfiguration(
     ): Step =
         stepBuilderFactory["jdbcTemplateInsertStep"]
             .chunk<Payment, Payment>(CHUNK_SZIE)
-            .reader(reader)
+            .reader(reader2)
             .writer(writer)
             .build()
 
@@ -54,6 +58,14 @@ class JdbcTemplateInsertJobConfiguration(
             .queryString("SELECT p FROM Payment p")
             .entityManagerFactory(entityManagerFactory)
             .name("readerPayment")
+            .build()
+
+
+    private val reader2: HibernateCursorItemReader<Payment> =
+        HibernateCursorItemReaderBuilder<Payment>()
+            .name("hibernateCursorItemReader")
+            .sessionFactory(sessionFactory)
+            .queryString("FROM Payment")
             .build()
 
 
