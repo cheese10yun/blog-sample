@@ -16,7 +16,7 @@ class JobDataSetUpListener(
     val log by logger()
 
     override fun beforeJob(jobExecution: JobExecution) {
-        val payments = (1..50_000_000)
+        val payments = (1..10_000_000)
             .map { Payment(it.toBigDecimal(), it.toLong()) }
 
         insert(payments)
