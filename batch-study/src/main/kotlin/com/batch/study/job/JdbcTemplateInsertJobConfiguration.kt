@@ -1,6 +1,6 @@
 package com.batch.study.job
 
-import com.batch.study.GLOBAL_CHUNK_SIZE
+import com.batch.study.listener.GLOBAL_CHUNK_SIZE
 import com.batch.study.domain.payment.Payment
 import com.batch.study.listener.JobDataSetUpListener
 import com.batch.study.listener.JobReportListener

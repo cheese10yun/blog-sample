@@ -23,7 +23,7 @@ class PaymentBackTest(
 
     val log by logger()
 
-    val intRange = 1..1_000_000
+    val intRange = 1..10_000
 
     @Test
     fun `exposed batch`() {
@@ -32,14 +32,11 @@ class PaymentBackTest(
 
         val stopWatch = StopWatch()
         stopWatch.start()
-        transaction(
-//            transactionIsolation = 1,
-//            repetitionAttempts = 1,
-            db = exposedDataBase,
-        ) {
+        transaction(db = exposedDataBase,) {
+
             PaymentBack.batchInsert(
                 data = payments,
-                shouldReturnGeneratedValues = false
+                shouldReturnGeneratedValues = false,
             ) { payment ->
                 this[PaymentBack.orderId] = payment.orderId
                 this[PaymentBack.amount] = payment.amount
@@ -73,6 +70,7 @@ class PaymentBackTest(
         val connection = dataSource.connection
         val batchStatement = BatchStatement(connection)
 
+        connection.autoCommit = false
         try {
             for (payment in payments) {
                 batchStatement.addBatch(payment)

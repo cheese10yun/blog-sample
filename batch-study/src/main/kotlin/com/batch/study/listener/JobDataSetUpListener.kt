@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component
 import java.sql.Connection
 import javax.sql.DataSource
 
+const val GLOBAL_CHUNK_SIZE = 4
+
 @Component
 class JobDataSetUpListener(
     private val dataSource: DataSource,
@@ -16,7 +18,7 @@ class JobDataSetUpListener(
     val log by logger()
 
     override fun beforeJob(jobExecution: JobExecution) {
-        val payments = (1..10_000_000)
+        val payments = (1..10)
             .map { Payment(it.toBigDecimal(), it.toLong()) }
 
         insert(payments)
@@ -44,6 +46,7 @@ class JobDataSetUpListener(
 
     private class BatchStatement(connection: Connection) {
         val sql = "insert into payment (amount, order_id) values (?, ?)"
+
         val statement = connection.prepareStatement(sql)!!
 
         fun addBatch(payment: Payment) = statement.apply {
@@ -51,13 +54,10 @@ class JobDataSetUpListener(
             this.setLong(2, payment.orderId)
             this.addBatch()
         }
-
         fun close() {
             if (statement.isClosed.not())
                 statement.close()
         }
     }
-
     override fun afterJob(jobExecution: JobExecution): Unit = Unit
 }
-
