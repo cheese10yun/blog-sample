@@ -9,6 +9,13 @@ Batch Insert 성능 개선기
     - Exposed 결정 이유
 5. Exposed 성능 측정
 
+
+## Batch Insert 성능 향상
+
+
+## 왜 Hibernate 에서는 Batch Insert를 지원하지 않을까 ?
+
+
 ## 대량 등록을 위한 Insert
 
 ## JPA 에서는 왜 Batch Insert를 못할까 ?
