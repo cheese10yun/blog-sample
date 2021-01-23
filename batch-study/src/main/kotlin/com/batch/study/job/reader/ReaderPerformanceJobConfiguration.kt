@@ -5,7 +5,9 @@ import com.batch.study.listener.GLOBAL_CHUNK_SIZE
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
+import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
+import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.item.ItemWriter
 import org.springframework.batch.item.database.JpaPagingItemReader
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
@@ -21,6 +23,7 @@ class ReaderPerformanceJobConfiguration(
 ) {
 
     @Bean
+    @JobScope
     fun readerPerformanceJob(
         readerPerformanceStep: Step
     ): Job =
@@ -29,6 +32,7 @@ class ReaderPerformanceJobConfiguration(
             .build()
 
     @Bean
+    @StepScope
     fun readerPerformanceStep(): Step =
         stepBuilderFactory["readerPerformanceStep"]
             .chunk<Payment, Payment>(GLOBAL_CHUNK_SIZE)
