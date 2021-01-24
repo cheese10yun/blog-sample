@@ -1,37 +1,53 @@
 package com.batch.study
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Configuration
 import javax.persistence.EntityManager
-import javax.transaction.Transactional
+import javax.persistence.EntityManagerFactory
 
-class BatchJpaTestSupport : BatchApplicationTestSupport() {
+@Configuration
+abstract class BatchJpaTestSupport {
 
     @Autowired
-    protected lateinit var entityManager: EntityManager
+    lateinit var entityManagerFactory: EntityManagerFactory
 
-    @Transactional
+    private val entityManager: EntityManager by lazy {
+        entityManagerFactory.createEntityManager()
+    }
+
     protected fun <T> save(entity: T): T {
-        entityManager.persist(entity)
-        flushAndClearPersistentContext()
+        entityManager.transaction?.let { transaction ->
+            transaction.begin()
+            try {
+                entityManager.persist(entity)
+                transaction.commit()
+                entityManager.clear()
+            } catch (e: Exception) {
+                transaction.rollbackOnly
+                throw e
+            }
+        }
         return entity
     }
 
-    @Transactional
-    protected fun <T> saveAll(entities: Iterable<T>): Iterable<T> {
-        for (entity in entities) {
-            entityManager.persist(entity)
-        }
-        flushAndClearPersistentContext()
-        return entities
-    }
-
-    protected fun <T> saveAll(entities: List<T>): List<T> = saveAll(entities.asIterable()).toList()
-
     protected fun <T> List<T>.persistAll(): List<T> = saveAll(this)
 
-    private fun flushAndClearPersistentContext() {
-        entityManager.flush()
-        entityManager.clear()
+    protected fun <T> saveAll(entities: List<T>): List<T> {
+        val results = mutableListOf<T>()
+        entityManager.transaction?.let { transaction ->
+            transaction.begin()
+            try {
+                entities.forEach { entity ->
+                    entityManager.persist(entity)
+                    results.add(entity)
+                }
+                transaction.commit()
+                entityManager.clear()
+            } catch (e: Exception) {
+                transaction.rollback()
+                throw e
+            }
+        }
+        return results
     }
-
 }
