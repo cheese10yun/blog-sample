@@ -1,5 +1,6 @@
 package com.batch.study
 
+import com.batch.study.job.reader.ReaderPerformanceJobConfiguration
 import org.junit.jupiter.api.TestInstance
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobParameters
