@@ -1,41 +1,36 @@
 package com.batch.study.job.reader
 
 import com.batch.study.BatchApplicationTestSupport
+import com.batch.study.domain.payment.Payment
+import com.batch.study.domain.payment.QPayment
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import org.springframework.batch.core.Job
-import org.springframework.batch.core.JobParametersBuilder
-import org.springframework.batch.core.Step
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
-import org.springframework.batch.core.launch.support.RunIdIncrementer
-import org.springframework.batch.test.JobLauncherTestUtils
-import org.springframework.batch.test.JobRepositoryTestUtils
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.context.TestPropertySource
 
 
-class ReaderPerformanceJobConfigurationTest(
-    jobBuilderFactory: JobBuilderFactory,
-    readerPerformanceStep: Step,
-     private val readerPerformanceJob: Job
-) : BatchApplicationTestSupport() {
+@TestPropertySource(
+    properties = [
+        "args.value=string value"
+    ]
+)
+internal class ReaderPerformanceJobConfigurationTest : BatchApplicationTestSupport() {
 
-//    private val job = jobBuilderFactory["readerPerformanceJob"]
-//        .incrementer(RunIdIncrementer())
-//        .start(readerPerformanceStep)
-//        .build()
-
+    @AfterEach
+    internal fun tearDown() {
+        query.delete(QPayment.payment)
+    }
 
     @Test
-    internal fun asd() {
+    internal fun `test`() {
+        (1..5).map {
+            Payment(
+                amount = it.toBigDecimal(),
+                orderId = it.toLong()
+            )
+        }
+            .toList()
+            .persistAll()
 
-        val jobParameters = JobParametersBuilder()
-            .addString("orderDate", "2020-12-12")
-            .toJobParameters()
-
-
-//        jobLauncherTestUtils.launchJob(jobParameters)
-
-        launchJob(readerPerformanceJob)
-
-
+        launchStep("readerPerformanceStep")
     }
 }

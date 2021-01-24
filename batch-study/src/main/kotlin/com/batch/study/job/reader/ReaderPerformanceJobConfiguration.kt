@@ -7,13 +7,18 @@ import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
-import org.springframework.batch.core.configuration.annotation.StepScope
+import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.item.ItemWriter
 import org.springframework.batch.item.database.JpaPagingItemReader
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
+import org.springframework.validation.annotation.Validated
 import javax.persistence.EntityManagerFactory
+import javax.validation.constraints.NotEmpty
 
 @Configuration
 class ReaderPerformanceJobConfiguration(
@@ -23,21 +28,28 @@ class ReaderPerformanceJobConfiguration(
 ) {
 
     @Bean
-    @JobScope
+    @Primary
     fun readerPerformanceJob(
         readerPerformanceStep: Step
     ): Job =
         jobBuilderFactory["readerPerformanceJob"]
+            .incrementer(RunIdIncrementer())
             .start(readerPerformanceStep)
             .build()
 
     @Bean
-    @StepScope
-    fun readerPerformanceStep(): Step =
+    @JobScope
+    fun readerPerformanceStep(
+        properties: ReaderPerformanceJobProperties
+    ): Step =
         stepBuilderFactory["readerPerformanceStep"]
             .chunk<Payment, Payment>(GLOBAL_CHUNK_SIZE)
             .reader(jpaPagingItemReader)
-            .writer(writer)
+            .writer {
+                it.forEach { payment ->
+                    println(payment)
+                }
+            }
             .build()
 
     val jpaPagingItemReader: JpaPagingItemReader<Payment> =
@@ -47,5 +59,19 @@ class ReaderPerformanceJobConfiguration(
             .name("jpaPagingItemReader")
             .build()
 
-    private val writer: ItemWriter<Payment> = ItemWriter {}
+    private val writer: ItemWriter<Payment> = ItemWriter {
+        it.forEach { payment ->
+            println("===============")
+            println(payment)
+            println("===============")
+        }
+    }
 }
+
+@ConstructorBinding
+@ConfigurationProperties(prefix = "args")
+@Validated
+class ReaderPerformanceJobProperties(
+    @field:NotEmpty
+    val value: String
+)

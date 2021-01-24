@@ -6,8 +6,6 @@ import org.springframework.batch.core.JobParameters
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.test.JobLauncherTestUtils
 import org.springframework.batch.test.JobRepositoryTestUtils
-import org.springframework.batch.test.JobScopeTestExecutionListener
-import org.springframework.batch.test.StepScopeTestExecutionListener
 import org.springframework.batch.test.context.SpringBatchTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -33,14 +31,12 @@ abstract class BatchApplicationTestSupport : BatchJpaTestSupport() {
     @Autowired
     protected lateinit var jobRepositoryTestUtils: JobRepositoryTestUtils
 
-    @Autowired
-    protected lateinit var stepScopeTestExecutionListener: StepScopeTestExecutionListener
-
-    @Autowired
-    protected lateinit var jobScopeTestExecutionListener: JobScopeTestExecutionListener
-
     protected fun launchJob(job: Job, jobParameters: JobParameters = jobLauncherTestUtils.uniqueJobParameters) {
         jobLauncherTestUtils.job = job
         jobLauncherTestUtils.launchJob(jobParameters)
+    }
+
+    protected fun launchStep(stepName: String, jobParameters: JobParameters = jobLauncherTestUtils.uniqueJobParameters) {
+        jobLauncherTestUtils.launchStep(stepName, jobParameters)
     }
 }
