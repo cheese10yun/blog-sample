@@ -1,4 +1,4 @@
-package com.batch.core.listener
+package com.batch.task.core.listener
 
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobExecutionListener

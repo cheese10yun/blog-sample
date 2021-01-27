@@ -1,10 +1,9 @@
-package com.batch.study
+package com.batch.task
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 
 @SpringBootApplication

@@ -6,9 +6,9 @@ spring:
     jpa:
         database: mysql
         properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-#        hibernate:
-#            ddl-auto: create
-#        show-sql: false
+        #        hibernate:
+        #            ddl-auto: create
+        #        show-sql: false
         properties:
             hibernate.hbm2ddl.auto: create
             hibernate.generate_statistics: true

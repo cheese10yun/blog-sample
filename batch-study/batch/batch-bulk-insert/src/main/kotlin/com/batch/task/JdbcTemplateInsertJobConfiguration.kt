@@ -1,10 +1,5 @@
-package com.batch
+package com.batch.task
 
-import com.batch.core.listener.JobReportListener
-import com.batch.payment.domain.payment.Payment
-import com.batch.payment.domain.payment.PaymentBackJpa
-import com.batch.study.listener.JobDataSetUpListener
-import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
@@ -20,7 +15,6 @@ import org.springframework.batch.item.database.builder.JpaItemWriterBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.sql.Connection
-import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
 const val GLOBAL_CHUNK_SIZE = 4

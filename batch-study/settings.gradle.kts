@@ -1,6 +1,5 @@
 rootProject.name = "batch-study"
 
-
 include(
     "batch",
     "batch:batch-core",
@@ -11,7 +10,8 @@ include(
 
 include(
     "payment",
-    "payment:payment-domain"
+    "payment:payment-domain",
+    "payment:payment-api"
 )
 
 
