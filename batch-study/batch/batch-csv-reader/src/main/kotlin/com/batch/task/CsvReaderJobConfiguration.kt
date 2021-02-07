@@ -2,6 +2,7 @@ package com.batch.task
 
 
 import com.batch.payment.domain.payment.Payment
+import com.batch.task.core.listener.JobReportListener
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
@@ -33,7 +34,7 @@ class CsvReaderJobConfiguration(
         csvReaderStep: Step
     ): Job = jobBuilderFactory["csvReaderJob"]
         .incrementer(RunIdIncrementer())
-//        .listener(JobReportListener())
+        .listener(JobReportListener())
         .start(csvReaderStep)
         .build()
 
@@ -48,12 +49,7 @@ class CsvReaderJobConfiguration(
             .build()
 
     private val processor: ItemProcessor<in PaymentCsv, out Payment> =
-        ItemProcessor {
-            println("==================")
-            println(it.toEntity())
-            println("==================")
-            it.toEntity()
-        }
+        ItemProcessor { it.toEntity() }
 
     private val reader: FlatFileItemReader<PaymentCsv> =
         FlatFileItemReaderBuilder<PaymentCsv>()

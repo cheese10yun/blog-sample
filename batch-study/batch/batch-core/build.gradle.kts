@@ -1,0 +1,3 @@
+tasks.bootJar {
+    enabled = false
+}

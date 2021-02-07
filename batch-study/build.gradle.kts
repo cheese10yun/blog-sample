@@ -76,7 +76,6 @@ subprojects {
             jvmTarget = "1.8"
         }
     }
-
 }
 
 tasks.bootJar {

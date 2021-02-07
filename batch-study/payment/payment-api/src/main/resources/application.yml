@@ -1,7 +1,6 @@
 spring:
     main:
         allow-bean-definition-overriding: true
-        web-application-type: NONE
 
     jpa:
         database: mysql
@@ -25,13 +24,8 @@ spring:
         dbcp2:
             test-on-borrow: true
             validation-query: select 1
-    batch:
-        initialize-schema: always
-        job:
-            names: ${job.name:NONE}
 
 logging:
     level:
         ROOT: info
-        #org.springframework.batch: DEBUG
         org.hibernate.type.descriptor.sql.BasicBinder: trace

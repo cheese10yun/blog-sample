@@ -11,8 +11,6 @@ subprojects {
         implementation("org.springframework.boot:spring-boot-starter-data-jpa")
         implementation("org.springframework.boot:spring-boot-starter-validation")
 
-//        api(project(":batch:batch-core"))
-
         implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
         implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
@@ -30,6 +28,10 @@ subprojects {
     }
 
     tasks.bootJar {
+        enabled = true
+    }
+
+    tasks.jar {
         enabled = true
     }
 }

@@ -21,3 +21,7 @@ dependencies {
 
     kapt("com.querydsl:querydsl-apt:4.4.0:jpa")
 }
+
+tasks.bootJar {
+    enabled = false
+}

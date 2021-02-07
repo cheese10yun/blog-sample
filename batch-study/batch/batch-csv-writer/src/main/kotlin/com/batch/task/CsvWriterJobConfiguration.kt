@@ -26,7 +26,7 @@ import javax.persistence.EntityManagerFactory
 class CsvWriterJobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
 //    private val jobDataSetUpListener: JobDataSetUpListener,
-    private val entityManagerFactory: EntityManagerFactory
+    entityManagerFactory: EntityManagerFactory
 ) {
     private val CHUNK_SZIE = 10
 
@@ -54,7 +54,7 @@ class CsvWriterJobConfiguration(
 
     private val reader: JpaPagingItemReader<Payment> =
         JpaPagingItemReaderBuilder<Payment>()
-            .queryString("SELECT p FROM Payment p")
+            .queryString("select p from Payment p")
             .entityManagerFactory(entityManagerFactory)
             .name("readerPayment")
             .build()
@@ -75,9 +75,7 @@ class CsvWriterJobConfiguration(
 data class PaymentCsv(
     val amount: BigDecimal,
     val orderId: Long
-) {
-    fun toEntity() = Payment(amount, orderId)
-}
+)
 
 class PaymentCsvMapper :
     LineMapper<PaymentCsv>,
