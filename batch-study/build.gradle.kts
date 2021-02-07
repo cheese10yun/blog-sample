@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("jvm")
     kotlin("kapt") apply false
@@ -64,6 +62,15 @@ subprojects {
     }
 
     tasks.compileKotlin {
+        dependsOn(tasks.processResources)
+        inputs.files(tasks.processResources)
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=compatibility")
+            jvmTarget = "1.8"
+        }
+    }
+
+    tasks.compileTestKotlin {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=compatibility")
             jvmTarget = "1.8"
