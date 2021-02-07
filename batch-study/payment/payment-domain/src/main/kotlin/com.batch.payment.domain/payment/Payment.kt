@@ -1,7 +1,6 @@
 package com.batch.payment.domain.payment
 
 import com.batch.payment.domain.core.EntityAuditing
-import org.springframework.data.jpa.repository.JpaRepository
 import java.math.BigDecimal
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -22,5 +21,3 @@ class Payment(
         return "Payment(amount=$amount, orderId=$orderId)"
     }
 }
-
-interface PaymentRepository : JpaRepository<Payment, Long>

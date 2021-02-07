@@ -4,6 +4,12 @@ plugins {
     kotlin("kapt")
 }
 
+allOpen {
+    annotation("javax.persistence.Entity")
+    annotation("javax.persistence.MappedSuperclass")
+    annotation("javax.persistence.Embeddable")
+}
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -18,10 +24,4 @@ dependencies {
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("mysql:mysql-connector-java")
-
-    kapt("com.querydsl:querydsl-apt:4.4.0:jpa")
-}
-
-tasks.bootJar {
-    enabled = false
 }

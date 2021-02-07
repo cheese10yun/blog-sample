@@ -15,8 +15,7 @@ const val basePackages = "com.batch.payment.domain"
 @EnableJpaRepositories(
     basePackages = [basePackages],
     entityManagerFactoryRef = "entityManagerFactory",
-    transactionManagerRef = "transactionManager",
-
+    transactionManagerRef = "transactionManager"
 )
 @EnableAutoConfiguration
 @EnableTransactionManagement

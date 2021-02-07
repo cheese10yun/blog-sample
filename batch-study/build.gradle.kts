@@ -62,8 +62,8 @@ subprojects {
     }
 
     tasks.compileKotlin {
-        dependsOn(tasks.processResources)
-        inputs.files(tasks.processResources)
+//        dependsOn(tasks.processResources)
+//        inputs.files(tasks.processResources)
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=compatibility")
             jvmTarget = "1.8"
