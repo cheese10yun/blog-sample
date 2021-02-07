@@ -3,7 +3,6 @@ spring:
         allow-bean-definition-overriding: true
         web-application-type: NONE
 
-    batch.job.names: ${job.name:NONE}
     jpa:
         database: mysql
         properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
@@ -23,6 +22,9 @@ spring:
             validation-query: select 1
     batch:
         initialize-schema: always
+        job:
+            names: ${job.name:NONE}
+            enabled: false
 
 logging:
     level:
