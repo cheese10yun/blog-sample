@@ -3,7 +3,6 @@ package com.batch.task
 import com.batch.payment.domain.payment.Payment
 import com.batch.payment.domain.payment.PaymentBackJpa
 import com.batch.task.core.listener.JobReportListener
-import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
@@ -12,10 +11,10 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.item.ItemWriter
-import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.JpaItemWriter
-import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
+import org.springframework.batch.item.database.JpaPagingItemReader
 import org.springframework.batch.item.database.builder.JpaItemWriterBuilder
+import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.sql.Connection
@@ -48,23 +47,23 @@ class BulkInsertJobConfiguration(
     @JobScope
     fun bulkInsertStep(
         stepBuilderFactory: StepBuilderFactory,
-        cursorItemReader: HibernateCursorItemReader<Payment>
+        bulkInsertReader: JpaPagingItemReader<Payment>
     ): Step =
         stepBuilderFactory["bulkInsertStep"]
             .chunk<Payment, Payment>(GLOBAL_CHUNK_SIZE)
-            .reader(cursorItemReader)
+            .reader(bulkInsertReader)
             .writer(writerWithStatement)
             .build()
 
     @Bean
     @StepScope
     fun bulkInsertReader(
-        sessionFactory: SessionFactory,
-    ): HibernateCursorItemReader<Payment> =
-        HibernateCursorItemReaderBuilder<Payment>()
-            .name("hibernateCursorItemReader")
-            .sessionFactory(sessionFactory)
-            .queryString("FROM Payment")
+        entityManagerFactory: EntityManagerFactory
+    ): JpaPagingItemReader<Payment> =
+        JpaPagingItemReaderBuilder<Payment>()
+            .queryString("SELECT p FROM Payment p")
+            .entityManagerFactory(entityManagerFactory)
+            .name("bulkInsertReader")
             .build()
 
 
