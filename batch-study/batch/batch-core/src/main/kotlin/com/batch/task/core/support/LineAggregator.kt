@@ -1,4 +1,4 @@
-package com.batch.payment.domain.core
+package com.batch.task.core.support
 
 import org.springframework.batch.item.file.mapping.DefaultLineMapper
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor

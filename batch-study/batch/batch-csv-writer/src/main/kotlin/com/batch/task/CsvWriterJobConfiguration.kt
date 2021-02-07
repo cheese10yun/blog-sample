@@ -1,7 +1,9 @@
 package com.batch.task
 
-import com.batch.core.listener.JobReportListener
 import com.batch.payment.domain.payment.Payment
+import com.batch.task.core.listener.JobReportListener
+import com.batch.task.core.support.LineAggregator
+import com.batch.task.core.support.LineMapper
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
@@ -11,10 +13,8 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.item.database.JpaPagingItemReader
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.batch.item.file.FlatFileItemWriter
-import org.springframework.batch.item.file.LineMapper
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder
 import org.springframework.batch.item.file.transform.FieldSet
-import org.springframework.batch.item.file.transform.LineAggregator
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.FileSystemResource
@@ -25,8 +25,8 @@ import javax.persistence.EntityManagerFactory
 @Configuration
 class CsvWriterJobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
-    private val jobDataSetUpListener: JobDataSetUpListener,
-    entityManagerFactory: EntityManagerFactory
+//    private val jobDataSetUpListener: JobDataSetUpListener,
+    private val entityManagerFactory: EntityManagerFactory
 ) {
     private val CHUNK_SZIE = 10
 
@@ -37,7 +37,7 @@ class CsvWriterJobConfiguration(
         jobBuilderFactory["csvWriterJob"]
             .incrementer(RunIdIncrementer())
             .listener(JobReportListener())
-            .listener(jobDataSetUpListener)
+//            .listener(jobDataSetUpListener)
             .start(csvWriterStep)
             .build()
 

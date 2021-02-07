@@ -5,15 +5,13 @@ spring:
 
     jpa:
         database: mysql
-        properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-            hibernate:
-                ddl-auto: create
-            show-sql: true
         properties:
             hibernate.hbm2ddl.auto: create
             hibernate.generate_statistics: true
             hibernate.jdbc.batch_size: 500
             hibernate.show_sql: true
+            hibernate.ddl-auto: create
+            hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
 
     datasource:
         url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&rewriteBatchedInserts=true
