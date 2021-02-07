@@ -1,5 +1,6 @@
 package com.batch.task.core.listener
 
+import com.batch.task.core.logger
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobExecutionListener
 import org.springframework.batch.core.JobParameters
@@ -11,13 +12,13 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 
 class JobReportListener : JobExecutionListener {
-//    private val log by logger()
+    private val log by logger()
 
     override fun beforeJob(jobExecution: JobExecution): Unit = Unit
 
     override fun afterJob(jobExecution: JobExecution) {
-//        log.info(jobReport(jobExecution))
-//        log.info(stepReport(jobExecution.stepExecutions))
+        log.info(jobReport(jobExecution))
+        log.info(stepReport(jobExecution.stepExecutions))
     }
 
     private fun jobReport(jobExecution: JobExecution): String {

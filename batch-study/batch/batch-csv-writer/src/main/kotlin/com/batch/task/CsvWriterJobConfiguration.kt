@@ -2,7 +2,6 @@ package com.batch.task
 
 import com.batch.core.listener.JobReportListener
 import com.batch.payment.domain.payment.Payment
-
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
@@ -92,5 +91,4 @@ class PaymentCsvMapper :
         amount = fs.readBigDecimal("amount"),
         orderId = fs.readLong("orderId")
     )
-
 }

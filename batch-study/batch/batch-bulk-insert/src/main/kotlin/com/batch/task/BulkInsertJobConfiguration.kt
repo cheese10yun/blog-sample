@@ -1,5 +1,9 @@
 package com.batch.task
 
+import com.batch.payment.domain.payment.Payment
+import com.batch.payment.domain.payment.PaymentBackJpa
+import com.batch.task.core.listener.JobReportListener
+import org.hibernate.SessionFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
@@ -15,23 +19,25 @@ import org.springframework.batch.item.database.builder.JpaItemWriterBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.sql.Connection
+import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
-const val GLOBAL_CHUNK_SIZE = 4
+const val GLOBAL_CHUNK_SIZE = 100
 
 @Configuration
-class JdbcTemplateInsertJobConfiguration(
+class BulkInsertJobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
     private val jobDataSetUpListener: JobDataSetUpListener,
     private val dataSource: DataSource,
+//    private val exposedDataBase: Database,
     entityManagerFactory: EntityManagerFactory
 ) {
 
     @Bean
-    fun jdbcTemplateInsertJob(
+    fun bulkInsertJob(
         jdbcTemplateInsertStep: Step
     ): Job =
-        jobBuilderFactory["jdbcTemplateInsertJob"]
+        jobBuilderFactory["bulkInsertJob"]
             .incrementer(RunIdIncrementer())
             .listener(JobReportListener())
             .listener(jobDataSetUpListener)
@@ -40,19 +46,19 @@ class JdbcTemplateInsertJobConfiguration(
 
     @Bean
     @JobScope
-    fun jdbcTemplateInsertStep(
+    fun bulkInsertStep(
         stepBuilderFactory: StepBuilderFactory,
         cursorItemReader: HibernateCursorItemReader<Payment>
     ): Step =
-        stepBuilderFactory["jdbcTemplateInsertStep"]
+        stepBuilderFactory["bulkInsertStep"]
             .chunk<Payment, Payment>(GLOBAL_CHUNK_SIZE)
             .reader(cursorItemReader)
-            .writer(writer)
+            .writer(writerWithStatement)
             .build()
 
     @Bean
     @StepScope
-    fun cursorItemReader(
+    fun bulkInsertReader(
         sessionFactory: SessionFactory,
     ): HibernateCursorItemReader<Payment> =
         HibernateCursorItemReaderBuilder<Payment>()
@@ -62,16 +68,16 @@ class JdbcTemplateInsertJobConfiguration(
             .build()
 
 
-    private val writer: ItemWriter<Payment> = ItemWriter { payments ->
-        insert(payments)
+    private val writerWithStatement: ItemWriter<Payment> = ItemWriter { payments ->
+        insertWithStatement(payments)
     }
 
-    private val writerJpa: JpaItemWriter<PaymentBackJpa> =
+    private val writerWithJpa: JpaItemWriter<PaymentBackJpa> =
         JpaItemWriterBuilder<PaymentBackJpa>()
             .entityManagerFactory(entityManagerFactory)
             .build()
 
-    private fun insert(payments: List<Payment>) {
+    private fun insertWithStatement(payments: List<Payment>) {
         val connection = dataSource.connection
         val batchStatement = BatchStatement(connection)
 
@@ -106,21 +112,17 @@ class JdbcTemplateInsertJobConfiguration(
         }
     }
 
-    private val writer2: ItemWriter<Payment> = ItemWriter { payments ->
-        insert(payments)
-    }
-
-    private fun insert(payments: List<Payment>) {
-        transaction(
-            exposedDataBase
-        ) {
-            PaymentBack.batchInsert(
-                data = payments,
-                shouldReturnGeneratedValues = false
-            ) { payment ->
-                this[PaymentBack.orderId] = payment.orderId
-                this[PaymentBack.amount] = payment.amount
-            }
-        }
-    }
+//    private val writerWithExposed: ItemWriter<Payment> = ItemWriter { payments ->
+//        transaction(
+//            exposedDataBase
+//        ) {
+//            PaymentBack.batchInsert(
+//                data = payments,
+//                shouldReturnGeneratedValues = false
+//            ) { payment ->
+//                this[PaymentBack.orderId] = payment.orderId
+//                this[PaymentBack.amount] = payment.amount
+//            }
+//        }
+//    }
 }

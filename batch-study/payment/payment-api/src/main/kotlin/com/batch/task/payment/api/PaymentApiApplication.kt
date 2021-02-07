@@ -1,4 +1,4 @@
-package com.batch.payment.api
+package com.batch.task.payment.api
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
