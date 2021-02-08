@@ -22,9 +22,6 @@ subprojects {
         implementation("org.jetbrains.exposed:exposed-java-time:${properties["exposed_version"]}")
 
         runtimeOnly("mysql:mysql-connector-java")
-
-        testImplementation("org.springframework.boot:spring-boot-starter-test")
-        testImplementation("org.springframework.batch:spring-batch-test")
     }
 
     tasks.bootJar {

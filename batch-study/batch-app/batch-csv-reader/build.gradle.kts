@@ -1,4 +1,4 @@
 dependencies {
     api(project(":payment:payment-domain"))
-    api(project(":batch:batch-core"))
+    api(project(":batch-app:batch-support:batch-support"))
 }
