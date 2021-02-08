@@ -2,7 +2,7 @@ rootProject.name = "batch-study"
 
 include(
     "batch",
-    "batch:batch-core",
+    "batch:batch-support",
     "batch:batch-csv-reader",
     "batch:batch-csv-writer",
     "batch:batch-bulk-insert"
