@@ -7,6 +7,7 @@ import org.springframework.batch.test.JobLauncherTestUtils
 import org.springframework.batch.test.context.SpringBatchTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
 import javax.persistence.EntityManager
 
@@ -19,6 +20,7 @@ import javax.persistence.EntityManager
 @SpringBatchTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@ActiveProfiles("test")
 abstract class BatchJobTestSupport {
 
     @Autowired
