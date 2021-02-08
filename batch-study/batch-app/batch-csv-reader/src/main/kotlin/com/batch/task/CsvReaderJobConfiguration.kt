@@ -2,7 +2,7 @@ package com.batch.task
 
 
 import com.batch.payment.domain.payment.Payment
-import com.batch.task.core.listener.JobReportListener
+import com.batch.task.support.listener.JobReportListener
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory

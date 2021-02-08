@@ -1,7 +1,7 @@
 package com.batch.task
 
 import com.batch.payment.domain.payment.Payment
-import com.batch.task.core.logger
+import com.batch.task.support.logger
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobExecutionListener
 import org.springframework.stereotype.Component

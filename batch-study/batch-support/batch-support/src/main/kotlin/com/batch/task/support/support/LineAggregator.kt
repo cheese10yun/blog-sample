@@ -1,4 +1,4 @@
-package com.batch.task.core.support
+package com.batch.task.support.support
 
 import org.springframework.batch.item.file.mapping.DefaultLineMapper
 import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor

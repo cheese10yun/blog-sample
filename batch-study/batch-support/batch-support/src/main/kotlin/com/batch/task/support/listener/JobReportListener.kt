@@ -1,6 +1,6 @@
-package com.batch.task.core.listener
+package com.batch.task.support.listener
 
-import com.batch.task.core.logger
+import com.batch.task.support.logger
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobExecutionListener
 import org.springframework.batch.core.JobParameters

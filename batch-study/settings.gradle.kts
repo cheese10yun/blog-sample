@@ -2,15 +2,15 @@ rootProject.name = "batch-study"
 
 include(
     "batch-app",
-    "batch-app:batch-support",
-    "batch-app:batch-test",
     "batch-app:batch-csv-reader",
     "batch-app:batch-csv-writer",
     "batch-app:batch-bulk-insert"
 )
 
 include(
-    "batch-support"
+    "batch-support",
+    "batch-support:batch-test",
+    "batch-support:batch-support"
 )
 
 include(
