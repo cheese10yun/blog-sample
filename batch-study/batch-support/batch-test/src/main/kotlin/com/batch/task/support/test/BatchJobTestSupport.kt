@@ -1,5 +1,7 @@
 package com.batch.task.support.test
 
+import com.querydsl.core.types.EntityPath
+import com.querydsl.jpa.impl.JPAQueryFactory
 import org.junit.jupiter.api.TestInstance
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobParameters
@@ -30,6 +32,8 @@ abstract class BatchJobTestSupport {
     @Autowired
     protected lateinit var jobLauncherTestUtils: JobLauncherTestUtils
 
+    protected val query: JPAQueryFactory by lazy { JPAQueryFactory(entityManager) }
+
     protected fun launchJob(job: Job, jobParameters: JobParameters = jobLauncherTestUtils.uniqueJobParameters) {
         jobLauncherTestUtils.job = job
         jobLauncherTestUtils.launchJob(jobParameters)
@@ -44,7 +48,6 @@ abstract class BatchJobTestSupport {
             transaction.begin()
             entityManager.persist(entity)
             transaction.commit()
-
             entityManager.clear()
         }
         return entity
@@ -54,14 +57,21 @@ abstract class BatchJobTestSupport {
         val entityManager = entityManagerFactory.createEntityManager()
         entityManager.transaction.let { transaction ->
             transaction.begin()
-
             for (entity in entities) {
                 entityManager.persist(entity)
             }
-
             transaction.commit()
             entityManager.clear()
         }
         return entities
+    }
+
+
+    protected fun <T> deleteAll(path: EntityPath<T>) {
+        entityManager.transaction.let { transaction ->
+            transaction.begin()
+            query.delete(path).execute()
+            transaction.commit()
+        }
     }
 }
