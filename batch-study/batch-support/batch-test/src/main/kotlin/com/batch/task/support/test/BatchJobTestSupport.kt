@@ -2,8 +2,11 @@ package com.batch.task.support.test
 
 import com.querydsl.core.types.EntityPath
 import com.querydsl.jpa.impl.JPAQueryFactory
+import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.TestInstance
+import org.springframework.batch.core.BatchStatus
 import org.springframework.batch.core.Job
+import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobParameters
 import org.springframework.batch.test.JobLauncherTestUtils
 import org.springframework.batch.test.context.SpringBatchTest
@@ -27,16 +30,23 @@ abstract class BatchJobTestSupport {
 
     @Autowired
     protected lateinit var entityManagerFactory: EntityManagerFactory
-    protected val entityManager by lazy { entityManagerFactory.createEntityManager() }
 
     @Autowired
     protected lateinit var jobLauncherTestUtils: JobLauncherTestUtils
+
+    protected val entityManager by lazy { entityManagerFactory.createEntityManager() }
+
+    protected var jobExecution: JobExecution? = null
 
     protected val query: JPAQueryFactory by lazy { JPAQueryFactory(entityManager) }
 
     protected fun launchJob(job: Job, jobParameters: JobParameters = jobLauncherTestUtils.uniqueJobParameters) {
         jobLauncherTestUtils.job = job
-        jobLauncherTestUtils.launchJob(jobParameters)
+        jobExecution = jobLauncherTestUtils.launchJob(jobParameters)
+    }
+
+    protected fun thenJobCompleted() {
+        then(BatchStatus.COMPLETED).isEqualTo(jobExecution?.status)
     }
 
     protected fun <E> List<E>.persist() {
@@ -65,7 +75,6 @@ abstract class BatchJobTestSupport {
         }
         return entities
     }
-
 
     protected fun <T> deleteAll(path: EntityPath<T>) {
         entityManager.transaction.let { transaction ->

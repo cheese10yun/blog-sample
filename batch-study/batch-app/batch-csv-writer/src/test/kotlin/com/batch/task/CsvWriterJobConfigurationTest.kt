@@ -25,6 +25,8 @@ internal class CsvWriterJobConfigurationTest(
         launchJob(csvWriterJob)
 
         //then
+        thenJobCompleted()
+
         deleteAll(QPayment.payment)
     }
 }
