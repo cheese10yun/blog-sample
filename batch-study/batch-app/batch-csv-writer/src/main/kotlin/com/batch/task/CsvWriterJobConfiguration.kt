@@ -25,7 +25,6 @@ import javax.persistence.EntityManagerFactory
 @Configuration
 class CsvWriterJobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
-//    private val jobDataSetUpListener: JobDataSetUpListener,
     entityManagerFactory: EntityManagerFactory
 ) {
     private val CHUNK_SZIE = 10
@@ -37,7 +36,6 @@ class CsvWriterJobConfiguration(
         jobBuilderFactory["csvWriterJob"]
             .incrementer(RunIdIncrementer())
             .listener(JobReportListener())
-//            .listener(jobDataSetUpListener)
             .start(csvWriterStep)
             .build()
 

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
-import javax.persistence.EntityManager
+import javax.persistence.EntityManagerFactory
 
 @SpringBootTest(
     properties = [
@@ -24,7 +24,8 @@ import javax.persistence.EntityManager
 abstract class BatchJobTestSupport {
 
     @Autowired
-    protected lateinit var entityManager: EntityManager
+    protected lateinit var entityManagerFactory: EntityManagerFactory
+    protected val entityManager by lazy { entityManagerFactory.createEntityManager() }
 
     @Autowired
     protected lateinit var jobLauncherTestUtils: JobLauncherTestUtils
@@ -34,11 +35,15 @@ abstract class BatchJobTestSupport {
         jobLauncherTestUtils.launchJob(jobParameters)
     }
 
+    protected fun <E> List<E>.persist() {
+        saveAll(this)
+    }
+
     protected fun <T> save(entity: T): T {
-        entityManager.transaction.let {
-            it.begin()
+        entityManager.transaction.let { transaction ->
+            transaction.begin()
             entityManager.persist(entity)
-            it.commit()
+            transaction.commit()
 
             entityManager.clear()
         }
@@ -46,10 +51,15 @@ abstract class BatchJobTestSupport {
     }
 
     protected fun <T> saveAll(entities: List<T>): List<T> {
-        entityManager.transaction.let {
-            it.begin()
-            entities.let { entityManager.persist(it) }
-            it.commit()
+        val entityManager = entityManagerFactory.createEntityManager()
+        entityManager.transaction.let { transaction ->
+            transaction.begin()
+
+            for (entity in entities) {
+                entityManager.persist(entity)
+            }
+
+            transaction.commit()
             entityManager.clear()
         }
         return entities
