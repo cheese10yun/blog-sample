@@ -61,7 +61,7 @@ class CsvWriterJobConfiguration(
         FlatFileItemWriterBuilder<PaymentCsv>()
             .name("writerPayment")
             .resource(FileSystemResource("src/main/resources/payment.csv"))
-            .append(true)
+            .append(false)
             .lineAggregator(PaymentCsvMapper().delimitedLineAggregator())
             .headerCallback {
                 it.write(PaymentCsvMapper().headerNames.joinToString(","))
