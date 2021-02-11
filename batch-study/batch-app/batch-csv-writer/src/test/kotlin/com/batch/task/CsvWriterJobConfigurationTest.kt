@@ -22,7 +22,8 @@ internal class CsvWriterJobConfigurationTest(
             .persist()
 
         //when
-        launchJob(csvWriterJob)
+//        launchJob(csvWriterJob)
+        launchStep(csvWriterJob, "csvWriterStep")
 
         //then
         thenJobCompleted()

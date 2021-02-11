@@ -33,5 +33,5 @@ spring:
 logging:
     level:
         ROOT: info
-        #org.springframework.batch: DEBUG
+        org.springframework.batch: info
         org.hibernate.type.descriptor.sql.BasicBinder: trace

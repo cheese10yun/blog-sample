@@ -7,7 +7,6 @@ import com.batch.task.support.support.LineMapper
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
-import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.item.database.JpaPagingItemReader
@@ -24,13 +23,13 @@ import javax.persistence.EntityManagerFactory
 
 @Configuration
 class CsvWriterJobConfiguration(
-    private val jobBuilderFactory: JobBuilderFactory,
     entityManagerFactory: EntityManagerFactory
 ) {
     private val CHUNK_SIZE = 10
 
     @Bean
     fun csvWriterJob(
+        jobBuilderFactory: JobBuilderFactory,
         csvWriterStep: Step
     ): Job =
         jobBuilderFactory["csvWriterJob"]
@@ -40,7 +39,6 @@ class CsvWriterJobConfiguration(
             .build()
 
     @Bean
-    @JobScope
     fun csvWriterStep(
         stepBuilderFactory: StepBuilderFactory
     ): Step =

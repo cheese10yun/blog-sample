@@ -8,6 +8,7 @@ import org.springframework.batch.core.BatchStatus
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobParameters
+import org.springframework.batch.item.ExecutionContext
 import org.springframework.batch.test.JobLauncherTestUtils
 import org.springframework.batch.test.context.SpringBatchTest
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,17 +41,31 @@ abstract class BatchJobTestSupport {
 
     protected val query: JPAQueryFactory by lazy { JPAQueryFactory(entityManager) }
 
-    protected fun launchJob(job: Job, jobParameters: JobParameters = jobLauncherTestUtils.uniqueJobParameters) {
+    /**
+     * Job 실행
+     */
+    protected fun launchJob(
+        job: Job,
+        jobParameters: JobParameters = jobLauncherTestUtils.uniqueJobParameters
+    ) {
         jobLauncherTestUtils.job = job
-        jobExecution = jobLauncherTestUtils.launchJob(jobParameters)
+        this.jobExecution = jobLauncherTestUtils.launchJob(jobParameters)
+    }
+
+    /**
+     * Step 실행
+     */
+    protected fun launchStep(
+        job: Job,
+        stepName: String,
+        jobParameters: JobParameters = jobLauncherTestUtils.uniqueJobParameters,
+        executionContext: ExecutionContext? = null
+    ) {
+        this.jobExecution = jobLauncherTestUtils.launchStep(stepName, jobParameters, executionContext)
     }
 
     protected fun thenJobCompleted() {
         then(BatchStatus.COMPLETED).isEqualTo(jobExecution?.status)
-    }
-
-    protected fun <E> List<E>.persist() {
-        saveAll(this)
     }
 
     protected fun <T> save(entity: T): T {
@@ -74,6 +89,10 @@ abstract class BatchJobTestSupport {
             entityManager.clear()
         }
         return entities
+    }
+
+    protected fun <E> List<E>.persist() {
+        saveAll(this)
     }
 
     protected fun <T> deleteAll(path: EntityPath<T>) {
