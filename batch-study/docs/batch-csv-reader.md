@@ -37,7 +37,7 @@ class CsvReaderJobConfiguration(
     private val stepBuilderFactory: StepBuilderFactory,
     entityManagerFactory: EntityManagerFactory
 ) {
-    private val CHUNK_SZIE = 10
+    private val CHUNK_SIZE = 10
 
     @Bean
     fun csvReaderJob(
@@ -52,7 +52,7 @@ class CsvReaderJobConfiguration(
     @JobScope
     fun csvReaderStep(): Step =
         stepBuilderFactory["csvReaderStep"]
-            .chunk<PaymentCsv, Payment>(CHUNK_SZIE) // (3)
+            .chunk<PaymentCsv, Payment>(CHUNK_SIZE) // (3)
             .reader(reader) // (4)
             .processor(processor) // (5)
             .writer(writer) // (6)

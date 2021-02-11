@@ -182,7 +182,7 @@ private fun reader(): RepositoryItemReader<Order> {
 
 ## JpaPagingItemReader 더 살펴 보기
 
-JpaPagingItemReader에는 지정한 setPageSize 크기만큼 데이터베이스에서 읽어옵니다.(대부분 CHUNK_SZIE와 맞추는 게 좋을 거 같다.) 즉 모든 데이터를 가져와서 처리하는 방식이 아닌 paging 처리만큼 가져와서 처리하는
+JpaPagingItemReader에는 지정한 setPageSize 크기만큼 데이터베이스에서 읽어옵니다.(대부분 CHUNK_SIZE와 맞추는 게 좋을 거 같다.) 즉 모든 데이터를 가져와서 처리하는 방식이 아닌 paging 처리만큼 가져와서 처리하는
 방식입니다.
 
 ```kotlin
@@ -195,7 +195,7 @@ fun orderPagingReader(): JpaPagingItemReader<Order> {
         }
     }
     itemReader.setQueryString("select o from Order o where o.amount > :targetAmount") //(2)
-    itemReader.pageSize = CHUNK_SZIE // (4)
+    itemReader.pageSize = CHUNK_SIZE // (4)
     itemReader.setEntityManagerFactory(entityManagerFactory)
     val parameterValues = HashMap<String, Any>() //(3)
     parameterValues["targetAmount"] = BigDecimal("1000.00")
@@ -267,7 +267,7 @@ fun orderPagingReader(): JpaPagingItemReader<Order> {
         }
     }
     itemReader.setQueryString("select o from Order o where o.amount < :targetAmount")
-    itemReader.pageSize = CHUNK_SZIE
+    itemReader.pageSize = CHUNK_SIZE
     itemReader.setEntityManagerFactory(entityManagerFactory)
     val parameterValues = HashMap<String, Any>()
     parameterValues["targetAmount"] = BigDecimal("1000.00")

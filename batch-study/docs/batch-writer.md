@@ -77,7 +77,7 @@ ORM을 사용하지 않은 경우 Writer는 대부분 JdbcBatchItemWriter를 사
 
 ![](https://github.com/cheese10yun/TIL/blob/master/assets/jdbc-batch-item-wirter.png?raw=true)
 
-**이렇게 ChunkSzie 만큼 쌓아 Query를 한번에 전송하기 때문에 애플리케이션과 데이터베이스 간의 데이터 통신의 최소화 시켜 성능을 향상 시킬수 있습니다.** 업데이트 쿼리 또한 마찬 가지입니다. 업데이트를 일괄 처리로 그룹화하면
+**이렇게 ChunkSIZE 만큼 쌓아 Query를 한번에 전송하기 때문에 애플리케이션과 데이터베이스 간의 데이터 통신의 최소화 시켜 성능을 향상 시킬수 있습니다.** 업데이트 쿼리 또한 마찬 가지입니다. 업데이트를 일괄 처리로 그룹화하면
 데이터베이스와 어플리케이션간 왕복 횟수가 줄어들어 성능이 향상 됩니다.
 
 ```kotlin

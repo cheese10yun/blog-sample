@@ -22,7 +22,7 @@ class CsvWriterJobConfiguration(
     private val jobDataSetUpListener: JobDataSetUpListener,
     entityManagerFactory: EntityManagerFactory
 ) {
-    private val CHUNK_SZIE = 10
+    private val CHUNK_SIZE = 10
 
     @Bean
     fun csvWriterJob(
@@ -40,7 +40,7 @@ class CsvWriterJobConfiguration(
         stepBuilderFactory: StepBuilderFactory
     ): Step =
         stepBuilderFactory["csvWriterStep"]
-            .chunk<Payment, PaymentCsv>(CHUNK_SZIE)
+            .chunk<Payment, PaymentCsv>(CHUNK_SIZE)
             .reader(reader)
             .writer(writer)
             .build()
@@ -103,7 +103,7 @@ fun csvWriterStep(
     stepBuilderFactory: StepBuilderFactory
 ): Step =
     stepBuilderFactory["csvWriterStep"]
-        .chunk<Payment, PaymentCsv>(CHUNK_SZIE) // (1)
+        .chunk<Payment, PaymentCsv>(CHUNK_SIZE) // (1)
         .reader(reader) // (2)
         .writer(writer) // (3)
         .build()

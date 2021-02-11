@@ -472,7 +472,7 @@ class OrderPaging(
         private val entityManagerFactory: EntityManagerFactory
 ) {
 
-    private val CHUNK_SZIE: Int = 5
+    private val CHUNK_SIZE: Int = 5
 
     @Bean
     fun orderPagingJob(orderPagingStep: Step, inactiveJobListener: InactiveJobListener, orderPagingJobFlow: Flow): Job {

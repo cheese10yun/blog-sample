@@ -256,7 +256,7 @@ protected T doRead() throws Exception {
 }
 ```
 
-doRead()에서는 현재 읽어올 데이터가 없거나, Page Size를 초과한 경우 doReadPage()를 호출합니다. 읽어올 데이터가 없는 경우 read가 처음 시작할 떄를 얘기합니다. Page Szie를 초과하는 경우, 예를 들면 Page
+doRead()에서는 현재 읽어올 데이터가 없거나, Page Size를 초과한 경우 doReadPage()를 호출합니다. 읽어올 데이터가 없는 경우 read가 처음 시작할 떄를 얘기합니다. Page SIZE를 초과하는 경우, 예를 들면 Page
 Size가 10인데, 이번에 읽어야할 데이터가 11 번째 데이터인 경우입니다. 이런 경우 Page Size를 초과했기 때문에 `doReadPage()`를 호출합니다.
 
 **즉, Page 단위로 끊어서 조회하는 것입니다.**
@@ -333,4 +333,4 @@ Reader에서 지정한 Page Size 만큼 offset, limit 값을 지정하여 페이
 > Setting a fairly large page size and using a commit interval that matches the page size should provide better performance.
 (상당히 큰 페이지 크기를 설정하고 페이지 크기와 일치하는 커미트 간격을 사용하면 성능이 향상됩니다.)
 
-2개 값이 의미하는 바가 다르지만 위에서 언급한 여러 이슈로 **2개 값(ChunkSzie, PageSzie)을 일치시키는 것이 보편적으로 좋은 방법이니 꼭 2개 값을 일치시키시길 추천드립니다.**
+2개 값이 의미하는 바가 다르지만 위에서 언급한 여러 이슈로 **2개 값(ChunkSIZE, PageSIZE)을 일치시키는 것이 보편적으로 좋은 방법이니 꼭 2개 값을 일치시키시길 추천드립니다.**

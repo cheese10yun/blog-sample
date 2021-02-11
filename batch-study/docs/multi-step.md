@@ -18,7 +18,7 @@ Task는 Runnable 인터페이스를 구현해 각각의 스레드가 독립저�
     @JobScope
     fun orderPagingStep(orderPagingReader: JpaPagingItemReader<Order>, taskExecutor: TaskExecutor): Step {
         return stepBuilderFactory.get("orderPagingStep")
-                .chunk<Order, Order>(CHUNK_SZIE)
+                .chunk<Order, Order>(CHUNK_SIZE)
                 .reader(orderPagingReader)
                 .processor(pagingProcessor())
                 .writer(pagingWriter())
@@ -75,11 +75,11 @@ Hibernate: select order0_.id as id1_0_0_, order0_.amount as amount2_0_0_, order0
 
 ```java
 public interface Partitioner{
-    Map<String, ExecutionContext> partition(int gridSzie);
+    Map<String, ExecutionContext> partition(int gridSIZE);
 }
 ```
 
-Partitioner 인터페이스는 partition() 메서드만 제공합니다. **Partitioner() 메서드는 Step의 최대 분할 수를 지정하는 파라미터 gridSzie를 갖습니다.** 키는 스레드명, 값은 ExecutionContext를 갖는
+Partitioner 인터페이스는 partition() 메서드만 제공합니다. **Partitioner() 메서드는 Step의 최대 분할 수를 지정하는 파라미터 gridSIZE를 갖습니다.** 키는 스레드명, 값은 ExecutionContext를 갖는
 Map 타입을 반환합니다.
 
 ```java
@@ -89,8 +89,8 @@ public class InactiveUserPartitioner implements Partitioner {
     private static final String INACTIVE_USER_TASK = "InactiveUserTask";
 
     @Override
-    public Map<String, ExecutionContext> partition(int gridSzie) {
-        Map<String, ExecutionContext> map = new HashMap<>(gridSzie); // (1)
+    public Map<String, ExecutionContext> partition(int gridSIZE) {
+        Map<String, ExecutionContext> map = new HashMap<>(gridSIZE); // (1)
         Grade[] grades = Grade.values(); // (2)
         for (int i = 0, length = grades.length; i < length; i++){ // (3)
             ExecutionContext context = new ExecutionContext();
@@ -101,7 +101,7 @@ public class InactiveUserPartitioner implements Partitioner {
 }
 ```
 
-* (1) gridSzie만큼 Map을 할당합니다.
+* (1) gridSIZE만큼 Map을 할당합니다.
 * (2) Grade Enum에 정의된 모든 값을 grades 배열 변수로 할당합니다.
 * (3) grades 값만큼 파티션 생성하는 루프문을 돌립니다.
 * (4) Step에서 파라미터로 Grade 값을 받아 사용합니다. 이대 ExecutionContext 키값은 `grade` 입니다.
@@ -116,7 +116,7 @@ public class InactiveUserPartitioner implements Partitioner {
         return stepBuilderFactory
             .get("partitionerStep")
             .partitioner("partitionerStep", new InactiveUserPartitioner())
-            .gridSzie(5) // (2)
+            .gridSIZE(5) // (2)
             .step(inactiveJobStep)
             .taskExecutor(taskExecutor())
             .build();

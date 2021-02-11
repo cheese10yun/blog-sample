@@ -22,6 +22,6 @@ override fun doReadPage() {
 }
 ````
 
-`offset`, `limit`은 super 클래스인 AbstractPagingItemReader의 `page`, `pageSzie`를 사용해 최대한 변경 요소를 줄임
+`offset`, `limit`은 super 클래스인 AbstractPagingItemReader의 `page`, `pageSIZE`를 사용해 최대한 변경 요소를 줄임
 
 기존 JpaPagingItemReader의 `EntityTransacion` 부분이 다릅니다. 

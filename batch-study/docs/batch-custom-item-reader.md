@@ -84,7 +84,7 @@ open class PageableItemReader<T>(
 
 * name: 해당 페이징 reader의 이름을 지정합니다.
 * sort: 페이징 처리를 위한 sort를 받습니다. 당연한 이야기 이지만 페이징 처리르 위해서는 sort를 받아야 합니다.
-* pageSzie: paging 처리르 위한 pageSzie를 받습니다. 여기서 중요한 점은 pageSzie만큼 ChunkSzie가 설정되며, 해당 ChunkSize의로 트랜잭션 범위가 묶이게 됩니다.
+* pageSIZE: paging 처리르 위한 pageSIZE를 받습니다. 여기서 중요한 점은 pageSIZE만큼 ChunkSIZE가 설정되며, 해당 ChunkSize의로 트랜잭션 범위가 묶이게 됩니다.
 * query: 실제 페이징 쿼리를 진행하는 Pageable 인퍼페이스를 받습니다.
 
 ### BeforeStep
