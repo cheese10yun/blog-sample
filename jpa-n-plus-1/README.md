@@ -115,7 +115,7 @@ JPQL에서 동작한 쿼리를 통해서 members에 데이터가 바인딩 됩�
 
 ## 해결 방법
 
-### Batch Szie
+### Batch SIZE
 ```kotlin
 @Entity
 @Table(name = "member")

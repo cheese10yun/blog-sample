@@ -77,7 +77,7 @@ class PersistenceContextTest(
 
 ![](images/team-members-result.png)
 
-디버깅 모드로 보면 `memebers` szie가 0인 것을 확인할 수 있습니다. 그렇다면 실제 데이터베이에 `member1`, `member2`가 영속화가 안 된 것일 까요?
+디버깅 모드로 보면 `memebers` SIZE가 0인 것을 확인할 수 있습니다. 그렇다면 실제 데이터베이에 `member1`, `member2`가 영속화가 안 된 것일 까요?
 
 ![](images/insert-result.png)
 
