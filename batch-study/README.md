@@ -15,3 +15,4 @@
 * [Batch CSV Writer](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-csv-wirter.md)
 * [Batch CSV Reader](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-csv-reader.md)
 * [Batch 개발](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-application.md)
+* [Batch Test 노하우](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-test-2.md)
