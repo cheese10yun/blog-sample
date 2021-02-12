@@ -17,17 +17,12 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
 import javax.persistence.EntityManagerFactory
 
-@SpringBootTest(
-    properties = [
-        "spring.batch.job.enabled=false", // Job Bean 전체가 올라오는 것을 방지
-        "spring.batch.job.names="
-    ]
-)
+@SpringBootTest
 @SpringBatchTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @ActiveProfiles("test")
-abstract class BatchJobTestSupport {
+abstract class BatchTestSupport {
 
     @Autowired
     protected lateinit var entityManagerFactory: EntityManagerFactory
@@ -41,9 +36,6 @@ abstract class BatchJobTestSupport {
 
     protected val query: JPAQueryFactory by lazy { JPAQueryFactory(entityManager) }
 
-    /**
-     * Job 실행
-     */
     protected fun launchJob(
         job: Job,
         jobParameters: JobParameters = jobLauncherTestUtils.uniqueJobParameters
@@ -52,11 +44,7 @@ abstract class BatchJobTestSupport {
         this.jobExecution = jobLauncherTestUtils.launchJob(jobParameters)
     }
 
-    /**
-     * Step 실행
-     */
     protected fun launchStep(
-        job: Job,
         stepName: String,
         jobParameters: JobParameters = jobLauncherTestUtils.uniqueJobParameters,
         executionContext: ExecutionContext? = null
@@ -64,8 +52,12 @@ abstract class BatchJobTestSupport {
         this.jobExecution = jobLauncherTestUtils.launchStep(stepName, jobParameters, executionContext)
     }
 
-    protected fun thenJobCompleted() {
+    protected fun thenBatchCompleted() {
         then(BatchStatus.COMPLETED).isEqualTo(jobExecution?.status)
+    }
+
+    protected fun thenBatchStatus(batchStatus: BatchStatus) {
+        then(batchStatus).isEqualTo(jobExecution?.status)
     }
 
     protected fun <T> save(entity: T): T {

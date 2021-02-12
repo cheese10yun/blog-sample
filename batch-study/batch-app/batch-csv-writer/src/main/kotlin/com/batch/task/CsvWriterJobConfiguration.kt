@@ -1,7 +1,7 @@
 package com.batch.task
 
 import com.batch.payment.domain.payment.Payment
-import com.batch.task.support.listener.JobReportListener
+import com.batch.task.support.listener.SimpleJobListener
 import com.batch.task.support.support.LineAggregator
 import com.batch.task.support.support.LineMapper
 import org.springframework.batch.core.Job
@@ -34,7 +34,7 @@ class CsvWriterJobConfiguration(
     ): Job =
         jobBuilderFactory["csvWriterJob"]
             .incrementer(RunIdIncrementer())
-            .listener(JobReportListener())
+            .listener(SimpleJobListener())
             .start(csvWriterStep)
             .build()
 
