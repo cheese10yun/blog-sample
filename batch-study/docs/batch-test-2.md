@@ -519,6 +519,42 @@ JPAQueryFactory 기반으로 테스트는 Query DSL 방식으로 검증을 진�
 
 ### 테스트 검증 이후 데이터 제거는 ?
 
+스프링 배치 애플리케이션은 `@Transactional`으로 시작할 수 없습니다. 그 결과 테스트 메서드가 끝난 이후에 **자동으로 해당 데이터가 롤백되지 않으며 데이터가 남아 있어 다른 테스트 코드에 영향을 주게 됩니다.** 그러기 때문에 테스트가 끝난 이후에 데이터를 제거하는 작업을 해야합니다. 반복적인 이야기이지만 Repositroy 기반으로 해당 작업을 하기 위해서는 의존성을 주입 받아야합니다. 이것들을 쉽게 처리할 수 있게 `BatchTestSupport`에서 `deleteAll()` 메서드를 지원 합니다.
+
+```kotlin
+abstract class BatchTestSupport {
+
+    @Autowired
+    protected lateinit var entityManagerFactory: EntityManagerFactory
+
+    protected val entityManager by lazy { entityManagerFactory.createEntityManager() }
+
+    protected fun <T> deleteAll(path: EntityPath<T>) {
+        entityManager.transaction.let { transaction ->
+            transaction.begin()
+            query.delete(path).execute()
+            transaction.commit()
+        }
+    }
+}
+
+internal class CsvReaderJobConfigurationTest(
+    private val csvReaderJob: Job
+) : BatchTestSupport() {
+
+    @AfterEach
+    internal fun deleteAll() {
+        deleteAll(QPayment.payment)
+    }
+}
+```
+`BatchTestSupport`에서 엔티티 메니저를 직접생성해서 `JPAQueryFactory` 기반으로 데이터를 제거합니다. 
+
+![](img/delete-query.png)
+
+실제 delete 쿼리가 동작하는 것을 확인 할 수 있습니다.
+
+
 ### 왜 배치에서는 @Transactional을 물고 시작할 수 없을까?
 
 
