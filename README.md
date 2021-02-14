@@ -72,6 +72,7 @@
 * [Rx Kotlin 으로 성능 개선](https://github.com/cheese10yun/blog-sample/blob/master/reactive/README.md)
 * [Spring Batch CSV Writer](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-csv-wirter.md)
 * [Batch 개발](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-application.md)
+* [Spring Batch Test 작성 방법 및 고찰](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-test-2.md)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
