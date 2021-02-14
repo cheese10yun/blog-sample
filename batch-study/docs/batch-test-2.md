@@ -244,7 +244,7 @@ internal class CsvWriterConfigurationTest(
 ```
 Step 테스트도 마찬가지로 `jobLauncherTestUtils.launchStep()` 메서드를 활용해서 특정 Step을 실행할 수 있습니다. 개인적으로는 `launchStep()` 테스트를 진행하는 것은 좋아하지는 않습니다.
 
-![](/docs/img/ste-test-1.png)
+![](img/ste-test-1.png)
 
 Job name이 `name=TestJob` 이것을 확인할 수 있습니다. Step을 테스트하기 위해서는 반드시 Job이 있어야 하기 때문에 `TestJob`으로 연결해서 테스트를 진행하는 것입니다. 이렇게 테스트가 진행되게 되면 문제가 있을 수 있습니다.
 
