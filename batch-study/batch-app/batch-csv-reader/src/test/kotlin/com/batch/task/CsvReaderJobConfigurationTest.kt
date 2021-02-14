@@ -8,6 +8,8 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.batch.core.Job
 
+//@Transactional(propagation = Propagation.NOT_SUPPORTED)
+//@Transactional
 internal class CsvReaderJobConfigurationTest(
     private val csvReaderJob: Job,
     private val paymentRepository: PaymentRepository
