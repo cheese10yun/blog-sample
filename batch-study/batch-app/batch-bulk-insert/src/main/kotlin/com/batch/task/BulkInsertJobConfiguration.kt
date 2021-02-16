@@ -28,7 +28,7 @@ class BulkInsertJobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
     private val jobDataSetUpListener: JobDataSetUpListener,
     private val dataSource: DataSource,
-//    private val exposedDataBase: Database,
+    private val exposedDataBase: Database,
     entityManagerFactory: EntityManagerFactory
 ) {
 
@@ -111,17 +111,17 @@ class BulkInsertJobConfiguration(
         }
     }
 
-//    private val writerWithExposed: ItemWriter<Payment> = ItemWriter { payments ->
-//        transaction(
-//            exposedDataBase
-//        ) {
-//            PaymentBack.batchInsert(
-//                data = payments,
-//                shouldReturnGeneratedValues = false
-//            ) { payment ->
-//                this[PaymentBack.orderId] = payment.orderId
-//                this[PaymentBack.amount] = payment.amount
-//            }
-//        }
-//    }
+    private val writerWithExposed: ItemWriter<Payment> = ItemWriter { payments ->
+        transaction(
+            exposedDataBase
+        ) {
+            PaymentBack.batchInsert(
+                data = payments,
+                shouldReturnGeneratedValues = false
+            ) { payment ->
+                this[PaymentBack.orderId] = payment.orderId
+                this[PaymentBack.amount] = payment.amount
+            }
+        }
+    }
 }
