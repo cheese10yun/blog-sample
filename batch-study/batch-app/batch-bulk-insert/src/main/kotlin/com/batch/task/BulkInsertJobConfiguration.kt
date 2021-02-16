@@ -1,8 +1,12 @@
 package com.batch.task
 
 import com.batch.payment.domain.payment.Payment
+import com.batch.payment.domain.payment.PaymentBack
 import com.batch.payment.domain.payment.PaymentBackJpa
 import com.batch.task.support.listener.JobReportListener
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.batchInsert
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
@@ -52,7 +56,9 @@ class BulkInsertJobConfiguration(
         stepBuilderFactory["bulkInsertStep"]
             .chunk<Payment, Payment>(GLOBAL_CHUNK_SIZE)
             .reader(bulkInsertReader)
-            .writer(writerWithStatement)
+//            .writer(writerWithStatement)
+//            .writer(writerWithJpa)
+            .writer(writerWithExposed)
             .build()
 
     @Bean
