@@ -1,6 +1,7 @@
 package com.batch.payment.domain.payment
 
 import com.batch.payment.domain.core.EntityAuditing
+import org.springframework.data.jpa.repository.JpaRepository
 import java.math.BigDecimal
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -15,3 +16,5 @@ class PaymentBackJpa(
     @Column(name = "order_id", nullable = false, updatable = false)
     val orderId: Long
 ) : EntityAuditing()
+
+interface PaymentBackJpaRepository: JpaRepository<PaymentBackJpa, Long>

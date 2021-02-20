@@ -7,7 +7,7 @@ spring:
         database: mysql
         properties:
             hibernate.hbm2ddl.auto: create
-            hibernate.generate_statistics: true
+#            hibernate.generate_statistics: true
             hibernate.jdbc.batch_size: 500
             hibernate.show_sql: true
             hibernate.ddl-auto: create

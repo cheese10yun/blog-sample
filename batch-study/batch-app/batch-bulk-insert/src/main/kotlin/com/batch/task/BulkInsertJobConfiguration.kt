@@ -3,6 +3,7 @@ package com.batch.task
 import com.batch.payment.domain.payment.Payment
 import com.batch.payment.domain.payment.PaymentBack
 import com.batch.payment.domain.payment.PaymentBackJpa
+import com.batch.payment.domain.payment.PaymentBackJpaRepository
 import com.batch.task.support.listener.JobReportListener
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.batchInsert
@@ -15,9 +16,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.item.ItemWriter
-import org.springframework.batch.item.database.JpaItemWriter
 import org.springframework.batch.item.database.JpaPagingItemReader
-import org.springframework.batch.item.database.builder.JpaItemWriterBuilder
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -33,6 +32,7 @@ class BulkInsertJobConfiguration(
     private val jobDataSetUpListener: JobDataSetUpListener,
     private val dataSource: DataSource,
     private val exposedDataBase: Database,
+    private val paymentBackJpaRepository: PaymentBackJpaRepository,
     entityManagerFactory: EntityManagerFactory
 ) {
 
@@ -57,8 +57,8 @@ class BulkInsertJobConfiguration(
             .chunk<Payment, Payment>(GLOBAL_CHUNK_SIZE)
             .reader(bulkInsertReader)
 //            .writer(writerWithStatement)
-//            .writer(writerWithJpa)
-            .writer(writerWithExposed)
+//            .writer(writerWithExposed)
+            .writer(writerWithJpa)
             .build()
 
     @Bean
@@ -77,10 +77,18 @@ class BulkInsertJobConfiguration(
         insertWithStatement(payments)
     }
 
-    private val writerWithJpa: JpaItemWriter<PaymentBackJpa> =
-        JpaItemWriterBuilder<PaymentBackJpa>()
-            .entityManagerFactory(entityManagerFactory)
-            .build()
+    private val writerWithJpa: ItemWriter<Payment> =
+        ItemWriter { payments ->
+            payments.map {
+                PaymentBackJpa(
+                    amount = it.amount,
+                    orderId = it.orderId
+                )
+            }
+                .also {
+                    paymentBackJpaRepository.saveAll(it)
+                }
+        }
 
     private fun insertWithStatement(payments: List<Payment>) {
         val connection = dataSource.connection
