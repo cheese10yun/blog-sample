@@ -36,10 +36,13 @@ class JobReportListener : JobExecutionListener {
     private fun stepReport(stepExecutions: Collection<StepExecution>): String {
         return stepExecutions.joinToString("\n") { stepExecution ->
 
+            val toMillis = duration(stepExecution.startTime, stepExecution.endTime)
             """                    ------
                     [${stepExecution.stepName} 리포트]
                     최종상태: ${stepExecution.exitStatus}
-                    소요시간: ${duration(stepExecution.startTime, stepExecution.endTime).toMillis()}
+                    소요시간: ${toMillis.toMillis()}
+                    소요시간: ${toMillis.toMinutes()}
+                    소요시간: ${toMillis.toSeconds()}
                     시작일시: ${stepExecution.startTime.isoDateTime()}
                     종료일시: ${stepExecution.endTime.isoDateTime()}
                     읽기갯수: ${stepExecution.readCount}

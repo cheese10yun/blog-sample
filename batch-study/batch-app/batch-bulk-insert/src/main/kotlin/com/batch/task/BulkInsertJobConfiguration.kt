@@ -79,10 +79,10 @@ class BulkInsertJobConfiguration(
 
     private val writerWithJpa: ItemWriter<Payment> =
         ItemWriter { payments ->
-            payments.map {
+            payments.map { payment ->
                 PaymentBackJpa(
-                    amount = it.amount,
-                    orderId = it.orderId
+                    amount = payment.amount,
+                    orderId = payment.orderId
                 )
             }
                 .also {
