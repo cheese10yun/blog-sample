@@ -17,10 +17,10 @@ values
        (1, 2)
 ```
 
-insert rows 여러 개 연결해서 한 번에 입력하는 것을 batch insert라고 말합니다. 당연한 이야기이지만 batch insert는 하나의 트랜잭션으로 묶이게 됩니다.
+insert rows 여러 개 연결해서 한 번에 입력하는 것을 Batch Insert라고 말합니다. 당연한 이야기이지만 Batch Insert는 하나의 트랜잭션으로 묶이게 됩니다.
 
 ## Batch Insert With JPA
-위 batch insert SQL이 간단해 보이지만 실제 로직으로 작성하려면 코드가 복잡해지고 실수하기 좋은 포인트들이 있어 유지 보수하기 어려운 코드가 되기 쉽습니다. 해당 포인트들은 아래 주석으로 작성했습니다. **JPA를 사용하면 이러한 문제들을 정말 쉽게 해결이 가능합니다.**
+위 Batch Insert SQL이 간단해 보이지만 실제 로직으로 작성하려면 코드가 복잡해지고 실수하기 좋은 포인트들이 있어 유지 보수하기 어려운 코드가 되기 쉽습니다. 해당 포인트들은 아래 주석으로 작성했습니다. **JPA를 사용하면 이러한 문제들을 정말 쉽게 해결이 가능합니다.**
 
 ```kotlin
     // 문자열로 기반으로 SQL을 관리하기 때문에 변경 및 유지 보수에 좋지 않음
@@ -90,12 +90,12 @@ spring:
         url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true
         driver-class-name: com.mysql.cj.jdbc.Driver
 ```
-addBatch 구분을 사용하기 위해서는 `rewriteBatchedStatements=true` 속성을 지정해야 합니다. 기본 설정은 `false`이며, 해당 설정이 없으면 batch insert는 동작하지 않습니다. 정확한 내용은 공식 문서를 참고해 주세요.
+addBatch 구분을 사용하기 위해서는 `rewriteBatchedStatements=true` 속성을 지정해야 합니다. 기본 설정은 `false`이며, 해당 설정이 없으면 Batch Insert는 동작하지 않습니다. 정확한 내용은 공식 문서를 참고해 주세요.
 
 > [MySQL Connector/J 8.0 Developer Guide : 6.3.13 Performance Extensions](https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-connp-props-performance-extensions.html)
 > Stops checking if every INSERT statement contains the "ON DUPLICATE KEY UPDATE" clause. As a side effect, obtaining the statement's generated keys information will return a list where normally it wouldn't. Also be aware that, in this case, the list of generated keys returned may not be accurate. The effect of this property is canceled if set simultaneously with 'rewriteBatchedStatements=true'.
 
-`hibernate.jdbc.batch_size: 50` batch insert의 size를 지정합니다. 해당 크기에 따라서 한 번에 insert 되는 rows가 결정됩니다. 자세한 내용은 아래에서 설명드리겠습니다.
+`hibernate.jdbc.batch_size: 50` Batch Insert의 size를 지정합니다. 해당 크기에 따라서 한 번에 insert 되는 rows가 결정됩니다. 자세한 내용은 아래에서 설명드리겠습니다.
 
 ```kotlin
 @Entity
@@ -140,11 +140,11 @@ internal class BulkInsertJobConfigurationTest(
     }
 }
 ```
-`paymentBackJpaRepository.saveAll()`를 이용해서 batch inset를 진행합니다. JPA 기반으로 batch insert를 진행할 때 별다른 코드가 필요 없습니다. 컬렉션 객체를 `saveAll()`으로 저장하는 것이 전부입니다. `hibernate.show_sql: true`으로 로킹 결고를 확인해보겠습니다.
+`paymentBackJpaRepository.saveAll()`를 이용해서 batch inset를 진행합니다. JPA 기반으로 Batch Insert를 진행할 때 별다른 코드가 필요 없습니다. 컬렉션 객체를 `saveAll()`으로 저장하는 것이 전부입니다. `hibernate.show_sql: true`으로 로킹 결고를 확인해보겠습니다.
 
 ![](img/sql-batch-1.png)
 
-로그상으로는 batch insert가 진행되지 않은 것처럼 보입니다. 결론부터 말씀드리면 실제로는 batch insert가 진행됐지만 `hibernate.show_sql: true` 기반 로그에는 제대로 표시가 되지 않습니다. Mysql의 실제 로그로 확인해보겠습니다.
+로그상으로는 Batch Insert가 진행되지 않은 것처럼 보입니다. 결론부터 말씀드리면 실제로는 Batch Insert가 진행됐지만 `hibernate.show_sql: true` 기반 로그에는 제대로 표시가 되지 않습니다. Mysql의 실제 로그로 확인해보겠습니다.
 
 ```sql
 show variables like 'general_log%'; # general_log 획인
@@ -164,7 +164,7 @@ Query	commit
 Query	SET autocommit=1
 ```
 
-실제 mysql 로그에서는 batch insert를 확인할 수 있습니다. 그런데 왜 2번에 걸쳐서 batch insert가 진행되었을까요? **`hibernate.jdbc.batch_size: 50`설정으로 batch insert에 대한 size를 50으로 지정했기 때문에 rows 100를 저장할 때 2번에 걸쳐 insert를 진행하는 것입니다.** 만약 `hibernate.jdbc.batch_size: 100`이라면 1번의 insert로 저장됩니다.
+실제 mysql 로그에서는 Batch Insert를 확인할 수 있습니다. 그런데 왜 2번에 걸쳐서 Batch Insert가 진행되었을까요? **`hibernate.jdbc.batch_size: 50`설정으로 Batch Insert에 대한 size를 50으로 지정했기 때문에 rows 100를 저장할 때 2번에 걸쳐 insert를 진행하는 것입니다.** 만약 `hibernate.jdbc.batch_size: 100`이라면 1번의 insert로 저장됩니다.
 
 ```
 Query	insert into payment_back (amount, order_id, id) values (1, 1, 1),(2, 2, 2),(3, 3, 3),(4, 4, 4),(5, 5, 5),(6, 6, 6),(7, 7, 7),(8, 8, 8),(9, 9, 9),(10, 10, 10),(11, 11, 11),(12, 12, 12),(13, 13, 13),(14, 14, 14),(15, 15, 15),(16, 16, 16),(17, 17, 17),(18, 18, 18),(19, 19, 19),(20, 20, 20),(21, 21, 21),(22, 22, 22),(23, 23, 23),(24, 24, 24),(25, 25, 25),(26, 26, 26),(27, 27, 27),(28, 28, 28),(29, 29, 29),(30, 30, 30),(31, 31, 31),(32, 32, 32),(33, 33, 33),(34, 34, 34),(35, 35, 35),(36, 36, 36),(37, 37, 37),(38, 38, 38),(39, 39, 39),(40, 40, 40),(41, 41, 41),(42, 42, 42),(43, 43, 43),(44, 44, 44),(45, 45, 45),(46, 46, 46),(47, 47, 47),(48, 48, 48),(49, 49, 49),(50, 50, 50),(51, 51, 51),(52, 52, 52),(53, 53, 53),(54, 54, 54),(55, 55, 55),(56, 56, 56),(57, 57, 57),(58, 58, 58),(59, 59, 59),(60, 60, 60),(61, 61, 61),(62, 62, 62),(63, 63, 63),(64, 64, 64),(65, 65, 65),(66, 66, 66),(67, 67, 67),(68, 68, 68),(69, 69, 69),(70, 70, 70),(71, 71, 71),(72, 72, 72),(73, 73, 73),(74, 74, 74),(75, 75, 75),(76, 76, 76),(77, 77, 77),(78, 78, 78),(79, 79, 79),(80, 80, 80),(81, 81, 81),(82, 82, 82),(83, 83, 83),(84, 84, 84),(85, 85, 85),(86, 86, 86),(87, 87, 87),(88, 88, 88),(89, 89, 89),(90, 90, 90),(91, 91, 91),(92, 92, 92),(93, 93, 93),(94, 94, 94),(95, 95, 95),(96, 96, 96),(97, 97, 97),(98, 98, 98),(99, 99, 99),(100, 100, 100)
@@ -217,7 +217,7 @@ try {
 
 ### 쓰기 지연 SQL 제약 사항
 
-`batchSize: 50` 경우 `PaymentBackJpa` 객체를 50 단위로 batch insert 쿼리가 실행되지만, 중간에 다른 엔티티를 저장하는 경우 아래처럼 지금까지의 `PaymentBackJpa`에 대한 지정하기 때문에 최종적으로 `batchSize: 50` 단위로 저장되지 않습니다.
+`batchSize: 50` 경우 `PaymentBackJpa` 객체를 50 단위로 Batch Insert 쿼리가 실행되지만, 중간에 다른 엔티티를 저장하는 경우 아래처럼 지금까지의 `PaymentBackJpa`에 대한 지정하기 때문에 최종적으로 `batchSize: 50` 단위로 저장되지 않습니다.
 
 ```java
 em.persist(new PaymentBackJpa()); // 1
