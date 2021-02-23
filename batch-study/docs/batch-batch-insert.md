@@ -1,4 +1,7 @@
-Batch Insert 성능 개선기
+# Batch Insert 성능 향상 - JPA Batch Insert
+
+
+
 
 1. JPA에서 Batch Insert가 동작하지 않은 이유 길게 설명
 2. JDBC Template를 이용한 Batch Insert 방식
