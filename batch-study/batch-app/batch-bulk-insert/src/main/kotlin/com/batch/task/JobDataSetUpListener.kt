@@ -5,7 +5,6 @@ import com.batch.task.support.logger
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobExecutionListener
 import org.springframework.stereotype.Component
-import java.sql.Connection
 import javax.sql.DataSource
 
 @Component
@@ -16,47 +15,33 @@ class JobDataSetUpListener(
     val log by logger()
 
     override fun beforeJob(jobExecution: JobExecution) {
-        val payments = (1..GLOBAL_CHUNK_SIZE)
+        val payments = (1..DATA_SET_UP_SIZE)
             .map { Payment(it.toBigDecimal(), it.toLong()) }
 
-        insert(payments)
-        log.info("data set up done")
-    }
-
-    private fun insert(payments: List<Payment>) {
+        val sql = "insert into payment (amount, order_id) values (?, ?)"
         val connection = dataSource.connection
-        val batchStatement = BatchStatement(connection)
+        val statement = connection.prepareStatement(sql)!!
 
         try {
             for (payment in payments) {
-                batchStatement.addBatch(payment)
+                statement.apply {
+                    setBigDecimal(1, payment.amount)
+                    setLong(2, payment.orderId)
+                    addBatch()
+                }
             }
-            batchStatement.statement.executeBatch()
-        } catch (ex: Exception) {
-            throw ex
+            statement.executeBatch()
+        } catch (e: Exception) {
+            throw e
         } finally {
-            batchStatement.close()
+            if (statement.isClosed.not()) {
+                statement.close()
+            }
             if (connection.isClosed.not()) {
                 connection.close()
             }
         }
-    }
-
-    private class BatchStatement(connection: Connection) {
-        val sql = "insert into payment (amount, order_id) values (?, ?)"
-
-        val statement = connection.prepareStatement(sql)!!
-
-        fun addBatch(payment: Payment) = statement.apply {
-            this.setBigDecimal(1, payment.amount)
-            this.setLong(2, payment.orderId)
-            this.addBatch()
-        }
-
-        fun close() {
-            if (statement.isClosed.not())
-                statement.close()
-        }
+        log.info("data set up done")
     }
 
     override fun afterJob(jobExecution: JobExecution): Unit = Unit

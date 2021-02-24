@@ -5,6 +5,8 @@ import com.batch.payment.domain.payment.PaymentBack
 import com.batch.payment.domain.payment.PaymentBackJpa
 import com.batch.payment.domain.payment.PaymentBackJpaRepository
 import com.batch.task.support.listener.JobReportListener
+import io.reactivex.rxkotlin.toFlowable
+import io.reactivex.schedulers.Schedulers
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -20,11 +22,11 @@ import org.springframework.batch.item.database.JpaPagingItemReader
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import java.sql.Connection
 import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
 const val GLOBAL_CHUNK_SIZE = 100
+const val DATA_SET_UP_SIZE = 500
 
 @Configuration
 class BulkInsertJobConfiguration(
@@ -57,8 +59,8 @@ class BulkInsertJobConfiguration(
             .chunk<Payment, Payment>(GLOBAL_CHUNK_SIZE)
             .reader(bulkInsertReader)
 //            .writer(writerWithStatement)
-//            .writer(writerWithExposed)
-            .writer(writerWithJpa)
+            .writer(writerWithExposed)
+//            .writer(writerWithJpa)
             .build()
 
     @Bean
@@ -74,7 +76,28 @@ class BulkInsertJobConfiguration(
 
 
     private val writerWithStatement: ItemWriter<Payment> = ItemWriter { payments ->
-        insertWithStatement(payments)
+        val sql = "insert into payment_back (amount, order_id) values (?, ?)"
+        val connection = dataSource.connection
+        val statement = connection.prepareStatement(sql)!!
+        try {
+            for (payment in payments) {
+                statement.apply {
+                    this.setBigDecimal(1, payment.amount)
+                    this.setLong(2, payment.orderId)
+                    this.addBatch()
+                }
+            }
+            statement.executeBatch()
+        } catch (e: Exception) {
+            throw e
+        } finally {
+            if (statement.isClosed.not()) {
+                statement.close()
+            }
+            if (connection.isClosed.not()) {
+                connection.close()
+            }
+        }
     }
 
     private val writerWithJpa: ItemWriter<Payment> =
@@ -90,52 +113,35 @@ class BulkInsertJobConfiguration(
                 }
         }
 
-    private fun insertWithStatement(payments: List<Payment>) {
-        val connection = dataSource.connection
-        val batchStatement = BatchStatement(connection)
-
-        try {
-            for (payment in payments) {
-                batchStatement.addBatch(payment)
-            }
-            batchStatement.statement.executeBatch()
-        } catch (ex: Exception) {
-            throw ex
-        } finally {
-            batchStatement.close()
-            if (connection.isClosed.not()) {
-                connection.close()
-            }
-        }
-    }
-
-    private class BatchStatement(connection: Connection) {
-        val sql = "insert into payment_back (amount, order_id) values (?, ?)"
-        val statement = connection.prepareStatement(sql)!!
-
-        fun addBatch(payment: Payment) = statement.apply {
-            this.setBigDecimal(1, payment.amount)
-            this.setLong(2, payment.orderId)
-            this.addBatch()
-        }
-
-        fun close() {
-            if (statement.isClosed.not())
-                statement.close()
-        }
-    }
 
     private val writerWithExposed: ItemWriter<Payment> = ItemWriter { payments ->
-        transaction(
-            exposedDataBase
-        ) {
-            PaymentBack.batchInsert(
-                data = payments,
-                shouldReturnGeneratedValues = false
-            ) { payment ->
-                this[PaymentBack.orderId] = payment.orderId
-                this[PaymentBack.amount] = payment.amount
-            }
-        }
+
+        payments
+            .toFlowable()
+            .parallel()
+            .runOn(Schedulers.io())
+            .sequential()
+            .subscribe(
+                {
+                    println("Received ${Thread.currentThread().name}")
+                    it
+                }, {
+
+                }, {
+
+                }
+            )
+
+//        transaction(
+//            exposedDataBase
+//        ) {
+//            PaymentBack.batchInsert(
+//                data = payments,
+//                shouldReturnGeneratedValues = false
+//            ) { payment ->
+//                this[PaymentBack.orderId] = payment.orderId
+//                this[PaymentBack.amount] = payment.amount
+//            }
+//        }
     }
 }
