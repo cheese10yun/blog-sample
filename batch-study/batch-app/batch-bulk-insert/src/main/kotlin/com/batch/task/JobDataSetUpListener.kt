@@ -5,6 +5,7 @@ import com.batch.task.support.logger
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobExecutionListener
 import org.springframework.stereotype.Component
+import java.math.BigDecimal
 import javax.sql.DataSource
 
 @Component
@@ -25,7 +26,7 @@ class JobDataSetUpListener(
         try {
             for (payment in payments) {
                 statement.apply {
-                    setBigDecimal(1, payment.amount)
+                    setBigDecimal(1, BigDecimal.ZERO)
                     setLong(2, payment.orderId)
                     addBatch()
                 }

@@ -25,8 +25,8 @@ import org.springframework.context.annotation.Configuration
 import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
-const val GLOBAL_CHUNK_SIZE = 100
-const val DATA_SET_UP_SIZE = 500
+const val GLOBAL_CHUNK_SIZE = 10_000
+const val DATA_SET_UP_SIZE = GLOBAL_CHUNK_SIZE * 10
 
 @Configuration
 class BulkInsertJobConfiguration(
@@ -59,7 +59,8 @@ class BulkInsertJobConfiguration(
             .chunk<Payment, Payment>(GLOBAL_CHUNK_SIZE)
             .reader(bulkInsertReader)
 //            .writer(writerWithStatement)
-            .writer(writerWithExposed)
+//            .writer(writerWithExposed)
+            .writer(writerWithExposedMulti)
 //            .writer(writerWithJpa)
             .build()
 
@@ -71,6 +72,8 @@ class BulkInsertJobConfiguration(
         JpaPagingItemReaderBuilder<Payment>()
             .queryString("SELECT p FROM Payment p")
             .entityManagerFactory(entityManagerFactory)
+//            .maxItemCount(GLOBAL_CHUNK_SIZE * 4)
+            .pageSize(GLOBAL_CHUNK_SIZE)
             .name("bulkInsertReader")
             .build()
 
@@ -114,34 +117,47 @@ class BulkInsertJobConfiguration(
         }
 
 
-    private val writerWithExposed: ItemWriter<Payment> = ItemWriter { payments ->
-
+    private val writerWithExposedMulti: ItemWriter<Payment> = ItemWriter { payments ->
         payments
             .toFlowable()
-            .parallel()
-            .runOn(Schedulers.io())
-            .sequential()
-            .subscribe(
+            .parallel(Runtime.getRuntime().availableProcessors())
+            .runOn(Schedulers.computation())
+            .toSortedList { o1, o2 -> o1.amount.compareTo(o2.amount) }
+            .observeOn(Schedulers.computation())
+            .blockingSubscribe(
                 {
-                    println("Received ${Thread.currentThread().name}")
-                    it
+                    println("start ${Thread.currentThread().name}")
+                    transaction(
+                        exposedDataBase
+                    ) {
+                        PaymentBack.batchInsert(
+                            data = it,
+                            shouldReturnGeneratedValues = false
+                        ) { payment ->
+                            this[PaymentBack.orderId] = payment.orderId
+                            this[PaymentBack.amount] = payment.amount
+                        }
+                    }
                 }, {
 
                 }, {
-
+                    println("end ${Thread.currentThread().name}")
                 }
             )
-
-//        transaction(
-//            exposedDataBase
-//        ) {
-//            PaymentBack.batchInsert(
-//                data = payments,
-//                shouldReturnGeneratedValues = false
-//            ) { payment ->
-//                this[PaymentBack.orderId] = payment.orderId
-//                this[PaymentBack.amount] = payment.amount
-//            }
-//        }
     }
+
+    private val writerWithExposed: ItemWriter<Payment> = ItemWriter { payments ->
+        transaction(
+            exposedDataBase
+        ) {
+            PaymentBack.batchInsert(
+                data = payments,
+                shouldReturnGeneratedValues = false
+            ) { payment ->
+                this[PaymentBack.orderId] = payment.orderId
+                this[PaymentBack.amount] = payment.amount
+            }
+        }
+    }
+
 }

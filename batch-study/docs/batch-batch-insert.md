@@ -14,8 +14,7 @@ JPA + MySQL + GenerationType.IDENTITY 조합으로는 Batch Insert를 사용할 
 
 
 ## Insert 성능 측정
-
-Insert에 대한 성능 측정은 JPA, JDBC, Exposed 3가지 솔루션으로 진행하겠습니다. JPA는 단건으로 저장하며, JDBC는 문자열 기반으로 `addBatch()`를 직접 호출, Exposed는 자체적으로 지원하는 Batch Insert를 진행할 예정입니다.
+Insert에 대한 성능 측정은 JPA, JDBC, Exposed 3가지 솔루션으로 진행하겠습니다. JPA는 단건으로 저장하며, JDBC는 문자열 기반으로 `addBatch()`를 직접 호출, Exposed는 자체적으로 지원하는 Batch Insert를 진행하겠습니다.
 
 
 ### 성능 측정 플로우
