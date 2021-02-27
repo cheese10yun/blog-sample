@@ -53,7 +53,7 @@ class BulkInsertJobConfiguration(
     @JobScope
     fun bulkInsertStep(
         stepBuilderFactory: StepBuilderFactory,
-        bulkInsertReader: JpaPagingItemReader<Payment>
+        bulkInsertReader: JpaCursorItemReader<Payment>
     ): Step =
         stepBuilderFactory["bulkInsertStep"]
             .chunk<Payment, Payment>(GLOBAL_CHUNK_SIZE)
@@ -68,14 +68,11 @@ class BulkInsertJobConfiguration(
     @StepScope
     fun bulkInsertReader(
         entityManagerFactory: EntityManagerFactory
-    ): JpaPagingItemReader<Payment> =
-        JpaPagingItemReaderBuilder<Payment>()
-            .queryString("SELECT p FROM Payment p")
-            .entityManagerFactory(entityManagerFactory)
-//            .maxItemCount(GLOBAL_CHUNK_SIZE * 4)
-            .pageSize(GLOBAL_CHUNK_SIZE)
-            .name("bulkInsertReader")
-            .build()
+    ) = JpaCursorItemReaderBuilder<Payment>()
+        .name("bulkInsertReader")
+        .entityManagerFactory(entityManagerFactory)
+        .queryString("SELECT p FROM Payment p")
+        .build()
 
 
     private val writerWithStatement: ItemWriter<Payment> = ItemWriter { payments ->
