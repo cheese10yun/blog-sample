@@ -73,7 +73,8 @@
 * [Spring Batch CSV Writer](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-csv-wirter.md)
 * [Batch 개발](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-application.md)
 * [Spring Batch Test 작성 방법 및 고찰](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-test-2.md)
-* [Batch Insert 성능 향상 - JPA Batch Insert](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/jpa-batch-insert.md)
+* [Batch Insert 성능 향상기 1편 - JPA Batch Insert](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/jpa-batch-insert.md)
+* [Batch Insert 성능 향상기 2편 - 성능 측정](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-batch-insert.md)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
