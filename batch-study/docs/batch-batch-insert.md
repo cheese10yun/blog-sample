@@ -184,6 +184,7 @@ rows | Statement | Exposed
 
 
 #### chunk size = 10,000
+![](img/chunk_size_100000.png)
 
 rows | Statement | Exposed
 -----|-----------|--------
