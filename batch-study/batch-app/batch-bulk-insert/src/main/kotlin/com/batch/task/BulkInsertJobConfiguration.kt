@@ -5,8 +5,6 @@ import com.batch.payment.domain.payment.PaymentBack
 import com.batch.payment.domain.payment.PaymentBackJpa
 import com.batch.payment.domain.payment.PaymentBackJpaRepository
 import com.batch.task.support.listener.JobReportListener
-import io.reactivex.rxkotlin.toFlowable
-import io.reactivex.schedulers.Schedulers
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -18,8 +16,8 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.launch.support.RunIdIncrementer
 import org.springframework.batch.item.ItemWriter
-import org.springframework.batch.item.database.JpaPagingItemReader
-import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
+import org.springframework.batch.item.database.JpaCursorItemReader
+import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import javax.persistence.EntityManagerFactory
@@ -60,8 +58,7 @@ class BulkInsertJobConfiguration(
             .reader(bulkInsertReader)
 //            .writer(writerWithStatement)
 //            .writer(writerWithExposed)
-            .writer(writerWithExposedMulti)
-//            .writer(writerWithJpa)
+            .writer(writerWithJpa)
             .build()
 
     @Bean
@@ -113,36 +110,6 @@ class BulkInsertJobConfiguration(
                 }
         }
 
-
-    private val writerWithExposedMulti: ItemWriter<Payment> = ItemWriter { payments ->
-        payments
-            .toFlowable()
-            .parallel(Runtime.getRuntime().availableProcessors())
-            .runOn(Schedulers.computation())
-            .toSortedList { o1, o2 -> o1.amount.compareTo(o2.amount) }
-            .observeOn(Schedulers.computation())
-            .blockingSubscribe(
-                {
-                    println("start ${Thread.currentThread().name}")
-                    transaction(
-                        exposedDataBase
-                    ) {
-                        PaymentBack.batchInsert(
-                            data = it,
-                            shouldReturnGeneratedValues = false
-                        ) { payment ->
-                            this[PaymentBack.orderId] = payment.orderId
-                            this[PaymentBack.amount] = payment.amount
-                        }
-                    }
-                }, {
-
-                }, {
-                    println("end ${Thread.currentThread().name}")
-                }
-            )
-    }
-
     private val writerWithExposed: ItemWriter<Payment> = ItemWriter { payments ->
         transaction(
             exposedDataBase
@@ -156,5 +123,4 @@ class BulkInsertJobConfiguration(
             }
         }
     }
-
 }

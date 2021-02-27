@@ -24,6 +24,8 @@ spring:
         hikari:
             maximum-pool-size: 50
             minimum-idle: 25
+            connection-timeout: 90000
+            max-lifetime: 90000
         dbcp2:
             test-on-borrow: true
             validation-query: select 1
