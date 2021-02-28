@@ -3,6 +3,7 @@ package com.batch.task
 import com.batch.payment.domain.payment.Payment
 import com.batch.task.support.listener.JobReportListener
 import com.batch.task.support.logger
+import org.hibernate.SessionFactory
 import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobExecutionListener
 import org.springframework.batch.core.Step
@@ -11,8 +12,12 @@ import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.launch.support.RunIdIncrementer
+import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.JpaCursorItemReader
+import org.springframework.batch.item.database.JpaPagingItemReader
+import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
+import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Component
@@ -45,11 +50,15 @@ class ReaderPerformanceJobConfiguration(
     @Bean
     @JobScope
     fun readerPerformanceStep(
-        jpaCursorItemReader: JpaCursorItemReader<Payment>
+        jpaCursorItemReader: JpaCursorItemReader<Payment>,
+        jpaPagingItemReader: JpaPagingItemReader<Payment>,
+        hibernateCursorItemReader: HibernateCursorItemReader<Payment>,
     ) =
         stepBuilderFactory["readerPerformanceStep"]
             .chunk<Payment, Payment>(CHUNK_SIZE)
-            .reader(jpaCursorItemReader)
+//            .reader(jpaCursorItemReader)
+            .reader(jpaPagingItemReader)
+//            .reader(hibernateCursorItemReader)
             .writer { log.info("item size ${it.size}") }
             .build()
 
@@ -58,8 +67,28 @@ class ReaderPerformanceJobConfiguration(
     fun jpaCursorItemReader(
         entityManagerFactory: EntityManagerFactory
     ) = JpaCursorItemReaderBuilder<Payment>()
-        .name("bulkInsertReader")
+        .name("jpaCursorItemReader")
         .entityManagerFactory(entityManagerFactory)
+        .queryString("SELECT p FROM Payment p")
+        .build()
+
+    @Bean
+    @StepScope
+    fun jpaPagingItemReader(
+        entityManagerFactory: EntityManagerFactory
+    ) = JpaPagingItemReaderBuilder<Payment>()
+        .name("jpaPagingItemReader")
+        .entityManagerFactory(entityManagerFactory)
+        .queryString("SELECT p FROM Payment p")
+        .build()
+
+    @Bean
+    @StepScope
+    fun hibernateCursorItemReader(
+        sessionFactory: SessionFactory
+    ) = HibernateCursorItemReaderBuilder<Payment>()
+        .name("hibernateCursorItemReader")
+        .sessionFactory(sessionFactory)
         .queryString("SELECT p FROM Payment p")
         .build()
 }
