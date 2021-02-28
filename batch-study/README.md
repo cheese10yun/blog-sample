@@ -18,3 +18,7 @@
 * [Batch Test 노하우](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-test-2.md)
 * [Batch Insert 성능 향상기 1편 - JPA Batch Insert](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/jpa-batch-insert.md)
 * [Batch Insert 성능 향상기 2편 - 성능 측정](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-batch-insert.md)
+
+## Todo
+- [ ] 대표 ItemReader 분석 해보기 (PagingItemReade, CursorItemReader)
+- [ ] Reactor 기반으로 Writer 성능 향상 시키기
