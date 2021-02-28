@@ -1,11 +1,11 @@
 package com.batch.task
 
 import com.batch.payment.domain.payment.Payment
+import com.batch.payment.domain.payment.QPayment
 import com.batch.task.support.listener.JobReportListener
 import com.batch.task.support.logger
+import com.batch.task.support.reader.QuerydslPagingItemReader
 import org.hibernate.SessionFactory
-import org.springframework.batch.core.JobExecution
-import org.springframework.batch.core.JobExecutionListener
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
@@ -20,13 +20,10 @@ import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilde
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.stereotype.Component
-import java.math.BigDecimal
 import javax.persistence.EntityManagerFactory
-import javax.sql.DataSource
 
-const val CHUNK_SIZE = 10_000
-const val DATA_SET_UP_SIZE = 100_000
+const val CHUNK_SIZE = 100
+const val DATA_SET_UP_SIZE = 5_000
 
 @Configuration
 class ReaderPerformanceJobConfiguration(
@@ -53,12 +50,14 @@ class ReaderPerformanceJobConfiguration(
         jpaCursorItemReader: JpaCursorItemReader<Payment>,
         jpaPagingItemReader: JpaPagingItemReader<Payment>,
         hibernateCursorItemReader: HibernateCursorItemReader<Payment>,
+        queryDslPagingItemReader: QuerydslPagingItemReader<Payment>
     ) =
         stepBuilderFactory["readerPerformanceStep"]
             .chunk<Payment, Payment>(CHUNK_SIZE)
 //            .reader(jpaCursorItemReader)
-            .reader(jpaPagingItemReader)
+//            .reader(jpaPagingItemReader)
 //            .reader(hibernateCursorItemReader)
+            .reader(queryDslPagingItemReader)
             .writer { log.info("item size ${it.size}") }
             .build()
 
@@ -91,43 +90,15 @@ class ReaderPerformanceJobConfiguration(
         .sessionFactory(sessionFactory)
         .queryString("SELECT p FROM Payment p")
         .build()
-}
 
-@Component
-class JobDataSetUpListener(
-    private val dataSource: DataSource,
-) : JobExecutionListener {
-    val log by logger()
-
-    override fun beforeJob(jobExecution: JobExecution) {
-        val payments = (1..DATA_SET_UP_SIZE)
-            .map { Payment(it.toBigDecimal(), it.toLong()) }
-
-        val sql = "insert into payment (amount, order_id) values (?, ?)"
-        val connection = dataSource.connection
-        val statement = connection.prepareStatement(sql)!!
-
-        try {
-            for (payment in payments) {
-                statement.apply {
-                    setBigDecimal(1, BigDecimal.ZERO)
-                    setLong(2, payment.orderId)
-                    addBatch()
-                }
-            }
-            statement.executeBatch()
-        } catch (e: Exception) {
-            throw e
-        } finally {
-            if (statement.isClosed.not()) {
-                statement.close()
-            }
-            if (connection.isClosed.not()) {
-                connection.close()
-            }
-        }
-        log.info("data set up done")
+    @Bean
+    @StepScope
+    fun queryDslPagingItemReader(
+        entityManagerFactory: EntityManagerFactory
+    ) = QuerydslPagingItemReader(
+        entityManagerFactory = entityManagerFactory,
+        pageSize = CHUNK_SIZE
+    ){
+        it.selectFrom(QPayment.payment)
     }
-
-    override fun afterJob(jobExecution: JobExecution): Unit = Unit
 }

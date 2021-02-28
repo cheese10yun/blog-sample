@@ -11,7 +11,7 @@ spring:
             hibernate.jdbc.batch_size: 100
             hibernate.order_inserts: true
             hibernate.order_updates: true
-#            hibernate.show_sql: true
+            hibernate.show_sql: true
             hibernate.ddl-auto: create
             hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
 

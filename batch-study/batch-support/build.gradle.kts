@@ -8,7 +8,8 @@ plugins {
 subprojects {
     dependencies {
         api("org.springframework.boot:spring-boot-starter-batch")
-//        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+        api("org.springframework.boot:spring-boot-starter-data-jpa")
+        api("com.querydsl:querydsl-jpa")
         api("org.springframework.boot:spring-boot-starter-validation")
 
 //        implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
