@@ -28,7 +28,8 @@ class JobReportListener : JobExecutionListener {
             시작일시: ${jobExecution.createTime.isoDateTime()}
             종료일시: ${jobExecution.endTime.isoDateTime()}()
             소요시간: ${duration(jobExecution.startTime, jobExecution.endTime).toMillis()}
-            아이디  : ${jobExecution.jobId}(인스턴스: ${jobExecution.jobInstance.id})
+            아이디: ${jobExecution.jobId}
+            인스턴스: ${jobExecution.jobInstance.id}
             매개변수: ${jobExecution.jobParameters.parameters()}
         """.trimIndent()
     }
@@ -37,19 +38,18 @@ class JobReportListener : JobExecutionListener {
         return stepExecutions.joinToString("\n") { stepExecution ->
 
             val toMillis = duration(stepExecution.startTime, stepExecution.endTime)
-            """                    ------
+            """
                     [${stepExecution.stepName} 리포트]
                     최종상태: ${stepExecution.exitStatus}
-                    소요시간: ${toMillis.toMillis()}
-                    소요시간: ${toMillis.toMinutes()}
-                    소요시간: ${toMillis.toSeconds()}
+                    소요시간: ${toMillis.toMillis()} ms
+                    소요시간: ${toMillis.toMinutes()} min
                     시작일시: ${stepExecution.startTime.isoDateTime()}
                     종료일시: ${stepExecution.endTime.isoDateTime()}
                     읽기갯수: ${stepExecution.readCount}
                     필터갯수: ${stepExecution.filterCount}
                     쓰기갯수: ${stepExecution.writeCount}
                     커밋갯수: ${stepExecution.commitCount}
-                """.trimIndent()
+            """.trimIndent()
         }
     }
 
