@@ -25,4 +25,3 @@ open class QuerydslNoOffsetPagingItemReader<T>(
         return super.createQuery()
     }
 }
-
