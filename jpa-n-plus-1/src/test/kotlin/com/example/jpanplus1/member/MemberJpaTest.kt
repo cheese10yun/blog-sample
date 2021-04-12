@@ -25,11 +25,11 @@ internal class MemberJpaTest(
 
         // 회원 한명에 대한 조회는 문제가 없다
         val firstMember = members[0]
-        println("order size : ${firstMember.orders.size}")
+//        println("order size : ${firstMember.orders.size}")
 
         // 조회한 모든 회원에 대해서 조회하는 경우 문제 발생
         for (member in members) {
-            println("order size: ${member.orders.size}")
+            println("order size of member ${member.id}: ${member.orders.size}")
         }
     }
 

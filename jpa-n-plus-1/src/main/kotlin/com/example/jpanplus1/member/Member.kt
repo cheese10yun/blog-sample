@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
 import javax.persistence.*
+import org.hibernate.annotations.BatchSize
 
 @Entity
 @Table(name = "member")
@@ -33,11 +34,13 @@ class Member private constructor() {
     lateinit var updatedAt: LocalDateTime
         private set
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    @BatchSize(size = 5)
+    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
     var orders: Set<Order> = emptySet()
         private set
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    @BatchSize(size = 5)
+    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
     var coupons: Set<Coupon> = emptySet()
         private set
 
