@@ -19,7 +19,7 @@ allprojects{
     }
 }
 
-extra["springCloudVersion"] = "Hoxton.SR7"
+extra["springCloudVersion"] = "2020.0.2"
 
 subprojects {
     apply(plugin = "java")

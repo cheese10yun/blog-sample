@@ -10,51 +10,26 @@ spring:
             discovery:
                 locator:
                     enabled: false
-            routes:
-                -   id: order-service
-                    uri: http://localhost:8181
-                    #                    uri: lb://order-service
-                    predicates:
-                        - Path=/order/**
-                    filters:
-                        - RewritePath=/order/(?<path>.*),/$\{path}
-                        #                        - AddRequestParameter=red, blue
-                        #                        - AddRequestHeader=X-Request-red, blue
-#                        -   name: Retry
-#                            args:
-#                                retries: 3
-#                                statuses: INTERNAL_SERVER_ERROR
-#                                methods: GET
-#                                backoff:
-#                                    firstBackoff: 1000ms
-#                                    maxBackoff: 6000ms
-#                                    factor: 2
-#                                    basedOnPreviousValue: false
-                    metadata:
-                        connect-timeout: 1000
-                        response-timeout: 1000
-                -   id: cart-service
-                    uri: http://localhost:8181
-#                    uri: lb://cart-service
-                    predicates:
-                        - Path=/cart/**
-                    filters:
-                        - RewritePath=/cart/(?<path>.*),/$\{path}
-                    metadata:
-                        connect-timeout: 10000
-                        response-timeout: 10000
 
             httpclient:
                 connect-timeout: 10000
                 response-timeout: 10s
-#eureka:
-#    instance:
-#        prefer-ip-address: true
-#    client:
-#        register-with-eureka: true
-#        fetch-registry: true
-#        service-url:
-#            default-zone: http://localhost:8761/eureka/
+
+            routes:
+                -   id: order-service
+                    uri: http://localhost:8181
+                    predicates:
+                        - Path=/order/**
+                    filters:
+                        - RewritePath=/order/(?<path>.*),/$\{path}
+
+                -   id: cart-service
+                    uri: http://localhost:8181
+                    predicates:
+                        - Path=/cart/**
+                    filters:
+                        - RewritePath=/cart/(?<path>.*),/$\{path}
+
 logging:
     level:
         root: info
