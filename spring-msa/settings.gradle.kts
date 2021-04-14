@@ -1,4 +1,4 @@
-rootProject.name = "msa-study"
+rootProject.name = "spring-msa"
 
 include("order-service")
 include("cart-service")
