@@ -19,16 +19,19 @@ spring:
                 -   id: order-service
                     uri: http://localhost:8181
                     predicates:
-                        - Path=/order/**
+                        - Path=/order-service/**
                     filters:
-                        - RewritePath=/order/(?<path>.*),/$\{path}
+                        - RewritePath=/order-service/(?<path>.*),/$\{path}
+                        - CustomFilter
+
 
                 -   id: cart-service
                     uri: http://localhost:8181
                     predicates:
-                        - Path=/cart/**
+                        - Path=/cart-service/**
                     filters:
-                        - RewritePath=/cart/(?<path>.*),/$\{path}
+                        - RewritePath=/cart-service/(?<path>.*),/$\{path}
+                        - CustomFilter
 
 logging:
     level:

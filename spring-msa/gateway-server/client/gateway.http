@@ -1,0 +1,8 @@
+# 호출
+
+
+GET http://localhost:5555/order-service/actuator
+
+###
+
+ads
