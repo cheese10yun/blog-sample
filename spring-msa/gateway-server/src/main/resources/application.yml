@@ -15,6 +15,13 @@ spring:
                 connect-timeout: 10000
                 response-timeout: 10s
 
+            default-filters:
+                -   name: GlobalFilter
+                    args:
+                        message: "spring gateway global filter"
+                        preLogger: true
+                        postLogger: true
+
             routes:
                 -   id: order-service
                     uri: http://localhost:8181
