@@ -1,11 +1,9 @@
-# Spring Cloud Gateway
-
 # 용어
 
 | 명칭               | 설명                                                                                                                                            |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | 라우트(Route)      | 라우트는 목적지 URI, 조건자 목록과 필터의 목록을 식별하기 위한 고유 ID로 구성된다. 라우트는 모든 조건자가 충족됐을 때만 매칭된다                |
-| 조건자(Predicates) | 각 요청을 처리하기 전에 실행되는 로직, 헤더와 입력돤값 등 다양한 HTTP 요청이 정의된 기준에 맞는지를 찾는다.                                     |
+| 조건자(Predicates) | 각 요청을 처리하기 전에 실행되는 로직, 헤더와 입력된 값 등 다양한 HTTP 요청이 정의된 기준에 맞는지를 찾는다.                                     |
 | 필터(Filters)      | HTTP 요청 또는 나가는 HTTP 응답을 수정할 수 있게한다. 다운스트림 요청을 보내기전이나 후에 수정할 수 있다. 라우트 필터는 특정 라우트에 한정된다. |
 
 # Getting Started
@@ -23,7 +21,7 @@ fun main(args: Array<String>) {
     runApplication<GatewayServerApplication>(*args)
 }
 ```
-필요한 의존성만 추가하면 빠르게 Srping Cloud Gateway를 만들 수 있습니다.
+필요한 의존성만 추가하면 빠르게 Spring Cloud Gateway를 만들 수 있습니다.
 
 
 ## Gateway Route 노출
@@ -243,7 +241,7 @@ routes:
             - Path=/order/**
             - Before=2020-08-20T19:25:19.126+09:00[Asia/Seoul]
 ```
-`Befroe`는 특정 날짜 이전 호출이 가능합니다. 현재 날짜가 `Befroe`에서 지정한 날짜 보다 이전 이어야 합니다. 특정 API가 deprecate가 되는 경우 유용합니다.
+`Before`는 특정 날짜 이전 호출이 가능합니다. 현재 날짜가 `Before`에서 지정한 날짜 보다 이전 이어야 합니다. 특정 API가 deprecate가 되는 경우 유용합니다.
 
 ## Between
 ```yml
@@ -277,7 +275,7 @@ routes:
         filters:
             - RewritePath=/order/(?<path>.*),/$\{path}
 ```
-`grpup`, `weight`를 기반으로 그룹별로 가중치를 계산하게 됩니다. 위 설정은 70% `order-service-high`, 30% `order-service-low`으로 라우팅을 분배합니다.
+`group`, `weight`를 기반으로 그룹별로 가중치를 계산하게 됩니다. 위 설정은 70% `order-service-high`, 30% `order-service-low`으로 라우팅을 분배합니다.
 
 # Filters
 
@@ -295,7 +293,7 @@ RewritePath는 HTTP Request를 수정하여 특정 Server에 전달하게 됩니
          filters:
              - RewritePath=/order/(?<path>.*),/$\{path}
 ```
- 
+
 `RewritePath`를 통해서 `/order/orders` -> `/order/orders`으로 재작성합니다. 즉, `/order/orders?page=0&size=5` 요청이 오면 `/order/`를제거하고 `orders?page=0&size=5`를 기반으로 `order-service`를 호출하게 됩니다.
 
 
@@ -659,6 +657,58 @@ CUSTOM-RESPONSE-HEADER: It worked
 
 Response code: 200 (OK); Time: 109ms; Content length: 15 bytes
 ```
+
+## Filter 설명
+
+![](https://cloud.spring.io/spring-cloud-gateway/reference/html/images/spring_cloud_gateway_diagram.png)
+
+클라이언트는 Spring Cloud Gateway를 통해 요청을 하고 게이트웨이는 매핑에서 요청이 경로와 일치한다고 판단하면 게이트웨이 웹 처리기로 요청을 전송하게 됩니다.
+
+> [Spring Cloud Gateway Document](https://cloud.spring.io/spring-cloud-gateway/reference/html/)
+
+
+![](https://github.com/cheese10yun/blog-sample/raw/master/spring-msa/docs/images/gateway-flow.png)
+
+```kotlin
+@Component
+class CustomFilter : AbstractGatewayFilterFactory<CustomFilter.Config>(Config::class.java) {
+    val log by logger()
+
+    override fun apply(config: Config): GatewayFilter {
+        return GatewayFilter { exchange, chain ->
+            val request = exchange.request
+            val response = exchange.response
+            log.info("CustomFilter request id: ${request.id}")
+            chain.filter(exchange).then(Mono.fromRunnable { log.info("CustomFilter response status code: ${response.statusCode}") })
+        }
+    }
+
+    class Config
+}
+
+@Component
+class GlobalFilter : AbstractGatewayFilterFactory<GlobalFilter.Config>(Config::class.java) {
+    val log by logger()
+
+    override fun apply(config: Config): GatewayFilter {
+        return GatewayFilter { exchange, chain ->
+            val request = exchange.request
+            val response = exchange.response
+
+            log.info("Global request id: ${request.id}")
+            chain.filter(exchange).then(Mono.fromRunnable {
+                log.info("Global response status code: ${response.statusCode}")
+            })
+        }
+    }
+
+    class Config
+}
+```
+필터는 모두 AbstractGatewayFilterFactory를 상속받아 구현을 진행합니다. 실제 Gateay 로그는 아래와 같습니다.
+
+![](https://github.com/cheese10yun/blog-sample/raw/master/spring-msa/docs/images/gateway-log.png)
+
 
 # 출처
 * [Spring Cloud Gateway  Reference](https://cloud.spring.io/spring-cloud-gateway/reference/html/)
