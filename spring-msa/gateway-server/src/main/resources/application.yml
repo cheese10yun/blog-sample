@@ -18,7 +18,6 @@ spring:
             default-filters:
                 -   name: GlobalFilter
                     args:
-                        message: "spring gateway global filter"
                         preLogger: true
                         postLogger: true
 

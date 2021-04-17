@@ -17,6 +17,7 @@ class CustomFilter : AbstractGatewayFilterFactory<CustomFilter.Config>(Config::c
             chain.filter(exchange).then(Mono.fromRunnable { log.info("CustomFilter response status code: ${response.statusCode}") })
         }
     }
+
     class Config
 }
 
@@ -29,22 +30,13 @@ class GlobalFilter : AbstractGatewayFilterFactory<GlobalFilter.Config>(Config::c
             val request = exchange.request
             val response = exchange.response
 
-            log.info(config.message)
-            if (config.preLogger) {
-                log.info("Global request id: ${request.id}")
-            }
+            log.info("Global request id: ${request.id}")
             chain.filter(exchange).then(Mono.fromRunnable {
-                if (config.postLogger) {
-                    log.info("Global response status code: ${response.statusCode}")
-                }
+                log.info("Global response status code: ${response.statusCode}")
             })
         }
     }
 
-    data class Config(
-            val message: String,
-            val preLogger: Boolean,
-            val postLogger: Boolean
-    )
+    class Config
 }
 
