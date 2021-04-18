@@ -10,9 +10,9 @@ interface MemberRepository : JpaRepository<Member, Long> {
 
     @Modifying(clearAutomatically = true)
     @Query(
-            "update Member m set m.name = 'none_name' " +
-                    "where m.id in :ids "
+        "update Member m set m.name = 'none_name' " +
+                "where m.id in :ids "
     )
-    fun updateName(@Param("ids") ids: List<Long>) : Int
+    fun updateName(@Param("ids") ids: List<Long>): Int
 
 }

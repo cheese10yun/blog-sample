@@ -26,6 +26,5 @@ class MemberTest {
     fun `asdasd`() {
 
 
-
     }
 }

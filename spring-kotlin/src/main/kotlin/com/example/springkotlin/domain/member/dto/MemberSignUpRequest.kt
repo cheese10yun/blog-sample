@@ -13,7 +13,7 @@ class MemberSignUpRequest {
     @NotEmpty
     lateinit var name: String
 
-    fun toEntity() : Member{
+    fun toEntity(): Member {
         return Member(email, name)
     }
 }

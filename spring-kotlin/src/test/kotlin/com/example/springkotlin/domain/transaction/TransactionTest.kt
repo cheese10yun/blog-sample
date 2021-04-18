@@ -7,9 +7,9 @@ class TransactionTest {
     @Test
     fun name() {
         val transaction = Transaction.newInstance(
-                code = "code",
-                paymentMethodType = PaymentMethodType.CARD,
-                thirdPartyTransactionId = "123"
+            code = "code",
+            paymentMethodType = PaymentMethodType.CARD,
+            thirdPartyTransactionId = "123"
         )
         println(transaction.code)
         println(transaction.paymentMethodType)

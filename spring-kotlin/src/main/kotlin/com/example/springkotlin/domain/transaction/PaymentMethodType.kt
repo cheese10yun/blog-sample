@@ -11,7 +11,7 @@ enum class PaymentMethodType {
     ;
 
     fun asd(): PaymentMethodType {
-        return  when (Random().nextInt(4)) {
+        return when (Random().nextInt(4)) {
             1 -> CARD
             2 -> CASH
             3 -> KAKAOPAY

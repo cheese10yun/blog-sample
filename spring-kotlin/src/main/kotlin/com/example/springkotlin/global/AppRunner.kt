@@ -14,19 +14,20 @@ import java.util.*
 class AppRunner(val transactionRepository: TransactionRepository) : ApplicationRunner {
 
 
-
     override fun run(args: ApplicationArguments?) {
         val stopWatch = StopWatch("test")
         val transactions = ArrayList<Transaction>()
 
         stopWatch.start("Transaction")
-        for (i in 1..10){
+        for (i in 1..10) {
 
-            transactions.add(Transaction.newInstance(
+            transactions.add(
+                Transaction.newInstance(
                     code = UUID.randomUUID().toString(),
                     paymentMethodType = random(),
                     thirdPartyTransactionId = UUID.randomUUID().toString()
-            ))
+                )
+            )
         }
 
         stopWatch.stop()
@@ -40,7 +41,7 @@ class AppRunner(val transactionRepository: TransactionRepository) : ApplicationR
     }
 
     fun random(): PaymentMethodType {
-        return  when (Random().nextInt(4)) {
+        return when (Random().nextInt(4)) {
             1 -> PaymentMethodType.CARD
             2 -> PaymentMethodType.CASH
             3 -> PaymentMethodType.KAKAOPAY

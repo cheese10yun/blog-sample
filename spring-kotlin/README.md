@@ -1,6 +1,7 @@
 # 무식 하게 배우는 JPA
 
 ## @Transactional 어노테이션 위치에 따른 차이
+
 ```kotlin
 @RestController
 @RequestMapping("/members")
@@ -67,11 +68,13 @@ Hibernate:
 ``` 
 
 ### 차이점
-결과는 동일 하다. **update 쿼리 유무가 차이가 있다.** 
+
+결과는 동일 하다. **update 쿼리 유무가 차이가 있다.**
 
 :exclamation: **뇌피셜 이므로 정확하지는 않음**
 
-우선 `@Transaction` 어노테이션이 없는 경우는 **트랜잭션 시작 시점은 SimpleJpaRepository 에서 시작된다.** JpaRepository를 타고 올라가면 `SimpleJpaRepository` 클래스 까지 올라가게 되며 그리고 **JpaRepository 인터페이스로 find, delete, create 등이 가능했던 이유는 SimpleJpaRepository에서 @Transaction을 선언했기 때문이다.**
+우선 `@Transaction` 어노테이션이 없는 경우는 **트랜잭션 시작 시점은 SimpleJpaRepository 에서 시작된다.** JpaRepository를 타고 올라가면 `SimpleJpaRepository` 클래스 까지 올라가게 되며
+그리고 **JpaRepository 인터페이스로 find, delete, create 등이 가능했던 이유는 SimpleJpaRepository에서 @Transaction을 선언했기 때문이다.**
 
 ```java
 @Repository
@@ -109,17 +112,18 @@ public class SimpleJpaRepository<T, ID> implements JpaRepositoryImplementation<T
 }
 ```
 
-**그렇다면 트랜잭션이 `SimpleJpaRepository` 클래스에서 시작되면 `memberRepository.findAll()` 메서드 종료가 되면 트랜잭션이 종료된다.(Flush, Commit을 완료한다.)** 그 다음에 `member.updateName(..)` 메서드에는 트랜잭션이 없다. 하지만 **영속성 컨텍스트는 살아 있으니 해당 커밋은 가능 하다.** 이런 상태에서는 `show-sql: true`에 log가 찍히지 않는 것을 보인다.
+**그렇다면 트랜잭션이 `SimpleJpaRepository` 클래스에서 시작되면 `memberRepository.findAll()` 메서드 종료가 되면 트랜잭션이 종료된다.(Flush, Commit을 완료한다.)** 그
+다음에 `member.updateName(..)` 메서드에는 트랜잭션이 없다. 하지만 **영속성 컨텍스트는 살아 있으니 해당 커밋은 가능 하다.** 이런 상태에서는 `show-sql: true`에 log가 찍히지 않는 것을 보인다.
 
-반면 컨트롤러 코드에 `@Transactional` 어노테이션이 있는 경우는 트랜젝션 이름이 `MemberApi.getMembers`으로 동일한 것을 확인 할 수 있다. 그렇다는 것은 **memberRepository.findAll(), member.updateName(..)가 동일한 트랜잭션에서 진행된다는 것이고 트랜잭션이 있는 경우 `show-sql: true`의 log가 찍히는 것으로 판단된다.**
+반면 컨트롤러 코드에 `@Transactional` 어노테이션이 있는 경우는 트랜젝션 이름이 `MemberApi.getMembers`으로 동일한 것을 확인 할 수 있다. 그렇다는 것은 **memberRepository.findAll(),
+member.updateName(..)가 동일한 트랜잭션에서 진행된다는 것이고 트랜잭션이 있는 경우 `show-sql: true`의 log가 찍히는 것으로 판단된다.**
 
 그렇다면 트랜잭션 범위와, 영속성 컨텍스트의 범위는 다르다는 것으로 보인다. 그렇다면 이 둘이 어떻게 다른지 알아보자.
 
-
 ## 벌크 연산
 
-
 ### 벌크 연산 안됨
+
 ```kotlin
 @RestController
 @RequestMapping("/members")
@@ -138,6 +142,7 @@ private var memberRepository: MemberRepository) {
     }
 }
 ```
+
 일반적으로 JPA 기반으로 UPDATE 작업 수행 하는 코드이다. 영속성컨텍스트에 데이터를 가져와서`member`를 수정하는 방법이다.
 
 ```SQL
@@ -193,6 +198,7 @@ Hibernate:
     where
         id=?
 ```
+
 UPDATE 로그를 보면 영속성 컨텍스트에서 하나씩 꺼내와서 UPDATE 쿼리를 진행하고 있다.
 
 ### 벌크 연산 됨
@@ -212,8 +218,8 @@ private var memberRepository: MemberRepository) {
     }
 }
 ```
-* **조회를 하지 않아도(영속성 컨텍스트를 담아 오지 않아도) 벌크 수정이 가능하다.**
 
+* **조회를 하지 않아도(영속성 컨텍스트를 담아 오지 않아도) 벌크 수정이 가능하다.**
 
 ```kotlin
 interface MemberRepository : JpaRepository<Member, Long> {
@@ -227,8 +233,9 @@ interface MemberRepository : JpaRepository<Member, Long> {
 
 }
 ```
-**스프링 데이터 JPA에서 벌크, 수정, 삭제 쿼리는 `@Modifying` 어노테이션을 사용하면된다.** 벌크성 쿼리를 실행하고 나서 영속성 컨텍스트를 초기화하고 싶으면 `@Modifying(clearAutomatically = true)` 옵션을 true로 지정하면 된다. 기본은 false이다. [영속성 컨텍스트를 초기화해야하는 이유](https://github.com/cheese10yun/TIL/blob/master/Spring/jpa/jpa.md#벌크-연산-주의점) 
 
+**스프링 데이터 JPA에서 벌크, 수정, 삭제 쿼리는 `@Modifying` 어노테이션을 사용하면된다.** 벌크성 쿼리를 실행하고 나서 영속성 컨텍스트를 초기화하고 싶으면 `@Modifying(clearAutomatically = true)` 옵션을
+true로 지정하면 된다. 기본은 false이다. [영속성 컨텍스트를 초기화해야하는 이유](https://github.com/cheese10yun/TIL/blob/master/Spring/jpa/jpa.md#벌크-연산-주의점)
 
 ```sql
 Hibernate: 
@@ -249,4 +256,5 @@ Hibernate:
     from
         member member0_
 ```
+
 출력된 log를 보면 알수 있듯이 조회없이(영속성 컨텍스트없이) 수정이 가능하다.히 `where id in (...)`을 이용해서 벌크성으로 객체를 수정하고 있다.

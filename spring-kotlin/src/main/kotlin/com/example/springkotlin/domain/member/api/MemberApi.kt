@@ -16,7 +16,8 @@ import java.util.*
 @RestController
 @RequestMapping("/members")
 class MemberApi(
-        private var memberRepository: MemberRepository) {
+    private var memberRepository: MemberRepository
+) {
 
     @PostMapping
     fun createMember(@RequestBody dto: MemberSignUpRequest): Member {
@@ -37,7 +38,7 @@ class MemberApi(
 //    }
 
     @GetMapping
-    fun get(page: Pageable): Page<Member>{
+    fun get(page: Pageable): Page<Member> {
         return memberRepository.findAll(page)
     }
 

@@ -7,8 +7,8 @@ import javax.persistence.*
 
 @Entity
 @Table(
-        name = "transaction",
-        uniqueConstraints = [UniqueConstraint(columnNames = ["payment_method_type", "partner_transaction_id"])]
+    name = "transaction",
+    uniqueConstraints = [UniqueConstraint(columnNames = ["payment_method_type", "partner_transaction_id"])]
 )
 class Transaction protected constructor() {
 
@@ -40,14 +40,22 @@ class Transaction protected constructor() {
 //    lateinit var updatedAt: LocalDateTime
 //        protected set
 
-    private constructor(code: String, paymentMethodType: PaymentMethodType, thirdPartyTransactionId: String) : this() {
+    private constructor(
+        code: String,
+        paymentMethodType: PaymentMethodType,
+        thirdPartyTransactionId: String
+    ) : this() {
         this.code = code
         this.paymentMethodType = paymentMethodType
         this.partnerTransactionId = thirdPartyTransactionId
     }
 
     companion object {
-        fun newInstance(code: String, paymentMethodType: PaymentMethodType, thirdPartyTransactionId: String): Transaction {
+        fun newInstance(
+            code: String,
+            paymentMethodType: PaymentMethodType,
+            thirdPartyTransactionId: String
+        ): Transaction {
             return Transaction(code, paymentMethodType, thirdPartyTransactionId)
         }
     }
