@@ -8,6 +8,8 @@ plugins {
     kotlin("plugin.spring") version "1.4.31"
     kotlin("plugin.jpa") version "1.4.31"
     id("org.springframework.experimental.aot") version "0.9.1"
+    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
+    id("org.jlleitschuh.gradle.ktlint-idea") version "10.0.0"
 }
 
 group = "com.example"
