@@ -68,7 +68,7 @@ API를 서버를 만들고 게이트웨이와 연결해 보겠습니다.
                         - Path=/order/**
                     filters:
                         - RewritePath=/order/(?<path>.*),/$\{path}
-                
+
                 -   id: cart-service
                     uri: http://localhost:8181
                     predicates:
@@ -79,7 +79,7 @@ API를 서버를 만들고 게이트웨이와 연결해 보겠습니다.
 * id: 해당 라우트의 고유 식별자를 나타냅니다.
 * uri: 해당 라우터의 주소를 나타냅니다.
 * predicates: 해당 라우터의 조건을 작성, `/order/**`으로 시작하는 요청의 경우 해당 라우터로 요청을 보냄
-* filters: 해당 라우터의 필터로, RewritePath는 강제로 Patch를 다시 작성합니다.
+* filters: 해당 라우터의 필터로, RewritePath는 강제로 Path를 다시 작성합니다.
 
 
 
@@ -92,7 +92,7 @@ API를 서버를 만들고 게이트웨이와 연결해 보겠습니다.
 @RestController
 @RequestMapping("/orders")
 class OrderApi(
-    private val orderRepository: OrderRepository
+        private val orderRepository: OrderRepository
 ) {
 
     @GetMapping
@@ -102,8 +102,8 @@ class OrderApi(
 @Entity
 @Table(name = "orders")
 class Order(
-    @Column(name = "product_id", nullable = false)
-    val productId: Long
+        @Column(name = "product_id", nullable = false)
+        val productId: Long
 ) : EntityAuditing() {
     @Column(name = "order_number", nullable = false)
     val orderNumber: String = UUID.randomUUID().toString()
@@ -115,7 +115,7 @@ class Order(
 @RestController
 @RequestMapping("/carts")
 class CartApi(
-    private val cartRepository: CartRepository
+        private val cartRepository: CartRepository
 ) {
     @GetMapping
     fun getCarts(pageable: Pageable) = cartRepository.findAll(pageable)
@@ -124,8 +124,8 @@ class CartApi(
 @Entity
 @Table(name = "cart")
 class Cart(
-    @Column(name = "product_id", nullable = false)
-    var productId: Long
+        @Column(name = "product_id", nullable = false)
+        var productId: Long
 ) : EntityAuditing()
 ```
 
@@ -289,7 +289,7 @@ RewritePath는 HTTP Request를 수정하여 특정 Server에 전달하게 됩니
 ```yml
  routes:
      -   id: order-service
-         uri: http://localhost:8181    
+         uri: http://localhost:8181
          filters:
              - RewritePath=/order/(?<path>.*),/$\{path}
 ```
@@ -334,13 +334,13 @@ spring:
                                     factor: 2
                                     basedOnPreviousValue: false
 ```
-제시도 횟수는 `retries: 3`, 재시도 HTTP Status는 `statuses: INTERNAL_SERVER_ERROR (500)`, 재시도 HTTP method는 `GET` `backoff` 설정은 `10ms(firstBackoff) * (2(factor)* 3(retries))`으로 `retries` 만큼 반복됩니다.
+제시도 횟수는 `retries: 3`, 재시도 HTTP Status는 `statuses: INTERNAL_SERVER_ERROR (500)`, 재시도 HTTP method는 `GET` `backoff` 설정은 `1000ms(firstBackoff) * (2(factor) ^ n(retries))`으로 `retries` 만큼 반복됩니다.
 
 ```kotlin
 @RestController
 @RequestMapping("/orders")
 class OrderApi(
-    private val orderRepository: OrderRepository
+        private val orderRepository: OrderRepository
 ) {
 
     @GetMapping
@@ -397,7 +397,7 @@ getOrders 호출
 @RestController
 @RequestMapping("/orders")
 class OrderApi(
-    private val orderRepository: OrderRepository
+        private val orderRepository: OrderRepository
 ) {
 
     var errorCount = 0
@@ -465,7 +465,7 @@ spring:
 @RestController
 @RequestMapping("/orders")
 class OrderApi(
-    private val orderRepository: OrderRepository
+        private val orderRepository: OrderRepository
 ) {
 
     @GetMapping
@@ -556,7 +556,7 @@ cloud:
                     - Path=/order/**
                 filters:
                     - RewritePath=/order/(?<path>.*),/$\{path}
-            
+
             -   id: cart-service
                 uri: lb://cart-service
                 predicates:
@@ -594,25 +594,25 @@ Spring Cloud Gateway는 유레카 연동도 손쉽게 가능합니다. 본 포�
 
 ```yml
 gateway:
-        discovery:
-            locator:
-                enabled: true
-        routes:
-            -   id: order-service
-#                    uri: http://localhost:8181 # 기존 방시
-                uri: lb://order-service # 유레카를 통한 방식
-                predicates:
-                    - Path=/order/**
-                filters:
-                    - RewritePath=/order/(?<path>.*),/$\{path}
+    discovery:
+        locator:
+            enabled: true
+    routes:
+        -   id: order-service
+            #                    uri: http://localhost:8181 # 기존 방시
+            uri: lb://order-service # 유레카를 통한 방식
+            predicates:
+                - Path=/order/**
+            filters:
+                - RewritePath=/order/(?<path>.*),/$\{path}
 
-            -   id: cart-service
-#                    uri: http://localhost:8181 # 기존 방시
-                uri: lb://cart-service # 유레카를 통한 방식
-                predicates:
-                    - Path=/cart/**
-                filters:
-                    - RewritePath=/cart/(?<path>.*),/$\{path}
+        -   id: cart-service
+            #                    uri: http://localhost:8181 # 기존 방시
+            uri: lb://cart-service # 유레카를 통한 방식
+            predicates:
+                - Path=/cart/**
+            filters:
+                - RewritePath=/cart/(?<path>.*),/$\{path}
 ```
 설정은 간단합니다. `uri: lb://{service-name}`형식으로 유레카에 등록된 서비스 네임을 작성하게 되면 완료됩니다. 유레카에 등록했기 때문에 Feign, Ribbon 이용한 클라이언트 사이드 로드 밸런싱이 가능합니다.
 
