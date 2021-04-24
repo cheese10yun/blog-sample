@@ -54,3 +54,22 @@ IntelliJ를 이용하면 편리하게 Gradle 자동완성을 통해서 실행할
 ![](docs/gradle-ktlint-3.png)
 
 `ktlintFormat`는 스타일에 맞지 않은 코드 전체를 스타일에 맞게 변경해 줍니다. 개인적으로는 모든 commit을 완료하고 마지막에 `ktlintFormat`를 통해서 diff를 반드시 확인하는 방식으로 사용하는 것을 권장합니다. 단순 스타일 변경이라고는 하지만 혹시 모르는 부분이 있을 수 있으며 자동으로 변경되는 부분은 꼭 눈으로 확인하는 게 더 좋다고 생각합니다.
+
+
+## Git hook으로 설정
+```
+$ ./gradlew addKtlintCheckGitPreCommitHook
+```
+![](/docs/ktlint-git-hook.png)
+
+Git hook 설정하고 코드 컨벤션이 맞지 않으면 예외가 발생합니다.
+
+## IntelliJ에 적용 
+
+```
+$ ./gradlew ktlintApplyToIdea
+```
+
+## 참고
+* [jlleitschuh-ktlint-gradle](https://github.com/JLLeitschuh/ktlint-gradle)
+* [ktlint로 Kotlin 공식 코딩 컨벤션 맞추기](https://blog.benelog.net/ktlint.html)
