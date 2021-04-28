@@ -10,7 +10,6 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "member")
-//@Access(AccessType.FIELD) // 용도는 ?
 class Member protected constructor() {
 
     @Id
