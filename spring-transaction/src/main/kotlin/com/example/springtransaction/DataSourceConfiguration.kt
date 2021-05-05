@@ -3,17 +3,14 @@ package com.example.springtransaction
 import com.zaxxer.hikari.HikariDataSource
 import javax.sql.DataSource
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.Primary
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource
-import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.transaction.support.TransactionSynchronizationManager
 
 
@@ -22,9 +19,6 @@ const val MASTER_DATASOURCE = "masterDataSource"
 const val SLAVE_DATASOURCE = "slaveDataSource"
 
 @Configuration
-@EnableAutoConfiguration(exclude = [DataSourceAutoConfiguration::class])
-@EnableTransactionManagement
-@EnableJpaRepositories(basePackages = ["com.example.springtransaction"])
 class DataSourceConfiguration {
 
     @Bean(name = [MASTER_DATASOURCE])
@@ -43,6 +37,7 @@ class DataSourceConfiguration {
             .apply { this.isReadOnly = true }
 
     @Bean
+    @DependsOn(MASTER_DATASOURCE, SLAVE_DATASOURCE)
     fun routingDataSource(
         @Qualifier(MASTER_DATASOURCE) masterDataSource: DataSource,
         @Qualifier(SLAVE_DATASOURCE) slaveDataSource: DataSource
@@ -56,9 +51,9 @@ class DataSourceConfiguration {
         return routingDataSource
     }
 
-
     @Primary
-    @Bean(name = ["dataSource"])
+    @Bean
+    @DependsOn("routingDataSource")
     fun dataSource(routingDataSource: DataSource) =
         LazyConnectionDataSourceProxy(routingDataSource)
 
