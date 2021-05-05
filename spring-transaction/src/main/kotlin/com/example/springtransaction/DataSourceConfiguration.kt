@@ -13,7 +13,6 @@ import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource
 import org.springframework.transaction.support.TransactionSynchronizationManager
 
-
 const val PROPERTIES = "spring.datasource.hikari"
 const val MASTER_DATASOURCE = "masterDataSource"
 const val SLAVE_DATASOURCE = "slaveDataSource"
@@ -42,7 +41,7 @@ class DataSourceConfiguration {
         @Qualifier(MASTER_DATASOURCE) masterDataSource: DataSource,
         @Qualifier(SLAVE_DATASOURCE) slaveDataSource: DataSource
     ): DataSource {
-        val routingDataSource = ReplicationRoutingDataSource()
+        val routingDataSource = RoutingDataSource()
         val dataSources = hashMapOf<Any, Any>()
         dataSources["master"] = masterDataSource
         dataSources["slave"] = slaveDataSource
@@ -56,10 +55,9 @@ class DataSourceConfiguration {
     @DependsOn("routingDataSource")
     fun dataSource(routingDataSource: DataSource) =
         LazyConnectionDataSourceProxy(routingDataSource)
-
 }
 
-class ReplicationRoutingDataSource : AbstractRoutingDataSource() {
+class RoutingDataSource : AbstractRoutingDataSource() {
     override fun determineCurrentLookupKey(): Any =
         when {
             TransactionSynchronizationManager.isCurrentTransactionReadOnly() -> "slave"

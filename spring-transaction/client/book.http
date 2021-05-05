@@ -1,1 +1,10 @@
-GET http://localhost:8080/api/book
+GET http://localhost:8080/api/book/slave
+
+###
+GET http://localhost:8080/api/book/master
+
+###
+GET http://localhost:8080/api/book/update/slave
+
+###
+GET http://localhost:8080/api/book/update/master
