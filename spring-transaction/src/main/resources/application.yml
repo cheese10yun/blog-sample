@@ -1,13 +1,12 @@
 spring:
     main:
         allow-bean-definition-overriding: true
-        web-application-type: NONE
 
     jpa:
         database: mysql
         properties:
             hibernate.hbm2ddl.auto: create
-            hibernate.generate_statistics: true
+            #            hibernate.generate_statistics: true
             hibernate.jdbc.batch_size: 100
             hibernate.order_inserts: true
             hibernate.order_updates: true
@@ -16,16 +15,30 @@ spring:
             hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
 
     datasource:
-        url: jdbc:mysql://localhost:3306/study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
-        username: root
-        password: root
-        driver-class-name: com.mysql.cj.jdbc.Driver
         initialization-mode: never
-        hikari:
-            maximum-pool-size: 50
-            minimum-idle: 25
-            connection-timeout: 90000
-            max-lifetime: 90000
+        master:
+            hikari:
+                maximum-pool-size: 50
+                minimum-idle: 25
+                connection-timeout: 90000
+                max-lifetime: 90000
+                jdbc-url: jdbc:mysql://localhost:3306/study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
+                username: root
+                password: root
+                driver-class-name: com.mysql.cj.jdbc.Driver
+                auto-commit: false
+
+        slave:
+            hikari:
+                maximum-pool-size: 50
+                minimum-idle: 25
+                connection-timeout: 90000
+                max-lifetime: 90000
+                jdbc-url: jdbc:mysql://localhost:3307/study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
+                username: root
+                password: root
+                driver-class-name: com.mysql.cj.jdbc.Driver
+                auto-commit: false
         dbcp2:
             test-on-borrow: true
             validation-query: select 1

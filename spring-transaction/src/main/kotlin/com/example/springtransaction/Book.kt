@@ -2,11 +2,12 @@ package com.example.springtransaction
 
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
 import javax.persistence.Table
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @Entity
 @Table(name = "book")
@@ -18,6 +19,17 @@ class Book(
 //    @JoinColumn(name = "order_id", nullable = false)
 //    var order: Order
 ) : AuditingEntity()
+
+@RestController
+@RequestMapping("/api/book")
+class BookApi(
+    private val bookRepository: BookRepository
+) {
+
+    @GetMapping
+    @Transactional(readOnly = true)
+    fun get() = bookRepository.findAll()
+}
 
 @Entity
 @Table(name = "orders")
