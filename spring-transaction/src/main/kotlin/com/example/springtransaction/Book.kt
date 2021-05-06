@@ -28,7 +28,7 @@ class BookApi(
     private val bookService: BookService
 ) {
 
-    @GetMapping()
+    @GetMapping("/slave")
     @Transactional(readOnly = true)
     fun getSlave() = bookRepository.findAll()
 
@@ -39,35 +39,53 @@ class BookApi(
 
     @GetMapping("/update/slave")
     fun startSlave() {
-        bookService.startSlave()
+        bookService.updateSlave()
     }
 
     @GetMapping("/update/master")
     fun startMaster() {
-        bookService.startMaster()
+        bookService.updateMaster()
     }
+
 }
 
 @Service
 class BookService(
-    private val bookRepository: BookRepository
+    private val bookRepository: BookRepository,
+    private val bookUpdateService: BookUpdateService
 ) {
 
     @Transactional(readOnly = true)
-    fun startSlave() {
-        updateTitle("new title(slave)")
+    fun updateSlave() {
+        bookUpdateService.updateTitle("new title(slave)")
     }
 
     @Transactional(readOnly = false)
-    fun startMaster() {
-        updateTitle("new title(master)")
+    fun updateMaster() {
+        bookUpdateService.updateTitle("new title(master)")
     }
 
+//    @Transactional(readOnly = false)
+//    fun updateTitle(title: String) {
+//        val books = bookRepository.findAll()
+//        for (book in books) {
+//            book.title = title
+//        }
+//        bookRepository.saveAll(books)
+//    }
+}
+
+@Service
+class BookUpdateService(
+    private val bookRepository: BookRepository
+){
+    @Transactional(readOnly = false)
     fun updateTitle(title: String) {
         val books = bookRepository.findAll()
         for (book in books) {
             book.title = title
         }
+        bookRepository.saveAll(books)
     }
 }
 

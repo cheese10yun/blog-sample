@@ -21,7 +21,7 @@ class AppSetup(
 
     override fun run(args: ApplicationArguments) {
         bookRepository.saveAll(
-            (1..20).map { Book("asd") }
+            (1..5).map { Book(title = "INIT") }
                 .toList()
         )
     }
