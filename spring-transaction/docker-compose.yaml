@@ -1,0 +1,36 @@
+version: "3"
+services:
+    db_master:
+        image: mysql57:0.0
+        container_name: master
+        hostname: master
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_DATABASE: 'spring-transaction'
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        volumes:
+            - ./volumes/db/master/data:/var/lib/mysql
+            - ./volumes/db/master/log:/var/log/mysql
+            - ./volumes/db/master/conf:/etc/percona-server.conf.d
+        networks:
+            - mybridge
+    db_slave:
+        image: mysql57:0.0
+        container_name: slave
+        hostname: slave
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        volumes:
+            - ./volumes/db/slave/data:/var/lib/mysql
+            - ./volumes/db/slave/log:/var/log/mysql
+            - ./volumes/db/slave/conf:/etc/percona-server.conf.d
+        networks:
+            - mybridge
+networks:
+    mybridge:
+        external: true
