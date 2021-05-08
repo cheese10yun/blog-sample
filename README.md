@@ -77,6 +77,7 @@
 * [Batch Insert 성능 향상기 2편 - 성능 측정](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-batch-insert.md)
 * [Ktlint 코드 스타일 검사](https://github.com/cheese10yun/blog-sample/blob/master/ktlint/README.md)
 * [Spring with Kotlin](https://github.com/cheese10yun/spring-kotlin-api/blob/master/docs/spring-with-kotlin.md)
+* [레플리케이션 트랜잭션 처리 방식](https://github.com/cheese10yun/blog-sample/blob/master/spring-transaction/READEMD.md)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
