@@ -249,7 +249,7 @@ Response code: 200; Time: 31ms; Content length: 461 bytes
 ```
 결과는 변경되지 않았습니다.
 
-### master 조회 이후 업데이트
+#### master 조회 이후 업데이트
 
 ![](docs/master-update-result.png)
 
@@ -303,7 +303,7 @@ Response code: 200; Time: 51ms; Content length: 526 bytes
 정상적으로 title이 변경된 것을 확인할 수 있습니다.
 
 
-### 다른 트랜잭션에서 Update
+#### 다른 트랜잭션에서 Update
 
 ```kotlin
 @Service
