@@ -2,15 +2,9 @@
 
 대부분의 서비스에서는 데이터베이스를 Master, Slave 구조로 Master에서는 Create, Update, Delete 업무를 진행하고 Slave에서 Read 업무를 진행하는 구조로 설계합니다. Spring의 Master, Slave 환경에서의 트랜잭션에 대해서 포스팅해보겠습니다.
 
-* [ ] mysql master slave 구성 이론
-* [ ] mysql master slave 실습 코드
-* [ ] spring transaction의 방식
-* [ ] spring transaction 신규 트랜잭션이면 ?
+## 레플리케이션
 
-
-## Mysql Master, Slave 환경
-
-### Mysql Master, Slave
+### MySQL 레플리케이션
 
 ![](https://github.com/cheese10yun/TIL/raw/master/assets/mysql-replication3.png)
 
@@ -18,8 +12,8 @@ MySQL은 위와 같은 구조로 마스터 - 슬레이브 구조를 지원합니
 
 * 마스터의 변경을 기록하기 위한 바이너리 로그
 * 슬레이브에 데이터를 전송하기 위한 마스터 스레드
-* 슬레이브에서 데이터를 받아 릴레이 러그에 기록하기 위한 I/O 스레드
-* 릴레이 로그에서 데이터를 읽어 재생하기 위한 SQL 스레드
+* 슬레이브에서 데이터를 받아 릴레이 로그에 기록하기 위한 I/O 스레드
+* 릴레이 로그에서 데이터를 읽어 재생하기 위한 슬레이브 SQL 스레드
 
 MySQL 5.7부터 ACK를 기다리는 시점의 변경이 생겼습니다. 기존 COMMIT을 실행한 다음이 아니라 COMMIT을 실행하기 전에 ACK를 기다리도록 변경되었습니다. 이로 인해 마스터에서 COMMIT이 완료된 트랜잭션은 모두 슬레이브에 확실히 전달되게 되어서 무손실 레플리케이션을 보다 잘 지원하게 되었습니다. 자세한 내용은 [MySQL 5.7 완벽 분석](http://www.yes24.com/Product/Goods/72270172?)에 잘 설명되어 있습니다.
 
@@ -308,32 +302,98 @@ Response code: 200; Time: 51ms; Content length: 526 bytes
 ```
 정상적으로 title이 변경된 것을 확인할 수 있습니다.
 
-### 정리
 
-첫 트랜잭션의 설정의 `readOnly`에 따라 `salveDataSoruce`, `masterDataSource`가 결정된다. 즉 동일한 트랜잭션에서는 첫 트랜잭션의 `readOnly = true` 설정에 따라 DataSource가 결정되기 때문에 그 이후의 트랜잭션에서 변경되지 않습니다.
+### 다른 트랜잭션에서 Update
+
+```kotlin
+@Service
+class BookService(
+    private val bookRepository: BookRepository
+) {
+
+    @Transactional(readOnly = true)
+    fun updateSlave() {
+        println("updateSlave CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        bookUpdateService.updateTitle("new title(slave)")
+    }
+}
+
+@Service
+class BookUpdateService(
+    private val bookRepository: BookRepository
+){
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+    fun updateTitle(title: String) {
+        println("updateTitle CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
+        val books = bookRepository.findAll()
+        for (book in books) {
+            book.title = title
+        }
+        bookRepository.saveAll(books)
+    }
+}
+```
+BookUpdateService 클래스를 만들고 `updateTitle` 메서드를 해당 클래스에서 `propagation = Propagation.REQUIRES_NEW` 설정을 통해서 새로운 트랜잭션에서 처리하도록 작성하고 `/api/book/update/slave`를 호출하고 조회 API를 호출해서 결과를 확인해 보겠습니다. 
+
+기존 서비스 코드에서 구현을 하지 않고 BookUpdateService 서비스 코드를 만든 이유는 동일한 Bean에서 `@Transactional`예상하는 것과 다르게 동작하기 때문입니다. 자세한 내용은 이전 동일한 [Bean(Class)에서 @Transactional 동작 방식](https://cheese10yun.github.io/spring-transacion-same-bean/)을 참고해 주세요
+
+```
+GET http://localhost:8080/api/book/slave
+
+HTTP/1.1 200 
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Sat, 08 May 2021 12:38:56 GMT
+Keep-Alive: timeout=60
+Connection: keep-alive
+
+[
+  {
+    "title": "new title(slave)",
+    "id": 1,
+    "createdAt": "2021-05-08T21:37:43",
+    "updatedAt": "2021-05-08T21:38:44"
+  },
+  ...
+]
+
+Response code: 200; Time: 107ms; Content length: 521 bytes
+```
+새로운 트랜잭션의 경우 `masterDataSource`를 바라보게 되며 데이터베이스에 반영되는것을 확인할 수 있습니다.
+
+![](docs/transaction-name.png)
+
+트랜잭션 이름을 봐도 해당 트랜잭션이 다르다는 것을 확인할 수 있습니다. 즉 `com.example.springtransaction.BookService.updateSlave` 트랜잭션은 `salveDataSoruce`, `com.example.springtransaction.BookUpdateService.updateTitle`는 `masterDataSource`를 바라봅니다.
+
 
 ## 그렇다면 왜 그런것일까?
 
-![](https://mblogthumb-phinf.pstatic.net/20150409_258/yalun08_1428580299544nKwT5_JPEG/%BC%B3%B8%ED%C3%E6.jpg?type=w2)
-
-....
+**첫 트랜잭션의 설정의 `readOnly`에 따라 `salveDataSoruce`, `masterDataSource`가 결정되며, 동일한 트랜잭션에서는 지정된 `readOnly` 속성은 변경되지 않습니다.** 기존 트랜잭션과 전혀 다른 트랜잭션을 만나게 되면 해당 트랜잭션의 `readOnly`설정에 따라 `DataSource`가 결정됩니다. 그렇다면 왜 이렇게 되는 걸까요? **제가 학습했던 내용을 토대로 설명드리기 때문에 틀린 부분이 있을 수도 있습니다.**
 
 
-....
+### 스프링의 트랜잭션 동기화
 
+> ![](https://raw.githubusercontent.com/cheese10yun/TIL/master/assets/TransactionSynchronizations.png)
+> [토비의 스프링 3.1, 361 페이지](http://m.yes24.com/goods/detail/7516911)
 
+스프링은 위와 같은 방식으로 트랜잭션 동기화를 진행합니다. 해당 방식은 트랜잭션을 시작하기 위해 만든 Connection 오브젝트를 특별한 저장소에 보관해두고, 이후에 호출되는 메서드에서 저장된 Connection을 가져다가 사용합니다. 
 
+* `(1)` Userservice Connection을 생성
+* `(2)` 생성된 Connection을 트랜잭션 동기화 저장소에 저장, SetAutoCommit(false)를 호출하여 트랜잭션을 시작
+* `(3)` 첫 번째 `update()` 메서드가 호출되고 **`(4)` 트랜잭션 동기화 저장소에 현재 시작된 트랜잭션을 가진 Connection을 확인합니다. 이 경우는`(2)`에서 생성한 Connection을 가져옵니다.**
+* `(5)` Connection을 이용해 PreparedsStatment을 만들어 해당 SQL을 실행하고 **JdbcTemplated는 Connection 닫지 않은 상태로 작업을 마침**
+* 동일한 플로우로 `(6)`, `(7)`, `(8)` 수행
+* 또 동일한 플로우로 `(9)`, `(10)`, `(11)` 수행하며 **트랜잭션 내의 모든 작업이 정상적으로 끝났으면 `(12)` Conntion commit을 호출해 트랜잭션을 완료 시킨다.**
+* `(13)` 트랜잭션 저장소가 더 이상 Connection 객체를 저장하지 않도록 이를 제거
 
-... 는 23시 30분 
+위와 같은 플로우로 트랜잭션이 진행됩니다. 
 
-![](https://mblogthumb-phinf.pstatic.net/20150409_62/yalun08_14285882129128ejRq_JPEG/%B4%D9%BF%EE%B7%CE%B5%E5.jpg?type=w2)
+> `updateSlave()` 메서드는 `readOnly = true` 시작하고, `updateTitle()` 메서드에서 `readOnly = false`로 진행 되는 경우 
 
-
-
-![](https://i.pinimg.com/originals/65/eb/70/65eb70a4aad8ceb926b44cc4d6e7fdd9.jpg)
-다음주 포스팅에... 
+이런 경우에는 `updateSlave()`에서 Connection(Slave)을 생성 하고 **`updateTitle()`에서 트랜잭션 동기화 저장소에 저장된 트랜잭션을 가진 Connection(Slave) 기반으로 트랜잭션을 시작하게 됩니다.** 그러기 때문에 `updateTitle()` 메서드의 트랜잭션 `readOnly = false` 설정은 동작하지 않게 됩니다.
 
 
 ## 참고
 * [MySQL 5.7 완벽 분석](http://www.yes24.com/Product/Goods/72270172?)
 * [Spring, master-slave dynamic routing datasource 사용하기](https://taes-k.github.io/2020/03/11/sprinig-master-slave-dynamic-routing-datasource/)
+* [토비의 스프링 3.1](http://m.yes24.com/goods/detail/7516911)

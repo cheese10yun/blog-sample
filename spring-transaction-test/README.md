@@ -43,7 +43,7 @@ public class BService {
 }
 ```
 * **컨트롤러 메서드에서 `aCreate()`, `b.Create()` 메서드 각각 호출 한 경우**
-* `B => currentTransactionName : null` : Transa]ctional 어노테이션이 없으면 트랜잭션은 전위 되지 않는다. ?
+* `B => currentTransactionName : null` : Transa]ctional 어노테이션이 없으면 트랜잭션은 전이 되지 않는다. ?
 * `a.setName("1111");` :  BService 에서 update 쿼리가 발생한다 (트랜잭션이 없는 상태)
 * `bRepository.save(new B());` : insert into 발생 (트랜잭션이 없는 상태)
 * `@Transactional` 없어도 데이터베이스에 반영되는 정보는 다르지 않음

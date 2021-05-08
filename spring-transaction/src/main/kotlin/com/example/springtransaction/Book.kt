@@ -5,7 +5,9 @@ import javax.persistence.Entity
 import javax.persistence.Table
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -57,6 +59,7 @@ class BookService(
 
     @Transactional(readOnly = true)
     fun updateSlave() {
+        println("updateSlave CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
         bookUpdateService.updateTitle("new title(slave)")
     }
 
@@ -79,8 +82,9 @@ class BookService(
 class BookUpdateService(
     private val bookRepository: BookRepository
 ){
-    @Transactional(readOnly = false)
+    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
     fun updateTitle(title: String) {
+        println("updateTitle CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
         val books = bookRepository.findAll()
         for (book in books) {
             book.title = title
