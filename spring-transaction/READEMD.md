@@ -1,4 +1,4 @@
-# Spring Master, Slave 트랜잭션 처리 방식
+# Spring 레플리케이션 트랜잭션 처리 방식
 
 대부분의 서비스에서는 데이터베이스를 Master, Slave 구조로 Master에서는 Create, Update, Delete 업무를 진행하고 Slave에서 Read 업무를 진행하는 구조로 설계합니다. Spring의 Master, Slave 환경에서의 트랜잭션에 대해서 포스팅해보겠습니다.
 
