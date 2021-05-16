@@ -35,3 +35,5 @@ out/
 
 ### VS Code ###
 .vscode/
+/volumes/db/slave/data/
+/volumes/db/master/data/
