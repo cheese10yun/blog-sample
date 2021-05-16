@@ -2,13 +2,13 @@ package com.batch.task.support.reader
 
 import com.querydsl.jpa.impl.JPAQuery
 import com.querydsl.jpa.impl.JPAQueryFactory
-import org.springframework.batch.item.database.AbstractPagingItemReader
-import org.springframework.dao.DataAccessResourceFailureException
-import org.springframework.util.CollectionUtils
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.function.Function
 import javax.persistence.EntityManagerFactory
 import javax.persistence.EntityTransaction
+import org.springframework.batch.item.database.AbstractPagingItemReader
+import org.springframework.dao.DataAccessResourceFailureException
+import org.springframework.util.CollectionUtils
 
 /**
  * https://jojoldu.tistory.com/473 참고
@@ -32,7 +32,7 @@ open class QuerydslPagingItemReader<T> private constructor(
         jpaProperties = jpaProperties
     ) {
         setPageSize(pageSize)
-        setName("???")
+        setName("QuerydslPagingItemReader")
     }
 
     override fun doReadPage() {
@@ -57,7 +57,7 @@ open class QuerydslPagingItemReader<T> private constructor(
 
     /**
      * 영속성 컨텍스트의 flush and clear를 작업을하고 트랜잭션을 begin을 하고 해당 트랜잭션을 리턴한다.
-     * @return EntityTransaction
+     * @return [EntityTransaction]
      */
     protected fun getTransactionAndPersistContextFlushAndClear(): EntityTransaction {
         val transaction = entityManager.transaction ?: throw DataAccessResourceFailureException("Unable to obtain an EntityManager")
