@@ -16,9 +16,9 @@ spring:
             hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
 
     datasource:
-        url: jdbc:mysql://localhost:3306/batch_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
+        url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
         username: root
-        password: root
+        password:
         driver-class-name: com.mysql.cj.jdbc.Driver
         initialization-mode: never
         hikari:
@@ -26,6 +26,7 @@ spring:
             minimum-idle: 25
             connection-timeout: 90000
             max-lifetime: 90000
+            auto-commit: true
         dbcp2:
             test-on-borrow: true
             validation-query: select 1
