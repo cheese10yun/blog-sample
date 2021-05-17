@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3366/exposed_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  exposed:
+    generate-ddl: true
+#    excluded-packages:
+
+
+logging.level.Exposed: DEBUG

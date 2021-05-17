@@ -29,10 +29,12 @@ dependencies {
 //    runtimeOnly("com.h2database:h2")
     implementation("mysql:mysql-connector-java")
 
-    implementation("org.jetbrains.exposed:exposed-core:${properties["exposed_version"]}")
-    implementation("org.jetbrains.exposed:exposed-dao:${properties["exposed_version"]}")
-    implementation("org.jetbrains.exposed:exposed-jdbc:${properties["exposed_version"]}")
+//    implementation("org.jetbrains.exposed:exposed-core:${properties["exposed_version"]}")
+//    implementation("org.jetbrains.exposed:exposed-dao:${properties["exposed_version"]}")
+//    implementation("org.jetbrains.exposed:exposed-jdbc:${properties["exposed_version"]}")
     implementation("org.jetbrains.exposed:exposed-java-time:${properties["exposed_version"]}")
+    implementation("org.jetbrains.exposed:exposed-spring-boot-starter:${properties["exposed_version"]}")
+
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
