@@ -23,8 +23,8 @@ import org.springframework.context.annotation.Configuration
 import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
-const val GLOBAL_CHUNK_SIZE = 10_000
-const val DATA_SET_UP_SIZE = 5_000_000
+const val GLOBAL_CHUNK_SIZE = 1000
+const val DATA_SET_UP_SIZE = 50_000
 
 @Configuration
 class BulkInsertJobConfiguration(
@@ -56,8 +56,8 @@ class BulkInsertJobConfiguration(
         stepBuilderFactory["bulkInsertStep"]
             .chunk<Payment, Payment>(GLOBAL_CHUNK_SIZE)
             .reader(bulkInsertReader)
-            .writer(writerWithStatement)
-//            .writer(writerWithExposed)
+//            .writer(writerWithStatement)
+            .writer(writerWithExposed)
 //            .writer(writerWithJpa)
             .build()
 
