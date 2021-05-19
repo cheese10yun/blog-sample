@@ -144,6 +144,7 @@ class ExposedDslTest : ExposedTestSupport() {
             insertBook("$it-title", BigDecimal.TEN, writerId)
         }
 
+        // SELECT book.id, book.title, book.price, writer.`name`, writer.email FROM book INNER JOIN writer ON writer.id = book.writer_id
         (Books innerJoin Writers)
                 .slice(
                         Books.id,

@@ -28,8 +28,6 @@ class Book(id: EntityID<Long>) : LongEntity(id) {
     override fun toString(): String {
         return "Book(writer=$writer, title='$title', price=$price, createdAt=$createdAt, updatedAt=$updatedAt)"
     }
-
-
 }
 
 object Writers : LongIdTable("writer") {

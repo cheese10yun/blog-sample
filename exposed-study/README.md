@@ -359,6 +359,87 @@ class ExposedGettingStartedInSpringBoot : ExposedTestSupport() {
 
 `DataSource`는 스프링 Bean을 사용하기 때문에 제거했으며, `transaction { ... }`으로 트랜잭션을 시작했던 코드를 스프링의 `@Transactional`으로 대체했습니다. 또한 `SchemaUtils.create(Payments)`으로 스키마를 생성했던 부분을 `generate-ddl: true` 속성 파일로 대체했습니다. 또 `ExposedTestSupport` 객체에 `@Transactional`가 있어 테스트 코드의 최종 데이터는 모두 Rollback을 진행하게 됩니다.
 
+## 심화
+
+### batch insert
+
+```kotlin
+@Test
+fun `batch insert`() {
+    val data = (1..10).map { it }
+    Books.batchInsert(
+            data,
+            ignore = false,
+            shouldReturnGeneratedValues = false
+    ) {
+        this[Books.writer] = 1L
+        this[Books.title] = "$it-title"
+        this[Books.price] = it.toBigDecimal()
+        this[Books.createdAt] = LocalDateTime.now()
+        this[Books.updatedAt] = LocalDateTime.now()
+    }
+}
+```
+
+`Exposed`는 `batchInsert()` 메서드를 지원하기 때문에 쉽게 batch insert를 진행할 수 있습니다. Mysql의 경우 JDBC 드라이버에 `rewriteBatchedStatements=true` 속성을 반드시 입력해야 batch insert가 가능합니다. `shouldReturnGeneratedValues` 값을 false로 지정하면 `auto_increment`으로 증가된 ID 값을 가져오지 않기에 성능이 향상될 수 있습니다.
+
+![](docs/images/batch-insert-logger.png)
+
+로그에 출력되는 SQL은 batch insert가 진행되지 않고 개별 insert로 출력 됩니다.
+
+![](docs/images/mysql-log.png)
+**하지만 실제 데이터베이스의 로그를 확인해보면 batch insert가 정상적으로 동작하는 것을 확인할 수 있습니다.**
+
+
+### 연관 관계
+
+```kotlin
+object Books : LongIdTable("book") {
+    val writer = reference("writer_id", Writers)
+    val title = varchar("title", 150)
+    val price = decimal("price", 10, 4)
+    val createdAt = datetime("created_at")
+    val updatedAt = datetime("updated_at")
+}
+
+object Writers : LongIdTable("writer") {
+    val name = varchar("name", 150)
+    val email = varchar("email", 150)
+    val createdAt = datetime("created_at")
+    val updatedAt = datetime("updated_at")
+}
+```
+reference을 통해서 객체의 연관 관계를 참조할 수 있게 할 수 있습니다.
+
+### join
+
+```kotlin
+@Test
+fun `join`() {
+    val writerId = insertWriter("yun", "yun@asd.com")[Writers.id].value
+    (1..5).map {
+        insertBook("$it-title", BigDecimal.TEN, writerId)
+    }
+
+    // SELECT book.id, book.title, book.price, writer.`name`, writer.email FROM book INNER JOIN writer ON writer.id = book.writer_id
+    (Books innerJoin Writers)
+            .slice(
+                    Books.id,
+                    Books.title,
+                    Books.price,
+                    Writers.name,
+                    Writers.email,
+            )
+            .selectAll()
+            .forEach {
+                it.fieldIndex
+                println("bookId: ${it[Books.id]}, title: ${it[Books.title]}, writerName: ${it[Writers.name]}, writerEmail: ${it[Writers.email]}")
+            }
+}
+
+```
+DSL 기반으로 조인 SQL로 쉽게 작성할 수 있습니다.
+
 
 
 ## 참고
