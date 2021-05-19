@@ -1,16 +1,12 @@
 package com.example.exposedstudy
 
+import java.math.BigDecimal
+import java.time.LocalDateTime
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.insert
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.transaction.annotation.Transactional
-import java.math.BigDecimal
-import java.time.LocalDateTime
 
-@SpringBootTest
-@Transactional
-class ExposedDaoTest {
+class ExposedDaoTest : ExposedTestSupport() {
 
     @Test
     fun create() {
@@ -32,14 +28,14 @@ class ExposedDaoTest {
         insertWriter("name", "asd@asd.com")
 
         Writer.find { Writers.name eq "name" }
-            .forEach {
-                println(it)
-            }
+                .forEach {
+                    println(it)
+                }
     }
 
     private fun batchInsertBook(data: List<Int> = (1..10).map { it }) {
         Books.batchInsert(
-            data
+                data
         ) {
             this[Books.writer] = 1L
             this[Books.title] = "$it-title"
@@ -50,9 +46,9 @@ class ExposedDaoTest {
     }
 
     private fun insertBook(
-        title: String,
-        price: BigDecimal,
-        writerId: Long = 1L
+            title: String,
+            price: BigDecimal,
+            writerId: Long = 1L
     ) = Books.insert { book ->
         book[this.writer] = writerId
         book[this.title] = title
@@ -62,8 +58,8 @@ class ExposedDaoTest {
     }
 
     private fun insertWriter(
-        name: String,
-        email: String
+            name: String,
+            email: String
     ) = Writers.insert { writer ->
         writer[this.name] = name
         writer[this.email] = email

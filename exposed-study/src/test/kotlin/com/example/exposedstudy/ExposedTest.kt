@@ -2,31 +2,43 @@ package com.example.exposedstudy
 
 import com.example.exposedstudy.PaymentTable.amount
 import com.example.exposedstudy.PaymentTable.orderId
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
+import javax.sql.DataSource
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.JoinType
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.addLogger
+import org.jetbrains.exposed.sql.batchInsert
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.util.StopWatch
 
 
-class ExposedTest {
+class ExposedTest(
+        private val dataSource: DataSource
+) : ExposedTestSupport() {
 
-    private val config = HikariConfig().apply {
-        jdbcUrl = "jdbc:mysql://localhost:3366/exposed_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true"
-        driverClassName = "com.mysql.cj.jdbc.Driver"
-        username = "root"
-        password = ""
-        maximumPoolSize = 12
+//    private val config = HikariConfig().apply {
+//        jdbcUrl = "jdbc:mysql://localhost:3366/exposed_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true"
+//        driverClassName = "com.mysql.cj.jdbc.Driver"
+//        username = "root"
+//        password = ""
+//        maximumPoolSize = 12
+//
+//    }
 
-    }
-
-    private val dataSource = HikariDataSource(config)
+//    private val dataSource = HikariDataSource(config)
 
 
     @Test
@@ -190,12 +202,13 @@ class ExposedTest {
 //            SchemaUtils.create(OrderTable)
 //            SchemaUtils.create(PaymentTable)
 
-            val selectAll = PaymentTable.join(OrderTable, JoinType.INNER, additionalConstraint = { OrderTable.id eq orderId })
-                    .selectAll()
-                    .forEach {
-                        val bigDecimal = it[amount]
-                        println(bigDecimal)
-                    }
+            val selectAll =
+                    PaymentTable.join(OrderTable, JoinType.INNER, additionalConstraint = { OrderTable.id eq orderId })
+                            .selectAll()
+                            .forEach {
+                                val bigDecimal = it[amount]
+                                println(bigDecimal)
+                            }
 
 
             Payment.all()
