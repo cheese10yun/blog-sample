@@ -1,11 +1,12 @@
 package com.example.exposedstudy
 
+import java.math.BigDecimal
+import java.time.LocalDateTime
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.`java-time`.datetime
-import java.math.BigDecimal
 
 object Books : LongIdTable("book") {
     val writer = reference("writer_id", Writers)
@@ -23,6 +24,12 @@ class Book(id: EntityID<Long>) : LongEntity(id) {
     var price by Books.price
     var createdAt by Books.createdAt
     var updatedAt by Books.updatedAt
+
+    override fun toString(): String {
+        return "Book(writer=$writer, title='$title', price=$price, createdAt=$createdAt, updatedAt=$updatedAt)"
+    }
+
+
 }
 
 object Writers : LongIdTable("writer") {
@@ -36,9 +43,26 @@ class Writer(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<Writer>(Writers)
 
     var name by Writers.name
+        private set
     var email by Writers.email
+        private set
     var createdAt by Writers.createdAt
+        private set
     var updatedAt by Writers.updatedAt
+        private set
+
+    fun updateProfile(name: String, email: String) {
+        this.name = name
+        this.email = email
+        this.updatedAt = LocalDateTime.now()
+    }
+
+    fun register(name: String, email: String) {
+        this.name = name
+        this.email = email
+        this.updatedAt = LocalDateTime.now()
+        this.createdAt = LocalDateTime.now()
+    }
 
     override fun toString(): String {
         return "Writer(name='$name', email='$email', createdAt=$createdAt, updatedAt=$updatedAt)"
@@ -46,8 +70,8 @@ class Writer(id: EntityID<Long>) : LongEntity(id) {
 }
 
 data class BookWithWriter(
-    val title: String,
-    val price: BigDecimal,
-    val email: String,
-    val name: String
+        val title: String,
+        val price: BigDecimal,
+        val email: String,
+        val name: String
 )

@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.alias
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.count
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
@@ -70,6 +71,12 @@ class ExposedDslTest : ExposedTestSupport() {
         ) {
             it[title] = "new-title"
         }
+    }
+
+    @Test
+    fun `delete`() {
+        batchInsertBook()
+        Books.deleteWhere { Books.id greaterEq 1L }
     }
 
     @Test
@@ -150,6 +157,13 @@ class ExposedDslTest : ExposedTestSupport() {
                     it.fieldIndex
                     println("bookId: ${it[Books.id]}, title: ${it[Books.title]}, writerName: ${it[Writers.name]}, writerEmail: ${it[Writers.email]}")
                 }
+    }
+
+    @Test
+    fun name() {
+        insertWriter("yun", "yun@asd.com")
+
+        val query = Writers.selectAll()
     }
 
     @Test

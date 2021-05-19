@@ -4,6 +4,7 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.selectAll
 import org.junit.jupiter.api.Test
 
 class ExposedDaoTest : ExposedTestSupport() {
@@ -11,33 +12,90 @@ class ExposedDaoTest : ExposedTestSupport() {
     @Test
     fun create() {
         val writer = Writer.new {
-            name = "name"
-            email = "ad@ad.com"
-            createdAt = LocalDateTime.now()
-            updatedAt = LocalDateTime.now()
+            this.register("asd", "asd")
         }
 
         println(writer)
     }
 
     @Test
-    fun read() {
-
-        val all = Writer.all()
-
-        insertWriter("name", "asd@asd.com")
-
-        Writer.find { Writers.name eq "name" }
-                .forEach {
-                    println(it)
-                }
+    fun `read`() {
+        val writerId = insertWriter("asd", "asd@asd")[Writers.id].value
+        batchInsertBook(writerId = writerId)
+        val books = Book.find { Books.title like "%title%" }
+        for (book in books) {
+            println(book)
+        }
     }
 
-    private fun batchInsertBook(data: List<Int> = (1..10).map { it }) {
+    @Test
+    fun `sort`() {
+        (1..10).map { insertWriter("$it asd", "$it asd@asd") }
+
+        Writer.all().sortedByDescending { it.id }
+                .forEach { println(it) }
+    }
+
+    @Test
+    fun update() {
+        (1..10).map {
+            insertWriter("$it asd", "$it asd@asd")
+        }
+
+        val writers = Writer.all().sortedByDescending { it.id }
+
+        for (writer in writers) {
+            writer.updateProfile("new", "123@asd.com")
+        }
+
+        Writer.all().sortedByDescending { it.id }
+                .forEach { println(it) }
+
+    }
+
+    @Test
+    fun `delete`() {
+        (1..10).map {
+            insertWriter("$it asd", "$it asd@asd")
+        }
+
+        Writer.all()
+                .forEach { it.delete() }
+    }
+
+    @Test
+    fun `wrapRows`() {
+        val writerId = insertWriter("yun", "yun@asd.com")[Writers.id].value
+//        (1..5).map {
+//            insertBook("$it-title", BigDecimal.TEN, writerId)
+//        }
+//
+//        val query = (Books innerJoin Writers)
+//                .slice(
+//                        Books.id,
+//                        Books.title,
+//                        Books.price,
+//                        Writers.name,
+//                        Writers.email,
+//                )
+//                .selectAll()
+
+        val query = Writers.selectAll()
+
+        Writer.wrapRows(query)
+                .forEach { println(it) }
+
+    }
+
+
+    private fun batchInsertBook(
+            data: List<Int> = (1..10).map { it },
+            writerId: Long,
+    ) {
         Books.batchInsert(
                 data
         ) {
-            this[Books.writer] = 1L
+            this[Books.writer] = writerId
             this[Books.title] = "$it-title"
             this[Books.price] = it.toBigDecimal()
             this[Books.createdAt] = LocalDateTime.now()
