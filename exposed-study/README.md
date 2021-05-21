@@ -8,9 +8,7 @@
 
 저는 개인적, 회사 업무에서 [Spring Data JPA](https://spring.io/projects/spring-data-jpa)를 주로 사용하고 있습니다. JPA가 가져다주는 큰 장점이 많아 적극적으로 사용하고 있지만 **특정 상황에서 하이버네이트의 단점이 있어 이를 보안하기 위해서 Exposed를 사용하고 있습니다.** 해당 내용은 [Batch Insert 성능 향상기 1편 - With JPA](https://cheese10yun.github.io/jpa-batch-insert/), [Batch Insert 성능 향상기 2편 - 성능 측정](https://cheese10yun.github.io/spring-batch-batch-insert/)에서 포스팅한 바 있습니다.
 
-
 ## Getting Started
-
 
 ### MySQL
 
@@ -41,8 +39,6 @@ $ docker-compose up -d
 ```
 
 Exposed에서 지원해 주는 MySQL 기반으로 진행하기 위해서 해당 환경을 Docker로 구성합니다.
-
-
 
 ### Gradle
 ```gradle
@@ -127,7 +123,6 @@ class ExposedGettingStarted {
 ```
 
 `Payments`객체에 테이블 정보를 작성 하여 테이블을 생성하여 Insert, Select, Update, Delete를 하고 테이블을 Drop 합니다. SQL를 매핑한 DSL 방식으로 코틀린 코드 베이스로 SQL을 조작할 수 있습니다.
-
 
 ## DAO 방식
 
@@ -258,7 +253,6 @@ fun discoverExposedTables(applicationContext: ApplicationContext, excludedPackag
 ```
 
 스프링 표현식으로 제외 시킬 `excludedPackages`를 List로 받고, `generate-ddl` 여부에 따라 `DatabaseInitializer` 빈을 등록여부를 결정합니다. 만약 해당 빈을 등록하게 되면 `DatabaseInitializer` 객체가 `ApplicationRunner`을 구현하고 있기 때문에 스프링 어플리케이션이 실행하는 경우 `run()` 메서드에서 스키마를 생성하게 됩니다. (`excludedPackages`는 제외)
-
 
 **`run()` 메서드에 `@Transactional` 어노테이션이 있는 것을 볼 수 있습니다. 이것은 `spring-transaction`모듈을 통해서 `TransactionSynchronizationManager`를 기반으로 스프링의 트랜잭션 메커니즘을 그대로 사용할 수 있다는 의미 입니다.**
 
@@ -398,12 +392,10 @@ fun `batch insert`() {
 > `show variables like 'general_log%';` 확인 해서 `general_log`가 OFF인 경우
 > `set global general_log = 'ON';` 설정 이후 `general_log_file` 경로에 로그 파일 확인
 
-
 | Variable\_name | Value |
 | :--- | :--- |
 | general\_log | OFF |
 | general\_log\_file | /var/lib/mysql/2eb41ec6a5fe.log |
-
 
 ### 연관 관계
 
@@ -453,8 +445,6 @@ fun `join`() {
 
 ```
 DSL 기반으로 조인 SQL로 쉽게 작성할 수 있습니다.
-
-
 
 ## 참고
 
