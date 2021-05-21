@@ -180,7 +180,7 @@ class ExposedGettingStarted {
 
 DSL 객체인 `Payments` 기반으로 DAO `Payment`를 객체를 생성합니다. DAO는 `payment` 테이블에 대한 Data Access Object의 기능을 전담하게 됩니다. Data JPA의 Repository와 비슷한 개념입니다.
 
-## Winh Spring Boot
+## With Spring Boot
 
 Exposed에서는 Spring Boot를 지원하는 [exposed-spring-boot-starter](https://github.com/JetBrains/Exposed/tree/master/exposed-spring-boot-starter) 의존성을 제공하고 있습니다.
 
