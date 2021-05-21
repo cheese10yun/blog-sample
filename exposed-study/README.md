@@ -14,22 +14,22 @@
 version: '3'
 
 services:
-  db_mysql:
-    container_name: mysql.local
-    image: mysql/mysql-server:5.7
-    environment:
-      MYSQL_ROOT_HOST: '%'
-      MYSQL_DATABASE: 'exposed_study'
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
-    ports:
-      - '3366:3306'
-    volumes:
-      - './volumes/mysql/default:/var/lib/mysql'
-    command:
-      - 'mysqld'
-      - '--character-set-server=utf8mb4'
-      - '--collation-server=utf8mb4_unicode_ci'
-      - '--sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'
+    db_mysql:
+        container_name: mysql.local
+        image: mysql/mysql-server:5.7
+        environment:
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_DATABASE: 'exposed_study'
+            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        ports:
+            - '3366:3306'
+        volumes:
+            - './volumes/mysql/default:/var/lib/mysql'
+        command:
+            - 'mysqld'
+            - '--character-set-server=utf8mb4'
+            - '--collation-server=utf8mb4_unicode_ci'
+            - '--sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'
 ```
 
 ```
@@ -188,7 +188,7 @@ Exposed에서는 Spring Boot를 지원하는 [exposed-spring-boot-starter](https
 ```gradle
 implementation("org.jetbrains.exposed:exposed-spring-boot-starter:0.31.1")
 ```
-스프링 부트에서 공식적으로 지원하는 의존성은 아니기 때문에 버전을 명확하게 명시해야 합니다. 
+스프링 부트에서 공식적으로 지원하는 의존성은 아니기 때문에 버전을 명확하게 명시해야 합니다.
 
 ### properties
 ```yml
@@ -383,11 +383,11 @@ fun `batch insert`() {
 
 `Exposed`는 `batchInsert()` 메서드를 지원하기 때문에 쉽게 batch insert를 진행할 수 있습니다. Mysql의 경우 JDBC 드라이버에 `rewriteBatchedStatements=true` 속성을 반드시 입력해야 batch insert가 가능합니다. `shouldReturnGeneratedValues` 값을 false로 지정하면 `auto_increment`으로 증가된 ID 값을 가져오지 않기에 성능이 향상될 수 있습니다.
 
-![](docs/images/batch-insert-logger.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/62ba5c8fd643af1a9ab8c8bea88043d397591447/exposed-study/docs/images/batch-insert-logger.png)
 
 로그에 출력되는 SQL은 batch insert가 진행되지 않고 개별 insert로 출력 됩니다.
 
-![](docs/images/mysql-log.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/62ba5c8fd643af1a9ab8c8bea88043d397591447/exposed-study/docs/images/mysql-log.png)
 **하지만 실제 데이터베이스의 로그를 확인해보면 batch insert가 정상적으로 동작하는 것을 확인할 수 있습니다.**
 
 
