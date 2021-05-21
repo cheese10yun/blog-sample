@@ -2,7 +2,11 @@
 
 ## Exposed 란 ?
 
-[Exposed](https://github.com/JetBrains/Exposed)는 JetBrains에서 만든 Kotlin 언어 기반의 ORM 프레임워크입니다. Exposed는 두 가지 레벨의 데이터베이스 access를 제공합니다. SQL을 매핑 한 DSL 방식, 경량화한 DAO 방식을 제공합니다. 공식적으로 H2, MySQL, MariaDB, Oracle, PostgreSQL, SQL Server, SQLite 데이터베이스를 지원합니다.
+[Exposed](https://github.com/JetBrains/Exposed)는 JetBrains에서 만든 Kotlin 언어 기반의 ORM 프레임워크입니다. Exposed는 두 가지 레벨의 데이터베이스 access를 제공합니다. SQL을 매핑 한 DSL 방식, 경량화한 DAO 방식을 제공하며 공식적으로 H2, MySQL, MariaDB, Oracle, PostgreSQL, SQL Server, SQLite 데이터베이스를 지원합니다.
+
+## 그래서 왜 쓰는 데 ?
+
+저는 개인적, 회사 업무에서 [Spring Data JPA](https://spring.io/projects/spring-data-jpa)를 주로 사용하고 있습니다. JPA가 가져다주는 큰 장점이 많아 적극적으로 사용하고 있지만 **특정 상황에서 하이버네이트의 단점이 있어 이를 보안하기 위해서 Exposed를 사용하고 있습니다.** 해당 내용은 [Batch Insert 성능 향상기 1편 - With JPA](https://cheese10yun.github.io/jpa-batch-insert/), [Batch Insert 성능 향상기 2편 - 성능 측정](https://cheese10yun.github.io/spring-batch-batch-insert/)에서 포스팅한 바 있습니다.
 
 
 ## Getting Started
@@ -357,7 +361,7 @@ class ExposedGettingStartedInSpringBoot : ExposedTestSupport() {
 }
 ```
 
-`DataSource`는 스프링 Bean을 사용하기 때문에 제거했으며, `transaction { ... }`으로 트랜잭션을 시작했던 코드를 스프링의 `@Transactional`으로 대체했습니다. 또한 `SchemaUtils.create(Payments)`으로 스키마를 생성했던 부분을 `generate-ddl: true` 속성 파일로 대체했습니다. 또 `ExposedTestSupport` 객체에 `@Transactional`가 있어 테스트 코드의 최종 데이터는 모두 Rollback을 진행하게 됩니다.
+`DataSource`는 스프링 Bean을 사용하기 때문에 제거했으며, `transaction { ... }`으로 트랜잭션을 시작했던 코드를 스프링의 `@Transactional`으로 대체했습니다. 또한 `SchemaUtils.create(Payments)`으로 스키마를 생성했던 부분을 `generate-ddl: true` 속성 파일로 대체했습니다. 그리고 `ExposedTestSupport` 객체에 `@Transactional`가 있어 테스트 코드의 최종 데이터는 모두 Rollback을 진행하게 됩니다. **Spring 환경에서 Exposed를 사용하게 되면 보다 간결하게 사용 가능합니다.**
 
 ## 심화
 
@@ -390,6 +394,16 @@ fun `batch insert`() {
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/62ba5c8fd643af1a9ab8c8bea88043d397591447/exposed-study/docs/images/mysql-log.png)
 **하지만 실제 데이터베이스의 로그를 확인해보면 batch insert가 정상적으로 동작하는 것을 확인할 수 있습니다.**
 
+> SQL Log 확인 방법
+> `show variables like 'general_log%';` 확인 해서 `general_log`가 OFF인 경우
+> `set global general_log = 'ON';` 설정 이후 `general_log_file` 경로에 로그 파일 확인
+
+
+| Variable\_name | Value |
+| :--- | :--- |
+| general\_log | OFF |
+| general\_log\_file | /var/lib/mysql/2eb41ec6a5fe.log |
+
 
 ### 연관 관계
 
@@ -411,7 +425,7 @@ object Writers : LongIdTable("writer") {
 ```
 reference을 통해서 객체의 연관 관계를 참조할 수 있게 할 수 있습니다.
 
-### join
+### Join
 
 ```kotlin
 @Test
