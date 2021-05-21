@@ -68,20 +68,20 @@ class ReaderPerformanceJobConfiguration(
 
     @Bean
     @StepScope
-    fun jpaCursorItemReader(
+    fun jpaPagingItemReader(
         entityManagerFactory: EntityManagerFactory
-    ) = JpaCursorItemReaderBuilder<Payment>()
-        .name("jpaCursorItemReader")
+    ) = JpaPagingItemReaderBuilder<Payment>()
+        .name("jpaPagingItemReader")
         .entityManagerFactory(entityManagerFactory)
         .queryString("SELECT p FROM Payment p")
         .build()
 
     @Bean
     @StepScope
-    fun jpaPagingItemReader(
+    fun jpaCursorItemReader(
         entityManagerFactory: EntityManagerFactory
-    ) = JpaPagingItemReaderBuilder<Payment>()
-        .name("jpaPagingItemReader")
+    ) = JpaCursorItemReaderBuilder<Payment>()
+        .name("jpaCursorItemReader")
         .entityManagerFactory(entityManagerFactory)
         .queryString("SELECT p FROM Payment p")
         .build()
