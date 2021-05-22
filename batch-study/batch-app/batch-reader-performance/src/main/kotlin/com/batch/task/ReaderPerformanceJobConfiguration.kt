@@ -5,7 +5,6 @@ import com.batch.payment.domain.payment.QPayment
 import com.batch.task.support.listener.JobReportListener
 import com.batch.task.support.logger
 import com.batch.task.support.reader.QuerydslPagingItemReader
-import javax.persistence.EntityManagerFactory
 import org.hibernate.SessionFactory
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
@@ -21,6 +20,7 @@ import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilde
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import javax.persistence.EntityManagerFactory
 
 const val CHUNK_SIZE = 100
 const val DATA_SET_UP_SIZE = 5_000
@@ -83,6 +83,9 @@ class ReaderPerformanceJobConfiguration(
     ) = JpaCursorItemReaderBuilder<Payment>()
         .name("jpaCursorItemReader")
         .entityManagerFactory(entityManagerFactory)
+        .maxItemCount()
+        .currentItemCount()
+        .
         .queryString("SELECT p FROM Payment p")
         .build()
 
