@@ -38,7 +38,7 @@ dependencies {
     implementation("com.querydsl:querydsl-jpa")
 //    implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.8")
 
-    runtimeOnly("com.h2database:h2")
+//    runtimeOnly("com.h2database:h2")
     runtimeOnly("mysql:mysql-connector-java")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -52,7 +52,7 @@ dependencies {
 //    testImplementation("org.testcontainers:junit-jupiter:1.14.3")
 //    testImplementation("org.testcontainers:mysql:1.14.3")
 
-    kapt("com.querydsl:querydsl-apt:4.2.1:jpa")
+    kapt("com.querydsl:querydsl-apt:4.4.0:jpa")
 
     implementation("io.github.serpro69:kotlin-faker:1.5.0")
 }

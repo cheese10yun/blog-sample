@@ -17,12 +17,12 @@ import com.example.querydsl.domain.QMember.member as qMember
 import com.example.querydsl.domain.QTeam.team as qTeam
 
 @Transactional
-internal class MemberTest(
+class MemberTest(
     private val em: EntityManager
 ) : SpringBootTestSupport() {
 
     @BeforeEach
-    internal fun setUp() {
+    fun setUp() {
         val teamA = Team("teamA")
         val teamB = Team("teamB")
 
@@ -44,7 +44,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `member save test`() {
+    fun `member save test`() {
         val members = em.createQuery("select m from Member m", Member::class.java).resultList
         for (member in members) {
             println("member -->> : $member")
@@ -52,7 +52,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `hibernate query`() {
+    fun `hibernate query`() {
         //when
         val member = em.createQuery("SELECT m from Member m where m.username = :username", Member::class.java)
             .setParameter("username", "member1")
@@ -63,7 +63,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl`() {
+    fun `query dsl`() {
         val username = "member1"
 
         val member = query
@@ -76,7 +76,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl search`() {
+    fun `query dsl search`() {
         //@formatter:off
         val member = query
                 .selectFrom(qMember)
@@ -92,7 +92,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl and 생략 가능`() {
+    fun `query dsl and 생략 가능`() {
         val member = query
             .selectFrom(qMember)
             .where(
@@ -106,7 +106,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl fetch type`() {
+    fun `query dsl fetch type`() {
         // 단건 조회
         val member = query
             .selectFrom(qMember)
@@ -133,10 +133,17 @@ internal class MemberTest(
             .selectFrom(qMember)
             .fetchCount()
 
+        val toString = query
+            .selectFrom(qMember)
+            .fetchCount()
+            .toString()
+
+        println("toString")
+
     }
 
     @Test
-    internal fun `query dsl sort`() {
+    fun `query dsl sort`() {
         val members = query
             .selectFrom(qMember)
             .orderBy(qMember.age.desc(), qMember.username.asc().nullsLast())
@@ -144,7 +151,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl paging fetch 조회 건수 제한`() {
+    fun `query dsl paging fetch 조회 건수 제한`() {
         val members = query
             .selectFrom(qMember)
             .orderBy(qMember.username.desc())
@@ -154,7 +161,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl paging fetch results 전체 조회 수가 필요`() {
+    fun `query dsl paging fetch results 전체 조회 수가 필요`() {
         val paging = query
             .selectFrom(qMember)
             .orderBy(qMember.username.desc())
@@ -169,7 +176,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl aggregation set`() {
+    fun `query dsl aggregation set`() {
         val result = query
             .select(
                 qMember.count(),
@@ -192,7 +199,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl group by`() {
+    fun `query dsl group by`() {
         val result = query
             .select(qTeam.name, qMember.age.avg())
             .from(qMember)
@@ -211,7 +218,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl join`() {
+    fun `query dsl join`() {
 
         val members = query
             .selectFrom(qMember)
@@ -226,7 +233,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl seta join`() {
+    fun `query dsl seta join`() {
         val members = query
             .select(qMember)
             .from(qMember, qTeam)
@@ -235,7 +242,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl join on`() {
+    fun `query dsl join on`() {
         val members = query
             .select(qMember)
             .from(qMember)
@@ -248,7 +255,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl ro relation`() {
+    fun `query dsl ro relation`() {
         val result = query
             .select(qMember, qTeam)
             .from(qMember)
@@ -262,7 +269,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl fetch join`() {
+    fun `query dsl fetch join`() {
         val team = query
             .selectFrom(qTeam)
             .join(qTeam.members, qMember).fetchJoin()
@@ -271,28 +278,32 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl sub query 나이가 가장 큰 값`() {
+    fun `query dsl sub query 나이가 가장 큰 값`() {
         val qMemberSub = QMember("memberSub")
         val member = query
             .selectFrom(qMember)
-            .where(qMember.age.eq(
-                JPAExpressions.select(qMemberSub.age.max())
-                    .from(qMemberSub)
-            ))
+            .where(
+                qMember.age.eq(
+                    JPAExpressions.select(qMemberSub.age.max())
+                        .from(qMemberSub)
+                )
+            )
             .fetchOne()!!
 
         then(member.age).isEqualTo(40)
     }
 
     @Test
-    internal fun `query dsl sub query 평균 보다 큰 나이`() {
+    fun `query dsl sub query 평균 보다 큰 나이`() {
         val qMemberSub = QMember("memberSub")
         val members = query
             .selectFrom(qMember)
-            .where(qMember.age.goe(
-                JPAExpressions.select(qMemberSub.age.avg())
-                    .from(qMemberSub)
-            ))
+            .where(
+                qMember.age.goe(
+                    JPAExpressions.select(qMemberSub.age.avg())
+                        .from(qMemberSub)
+                )
+            )
             .fetch()!!
 
         then(members).anySatisfy {
@@ -301,12 +312,14 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl basic case`() {
+    fun `query dsl basic case`() {
         val results = query
-            .select(qMember.age
-                .`when`(10).then("열살")
-                .`when`(20).then("스무살")
-                .otherwise("이타"))
+            .select(
+                qMember.age
+                    .`when`(10).then("열살")
+                    .`when`(20).then("스무살")
+                    .otherwise("이타")
+            )
             .from(qMember)
             .fetch()
 
@@ -316,7 +329,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl projection simple`() {
+    fun `query dsl projection simple`() {
         val results = query
             .select(qMember.username)
             .from(qMember)
@@ -328,7 +341,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl tuple projection`() {
+    fun `query dsl tuple projection`() {
         val results = query
             .select(qMember.username, qMember.age)
             .from(qMember)
@@ -339,22 +352,26 @@ internal class MemberTest(
             val username = tuple.get(qMember.username)
             val age = tuple.get(qMember.age)
 
-            println("""
+            println(
+                """
                 username : $username
                 age : $age
-            """.trimIndent())
+            """.trimIndent()
+            )
 
         }
     }
 
     @Test
-    internal fun `query dsl projection dto`() {
+    fun `query dsl projection dto`() {
         val members = query
-            .select(Projections.constructor(
-                MemberDtoQueryProjection::class.java,
-                qMember.username,
-                qMember.age
-            ))
+            .select(
+                Projections.constructor(
+                    MemberDtoQueryProjection::class.java,
+                    qMember.username,
+                    qMember.age
+                )
+            )
             .from(qMember)
             .fetch()
 
@@ -364,13 +381,15 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl projection dto 2`() {
+    fun `query dsl projection dto 2`() {
         val members = query
-            .select(Projections.constructor(
-                MemberDtoQueryProjection::class.java,
-                qMember.username,
-                qMember.age.max().`as`("age")
-            ))
+            .select(
+                Projections.constructor(
+                    MemberDtoQueryProjection::class.java,
+                    qMember.username,
+                    qMember.age.max().`as`("age")
+                )
+            )
             .from(qMember)
             .groupBy(qMember.age)
             .fetch()
@@ -381,11 +400,13 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl dto projection QueryProjection`() {
+    fun `query dsl dto projection QueryProjection`() {
         val members = query
-            .select(QMemberDtoQueryProjection(
-                qMember.username, qMember.age
-            ))
+            .select(
+                QMemberDtoQueryProjection(
+                    qMember.username, qMember.age
+                )
+            )
             .from(qMember)
             .fetch()
 
@@ -395,7 +416,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl dynamic query boolean builder`() {
+    fun `query dsl dynamic query boolean builder`() {
 
         val username = "member1"
         val age = 10
@@ -408,7 +429,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query dsl dynamic query`() {
+    fun `query dsl dynamic query`() {
         val username = "member1"
         val age = 10
 
@@ -423,7 +444,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query  dsl bulk update`() {
+    fun `query  dsl bulk update`() {
         val count = query
             .update(qMember)
             .set(qMember.username, "set username")
@@ -434,7 +455,7 @@ internal class MemberTest(
     }
 
     @Test
-    internal fun `query  dsl bulk delete`() {
+    fun `query  dsl bulk delete`() {
         val count = query
             .delete(qMember)
             .where(qMember.age.gt(10))

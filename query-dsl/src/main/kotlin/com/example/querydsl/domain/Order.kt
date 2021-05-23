@@ -2,7 +2,6 @@ package com.example.querydsl.domain
 
 import java.math.BigDecimal
 import javax.persistence.*
-import javax.validation.OverridesAttribute
 
 @Entity
 @Table(name = "orders")

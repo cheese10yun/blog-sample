@@ -1,12 +1,25 @@
 spring:
-  main.allow-bean-definition-overriding: true
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+    main.allow-bean-definition-overriding: true
+    jpa:
+        database: mysql
+        database-platform: com.example.querydsl.config.MysqlCustomDialect
+        generate-ddl: true
+        hibernate:
+            ddl-auto: create
+    #    show-sql: true
+    #    database-platform: com.example.querydsl.config.MysqlCustomDialect
+    #    properties:
+    #      hibernate:
+    #        format_sql: true
+    datasource:
+        url: jdbc:mysql://localhost:3366/sample?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
+        username: root
+        password:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        initialization-mode: never
+
 
 logging:
-  level:
-    ROOT: info
-    org.hibernate.type.descriptor.sql.BasicBinder: trace
+    level:
+        ROOT: info
+#    org.hibernate.type.descriptor.sql.BasicBinder: trace
