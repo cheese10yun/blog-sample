@@ -11,6 +11,7 @@ subprojects {
         api("org.springframework.boot:spring-boot-starter-data-jpa")
         api("com.querydsl:querydsl-jpa")
         api("org.springframework.boot:spring-boot-starter-validation")
+        api("com.github.jojoldu.spring-batch-querydsl:spring-batch-querydsl-reader:2.4.8")
 
 //        implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
 //        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")

@@ -4,7 +4,6 @@ import com.batch.payment.domain.payment.Payment
 import com.batch.payment.domain.payment.QPayment
 import com.batch.task.support.listener.JobReportListener
 import com.batch.task.support.logger
-import com.batch.task.support.reader.QuerydslPagingItemReader
 import org.hibernate.SessionFactory
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
@@ -18,12 +17,15 @@ import org.springframework.batch.item.database.JpaPagingItemReader
 import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
+import org.springframework.batch.item.querydsl.reader.QuerydslNoOffsetPagingItemReader
+import org.springframework.batch.item.querydsl.reader.expression.Expression
+import org.springframework.batch.item.querydsl.reader.options.QuerydslNoOffsetNumberOptions
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import javax.persistence.EntityManagerFactory
 
-const val CHUNK_SIZE = 100
-const val DATA_SET_UP_SIZE = 5_000
+const val CHUNK_SIZE = 1000
+const val DATA_SET_UP_SIZE = 5_000_000
 
 @Configuration
 class ReaderPerformanceJobConfiguration(
@@ -49,20 +51,19 @@ class ReaderPerformanceJobConfiguration(
     fun readerPerformanceStep(
         jpaCursorItemReader: JpaCursorItemReader<Payment>,
         jpaPagingItemReader: JpaPagingItemReader<Payment>,
-        hibernateCursorItemReader: HibernateCursorItemReader<Payment>,
-        queryDslPagingItemReader: QuerydslPagingItemReader<Payment>
+        hibernateCursorItemReader: HibernateCursorItemReader<Payment>
     ) =
         stepBuilderFactory["readerPerformanceStep"]
             .chunk<Payment, Payment>(CHUNK_SIZE)
-            .reader(jpaCursorItemReader)
-//            .reader(jpaPagingItemReader)
+//            .reader(jpaCursorItemReader)
+            .reader(jpaPagingItemReader)
 //            .reader(hibernateCursorItemReader)
 //            .reader(queryDslPagingItemReader)
             .writer {
                 log.info("item size ${it.size}")
-                for (payment in it) {
-                    println(payment)
-                }
+//                for (payment in it) {
+//                    println(payment)
+//                }
             }
             .build()
 
@@ -72,6 +73,7 @@ class ReaderPerformanceJobConfiguration(
         entityManagerFactory: EntityManagerFactory
     ) = JpaPagingItemReaderBuilder<Payment>()
         .name("jpaPagingItemReader")
+        .pageSize(CHUNK_SIZE)
         .entityManagerFactory(entityManagerFactory)
         .queryString("SELECT p FROM Payment p")
         .build()
@@ -83,11 +85,22 @@ class ReaderPerformanceJobConfiguration(
     ) = JpaCursorItemReaderBuilder<Payment>()
         .name("jpaCursorItemReader")
         .entityManagerFactory(entityManagerFactory)
-        .maxItemCount()
-        .currentItemCount()
-        .
         .queryString("SELECT p FROM Payment p")
         .build()
+
+    @Bean
+    @StepScope
+    fun queryDslNoOffsetPagingReader(
+        entityManagerFactory: EntityManagerFactory
+    ): QuerydslNoOffsetPagingItemReader<Payment> {
+        // 1. No Offset Option
+        val options = QuerydslNoOffsetNumberOptions<Payment, Long>(QPayment.payment.id, Expression.ASC)
+
+        // 2. Querydsl Reader
+        return QuerydslNoOffsetPagingItemReader(entityManagerFactory, CHUNK_SIZE, options) {
+            it.selectFrom(QPayment.payment)
+        }
+    }
 
     @Bean
     @StepScope
@@ -98,15 +111,4 @@ class ReaderPerformanceJobConfiguration(
         .sessionFactory(sessionFactory)
         .queryString("SELECT p FROM Payment p")
         .build()
-
-    @Bean
-    @StepScope
-    fun queryDslPagingItemReader(
-        entityManagerFactory: EntityManagerFactory
-    ) = QuerydslPagingItemReader(
-        entityManagerFactory = entityManagerFactory,
-        pageSize = CHUNK_SIZE
-    ) {
-        it.selectFrom(QPayment.payment)
-    }
 }

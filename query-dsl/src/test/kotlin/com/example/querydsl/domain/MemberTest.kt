@@ -135,10 +135,11 @@ class MemberTest(
 
         val toString = query
             .selectFrom(qMember)
-            .fetchCount()
             .toString()
 
-        println("toString")
+        println("===========")
+        println(toString)
+        println("===========")
 
     }
 
@@ -462,6 +463,22 @@ class MemberTest(
             .execute()
 
         then(count).isEqualTo(3)
+    }
+
+    @Test
+    fun `sql logging`() {
+        val members = query
+            .select(
+                Projections.constructor(
+                    MemberDtoQueryProjection::class.java,
+                    qMember.username,
+                    qMember.age
+                )
+            )
+            .from(qMember)
+
+        println(members)
+
     }
 
     private fun usernameEq(username: String?): BooleanExpression? {
