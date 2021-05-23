@@ -1,10 +1,10 @@
 package com.batch.payment.domain.payment
 
-import com.batch.payment.domain.core.EntityAuditing
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 import java.math.BigDecimal
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Table
+import java.time.LocalDateTime
+import javax.persistence.*
 
 @Entity
 @Table(name = "payment")
@@ -13,11 +13,26 @@ class Payment(
     var amount: BigDecimal,
 
     @Column(name = "order_id", nullable = false, updatable = false)
-    val orderId: Long
+    var orderId: Long
 
-) : EntityAuditing() {
+) {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null
+        internal set
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    lateinit var createdAt: LocalDateTime
+        internal set
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    lateinit var updatedAt: LocalDateTime
+        internal set
 
     override fun toString(): String {
-        return "Payment(amount=$amount, orderId=$orderId)"
+        return "Payment(id=$id)"
     }
 }

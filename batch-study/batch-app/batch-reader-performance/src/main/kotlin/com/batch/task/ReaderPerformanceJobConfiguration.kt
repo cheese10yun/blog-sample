@@ -1,10 +1,10 @@
 package com.batch.task
 
 import com.batch.payment.domain.payment.Payment
-import com.batch.payment.domain.payment.QPayment
 import com.batch.task.support.listener.JobReportListener
-import com.batch.task.support.logger
 import org.hibernate.SessionFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
@@ -22,10 +22,14 @@ import org.springframework.batch.item.querydsl.reader.expression.Expression
 import org.springframework.batch.item.querydsl.reader.options.QuerydslNoOffsetNumberOptions
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.time.LocalDateTime
 import javax.persistence.EntityManagerFactory
+import com.batch.payment.domain.payment.QPayment.payment as qPayment
 
 const val CHUNK_SIZE = 1000
-const val DATA_SET_UP_SIZE = 5_000_000
+const val DATA_SET_UP_SIZE = 1_000_000
+
+fun <A : Any> A.logger(): Lazy<Logger> = lazy { LoggerFactory.getLogger(this.javaClass) }
 
 @Configuration
 class ReaderPerformanceJobConfiguration(
@@ -51,12 +55,14 @@ class ReaderPerformanceJobConfiguration(
     fun readerPerformanceStep(
         jpaCursorItemReader: JpaCursorItemReader<Payment>,
         jpaPagingItemReader: JpaPagingItemReader<Payment>,
+        queryDslNoOffsetPagingReader: QuerydslNoOffsetPagingItemReader<Payment>,
         hibernateCursorItemReader: HibernateCursorItemReader<Payment>
     ) =
         stepBuilderFactory["readerPerformanceStep"]
             .chunk<Payment, Payment>(CHUNK_SIZE)
 //            .reader(jpaCursorItemReader)
             .reader(jpaPagingItemReader)
+//            .reader(queryDslNoOffsetPagingReader)
 //            .reader(hibernateCursorItemReader)
 //            .reader(queryDslPagingItemReader)
             .writer {
@@ -75,7 +81,8 @@ class ReaderPerformanceJobConfiguration(
         .name("jpaPagingItemReader")
         .pageSize(CHUNK_SIZE)
         .entityManagerFactory(entityManagerFactory)
-        .queryString("SELECT p FROM Payment p")
+        .queryString("SELECT p FROM Payment p where p.createdAt >= :createdAt ORDER BY p.createdAt DESC")
+        .parameterValues(mapOf("createdAt" to LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)))
         .build()
 
     @Bean
@@ -85,7 +92,8 @@ class ReaderPerformanceJobConfiguration(
     ) = JpaCursorItemReaderBuilder<Payment>()
         .name("jpaCursorItemReader")
         .entityManagerFactory(entityManagerFactory)
-        .queryString("SELECT p FROM Payment p")
+        .queryString("SELECT p FROM Payment p where p.createdAt >= :createdAt ORDER BY p.createdAt DESC")
+        .parameterValues(mapOf("createdAt" to LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)))
         .build()
 
     @Bean
@@ -94,11 +102,11 @@ class ReaderPerformanceJobConfiguration(
         entityManagerFactory: EntityManagerFactory
     ): QuerydslNoOffsetPagingItemReader<Payment> {
         // 1. No Offset Option
-        val options = QuerydslNoOffsetNumberOptions<Payment, Long>(QPayment.payment.id, Expression.ASC)
-
+        val options = QuerydslNoOffsetNumberOptions<Payment, Long>(qPayment.id, Expression.ASC)
         // 2. Querydsl Reader
         return QuerydslNoOffsetPagingItemReader(entityManagerFactory, CHUNK_SIZE, options) {
-            it.selectFrom(QPayment.payment)
+            it.selectFrom(qPayment)
+                .where(qPayment.createdAt.goe(LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)))
         }
     }
 
@@ -109,6 +117,7 @@ class ReaderPerformanceJobConfiguration(
     ) = HibernateCursorItemReaderBuilder<Payment>()
         .name("hibernateCursorItemReader")
         .sessionFactory(sessionFactory)
-        .queryString("SELECT p FROM Payment p")
+        .queryString("SELECT p FROM Payment p where p.createdAt >= :createdAt ORDER BY p.createdAt DESC")
+        .parameterValues(mapOf("createdAt" to LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)))
         .build()
 }

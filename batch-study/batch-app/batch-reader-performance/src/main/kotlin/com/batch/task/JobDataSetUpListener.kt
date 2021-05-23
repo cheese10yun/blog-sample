@@ -18,7 +18,7 @@ class JobDataSetUpListener(
         val payments = (1..DATA_SET_UP_SIZE)
             .map { Payment(it.toBigDecimal(), it.toLong()) }
 
-        val sql = "insert into payment (amount, order_id) values (?, ?)"
+        val sql = "insert into payment (amount, order_id, created_at, updated_at) values (?, ?, now(), now())"
         val connection = dataSource.connection
         val statement = connection.prepareStatement(sql)!!
 
