@@ -22,8 +22,8 @@ JpaPagingItemReader             10,000      1000      633
 JpaPagingItemReader             50,000      1000      3827      
 JpaPagingItemReader             100,000      1000      11741      
 JpaPagingItemReader             500,000      1000      206747     
-JpaPagingItemReader             1,000_000      1000      861599
-JpaPagingItemReader             5,000_000      1000
+JpaPagingItemReader             1,000_000      1000      861599 / 14
+JpaPagingItemReader             5,000_000      1000     70 -> 140
 
 QueryDslNoOffsetPagingReader             10,000      1000      658      
 QueryDslNoOffsetPagingReader             50,000      1000      2004      

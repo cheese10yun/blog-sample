@@ -1,7 +1,10 @@
 package com.batch.task
 
+import com.batch.payment.domain.payment.QPayment.payment as qPayment
 import com.batch.payment.domain.payment.Payment
 import com.batch.task.support.listener.JobReportListener
+import java.time.LocalDateTime
+import javax.persistence.EntityManagerFactory
 import org.hibernate.SessionFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -22,12 +25,9 @@ import org.springframework.batch.item.querydsl.reader.expression.Expression
 import org.springframework.batch.item.querydsl.reader.options.QuerydslNoOffsetNumberOptions
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import java.time.LocalDateTime
-import javax.persistence.EntityManagerFactory
-import com.batch.payment.domain.payment.QPayment.payment as qPayment
 
 const val CHUNK_SIZE = 1000
-const val DATA_SET_UP_SIZE = 1_000_000
+const val DATA_SET_UP_SIZE = 5_000_000
 
 fun <A : Any> A.logger(): Lazy<Logger> = lazy { LoggerFactory.getLogger(this.javaClass) }
 
@@ -60,8 +60,8 @@ class ReaderPerformanceJobConfiguration(
     ) =
         stepBuilderFactory["readerPerformanceStep"]
             .chunk<Payment, Payment>(CHUNK_SIZE)
-//            .reader(jpaCursorItemReader)
-            .reader(jpaPagingItemReader)
+            .reader(jpaCursorItemReader)
+//            .reader(jpaPagingItemReader)
 //            .reader(queryDslNoOffsetPagingReader)
 //            .reader(hibernateCursorItemReader)
 //            .reader(queryDslPagingItemReader)

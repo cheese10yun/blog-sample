@@ -1,22 +1,29 @@
 package com.batch.payment.domain.payment
 
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import java.math.BigDecimal
 import java.time.LocalDateTime
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.Index
+import javax.persistence.Table
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 
 @Entity
-@Table(name = "payment")
+@Table(
+    name = "payment",
+    indexes = [Index(columnList = "created_at")]
+)
 class Payment(
     @Column(name = "amount", nullable = false)
     var amount: BigDecimal,
 
     @Column(name = "order_id", nullable = false, updatable = false)
     var orderId: Long
-
 ) {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
@@ -31,8 +38,4 @@ class Payment(
     @Column(name = "updated_at", nullable = false)
     lateinit var updatedAt: LocalDateTime
         internal set
-
-    override fun toString(): String {
-        return "Payment(id=$id)"
-    }
 }
