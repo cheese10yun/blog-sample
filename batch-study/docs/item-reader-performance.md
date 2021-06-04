@@ -145,8 +145,6 @@ class ReaderPerformanceJobConfiguration(
 }
 ```
 
-
-
 ### JpaPagingItemReader
 
 `JpaPagingItemReader`눈 Spring Batch에서 제공해주는 ItemReader로 일반적인 페이징 방식을 통해서 가져오는 방식입니다. 모든 데이터를 한 번에 가져와서 처리할 수는 없으니 `offset`, `limit` 방식으로 데이터를 가져옵니다. 위 성능표를 보듯이 다른 리더에 비해서 현저하게 느립니다.
@@ -164,8 +162,21 @@ Hibernate: select payment0_.id as id1_0_, payment0_.amount as amount2_0_, paymen
 ```
 첫 조회 이후 두 번째 조회 까지의 시간은 `26.016 - 25.963 = 0.053` 의 짧은 시간 밖에 걸리지 않았습니다.
 
-#### 49,999,999 ~ 5,000,0000 조회
+#### 49,990,000 ~ 5,000,0000 조회
 
+```
+2021-05-31 02:24:27.943  INFO 13475 --- [           main] uration$$EnhancerBySpringCGLIB$$4d92f8c5 : item size 1000
+Hibernate: select payment0_.id as id1_0_, payment0_.amount as amount2_0_, payment0_.created_at as created_3_0_, payment0_.order_id as order_id4_0_, payment0_.updated_at as updated_5_0_ from payment payment0_ where payment0_.created_at>=? order by payment0_.created_at DESC limit ?, ?
+2021-05-31 02:25:18.092  INFO 13475 --- [           main] uration$$EnhancerBySpringCGLIB$$4d92f8c5 : item size 1000
+Hibernate: select payment0_.id as id1_0_, payment0_.amount as amount2_0_, payment0_.created_at as created_3_0_, payment0_.order_id as order_id4_0_, payment0_.updated_at as updated_5_0_ from payment payment0_ where payment0_.created_at>=? order by payment0_.created_at DESC limit ?, ?
+```
+
+마지막 청크 사이즈 조회하는 시간은 `25:18.092 - 24:27.943` 대략 51초가 걸렸습니다. 
+
+
+
+
+12 ~ 15
 
 
 ### QueryDslNoOffsetPagingReader
