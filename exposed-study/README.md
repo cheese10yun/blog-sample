@@ -199,7 +199,7 @@ spring:
         driver-class-name: com.mysql.cj.jdbc.Driver
     exposed:
         generate-ddl: true
-#        excluded-packages: com.example.exposedstudy
+        excluded-packages: com.example.exposedstudy
 
 logging.level.Exposed: debug
 ```
