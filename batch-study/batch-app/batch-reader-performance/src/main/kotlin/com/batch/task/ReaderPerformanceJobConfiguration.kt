@@ -60,9 +60,9 @@ class ReaderPerformanceJobConfiguration(
     ) =
         stepBuilderFactory["readerPerformanceStep"]
             .chunk<Payment, Payment>(CHUNK_SIZE)
-            .reader(jpaCursorItemReader)
+//            .reader(jpaCursorItemReader)
 //            .reader(jpaPagingItemReader)
-//            .reader(queryDslNoOffsetPagingReader)
+            .reader(queryDslNoOffsetPagingReader)
 //            .reader(hibernateCursorItemReader)
 //            .reader(queryDslPagingItemReader)
             .writer { log.info("item size ${it.size}") }

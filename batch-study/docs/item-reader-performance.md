@@ -249,7 +249,7 @@ QueryDslNoOffsetPagingReader는 [Spring Batch QuerydslItemReader](https://github
 
 1. `where AND id < 마지막 조회 ID` 조건으로 균일할 리드 속도를 보장
 2. 복잡한 정렬 기준이(group by, 집계 쿼리 등등) 있는 경우 사용 불가능
-3. 대량의 페이지 조회에 적합 (개인적으로 대력 5만 건 이상의 경우 사용이 적합하다고 생각합니다.)
+3. 대량의 페이지 조회에 적합 (개인적으로 대략 5만 건 이상의 경우 사용이 적합하다고 생각합니다.)
 
 ### explain: 첫 청크
 
