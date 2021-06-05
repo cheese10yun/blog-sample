@@ -5,6 +5,7 @@ import com.batch.payment.domain.payment.Payment
 import com.batch.task.support.listener.JobReportListener
 import java.time.LocalDateTime
 import javax.persistence.EntityManagerFactory
+import org.hibernate.SessionFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.batch.core.Step
@@ -13,8 +14,10 @@ import org.springframework.batch.core.configuration.annotation.JobScope
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepScope
 import org.springframework.batch.core.launch.support.RunIdIncrementer
+import org.springframework.batch.item.database.HibernateCursorItemReader
 import org.springframework.batch.item.database.JpaCursorItemReader
 import org.springframework.batch.item.database.JpaPagingItemReader
+import org.springframework.batch.item.database.builder.HibernateCursorItemReaderBuilder
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.batch.item.querydsl.reader.QuerydslNoOffsetPagingItemReader
@@ -23,8 +26,8 @@ import org.springframework.batch.item.querydsl.reader.options.QuerydslNoOffsetNu
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-const val CHUNK_SIZE = 1000
-const val DATA_SET_UP_SIZE = 5_000_000
+const val CHUNK_SIZE = 100
+const val DATA_SET_UP_SIZE = 10_000
 
 fun <A : Any> A.logger(): Lazy<Logger> = lazy { LoggerFactory.getLogger(this.javaClass) }
 
@@ -52,12 +55,13 @@ class ReaderPerformanceJobConfiguration(
     fun readerPerformanceStep(
         jpaCursorItemReader: JpaCursorItemReader<Payment>,
         jpaPagingItemReader: JpaPagingItemReader<Payment>,
+        hibernateCursorItemReader: HibernateCursorItemReader<Payment>,
         queryDslNoOffsetPagingReader: QuerydslNoOffsetPagingItemReader<Payment>
     ) =
         stepBuilderFactory["readerPerformanceStep"]
             .chunk<Payment, Payment>(CHUNK_SIZE)
-//            .reader(jpaCursorItemReader)
-            .reader(jpaPagingItemReader)
+            .reader(jpaCursorItemReader)
+//            .reader(jpaPagingItemReader)
 //            .reader(queryDslNoOffsetPagingReader)
 //            .reader(hibernateCursorItemReader)
 //            .reader(queryDslPagingItemReader)
@@ -101,14 +105,15 @@ class ReaderPerformanceJobConfiguration(
         }
     }
 
-//    @Bean
-//    @StepScope
-//    fun hibernateCursorItemReader(
-//        sessionFactory: SessionFactory
-//    ) = HibernateCursorItemReaderBuilder<Payment>()
-//        .name("hibernateCursorItemReader")
-//        .sessionFactory(sessionFactory)
-//        .queryString("SELECT p FROM Payment p where p.createdAt >= :createdAt ORDER BY p.createdAt DESC")
-//        .parameterValues(mapOf("createdAt" to LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)))
-//        .build()
+    @Bean
+    @StepScope
+    fun hibernateCursorItemReader(
+        sessionFactory: SessionFactory
+    ) = HibernateCursorItemReaderBuilder<Payment>()
+        .name("hibernateCursorItemReader")
+//        .fetchSize()
+        .sessionFactory(sessionFactory)
+        .queryString("SELECT p FROM Payment p where p.createdAt >= :createdAt ORDER BY p.createdAt DESC")
+        .parameterValues(mapOf("createdAt" to LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)))
+        .build()
 }
