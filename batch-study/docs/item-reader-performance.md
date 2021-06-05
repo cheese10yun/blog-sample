@@ -27,7 +27,7 @@ CREATE TABLE `payment`
 ### 대상 리더
 * [JpaPagingItemReader](https://docs.spring.io/spring-batch/docs/current/api/org/springframework/batch/item/database/JpaPagingItemReader.html)
 * [QueryDslNoOffsetPagingReader](https://jojoldu.tistory.com/473?category=902551)
-* [JpaCursorItemReader](https://docs.spring.io/spring-batch/docs/current/api/org/springframework/batch/item/database/JpaCursorItemReader.html)
+* [HibernateCursorItemReader]()
 
 ### 성능
 
@@ -46,12 +46,12 @@ QueryDslNoOffsetPagingReader | 100,000 | 1000 | 3523 |
 QueryDslNoOffsetPagingReader | 500,000 | 1000 | 15501 | 
 QueryDslNoOffsetPagingReader | 1,000,000 | 1000 | 28732
 QueryDslNoOffsetPagingReader | 5,000,000 | 1000 | 165249
-JpaCursorItemReader | 10,000 | 1000 | 448 | 
-JpaCursorItemReader | 50,000 | 1000 | 1605 | 
-JpaCursorItemReader | 100,000 | 1000 | 2886 | 
-JpaCursorItemReader | 500,000 | 1000 | 17411 | 
-JpaCursorItemReader | 1,000,000 | 1000 | 25439 | 
-JpaCursorItemReader | 5,000,000 | 1000 | 132552
+HibernateCursorItemReader | 10,000 | 1000 | 448 | 
+HibernateCursorItemReader | 50,000 | 1000 | 1605 | 
+HibernateCursorItemReader | 100,000 | 1000 | 2886 | 
+HibernateCursorItemReader | 500,000 | 1000 | 17411 | 
+HibernateCursorItemReader | 1,000,000 | 1000 | 25439 | 
+HibernateCursorItemReader | 5,000,000 | 1000 | 132552
 
 `JpaPagingItemReader`의 rows `5,000,000` 측정은 너무 걸려 측정하지 못했습니다. 대략 5시간 이상까지 측정하다 종료했습니다.
 
@@ -61,7 +61,7 @@ JpaCursorItemReader | 5,000,000 | 1000 | 132552
 
 ![](img/reader-performance.png)
 
-`JpaPagingItemReader` 리더의 시간이 너무 오래 소요되어  `QueryDslNoOffsetPagingReader`, `JpaCursorItemReader` 리더 비교
+`JpaPagingItemReader` 리더의 시간이 너무 오래 소요되어  `QueryDslNoOffsetPagingReader`, `HibernateCursorItemReader` 리더 비교
 
 ### 전체 코드
 
@@ -85,18 +85,16 @@ class ReaderPerformanceJobConfiguration(
     @Bean
     @JobScope
     fun readerPerformanceStep(
-        jpaCursorItemReader: JpaCursorItemReader<Payment>,
         jpaPagingItemReader: JpaPagingItemReader<Payment>,
+        hibernateCursorItemReader: HibernateCursorItemReader<Payment>,
         queryDslNoOffsetPagingReader: QuerydslNoOffsetPagingItemReader<Payment>
     ) =
         stepBuilderFactory["readerPerformanceStep"]
             .chunk<Payment, Payment>(CHUNK_SIZE)
 // 해당 Reader 중 택 1
-//            .reader(jpaCursorItemReader)
 //            .reader(jpaPagingItemReader)
 //            .reader(queryDslNoOffsetPagingReader)
 //            .reader(hibernateCursorItemReader)
-//            .reader(queryDslPagingItemReader)
             .writer { log.info("item size ${it.size}") }
             .build()
 
@@ -111,18 +109,7 @@ class ReaderPerformanceJobConfiguration(
         .queryString("SELECT p FROM Payment p where p.createdAt >= :createdAt ORDER BY p.createdAt DESC")
         .parameterValues(mapOf("createdAt" to LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)))
         .build()
-
-    @Bean
-    @StepScope
-    fun jpaCursorItemReader(
-        entityManagerFactory: EntityManagerFactory
-    ) = JpaCursorItemReaderBuilder<Payment>()
-        .name("jpaCursorItemReader")
-        .entityManagerFactory(entityManagerFactory)
-        .queryString("SELECT p FROM Payment p where p.createdAt >= :createdAt ORDER BY p.createdAt DESC")
-        .parameterValues(mapOf("createdAt" to LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)))
-        .build()
-
+    
     @Bean
     @StepScope
     fun queryDslNoOffsetPagingReader(
@@ -136,6 +123,18 @@ class ReaderPerformanceJobConfiguration(
                 .where(qPayment.createdAt.goe(LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)))
         }
     }
+
+    @Bean
+    @StepScope
+    fun hibernateCursorItemReader(
+        sessionFactory: SessionFactory
+    ) = HibernateCursorItemReaderBuilder<Payment>()
+        .name("hibernateCursorItemReader")
+        .fetchSize()
+        .sessionFactory(sessionFactory)
+        .queryString("SELECT p FROM Payment p where p.createdAt >= :createdAt ORDER BY p.createdAt DESC")
+        .parameterValues(mapOf("createdAt" to LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)))
+        .build()
 }
 ```
 
@@ -298,4 +297,6 @@ limit 1000;
 
 **첫 청크와 마지막 청크의 실행 계획이 동일한 것을 확인할 수 있습니다. 즉 해당 리더는 청크 사이즈, 데이터 총 rows와 별개로 조회 시간이 균일합니다.**
 
-### JpaCursorItemReader
+### HibernateCursorItemReader
+
+나중에 추가하겠음
