@@ -6,7 +6,7 @@
 ## Mockserver Netty 장점
 직관적이고 쉽게 학습하기 좋은 점도 있지만, `MockRestServiceServer`에 비해서 가장 큰 장점으로 생각되는 것은 HTTP Client에 대한 제약이 생대적으로 없는 부분입니다. `MockRestServiceServer` 이름에서부터 설명되지만 `ResTemplate` 테스트를 위한 서비스입니다. 물론 RestTemplate만을 사용하면 괜찮은 도구라고 생각합니다. 전용 테스트 서비스이니 `RestTemplate`와 핏이 잘 맞는 부분은 큰 장점입니다. 하지만 `RestTemplate` 이외의 HTTP Client에 대한 테스트를 진행하기 어려운 점이 있습니다.
 
-무 것보다도 `RestTemplate`의존성이 `spring-boot-starter-web`에 종속해 이따 보니 웹서버 모듈이 아닌 경우에는 `RestTemplate`를 사용하기 어려운 부분이 있습니다. 특히 프로젝트가 고도화되면 모듈을 세부적으로 나누는 작업을 진행하다 보면 `IO` 관련된 모듈을 따로 만들게 되는데 이때 `spring-boot-starter-web` 의존성을 갖는 것이 바람직하지 않는 경우가 있습니다.
+무엇보다도 `RestTemplate`의존성이 `spring-boot-starter-web`에 종속해 이따 보니 웹서버 모듈이 아닌 경우에는 `RestTemplate`를 사용하기 어려운 부분이 있습니다. 특히 프로젝트가 고도화되면 모듈을 세부적으로 나누는 작업을 진행하다 보면 `IO` 관련된 모듈을 따로 만들게 되는데 이때 `spring-boot-starter-web` 의존성을 갖는 것이 바람직하지 않는 경우가 있습니다.
 
 ## 사용법
 
