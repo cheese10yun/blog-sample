@@ -69,7 +69,7 @@ open class PageableItemReader<T>(
 ### PageableItemReader 생성자
 
 `PageableItemReader`는 이전에 작성 `JpaPagingItemReaderBuilder` 사용법과 비슷합니다. 코틀린에서는 Named Parameter를 지원하기 때문에 별의 Builder Pattern을 사용하지 않고 손쉽게 객채
-생성이 가능하기 떄문에 별도의 Builder를 생성하지 않고 객채 생성을 진행 하면됩니다.
+생성이 가능하기 때문에 별도의 Builder를 생성하지 않고 객채 생성을 진행 하면됩니다.
 
 ```kotlin
 open class PageableItemReader<T>(
@@ -137,7 +137,7 @@ fun beforeRead() {
 `@BeforeRead`어노테이션으로 실제 ItemReader가 동작하기전에 해당 코드가 동작합니다. `this.page < 0`경우  **(page는 0부터 시작 하니 0 page까지 다읽고 -1 page가 되면 더이상 read할 데이터가 없으니
 종료 합니다)** 이제 더이상 작업을 진행하지 않기 위해서 return으로 종료를 진행합니다.
 
-또 `this.readContent.isEmpty()` 해당 page content가 없는 경우 다음 페이지 (정확히는 페이지를 감소 시키기 떄문에 이전 이라고 할 수 있음)의 content 리스트를 가저옵니다. 페이지 감소는 `read` 메서드 에서
+또 `this.readContent.isEmpty()` 해당 page content가 없는 경우 다음 페이지 (정확히는 페이지를 감소 시키기 때문에 이전 이라고 할 수 있음)의 content 리스트를 가저옵니다. 페이지 감소는 `read` 메서드 에서
 진행됩니다.
 
 ### read

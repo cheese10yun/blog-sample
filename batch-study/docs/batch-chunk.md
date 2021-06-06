@@ -8,7 +8,7 @@ Spring Batch의 킁 장점 중 하나는 Chunk 지향 처리에있습니다. Chu
 
 Spring Batch에서의 Chunk란 **데이터의 덩어리로 작업 할 때 각 커밋 사이의 처리되는 row수를 뜻합니다.**
 
-**Chunk 단위로 트랜잭션을 수행하기 떄문에 실패할 경우 해당 Chunk 만큼 롤백이 되고, 이전에 커밋도니 트랜잭션 범위까지는 반영이 됩니다.**
+**Chunk 단위로 트랜잭션을 수행하기 때문에 실패할 경우 해당 Chunk 만큼 롤백이 되고, 이전에 커밋도니 트랜잭션 범위까지는 반영이 됩니다.**
 
 ![](https://docs.spring.io/spring-batch/docs/4.0.x/reference/html/images/chunk-oriented-processing.png)
 
@@ -256,7 +256,7 @@ protected T doRead() throws Exception {
 }
 ```
 
-doRead()에서는 현재 읽어올 데이터가 없거나, Page Size를 초과한 경우 doReadPage()를 호출합니다. 읽어올 데이터가 없는 경우 read가 처음 시작할 떄를 얘기합니다. Page SIZE를 초과하는 경우, 예를 들면 Page
+doRead()에서는 현재 읽어올 데이터가 없거나, Page Size를 초과한 경우 doReadPage()를 호출합니다. 읽어올 데이터가 없는 경우 read가 처음 시작할 때를 얘기합니다. Page SIZE를 초과하는 경우, 예를 들면 Page
 Size가 10인데, 이번에 읽어야할 데이터가 11 번째 데이터인 경우입니다. 이런 경우 Page Size를 초과했기 때문에 `doReadPage()`를 호출합니다.
 
 **즉, Page 단위로 끊어서 조회하는 것입니다.**

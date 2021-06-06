@@ -140,7 +140,7 @@ class Task(val name: String) {
 }
 ```
 
-Task 클래스는 name, priority라는 두 가지 속성을 정의한다. 속성 하나는 주 생성자 안에 선언된 반면 다른 속성은 클래스의 최상위 멤버로 선언되었다. 이 방식으로 priority값을 할당할 수 있지만 클래스를 인스턴스할 떄 priority에 값을 할당할 수 없다는 것이다.
+Task 클래스는 name, priority라는 두 가지 속성을 정의한다. 속성 하나는 주 생성자 안에 선언된 반면 다른 속성은 클래스의 최상위 멤버로 선언되었다. 이 방식으로 priority값을 할당할 수 있지만 클래스를 인스턴스할 때 priority에 값을 할당할 수 없다는 것이다.
 
 ```kotlin
 var priority = 3
@@ -281,7 +281,7 @@ fun doNothing(): Nothing = throw Exceotion("Nothing at all")
 val x = null
 ```
 
-구체적인 타입 없이 변수에 널을 할당하는 경우 컴파일러는 x에 대한 다른 정보가 없기 떄문에 추론된 x의 타입은 Nothing? 이다. **더 중요한 사실은 코틀린에서 Nothing 클래스는 실제로 다른 모든 타입의 하위 타입이라는 것이다.**
+구체적인 타입 없이 변수에 널을 할당하는 경우 컴파일러는 x에 대한 다른 정보가 없기 때문에 추론된 x의 타입은 Nothing? 이다. **더 중요한 사실은 코틀린에서 Nothing 클래스는 실제로 다른 모든 타입의 하위 타입이라는 것이다.**
 
 Nothing 클래스가 다른 모든 타입의 하위 타윕어아야 하는 이유는 다음과 같다
 
