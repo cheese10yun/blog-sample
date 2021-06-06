@@ -79,7 +79,7 @@
 * [Spring with Kotlin](https://github.com/cheese10yun/spring-kotlin-api/blob/master/docs/spring-with-kotlin.md)
 * [레플리케이션 트랜잭션 처리 방식](https://github.com/cheese10yun/blog-sample/blob/master/spring-transaction/READEMD.md)
 * [Exposed](https://github.com/cheese10yun/blog-sample/blob/master/exposed-study/README.md)
-* [Spring Batch Reader 성능 측정 및 분석](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/batch-reader-performance.md)
+* [Spring Batch Reader 성능 측정 및 분석](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/item-reader-performance.md)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
