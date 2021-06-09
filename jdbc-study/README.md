@@ -1,3 +1,6 @@
+> [Real MySQL 개발자와 DBA를 위한](http://www.yes24.com/Product/Goods/6960931)을 보고 정리한 내용입니다.
+
+
 # JDBC
 자바 프로그램 언어로 MySQL 데이터베이스에 접속해서 SQL을 실행하려면 자바에서 제공하는 표준 데이터베이스 접속 API인 JDBC를 이용 해야한다. 자바에서 제공하는 JDBC는 사실은 껍대기 Inerface일 뿐이며, 실제 각 DBMS에 접속해 필요한 작업을 하는 알맹이는 각 DBMS 제조사에서 제공하는 JDBC 드라이버다.
 
