@@ -33,7 +33,7 @@ public class JdbcCursorFetch {
 
     public Connection getConnection() throws Exception {
         final String driver = "com.mysql.cj.jdbc.Driver";
-        final String url = "jdbc:mysql://localhost:3366/batch_study?useCursorFetch=true&defaultFetchSize=100000";
+        final String url = "jdbc:mysql://localhost:3366/batch_study?useCursorFetch=true&defaultFetchSize=10000";
         final String user = "root";
         final String password = "";
 
@@ -43,3 +43,4 @@ public class JdbcCursorFetch {
 }
 // 62
 // 62
+// 63

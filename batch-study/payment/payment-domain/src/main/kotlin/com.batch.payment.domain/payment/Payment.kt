@@ -15,7 +15,9 @@ import org.hibernate.annotations.UpdateTimestamp
 @Entity
 @Table(
     name = "payment",
-    indexes = [Index(columnList = "created_at")]
+    indexes = [
+        Index(columnList = "created_at", name = "idx_created_at")
+    ]
 )
 class Payment(
     @Column(name = "amount", nullable = false)

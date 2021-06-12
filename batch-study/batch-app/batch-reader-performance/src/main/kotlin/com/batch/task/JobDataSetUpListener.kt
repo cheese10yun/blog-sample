@@ -6,6 +6,8 @@ import org.springframework.batch.core.JobExecution
 import org.springframework.batch.core.JobExecutionListener
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.sql.DataSource
 
 @Component
@@ -18,7 +20,7 @@ class JobDataSetUpListener(
         val payments = (1..DATA_SET_UP_SIZE)
             .map { Payment(it.toBigDecimal(), it.toLong()) }
 
-        val sql = "insert into payment (amount, order_id, created_at, updated_at) values (?, ?, now(), now())"
+        val sql = "insert into payment (amount, order_id, created_at, updated_at) values (?, ?, ?, ?)"
         val connection = dataSource.connection
         val statement = connection.prepareStatement(sql)!!
 
@@ -27,6 +29,8 @@ class JobDataSetUpListener(
                 statement.apply {
                     setBigDecimal(1, BigDecimal.ZERO)
                     setLong(2, payment.orderId)
+                    setObject(3, LocalDateTime.now())
+                    setObject(4, LocalDateTime.now())
                     addBatch()
                 }
             }
