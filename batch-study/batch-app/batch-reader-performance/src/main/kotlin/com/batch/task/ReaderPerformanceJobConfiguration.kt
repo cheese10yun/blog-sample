@@ -26,8 +26,8 @@ import org.springframework.batch.item.querydsl.reader.options.QuerydslNoOffsetNu
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-const val CHUNK_SIZE = 100
-const val DATA_SET_UP_SIZE = 10_000
+const val CHUNK_SIZE = 10000
+const val DATA_SET_UP_SIZE = 5_000_000
 
 fun <A : Any> A.logger(): Lazy<Logger> = lazy { LoggerFactory.getLogger(this.javaClass) }
 
@@ -62,8 +62,8 @@ class ReaderPerformanceJobConfiguration(
             .chunk<Payment, Payment>(CHUNK_SIZE)
 //            .reader(jpaCursorItemReader)
 //            .reader(jpaPagingItemReader)
-            .reader(queryDslNoOffsetPagingReader)
-//            .reader(hibernateCursorItemReader)
+//            .reader(queryDslNoOffsetPagingReader)
+            .reader(hibernateCursorItemReader)
 //            .reader(queryDslPagingItemReader)
             .writer { log.info("item size ${it.size}") }
             .build()
@@ -111,7 +111,8 @@ class ReaderPerformanceJobConfiguration(
         sessionFactory: SessionFactory
     ) = HibernateCursorItemReaderBuilder<Payment>()
         .name("hibernateCursorItemReader")
-//        .fetchSize()
+        .fetchSize(CHUNK_SIZE)
+        .maxItemCount(CHUNK_SIZE)
         .sessionFactory(sessionFactory)
         .queryString("SELECT p FROM Payment p where p.createdAt >= :createdAt ORDER BY p.createdAt DESC")
         .parameterValues(mapOf("createdAt" to LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)))
