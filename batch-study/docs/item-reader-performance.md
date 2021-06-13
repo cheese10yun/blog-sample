@@ -462,7 +462,7 @@ class ReaderPerformanceJobConfiguration(
     }
 }
 ```
-fetchSize를 위처럼 10으로 주면 마치 `Statement.setFetchSzie(10)`이 입력되게 되며 해당 rows 별로 스트리밍 하는 거 같지만 저건 어디까지나 청크 사이즈와 개념으로 해당 해당 Reader가 fetchSize 만큼 읽고 나서 Processor or Writer로 넘어가는 사이즈입니다.
+fetchSize를 위처럼 10으로 주면 마치 `Statement.setFetchSzie(10)`이 입력되게 되며 해당 rows 별로 스트리밍 하는 거 같지만 저건 어디까지나 청크 사이즈 개념으로 해당 해당 Reader가 fetchSize 만큼 읽고 나서 Processor or Writer로 넘어가는 사이즈입니다.
 
 > ![](https://camo.githubusercontent.com/11d20a04aec707c42067d8d6797ffcdf55245c07d6345acf883bfec0a6674a4d/68747470733a2f2f646f63732e737072696e672e696f2f737072696e672d62617463682f646f63732f342e302e782f7265666572656e63652f68746d6c2f696d616765732f6368756e6b2d6f7269656e7465642d70726f63657373696e672e706e67)
 > 출처 [Chunk-oriented Processing](https://docs.spring.io/spring-batch/docs/4.0.x/reference/html/index-single.html#chunkOrientedProcessing)
