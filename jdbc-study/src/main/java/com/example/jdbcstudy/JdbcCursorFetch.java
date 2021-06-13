@@ -15,8 +15,8 @@ public class JdbcCursorFetch {
         final StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        final String sql = "SELECT *FROM payment WHERE created_at >= '2021-05-01 00:00:00' ORDER BY created_at DESC";
-        final Statement statement = connection.createStatement();
+        final String sql = "SELECT *FROM payment WHERE created_at >= '2021-05-01 00:00:00' ORDER BY id DESC";
+        final Statement statement = connection.prepareStatement(sql);
         final ResultSet resultSet = statement.executeQuery(sql);
 
         while (resultSet.next()) {

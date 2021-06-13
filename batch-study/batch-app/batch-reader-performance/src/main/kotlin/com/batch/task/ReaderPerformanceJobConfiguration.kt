@@ -27,10 +27,11 @@ import org.springframework.batch.item.querydsl.reader.options.QuerydslNoOffsetNu
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-const val CHUNK_SIZE = 1000
-const val DATA_SET_UP_SIZE = 10_000
+const val CHUNK_SIZE = 10
+const val DATA_SET_UP_SIZE = 1_000
 
 fun <A : Any> A.logger(): Lazy<Logger> = lazy { LoggerFactory.getLogger(this.javaClass) }
+private val localDateTime = LocalDateTime.of(2021, 6, 1, 0, 0, 0)
 
 @Configuration
 class ReaderPerformanceJobConfiguration(
@@ -62,9 +63,9 @@ class ReaderPerformanceJobConfiguration(
         stepBuilderFactory["readerPerformanceStep"]
             .chunk<Payment, Payment>(CHUNK_SIZE)
 //            .reader(jpaCursorItemReader)
-//            .reader(jpaPagingItemReader)
+            .reader(jpaPagingItemReader)
 //            .reader(queryDslNoOffsetPagingReader)
-            .reader(hibernateCursorItemReader)
+//            .reader(hibernateCursorItemReader)
 //            .reader(queryDslPagingItemReader)
 //            .writer { log.info("item size ${it.size}") }
             .writer(writer())
@@ -73,6 +74,7 @@ class ReaderPerformanceJobConfiguration(
     fun writer() = ItemWriter<Payment> {
         log.info("item size ${it.size}")
     }
+
 
     @Bean
     @StepScope
@@ -83,12 +85,7 @@ class ReaderPerformanceJobConfiguration(
         .pageSize(CHUNK_SIZE)
         .entityManagerFactory(entityManagerFactory)
         .queryString("SELECT p FROM Payment p where p.createdAt >= :createdAt ORDER BY p.createdAt DESC")
-        .parameterValues(
-            mapOf(
-                "createdAt" to LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)
-                    .withNano(0)
-            )
-        )
+        .parameterValues(mapOf("createdAt" to localDateTime))
         .build()
 
     @Bean
@@ -99,12 +96,7 @@ class ReaderPerformanceJobConfiguration(
         .name("jpaCursorItemReader")
         .entityManagerFactory(entityManagerFactory)
         .queryString("SELECT p FROM Payment p where p.createdAt >= :createdAt ORDER BY p.createdAt DESC")
-        .parameterValues(
-            mapOf(
-                "createdAt" to LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)
-                    .withNano(0)
-            )
-        )
+        .parameterValues(mapOf("createdAt" to localDateTime))
         .build()
 
     @Bean
@@ -119,7 +111,7 @@ class ReaderPerformanceJobConfiguration(
             it.selectFrom(qPayment)
                 .where(
                     qPayment.createdAt.goe(
-                        LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)
+                        localDateTime
                     )
                 )
         }
@@ -132,14 +124,8 @@ class ReaderPerformanceJobConfiguration(
     ) = HibernateCursorItemReaderBuilder<Payment>()
         .name("hibernateCursorItemReader")
         .fetchSize(CHUNK_SIZE)
-        .maxItemCount(CHUNK_SIZE)
         .sessionFactory(sessionFactory)
         .queryString("SELECT p FROM Payment p where p.createdAt >= :createdAt ORDER BY p.createdAt DESC")
-        .parameterValues(
-            mapOf(
-                "createdAt" to LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)
-                    .withNano(0)
-            )
-        )
+        .parameterValues(mapOf("createdAt" to localDateTime))
         .build()
 }
