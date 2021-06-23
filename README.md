@@ -80,6 +80,7 @@
 * [레플리케이션 트랜잭션 처리 방식](https://github.com/cheese10yun/blog-sample/blob/master/spring-transaction/READEMD.md)
 * [Exposed](https://github.com/cheese10yun/blog-sample/blob/master/exposed-study/README.md)
 * [Spring Batch Reader 성능 측정 및 분석](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/item-reader-performance.md)
+* [JPA JPQL의 조회 동작 살펴보기](https://github.com/cheese10yun/blog-sample/blob/master/jpa-repeatable-read/README.md)
 
 ## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
