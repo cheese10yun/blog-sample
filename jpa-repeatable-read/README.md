@@ -89,15 +89,15 @@ class JpqlTest(
 
 ```sql
 SELECT team0_.id AS id1_1_0_,
-         members1_.id AS id1_0_1_,
-         team0_.name AS name2_1_0_,
-         members1_.age AS age2_0_1_,
-         members1_.team_id AS team_id4_0_1_,
-         members1_.username AS username3_0_1_,
-         members1_.team_id AS team_id4_0_0__,
-         members1_.id AS id1_0_0__
+       members1_.id AS id1_0_1_,
+       team0_.name AS name2_1_0_,
+       members1_.age AS age2_0_1_,
+       members1_.team_id AS team_id4_0_1_,
+       members1_.username AS username3_0_1_,
+       members1_.team_id AS team_id4_0_0__,
+       members1_.id AS id1_0_0__
 FROM team team0_
-INNER JOIN member members1_ ON team0_.id=members1_.team_id
+         INNER JOIN member members1_ ON team0_.id=members1_.team_id
 WHERE team0_.name=?
 ```
 
@@ -212,11 +212,11 @@ READ COMMITTED 레벨에서는 더티 리드 현상은 발생하지 않습니다
 2. 사용자 A는 A 편의점 지급 금액을 5,000 -> 10,000으로 변경합니다.
 3. 사용자 B는 A 편의점 지급 금액을 다시 조회합니다. **1번에서 조회한 지급 금액 5,000이 아니라 10,000이 조회됩니다.**
 
-다시 조회하지 않으면 문제가 없다고 생각할 수 있지만 이는 문제의 본질이 아닙니다. **사용자 B는 트랜잭션을 BEGIN으로 시작했으면 해당 시점에서 데이터는 변경이 없이 반복적으로 조회를 하여도 결과가 반드시 동일하다는 것입니다.**
+다시 조회하지 않으면 문제가 없다고 생각할 수 있지만 이는 문제의 본질이 아닙니다. **사용자 B는 트랜잭션을 BEGIN으로 시작했으면 해당 시점에서 데이터는 변경이 없이 반복적으로 조회를 하여도 결과가 반드시 동일해야 하는 것입니다.**
 
 B마켓의 지급 금액을 2,000 -> 3,000으로 변경해도 동일합니다. 트랜잭션 BEGIN으로 데이터를 조회를 시작하면 그 시점의 스냅샷 데이터로 조회하는 것이며 반복적인 조회를 해도 해당 스냅샷의 데이터를 동일하게 조회해야 합니다.
 
-READ COMMITTED 격리 수준에서는 트랜잭션 내에서 실행되는 SELECT 문장과 트랜잭션 외부에서 실행되는 SELECT 문장의 차이가 없습니다. **하지만 REPEATABLE READ 격리 수준에서는 기본적으로 SELECT 쿼리 문장도 트랜잭션 범위 내에서만 작동해야 합니다. 즉, `BEGEN TRANSACTION`으로 트랜잭션을 시작한 상태에서 온종일 동일한 쿼리를 반복해서 실행해봐도 동일한 결과를 보장받습니다. 아무리 다른 트랜잭션에서 그 데이터를 변경하고자 COMMIT을 실행한다 하더라도 동일한 결과를 응답받습니다.**
+READ COMMITTED 격리 수준에서는 트랜잭션 내에서 실행되는 SELECT 문장과 트랜잭션 외부에서 실행되는 SELECT 문장의 차이가 없습니다. **하지만 REPEATABLE READ 격리 수준에서는 기본적으로 SELECT 쿼리 문장도 트랜잭션 범위 내에서만 작동해야 합니다. 즉, `BEGEN TRANSACTION`으로 트랜잭션을 시작한 상태에서는 동일한 쿼리를 반복해서 실행해봐도 동일한 결과를 보장받습니다. 아무리 다른 트랜잭션에서 그 데이터를 변경하고자 COMMIT을 실행한다 하더라도 동일한 결과를 응답받습니다.**
 
 ### REPEATABLE READ
 
