@@ -90,15 +90,15 @@ class JpqlTest(
 
 ```sql
 SELECT team0_.id AS id1_1_0_,
-         members1_.id AS id1_0_1_,
-         team0_.name AS name2_1_0_,
-         members1_.age AS age2_0_1_,
-         members1_.team_id AS team_id4_0_1_,
-         members1_.username AS username3_0_1_,
-         members1_.team_id AS team_id4_0_0__,
-         members1_.id AS id1_0_0__
+       members1_.id AS id1_0_1_,
+       team0_.name AS name2_1_0_,
+       members1_.age AS age2_0_1_,
+       members1_.team_id AS team_id4_0_1_,
+       members1_.username AS username3_0_1_,
+       members1_.team_id AS team_id4_0_0__,
+       members1_.id AS id1_0_0__
 FROM team team0_
-INNER JOIN member members1_ ON team0_.id=members1_.team_id
+         INNER JOIN member members1_ ON team0_.id=members1_.team_id
 WHERE team0_.name=?
 ```
 
@@ -201,7 +201,7 @@ READ COMMITTED 레벨에서는 더티 리드 현상은 발생하지 않습니다
 2. 사용자 A가 이름을 'Yun'으로 변경하고 커밋을 실행
 3. 사용자 B는 똑같이 **SELECT 하면 이번에는 결과가 1건이 조회된다.**
 
-이는 별다른 문제가 없어 보이지만, **사실 사용자 B가 하나의 트랜잭션 내에서 똑같은 SELECT 쿼리를 실행했을 때는 항상 같은 결과를 가져와야 한다는 REPEATABLE READ 정합성에 어긋나는 것이다.**
+이는 별다른 문제가 없어 보이지만, **사실 사용자 B가 하나의 트랜잭션 내에서 똑같은 SELECT 쿼리를 실행했을 때는 항상 같은 결과를 가져와야 한다는 REPEATABLE READ 정합성에 어긋납니다.**
 
 이것은 별다른 문제가 없어 보일 수 있습니다 **하지만 사용자 B가 하나의 트랜잭션 내에서 똑같은 SELECT 쿼리를 실행했을 때는 항상 동일한 결과를 가져와야 합니다. 이를 REPEATABLE READ 라고 하며 READ COMMITTED 레벨에서는 NOE-REPEATABLE READ 문제가 발생하게 됩니다.**
 
@@ -219,7 +219,7 @@ B마켓의 지급 금액을 2,000 -> 3,000으로 변경해도 동일합니다. �
 
 READ COMMITTED 격리 수준에서는 트랜잭션 내에서 실행되는 SELECT 문장과 트랜잭션 외부에서 실행되는 SELECT 문장의 차이가 없습니다. **하지만 REPEATABLE READ 격리 수준에서는 기본적으로 SELECT 쿼리 문장도 트랜잭션 범위 내에서만 작동해야 합니다. 즉, `BEGEN TRANSACTION`으로 트랜잭션을 시작한 상태에서 온종일 동일한 쿼리를 반복해서 실행해봐도 동일한 결과를 보장받습니다. 아무리 다른 트랜잭션에서 그 데이터를 변경하고자 COMMIT을 실행한다 하더라도 동일한 결과를 응답받습니다.**
 
-#### REPEATABLE READ
+### REPEATABLE READ
 
 REPEATABLE READ는 MySQL의 InnoDB 스토리지 엔진에서 기본적으로 사용되는 격리 수준입니다. 이 격리 수준에서는 READ COMMITED 격리 수준에서 발생하는 NON-REPEATABLE READ 문제가 발생하지 않습니다. **InnoDB 스토리지 엔진은 트랜잭션이 ROLLBACK될 가능성에 대비해 변경되기 전 레코드를 언두 공간에 백업해두고 실제 레코드 값을 변경하며 이러한 변경 방식을 MVCC라고 합니다.** REPEATABLE READ와 READ COMMITTED의 차이는 언두 영역에 백업된 레코드의 여러 버전 가운데 몇 번째 이전 버전까지 찾아 들어가야 하는지에 있는 것입니다.
 
@@ -245,4 +245,4 @@ MySQL을 사용한다면 기본적으로 격리 레벨이 REPEATABLE READ 이긴
 
 ## 참고
 * [자바 ORM 표준 JPA 프로그래밍 ](http://www.kyobobook.co.kr/product/detailViewKor.laf?mallGb=KOR&ejkGb=KOR&barcode=9788960777330)
-* [Real MySQL](http://www.yes24.com/Product/Goods/6960931)
+* [Real MySQL](http://www.yes24.com/Product/Goods/6960931) ISOLATION 설명은 해당 도서를 참고했습니다.
