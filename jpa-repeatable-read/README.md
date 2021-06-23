@@ -84,7 +84,7 @@ class JpqlTest(
     }
 }
 ```
-![](docs/test-code-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/jpa-repeatable-read/docs/test-code-1.png)
 
 해당 테스트는 실패합니다. teamA를 저장하고, member1, member2에 각각 teamA를 저장했습니다. 그리고 Fetch Join을 통해서 아래 SQL 문으로 데이터를 조회합니다.
 
@@ -109,7 +109,7 @@ WHERE team0_.name=?
 > 주의!
 > Team 객체를 저장할 때 member1, member2를 members 컬렉션에 저장하는 양방향 편의 메서드를 작성하면 해당 테스트는 실패하지 않습니다. JPQL의 동작 방식을 테스트해보기 위해서 작성했습니다.
 
-![](docs/jpql-2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/jpa-repeatable-read/docs/jpql-2.png)
 
 영속성 컨텍스트와 데이터베이스 흐름을 자세히 살펴 보겠습니다.
 
@@ -120,7 +120,7 @@ WHERE team0_.name=?
 
 위와 같은 메커니즘으로 JPQL이 동작하니 해당 테스트는 실패하게 됩니다. **그렇다면 조회 직전에 영속성 컨텍스트를 초기화 하면 어떻게 동작할까요?**
 
-![](docs/jpql-3.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/jpa-repeatable-read/docs/jpql-3.png)
 
 3번 조회 잔에 영속성 컨텍스트를 초기화를 하면 위 이미지처럼 3번에서 조회한 값을 영속성 컨텍스트에 저장하게 됩니다.
 
@@ -138,7 +138,7 @@ WHERE team0_.name=?
 
 em.clear() 메서드로 영속성 컨텍스트를 제거하고 테스트를 돌리면 정상적으로 동작하게 됩니다.
 
-![](docs/test-code-2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/jpa-repeatable-read/docs/test-code-2.png)
 
 위 테스트를 통해서 JPQL 조회 방식에 대해서 검증을 진행 완료했습니다.
 
@@ -207,7 +207,7 @@ READ COMMITTED 레벨에서는 더티 리드 현상은 발생하지 않습니다
 
 해당 문제를 정산 시스템의 시나리오로 다시 풀어서 설명드리겠습니다. (물론 아래 흐름처럼 정산 시스템이 동작하지는 않습니다. 예시를 들어 설명하기 위함입니다.)
 
-![](docs/mysql_commited-3.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/jpa-repeatable-read/docs/mysql_commited-3.png)
 
 1. 사용자 B는 A 편의점 지급 금액을 조회하여 지급 금액 5,000을 조회합니다.
 2. 사용자 A는 A 편의점 지급 금액을 5,000 -> 10,000으로 변경합니다.
@@ -237,7 +237,7 @@ REPEATABLE READ는 MySQL의 InnoDB 스토리지 엔진에서 기본적으로 사
 
 ## 다시 JPQL
 
-![](docs/jpql-2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/jpa-repeatable-read/docs/jpql-2.png)
 
 다시 JPQL 조회 방식으로 돌아가겠습니다. **이미 영속성 컨텍스트에 데이터가 존재하는 경우에는 DIRY READ가 발생해서 아직 COMMIT 되지 않은 데이터를 읽어 오더라도 4번 항목에서 데이터를 버리게 돼서 애플리케이션에서는 DIRY READ가 발생하지 않으며 동일하게 NON-REPEATABLE READ가 발생해서 동일 트랜잭션에서 반복 읽기 시에 UNDO 영역의 데이터를 가져오지 않더라도 애플리케이션에서는 NON-REPEATABLE READ가 발생하지 않습니다.**
 
