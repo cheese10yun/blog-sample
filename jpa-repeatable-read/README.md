@@ -2,10 +2,9 @@
 
 ## JPQL 조회 방식
 
-![](https://github.com/cheese10yun/blog-sample/raw/master/query-dsl/docs/images/query-result-.png)
-
-
 findById() 같은 경우는 영속성 컨텍스트를 먼저 찾고 영속성 컨텍스트에 해당 엔티티가 있으면 그 값을 바로 리턴합니다. 이를 1차 캐시라고 말합니다. **반면 JPQL은 영속성성 컨텍스트를 먼저 조회하지 않고 데이터베이스에 Query 하여 결과를 가져옵니다.** 그리고 아래와 같은 흐름으로 영속성 컨텍스트를 저장을 시도합니다.
+
+![](https://github.com/cheese10yun/blog-sample/raw/master/query-dsl/docs/images/query-result-.png)
 
 1. **JPQL을 호출하면 데이터베이스에 우선적으로 조회한다.**
 2. 조회한 값을 영속성 컨텍스트에 저장을 시도한다.
@@ -90,15 +89,15 @@ class JpqlTest(
 
 ```sql
 SELECT team0_.id AS id1_1_0_,
-       members1_.id AS id1_0_1_,
-       team0_.name AS name2_1_0_,
-       members1_.age AS age2_0_1_,
-       members1_.team_id AS team_id4_0_1_,
-       members1_.username AS username3_0_1_,
-       members1_.team_id AS team_id4_0_0__,
-       members1_.id AS id1_0_0__
+         members1_.id AS id1_0_1_,
+         team0_.name AS name2_1_0_,
+         members1_.age AS age2_0_1_,
+         members1_.team_id AS team_id4_0_1_,
+         members1_.username AS username3_0_1_,
+         members1_.team_id AS team_id4_0_0__,
+         members1_.id AS id1_0_0__
 FROM team team0_
-         INNER JOIN member members1_ ON team0_.id=members1_.team_id
+INNER JOIN member members1_ ON team0_.id=members1_.team_id
 WHERE team0_.name=?
 ```
 
