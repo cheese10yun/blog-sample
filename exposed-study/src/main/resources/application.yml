@@ -8,4 +8,4 @@ spring:
         generate-ddl: true
 #        excluded-packages: com.example.exposedstudy
 
-logging.level.Exposed: debug
+#logging.level.Exposed: debug

@@ -73,3 +73,24 @@ data class BookWithWriter(
         val email: String,
         val name: String
 )
+
+object Orders : LongIdTable(name = "orders") {
+    val amount = decimal("amount", 19, 4)
+    val name = varchar("name", 100)
+}
+
+object Payments : LongIdTable(name = "payment") {
+    val orderId = long("order_id")
+    val amount = decimal("amount", 19, 4)
+}
+
+class Payment(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<Payment>(Payments)
+
+    var amount by Payments.amount
+    var orderId by Payments.orderId
+
+    override fun toString(): String {
+        return "Payment(amount=$amount, orderId=$orderId)"
+    }
+}
