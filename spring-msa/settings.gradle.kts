@@ -8,9 +8,9 @@ include("config-server")
 
 pluginManagement {
     val pluginVersions = mapOf(
-        "org.jetbrains.kotlin" to "1.4.31",
-        "org.jetbrains.kotlin.plugin" to "1.4.31",
-        "org.springframework" to "2.4.4",
+        "org.jetbrains.kotlin" to "1.5.20",
+        "org.jetbrains.kotlin.plugin" to "1.5.20",
+        "org.springframework" to "2.5.2",
         "io.spring" to "1.0.11.RELEASE"
     )
 
