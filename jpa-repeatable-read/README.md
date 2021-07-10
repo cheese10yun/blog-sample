@@ -2,7 +2,7 @@
 
 ## JPQL 조회 방식
 
-findById() 같은 경우는 영속성 컨텍스트를 먼저 찾고 영속성 컨텍스트에 해당 엔티티가 있으면 그 값을 바로 리턴합니다. 이를 1차 캐시라고 말합니다. **반면 JPQL은 영속성성 컨텍스트를 먼저 조회하지 않고 데이터베이스에 Query 하여 결과를 가져옵니다.** 그리고 아래와 같은 흐름으로 영속성 컨텍스트를 저장을 시도합니다.
+findById() 같은 경우는 영속성 컨텍스트를 먼저 찾고 영속성 컨텍스트에 해당 엔티티가 있으면 그 값을 바로 리턴합니다. 이를 1차 캐시라고 말합니다. **반면 JPQL은 영속성 컨텍스트를 먼저 조회하지 않고 데이터베이스에 Query 하여 결과를 가져옵니다.** 그리고 아래와 같은 흐름으로 영속성 컨텍스트를 저장을 시도합니다.
 
 ![](https://github.com/cheese10yun/blog-sample/raw/master/query-dsl/docs/images/query-result-.png)
 
@@ -121,7 +121,7 @@ WHERE team0_.name=?
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/jpa-repeatable-read/docs/jpql-3.png)
 
-3번 조회 잔에 영속성 컨텍스트를 초기화를 하면 위 이미지처럼 3번에서 조회한 값을 영속성 컨텍스트에 저장하게 됩니다.
+3번 조회 전에 영속성 컨텍스트를 초기화를 하면 위 이미지처럼 3번에서 조회한 값을 영속성 컨텍스트에 저장하게 됩니다.
 
 ```kotlin
 {
