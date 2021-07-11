@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+    redis:
+        image: redis:6.2.4
+        command: redis-server --requirepass root --port 6379
+        restart: always
+        ports:
+            - 6379:6379
