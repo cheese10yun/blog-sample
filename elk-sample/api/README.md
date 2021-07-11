@@ -169,3 +169,44 @@ dependencies {
 위에서 설정한 logstash port를 입력합니다. 본 예제는 port 번호를 5044 설정해서 destination 설정을  5044으로 설정했습니다.
 
 ## 구동 스크린샷...?
+
+
+## Test
+
+//-javaagent:/Users/yun.cheese/yun/blog-sample/elk-sample/api/elastic-apm-agent-1.24.0.jar -Delastic.apm.service_name=spring-boot-api -Delastic.apm.server_url=http:http://localhost:8200 -Delastic.apm.application_packages=com.example.api
+
+
+
+java -javaagent:/path/to/elastic-apm-agent-.jar \
+     -Delastic.apm.service_name=my-application \
+     -Delastic.apm.server_url=http://localhost:8200 \
+     -Delastic.apm.secret_token= \
+     -Delastic.apm.application_packages=org.example \
+     -jar my-application.jar
+
+
+
+java -javaagent:elastic-apm-agent-1.17.0.jar \
+     -Delastic.apm.service_name=spring-boot-api \
+     -Delastic.apm.server_url=http://192.168.0.10:8200 \
+     -Delastic.apm.application_packages=com.example.api \
+     -jar ../build/libs/sample-0.0.1-SNAPSHOT.jar
+
+
+
+java -javaagent:/elastic-apm-agent-1.24.0.jar \
+     -Delastic.apm.service_name=batch-bulk-insert \
+     -Delastic.apm.server_url=http://localhost:8200 \
+     -Delastic.apm.application_packages=com.batch.task \
+     -jar ../api/build/libs/batch-bulk-insert-0.0.1-SNAPSHOT --job.name=bulkInsertJob
+
+
+
+
+
+
+
+
+
+
+

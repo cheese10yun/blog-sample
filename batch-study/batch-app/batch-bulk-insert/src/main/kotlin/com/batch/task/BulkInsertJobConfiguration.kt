@@ -24,7 +24,7 @@ import javax.persistence.EntityManagerFactory
 import javax.sql.DataSource
 
 const val GLOBAL_CHUNK_SIZE = 1000
-const val DATA_SET_UP_SIZE = 50_000
+const val DATA_SET_UP_SIZE = 500_000
 
 @Configuration
 class BulkInsertJobConfiguration(

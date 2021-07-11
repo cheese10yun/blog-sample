@@ -1,11 +1,32 @@
 server:
-  port: 8080
+    port: 8080
 
 spring:
-  profiles:
-    active: local
+    profiles:
+        active: local
+    application:
+        name: "spring-boot-api"
+
+
+    jpa:
+        database: mysql
+        properties:
+            hibernate.hbm2ddl.auto: create
+            #            hibernate.generate_statistics: true
+            #            hibernate.jdbc.batch_size: 100
+            #            hibernate.order_inserts: true
+            #            hibernate.order_updates: true
+            hibernate.show_sql: true
+            hibernate.ddl-auto: create
+            hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+
+    datasource:
+        url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
+        username: root
+        password:
+        driver-class-name: com.mysql.cj.jdbc.Driver
 
 logging:
-  level:
-    root: info
-  config: classpath:logback-spring.xml
+    level:
+        root: info
+    config: classpath:logback-spring.xml

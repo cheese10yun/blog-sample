@@ -44,12 +44,16 @@ class MemberApi(
         logger.info(objectMapper.writeValueAsString(members))
         return members
     }
+
+    @GetMapping("/test")
+    fun asd() {
+        if(true){
+            throw IllegalStateException("server error test error")
+        }
+    }
 }
 
 data class Sample(
     val name: String,
     val age: Int
 )
-
-
-

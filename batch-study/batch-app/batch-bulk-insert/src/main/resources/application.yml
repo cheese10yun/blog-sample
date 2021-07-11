@@ -40,3 +40,4 @@ logging:
         ROOT: info
 #        org.springframework.batch: DEBUG
 #        org.hibernate.type.descriptor.sql.BasicBinder: trace
+    config: classpath:logback-spring.xml

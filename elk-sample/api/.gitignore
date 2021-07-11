@@ -34,3 +34,4 @@ out/
 .DS_Store
 
 applicatoin.*log
+/apm-server-7.6.2-darwin-x86_64/
