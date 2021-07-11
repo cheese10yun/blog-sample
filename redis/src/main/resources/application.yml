@@ -3,3 +3,10 @@ spring:
         host: localhost
         port: 6379
         password: root
+
+
+logging:
+    level:
+        root: INFO
+        redis.clients: TRACE
+        org.springframework.data: TRACE
