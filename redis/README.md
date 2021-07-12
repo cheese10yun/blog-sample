@@ -5,13 +5,12 @@
 * [ ] Redis ㅇㅇㅇ?
 * [ ] @RedisHash("people" , timeToLive= "1000")
 
-
-
 # Getting Started Redis (Srping Data Redis)
 
 Redis에 대한 내용을 최대한 간략하게 설명한 포스팅입니다.
 
 ## Redis 설치 (Docker)
+
 ```yml
 version: '3.7'
 
@@ -29,10 +28,10 @@ $ docker-compose up -d
 ```
 
 ### Client 접속
+
 ![](docs/redis-2.png)
 
 [Medis](https://github.com/luin/medis)를 이용해서 Redis Client 접속을 진행
-
 
 ## Redis 용어 설명
 
@@ -118,7 +117,8 @@ Geospatial | 좌표 데이터를 저장 및 관리하는 데이터 타입
 
 ![](docs/redis-3.png)
 
-하나의 Key와 하나 이상의 `Field/Element` 값으로 저장할 수 있으며, Value에는 기본적으로 strings 데이터를 저장할 수 있습니다. 타입의 데이터들은 지정할 수 있으며 해당 컨테이너 타입에는 Hash, List, Set/Sorted SEt 4가지 유형이 있습니다.
+하나의 Key와 하나 이상의 `Field/Element` 값으로 저장할 수 있으며, Value에는 기본적으로 strings 데이터를 저장할 수 있습니다. 타입의 데이터들은 지정할 수 있으며 해당 컨테이너 타입에는 Hash, List,
+Set/Sorted SEt 4가지 유형이 있습니다.
 
 * Hash 타입은 기존 관계형 DB에서 Primary-Key와 하나 이상의 칼럼으로 구성된 테이블 구조와 매우 흡사한 데이터 유형
 * 하나의 Key는 오브젝트명과 하나 이상의 필드 값을 콜론 `:` 기호로 결합하여 표현할 수 있습니다. ex ex order:201809123, order_detail:201809123:01
@@ -127,7 +127,6 @@ Geospatial | 좌표 데이터를 저장 및 관리하는 데이터 타입
 * Hash 타입의 데이터를 처리할 때는 `hmset`, `hget`, `hgetall`, `hkey`, `hlen` 명령어를 사용합니다.
 
 ![](docs/redis-4.png)
-
 
 ```
 hmset order:201809123 customer_name "Woman & Sports" emp_name "Magee" total 601100 payment_type "Credit" order_filled "Y" ship_date 20180925
@@ -278,7 +277,6 @@ redis> SPOP product_new 1
 * Sorted Set 타입은 Set 타입과 동일한 데이터 구조이며 차이점은 저장된 데이터 값이 Sorting된 상태이면 Sroted Set 이라고 합니다.
 * 데이터를 처리할 떄는 `zadd`, `zragne,` `zcard`, `zcount`, `zrank` `zerverank` 명령어를 사용합니다.
 
-
 ```
 
 # Sorted된 값으로 데이터 저장
@@ -299,10 +297,35 @@ redis> ZREM order_detail:2018091234 {item_id: 1, product_name: Bunn
 y Boots, item_price: 135, qty: 500, price: 67000}
 ```
 
+## Spring Data Redis
 
+### Dependency 설정
 
+```
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+}
 
+```
+
+### yml 설정
+
+```yml
+spring:
+    redis:
+        host: localhost
+        port: 6379
+        password: root
+
+logging:
+    level:
+        root: INFO
+        redis.clients: TRACE
+        org.springframework.data: TRACE
+```
 
 ## 참고
+
 * [빅데이터 저장 및 분석을 위한 NoSQL & Redis](http://m.yes24.com/goods/detail/71131862)
-* 
+* [Spring Data Redis Reference Documentation](https://docs.spring.io/spring-data/data-redis/docs/current/reference/html/#reference)
+* [https://sabarada.tistory.com/105](Reference Documentation)
