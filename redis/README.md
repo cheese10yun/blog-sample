@@ -3,6 +3,8 @@
 * [ ] Redis 자로형
 * [ ] Data Redis
 * [ ] Redis ㅇㅇㅇ?
+* [ ] @RedisHash("people" , timeToLive= "1000")
+
 
 
 # Getting Started Redis (Srping Data Redis)

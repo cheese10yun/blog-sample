@@ -4,7 +4,10 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
 import org.springframework.data.repository.CrudRepository
 
-@RedisHash("member")
+@RedisHash(
+    value = "member",
+    timeToLive = 1000
+)
 data class Member(
     @Id
     var id: Long? = null

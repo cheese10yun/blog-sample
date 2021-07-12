@@ -176,6 +176,7 @@ dependencies {
 //-javaagent:/Users/yun.cheese/yun/blog-sample/elk-sample/api/elastic-apm-agent-1.24.0.jar -Delastic.apm.service_name=spring-boot-api -Delastic.apm.server_url=http:http://localhost:8200 -Delastic.apm.application_packages=com.example.api
 
 
+-javaagent:/Users/yun.cheese/yun/blog-sample/elk-sample/api/elastic-apm-agent-1.24.0.jar -Delastic.apm.service_name=batch-bulk-insert -Delastic.apm.server_url=http:http://localhost:8200 -Delastic.apm.application_packages=com.batch.task
 
 java -javaagent:/path/to/elastic-apm-agent-.jar \
      -Delastic.apm.service_name=my-application \
