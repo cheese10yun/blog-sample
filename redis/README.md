@@ -4,6 +4,11 @@
 * [ ] Data Redis
 * [ ] Redis ㅇㅇㅇ?
 * [ ] @RedisHash("people" , timeToLive= "1000")
+* [ ] Serialize Jackson
+* [ ] Serialize Object
+* [ ] CurdRepository saveAll 단건
+
+
 
 # Getting Started Redis (Srping Data Redis)
 
