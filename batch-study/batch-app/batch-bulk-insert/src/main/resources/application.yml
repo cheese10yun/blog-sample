@@ -1,13 +1,13 @@
 spring:
     main:
         allow-bean-definition-overriding: true
-    #        web-application-type: NONE
+        web-application-type: NONE
 
     jpa:
         database: mysql
         properties:
             hibernate.hbm2ddl.auto: create
-#            hibernate.generate_statistics: true
+            #            hibernate.generate_statistics: true
             hibernate.jdbc.batch_size: 100
             hibernate.order_inserts: true
             hibernate.order_updates: true

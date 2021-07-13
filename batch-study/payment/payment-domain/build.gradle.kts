@@ -17,6 +17,7 @@ dependencies {
     api("org.jetbrains.exposed:exposed-core:${properties["exposed_version"]}")
     api("org.jetbrains.exposed:exposed-dao:${properties["exposed_version"]}")
     api("org.jetbrains.exposed:exposed-jdbc:${properties["exposed_version"]}")
+    api("org.jetbrains.exposed:exposed-spring-boot-starter:${properties["exposed_version"]}")
     api("org.jetbrains.exposed:exposed-java-time:${properties["exposed_version"]}")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
