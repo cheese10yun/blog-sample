@@ -26,9 +26,9 @@
 
 
 
--javaagent:/Users/yun.cheese/yun/blog-sample/elk-sample/api/elastic-apm-agent-1.24.0.jar -Delastic.apm.service_name=spring-boot-api -Delastic.apm.server_url=http://192.168.0.10:8200 -Delastic.apm.application_packages=com.example.api -Delastic.apm.verify_server_cert=false
+-javaagent:/Users/yun.cheese/yun/blog-sample/elk-sample/api/elastic-apm-agent-1.24.0.jar -Delastic.apm.service_name=spring-boot-api -Delastic.apm.server_url=http://192.168.0.10:8200 -Delastic.apm.application_packages=com.example.api 
 
 
 -javaagent:/Users/yun.cheese/yun/blog-sample/elk-sample/api/elastic-apm-agent-1.24.0.jar -Delastic.apm.service_name=batch-bulk-insert -Delastic.apm.server_url=http://192.168.0.10:8200 -Delastic.apm.application_packages=com.batch.task
 
--javaagent:/Users/yun.cheese/yun/blog-sample/elk-sample/api/elastic-apm-agent-1.24.1.jar -Delastic.apm.service_name=batch-bulk-insert -Delastic.apm.server_url=http://192.168.0.10:8200 -Delastic.apm.application_packages=com.batch.task
+-javaagent:/Users/yun.cheese/yun/blog-sample/elk-sample/api/elastic-apm-agent-1.24.1.jar -Delastic.apm.service_name=batch-bulk-insert -Delastic.apm.server_url=http://192.168.0.10:8200 -Delastic.apm.application_packages=com.example.api -Delastic.apm.verify_server_cert=false
