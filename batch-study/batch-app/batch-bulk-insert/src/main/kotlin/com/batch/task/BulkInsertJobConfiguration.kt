@@ -5,6 +5,8 @@ import com.batch.payment.domain.payment.PaymentBack
 import com.batch.payment.domain.payment.PaymentBackJpa
 import com.batch.payment.domain.payment.PaymentBackJpaRepository
 import com.batch.task.support.listener.JobReportListener
+import javax.persistence.EntityManagerFactory
+import javax.sql.DataSource
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -20,8 +22,6 @@ import org.springframework.batch.item.database.JpaCursorItemReader
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import javax.persistence.EntityManagerFactory
-import javax.sql.DataSource
 
 const val GLOBAL_CHUNK_SIZE = 1000
 const val DATA_SET_UP_SIZE = 500_000
@@ -57,8 +57,8 @@ class BulkInsertJobConfiguration(
             .chunk<Payment, Payment>(GLOBAL_CHUNK_SIZE)
             .reader(bulkInsertReader)
 //            .writer(writerWithStatement)
-            .writer(writerWithExposed)
-//            .writer(writerWithJpa)
+//            .writer(writerWithExposed)
+            .writer(writerWithJpa)
             .build()
 
     @Bean
@@ -97,7 +97,7 @@ class BulkInsertJobConfiguration(
         }
     }
 
-    private val writerWithJpa: ItemWriter<Payment> =
+    val writerWithJpa: ItemWriter<Payment> =
         ItemWriter { payments ->
             payments.map { payment ->
                 PaymentBackJpa(
