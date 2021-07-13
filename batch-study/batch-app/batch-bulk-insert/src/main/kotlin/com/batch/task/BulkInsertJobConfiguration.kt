@@ -22,9 +22,11 @@ import org.springframework.batch.item.database.JpaCursorItemReader
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 const val GLOBAL_CHUNK_SIZE = 1000
-const val DATA_SET_UP_SIZE = 500_000
+const val DATA_SET_UP_SIZE = 100
 
 @Configuration
 class BulkInsertJobConfiguration(
@@ -33,6 +35,7 @@ class BulkInsertJobConfiguration(
     private val dataSource: DataSource,
     private val exposedDataBase: Database,
     private val paymentBackJpaRepository: PaymentBackJpaRepository,
+    private val txService: TxService,
     entityManagerFactory: EntityManagerFactory
 ) {
 
@@ -98,16 +101,8 @@ class BulkInsertJobConfiguration(
     }
 
     val writerWithJpa: ItemWriter<Payment> =
-        ItemWriter { payments ->
-            payments.map { payment ->
-                PaymentBackJpa(
-                    amount = payment.amount,
-                    orderId = payment.orderId
-                )
-            }
-                .also {
-                    paymentBackJpaRepository.saveAll(it)
-                }
+        ItemWriter {
+            txService.save(it)
         }
 
     private val writerWithExposed: ItemWriter<Payment> = ItemWriter { payments ->
@@ -122,5 +117,24 @@ class BulkInsertJobConfiguration(
                 this[PaymentBack.amount] = payment.amount
             }
         }
+    }
+}
+
+@Service
+class TxService(
+    private val paymentBackJpaRepository: PaymentBackJpaRepository
+) {
+
+    @Transactional
+    fun save(payments: List<Payment>) {
+        payments.map { payment ->
+            PaymentBackJpa(
+                amount = payment.amount,
+                orderId = payment.orderId
+            )
+        }
+            .also {
+                paymentBackJpaRepository.saveAll(it)
+            }
     }
 }
