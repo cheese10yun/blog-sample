@@ -125,7 +125,7 @@ class TxService(
     private val paymentBackJpaRepository: PaymentBackJpaRepository
 ) {
 
-    @Transactional
+    @Transactional(transactionManager = "transactionManager")
     fun save(payments: List<Payment>) {
         payments.map { payment ->
             PaymentBackJpa(
