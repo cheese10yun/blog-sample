@@ -1,0 +1,8 @@
+spring:
+    application:
+        name: elasticsearch
+
+    data:
+        elasticsearch:
+            repositories:
+                enabled: true
