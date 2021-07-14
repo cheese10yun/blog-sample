@@ -22,13 +22,13 @@ $ docker-compose up -d
 
 ### Client 접속
 
-![](docs/redis-2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/redis/docs/redis-2.png)
 
 [Medis](https://github.com/luin/medis)를 이용해서 Redis Client 접속을 진행
 
 ## Redis 용어 설명
 
-![](docs/redis-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/redis/docs/redis-1.png)
 
 | 용어      | 설명                                                                                           |
 | --------- | ---------------------------------------------------------------------------------------------- |
@@ -108,7 +108,7 @@ redis_version:6.2.1
 
 ### Hash
 
-![](docs/redis-3.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/redis/docs/redis-3.png)
 
 하나의 Key와 하나 이상의 `Field/Element` 값으로 저장할 수 있으며, Value에는 기본적으로 strings 데이터를 저장할 수 있습니다. 타입의 데이터들은 지정할 수 있으며 해당 컨테이너 타입에는 Hash, List,
 Set/Sorted SEt 4가지 유형이 있습니다.
@@ -119,7 +119,7 @@ Set/Sorted SEt 4가지 유형이 있습니다.
 * 기본적으로 필드 개수는 제한 없습니다.
 * Hash 타입의 데이터를 처리할 때는 `hmset`, `hget`, `hgetall`, `hkey`, `hlen` 명령어를 사용합니다.
 
-![](docs/redis-4.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/redis/docs/redis-4.png)
 
 ```
 hmset order:201809123 customer_name "Woman & Sports" emp_name "Magee" total 601100 payment_type "Credit" order_filled "Y" ship_date 20180925
@@ -187,13 +187,13 @@ hmget order:201809123 emp_name totla -> 해당 필드의 value만 조회
 
 ### List 타입
 
-![](docs/redis-5.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/redis/docs/redis-5.png)
 
 * List 타입은 기존의 관계형 테이블에는 존재하지 않은 데이터 유형이며 일반적인 프로그래밍 언어에서 데이터를 처리할 때 사용되는 array 변수와 유사한 데이터 구조입니다.
 * 기본적으로 Strings 타입의 경우 배열에 저장할 때는 데이터 크기는 512MB입니다.
 * List 타입의 데이터를 처리할 때는 lpush, lrange, rpush, rpop. llen, index 명령어를 사용합니다.
 
-![](docs/redis-6.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/redis/docs/redis-6.png)
 
 ```
 # Deta Format을 JOSN으로 저장
@@ -220,7 +220,7 @@ lpush order_detail:201809123 "{item_id: 1, product_name: Bunny Boots, item_price
 
 ### Set 타입
 
-![](docs/redis-7.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/redis/docs/redis-7.png)
 
 * List 타입은 하나의 필드에 여러 개의 배열 값을 저장할 수 있는 데이터 구조라면 Set 타입은 배열 구조가 아닌 여러 개의 엘리먼트로 데이터 값을 표현하는 구조입니다.
 * Set 타입의 데이터를 처리할 때는 `sadd`, `smemebers`, `scard`, `sdiif`, `sunion` 명령어를 사용할 합니다.
@@ -373,7 +373,7 @@ redis:6379> ttl member:1
 
 ### Medis Client 접속 
 
-![](docs/redis-8.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/redis/docs/redis-8.png)
 
 Medis Client로 접속하면 전체키를 확인할 수 있습니다.
 
