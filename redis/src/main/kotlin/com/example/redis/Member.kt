@@ -2,17 +2,19 @@ package com.example.redis
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
+import org.springframework.data.redis.core.TimeToLive
 import org.springframework.data.repository.CrudRepository
 
 @RedisHash(
-    value = "member",
-    timeToLive = 1000
+    value = "member"
 )
 data class Member(
     @Id
-    var id: Long? = null
-) {
+    var id: Long? = null,
 
+    @TimeToLive
+    val ttl: Long = 20
+) {
     var name: String = "name-$id"
 }
 

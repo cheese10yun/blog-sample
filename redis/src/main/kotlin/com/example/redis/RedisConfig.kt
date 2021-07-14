@@ -11,7 +11,6 @@ import org.springframework.data.redis.core.StringRedisTemplate
 @Configuration
 class RedisConfig {
 
-
     @Bean
     @Primary
     fun redisTemplate(redisConnectionFactory: LettuceConnectionFactory): RedisTemplate<*, *> =

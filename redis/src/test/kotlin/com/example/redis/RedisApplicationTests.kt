@@ -6,7 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.test.context.TestConstructor
-import org.springframework.util.StopWatch
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -19,22 +18,17 @@ class RedisApplicationTests(
     val redisTemplateWithTransaction: StringRedisTemplate
 ) {
 
-    private val memberCount = 5000
+    private val memberCount = 10
 
     @Test
-    fun `members`() {
+    fun `members 저장 테스트`() {
         val members = (1..memberCount).map {
-            Member(it.toLong())
+            Member(
+                id = it.toLong(),
+                ttl = 20L
+            )
         }
-        val stopWatch = StopWatch()
-        stopWatch.start()
         memberRepository.saveAll(members)
-        stopWatch.stop()
-
-
-        println(stopWatch.lastTaskTimeMillis)
-//        memberRepository.deleteAll()
-
     }
 
     @Test

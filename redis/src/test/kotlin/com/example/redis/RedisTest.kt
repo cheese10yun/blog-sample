@@ -44,4 +44,18 @@ class RedisTest(
         val range = list.range(key, 0, 9)
         println("range: $range")
     }
+
+    @Test
+    fun testSet() {
+        val set = redisTemplate.opsForSet()
+        set.add("11", "a11", "b11", "c11")
+        set.add("22", "a22", "b22", "c33")
+        set.add("33", "a33", "b33", "c33")
+
+        println("key 11: ${set.size("11")}")
+        println("key 22: ${set.size("22")}")
+
+        val difference = set.difference("11", "22")
+        println("difference: $difference")
+    }
 }

@@ -1,15 +1,3 @@
-# Redis
-
-* [ ] Redis 자로형
-* [ ] Data Redis
-* [ ] Redis ㅇㅇㅇ?
-* [ ] @RedisHash("people" , timeToLive= "1000")
-* [ ] Serialize Jackson
-* [ ] Serialize Object
-* [ ] CurdRepository saveAll 단건
-
-
-
 # Getting Started Redis (Srping Data Redis)
 
 Redis에 대한 내용을 최대한 간략하게 설명한 포스팅입니다.
@@ -42,23 +30,23 @@ $ docker-compose up -d
 
 ![](docs/redis-1.png)
 
-용어 | 설명
----|---
-Table | 하나의 DB에서 데이터를 저장하는 논리적인 구조
-Data Sets | 테이블을 구성하는 논리적단위, 하나의 Data-Set은 하나의 Key와 한 개 이상의 FIELD/ELEMENT로 구성
-Key | 하나의 Key는 하나 이상의 조합된 갓으로 펴현 가능 ex 주문번호, 주문번호+순번, 년월일+순번
-Values | 해당 Key에 대한 구체적인 데이터를 값으로 표현합니다.
+| 용어      | 설명                                                                                           |
+| --------- | ---------------------------------------------------------------------------------------------- |
+| Table     | 하나의 DB에서 데이터를 저장하는 논리적인 구조                                                  |
+| Data Sets | 테이블을 구성하는 논리적단위, 하나의 Data-Set은 하나의 Key와 한 개 이상의 FIELD/ELEMENT로 구성 |
+| Key       | 하나의 Key는 하나 이상의 조합된 갓으로 펴현 가능 ex 주문번호, 주문번호+순번, 년월일+순번       |
+| Values    | 해당 Key에 대한 구체적인 데이터를 값으로 표현합니다.                                           |
 
 ## 데이터 CURD
 
-종류 | 내용
----|---
-set | 데이터를 저장(Key, Value)
-get | 저장된 데이터를 조회
-rename | 저장된 데이터 값을 변경할 때
-Keys | 지정된 모든 Key를 조회
-exits | 검색 대상 Key가 존재하는지 여부를 확인
-mset/mget | 여러 개의 Key와 Value를 한번 저장하고 검색할 때 사용
+| 종류      | 내용                                                 |
+| --------- | ---------------------------------------------------- |
+| set       | 데이터를 저장(Key, Value)                            |
+| get       | 저장된 데이터를 조회                                 |
+| rename    | 저장된 데이터 값을 변경할 때                         |
+| Keys      | 지정된 모든 Key를 조회                               |
+| exits     | 검색 대상 Key가 존재하는지 여부를 확인               |
+| mset/mget | 여러 개의 Key와 Value를 한번 저장하고 검색할 때 사용 |
 
 ## 실습
 
@@ -107,14 +95,14 @@ redis_version:6.2.1
 
 ## 데이터 타입
 
-데이터 타입 | 내용
--------|---
-strings | 문자, Binary 유형 데이터를 저장
-List | 하나의 Key에 여러 개의 배열 값을 저장
-Hash | 하나의 Key에 여러 개의 Fields와 Value로 구성된 테이블을 저장
-Bitmaps | 0,1로 표현하는 데이터 타입
-HyperLogLogs | Element 중에 Unique 한 개수의 Element 만 계산
-Geospatial | 좌표 데이터를 저장 및 관리하는 데이터 타입
+| 데이터 타입  | 내용                                                         |
+| ------------ | ------------------------------------------------------------ |
+| strings      | 문자, Binary 유형 데이터를 저장                              |
+| List         | 하나의 Key에 여러 개의 배열 값을 저장                        |
+| Hash         | 하나의 Key에 여러 개의 Fields와 Value로 구성된 테이블을 저장 |
+| Bitmaps      | 0,1로 표현하는 데이터 타입                                   |
+| HyperLogLogs | Element 중에 Unique 한 개수의 Element 만 계산                |
+| Geospatial   | 좌표 데이터를 저장 및 관리하는 데이터 타입                   |
 
 본 포스팅에서는 `strings`, `List`, `Hash`만 살펴볼 예정입니다.
 
@@ -127,7 +115,7 @@ Set/Sorted SEt 4가지 유형이 있습니다.
 
 * Hash 타입은 기존 관계형 DB에서 Primary-Key와 하나 이상의 칼럼으로 구성된 테이블 구조와 매우 흡사한 데이터 유형
 * 하나의 Key는 오브젝트명과 하나 이상의 필드 값을 콜론 `:` 기호로 결합하여 표현할 수 있습니다. ex ex order:201809123, order_detail:201809123:01
-* 문자 값을 저장할 때는 인용부호 `""`를 사용하며 숫자 값을 저장할 떄는 인용부호가 필요 하지 않습니다.
+* 문자 값을 저장할 때는 인용부호 `""`를 사용하며 숫자 값을 저장할 때는 인용부호가 필요하지 않습니다.
 * 기본적으로 필드 개수는 제한 없습니다.
 * Hash 타입의 데이터를 처리할 때는 `hmset`, `hget`, `hgetall`, `hkey`, `hlen` 명령어를 사용합니다.
 
@@ -201,9 +189,9 @@ hmget order:201809123 emp_name totla -> 해당 필드의 value만 조회
 
 ![](docs/redis-5.png)
 
-* List 타입은 기존의 관계형 테이블에는 존재하지 않은 데이터 유형이며 일반적인 프로그래밍 언어에서 데이터를 처리할 때 사용되는 array 변수와 유사한 데이터 구조 입니다.
-* 기본저긍로 Strings 타입의 경우 배열에 저장할 떄는 데이터 크기는 512MB 입니다.
-* List 타입의 데이터를 처리할 떄는 lpush, lrange, rpush, rpop. llen, index 명령어를 사용합니다.
+* List 타입은 기존의 관계형 테이블에는 존재하지 않은 데이터 유형이며 일반적인 프로그래밍 언어에서 데이터를 처리할 때 사용되는 array 변수와 유사한 데이터 구조입니다.
+* 기본적으로 Strings 타입의 경우 배열에 저장할 때는 데이터 크기는 512MB입니다.
+* List 타입의 데이터를 처리할 때는 lpush, lrange, rpush, rpop. llen, index 명령어를 사용합니다.
 
 ![](docs/redis-6.png)
 
@@ -234,8 +222,8 @@ lpush order_detail:201809123 "{item_id: 1, product_name: Bunny Boots, item_price
 
 ![](docs/redis-7.png)
 
-* List 타입은 하나의 필드에 여러 개의 배열 값을 저장할 수 있는 데이터 구조라면 Set 타입은 배열 구조가 아닌 여러 개의 엘리먼트로 데이터 값을 표현하는 구조 입니다.
-* Set 타입의 데이터를 처리할 떄는 `sadd`, `smemebers`, `scard`, `sdiif`, `sunion` 명령어를 사용할 합니다.
+* List 타입은 하나의 필드에 여러 개의 배열 값을 저장할 수 있는 데이터 구조라면 Set 타입은 배열 구조가 아닌 여러 개의 엘리먼트로 데이터 값을 표현하는 구조입니다.
+* Set 타입의 데이터를 처리할 때는 `sadd`, `smemebers`, `scard`, `sdiif`, `sunion` 명령어를 사용할 합니다.
 
 ```
 SADD product "id:11, product_name:Sky Pole, item_prifce:55, qty:100, price: 5500" "id:12, product_name:Bunny Boots, item_prifce:135, qty:500, price: 67000"
@@ -279,8 +267,8 @@ redis> SPOP product_new 1
 
 ### Sorted Set 타입
 
-* Sorted Set 타입은 Set 타입과 동일한 데이터 구조이며 차이점은 저장된 데이터 값이 Sorting된 상태이면 Sroted Set 이라고 합니다.
-* 데이터를 처리할 떄는 `zadd`, `zragne,` `zcard`, `zcount`, `zrank` `zerverank` 명령어를 사용합니다.
+* Sorted Set 타입은 Set 타입과 동일한 데이터 구조이며 차이점은 저장된 데이터 값이 Sorting된 상태이면 Sroted Set이라고 합니다.
+* 데이터를 처리할 때는 `zadd`, `zragne,` `zcard`, `zcount`, `zrank` `zerverank` 명령어를 사용합니다.
 
 ```
 
@@ -329,8 +317,66 @@ logging:
         org.springframework.data: TRACE
 ```
 
-## 참고
+### Data Redis Repositroy
 
+```kotlin
+@RedisHash(
+    value = "member"
+)
+data class Member(
+    @Id
+    var id: Long? = null,
+
+    @TimeToLive
+    val ttl: Long = 20
+) {
+    var name: String = "name-$id"
+}
+
+interface MemberRepository : CrudRepository<Member, Long>
+```
+
+* `@RedisHash` Redis Hash에 저장하는 aggregate 루트로 저장
+  * `value`: Redis Key에 대한 Prefix, `member:6`
+* `@timeToLive`: TTL 시간을 지정해서 저장합니다.
+
+```kotlin
+@Test
+fun `members 저장 테스트`() {
+    // 10개의 Member를 10개를 TTL 20초로 저장
+    val members = (1..10).map {
+        Member(
+            id = it.toLong(),
+            ttl = 20
+        )
+    }
+    memberRepository.saveAll(members)
+}
+```
+
+```
+# member:1 전페 필드 조회
+redis:6379> hgetall member:1
+1) "_class"
+2) "com.example.redis.Member"
+3) "id"
+4) "1"
+5) "name"
+6) "name-1"
+7) "ttl"
+8) "20"
+
+# member ttl 만료 시간
+redis:6379> ttl member:1
+(integer) 20
+```
+
+### Medis Client 접속 
+
+![](docs/redis-8.png)
+
+Medis Client로 접속하면 전체키를 확인할 수 있습니다.
+
+## 참고
 * [빅데이터 저장 및 분석을 위한 NoSQL & Redis](http://m.yes24.com/goods/detail/71131862)
-* [Spring Data Redis Reference Documentation](https://docs.spring.io/spring-data/data-redis/docs/current/reference/html/#reference)
-* [https://sabarada.tistory.com/105](Reference Documentation)
+* [Spring Data Redis Reference Documentation](https://docs.spring.io/spring-data/data-redis/docs/current/reference/html#reference)
