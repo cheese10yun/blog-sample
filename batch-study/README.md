@@ -29,6 +29,24 @@
 -javaagent:/Users/yun.cheese/yun/blog-sample/elk-sample/api/elastic-apm-agent-1.24.0.jar -Delastic.apm.service_name=spring-boot-api -Delastic.apm.server_url=http://192.168.0.10:8200 -Delastic.apm.application_packages=com.example.api 
 
 
--javaagent:/Users/yun.cheese/yun/blog-sample/elk-sample/api/elastic-apm-agent-1.24.0.jar -Delastic.apm.service_name=batch-bulk-insert -Delastic.apm.server_url=http://192.168.0.10:8200 -Delastic.apm.application_packages=com.batch.task
+-javaagent:/Users/yun.cheese/yun/blog-sample/elk-sample/api/elastic-apm-agent-1.24.0.jar -Delastic.apm.service_name=batch-bulk-insert -Delastic.apm.server_url=http://124.80.103.104:8200 -Delastic.apm.application_packages=com.batch.task
 
 -javaagent:/Users/yun.cheese/yun/blog-sample/elk-sample/api/elastic-apm-agent-1.24.1.jar -Delastic.apm.service_name=batch-bulk-insert -Delastic.apm.server_url=http://192.168.0.10:8200 -Delastic.apm.application_packages=com.example.api -Delastic.apm.verify_server_cert=false
+
+
+422877
+
+
+
+| ELK Agent 유무 | rows(읽기/쓰기) | Job 시간(ms) |
+| -------------- | --------------- | ------------ |
+| x              | 100,000         | 4121         |
+| O              | 100,000         | 4294         |
+| x              | 250,000         | 9102         |
+| O              | 250,000         | 9591         |
+| x              | 500,000         | 18969        |
+| O              | 500,000         | 20293        |
+| x              | 1,000,000       | 35008        |
+| O              | 1,000,000       | 35717        |
+
+
