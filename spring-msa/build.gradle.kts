@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
@@ -13,13 +11,20 @@ group = "com.example"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
+//configurations {
+//    compileOnly {
+//        extendsFrom(configurations.annotationProcessor.get())
+//    }
+//}
+
 allprojects{
     repositories {
-        jcenter()
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
     }
 }
 
-extra["springCloudVersion"] = "2020.0.2"
+extra["springCloudVersion"] = "2020.0.3"
 
 subprojects {
     apply(plugin = "java")
@@ -108,13 +113,13 @@ subprojects {
 
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "1.8"
-    }
-}
+//tasks.withType<Test> {
+//    useJUnitPlatform()
+//}
+//
+//tasks.withType<KotlinCompile> {
+//    kotlinOptions {
+//        freeCompilerArgs = listOf("-Xjsr305=strict")
+//        jvmTarget = "1.8"
+//    }
+//}

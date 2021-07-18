@@ -7,6 +7,11 @@ include("gateway-server")
 include("config-server")
 
 pluginManagement {
+
+    repositories {
+        gradlePluginPortal()
+    }
+
     val pluginVersions = mapOf(
         "org.jetbrains.kotlin" to "1.5.20",
         "org.jetbrains.kotlin.plugin" to "1.5.20",
