@@ -9,7 +9,7 @@ build/
 .apt_generated
 .classpath
 .factorypath
-.project
+.projecte
 .settings
 .springBeans
 .sts4-cache
