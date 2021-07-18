@@ -24,12 +24,14 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.MappedSuperclass
 import javax.persistence.Table
+import org.springframework.cloud.netflix.ribbon.RibbonClient
+import org.springframework.cloud.openfeign.FeignClient
 
 @RestController
 @RequestMapping("/orders")
 class OrderApi(
-    private val orderRepository: OrderRepository
-//    private val cartClient: CartClient
+    private val orderRepository: OrderRepository,
+    private val cartClient: CartClient
 ) {
 
     var errorCount = 0
@@ -67,17 +69,18 @@ class Order(
 
 interface OrderRepository : JpaRepository<Order, Long>
 
-//@FeignClient("cart-service")
-//@RibbonClient("cart-service")
-//interface CartClient {
-//
-//    @GetMapping("/carts/{id}")
-//    fun getCart(@PathVariable id: Long): CartResponse
-//
-//    data class CartResponse(
-//        val productId: Long
-//    )
-//}
+@FeignClient("cart-service")
+@RibbonClient("cart-service")
+//@RibbonClient
+interface CartClient {
+
+    @GetMapping("/carts/{id}")
+    fun getCart(@PathVariable id: Long): CartResponse
+
+    data class CartResponse(
+        val productId: Long
+    )
+}
 
 
 @EntityListeners(value = [AuditingEntityListener::class])
