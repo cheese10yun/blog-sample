@@ -18,7 +18,7 @@ class CustomFilter : AbstractGatewayFilterFactory<CustomFilter.Config>(Config::c
         }
     }
 
-    class Config''
+    class Config
 }
 
 @Component
