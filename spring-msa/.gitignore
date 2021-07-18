@@ -34,3 +34,4 @@ out/
 .vscode/
 /volumes/
 /elk/volume/
+/elk/apm-server-7.5.1-darwin-x86_64/

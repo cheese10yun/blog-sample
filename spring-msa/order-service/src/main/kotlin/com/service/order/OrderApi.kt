@@ -39,11 +39,11 @@ class OrderApi(
     @GetMapping
     fun getOrders(pageable: Pageable): Page<Order> {
 //        println("getOrders 호출")
-//        if (errorCount < 2) {
-//            println("예외발생 $errorCount 1증가")
-//            errorCount++
-//            throw RuntimeException("Error")
-//        }
+        if (true) {
+            println("예외발생 $errorCount 1증가")
+            errorCount++
+            throw RuntimeException("Error")
+        }
 //        errorCount = 0 // 초기화
         return orderRepository.findAll(pageable)
     }
