@@ -15,15 +15,14 @@ spring:
                 connect-timeout: 10000
                 response-timeout: 10s
 
-            default-filters:
-                -   name: GlobalFilter
-                    args:
-                        preLogger: true
-                        postLogger: true
+#            default-filters:
+#                -   name: GlobalFilter
+#                    args:
+#                        preLogger: true
+#                        postLogger: true
 
             routes:
                 -   id: order-service
-#                    uri: http://localhost:8181
                     uri: lb://order-service
                     predicates:
                         - Path=/order-service/**
@@ -32,13 +31,22 @@ spring:
                         - CustomFilter
 
                 -   id: cart-service
-#                    uri: http://localhost:8181
                     uri: lb://cart-service
                     predicates:
                         - Path=/cart-service/**
                     filters:
                         - RewritePath=/cart-service/(?<path>.*),/$\{path}
                         - CustomFilter
+
+
+eureka:
+    instance:
+        prefer-ip-address: true
+    client:
+        register-with-eureka: true
+        fetch-registry: true
+        service-url:
+            default-zone: http://localhost:8761/eureka/
 
 logging:
     level:

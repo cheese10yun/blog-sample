@@ -1,7 +1,19 @@
 package com.service.order
 
+import java.time.LocalDateTime
+import java.util.UUID
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.EntityListeners
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.MappedSuperclass
+import javax.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
+import org.springframework.cloud.netflix.ribbon.RibbonClient
+import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
@@ -14,18 +26,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import java.time.LocalDateTime
-import java.util.UUID
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.EntityListeners
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.MappedSuperclass
-import javax.persistence.Table
-import org.springframework.cloud.netflix.ribbon.RibbonClient
-import org.springframework.cloud.openfeign.FeignClient
 
 @RestController
 @RequestMapping("/orders")
@@ -38,21 +38,18 @@ class OrderApi(
 
     @GetMapping
     fun getOrders(pageable: Pageable): Page<Order> {
-//        println("getOrders 호출")
-        if (true) {
-            println("예외발생 $errorCount 1증가")
-            errorCount++
-            throw RuntimeException("Error")
-        }
-//        errorCount = 0 // 초기화
         return orderRepository.findAll(pageable)
     }
 
     @GetMapping("/carts/{id}")
-    fun getCarts(@PathVariable id: Long) {
-        if (id == 1L) {
-            throw RuntimeException("error")
-        }
+    fun getCarts(@PathVariable id: Long): CartClient.CartResponse {
+
+        orderRepository.findById(1)
+        orderRepository.findById(2)
+        orderRepository.findById(2)
+        orderRepository.findById(3)
+
+        return cartClient.getCart(1)
     }
 }
 
@@ -69,9 +66,8 @@ class Order(
 
 interface OrderRepository : JpaRepository<Order, Long>
 
-@FeignClient("cart-service")
-@RibbonClient("cart-service")
-//@RibbonClient
+@FeignClient(name = "cart-service")
+@RibbonClient(name = "cart-service")
 interface CartClient {
 
     @GetMapping("/carts/{id}")
@@ -102,16 +98,16 @@ abstract class EntityAuditing {
         internal set
 }
 
-@RestControllerAdvice
-class GlobalExceptionHandler {
-
-    @ExceptionHandler(Exception::class)
-    fun handlerException(e: Exception): ResponseEntity<ErrorResponse> {
-        return ResponseEntity(ErrorResponse(e.message!!), HttpStatus.INTERNAL_SERVER_ERROR)
-    }
-
-    data class ErrorResponse(
-        val message: String,
-        val timestamp: LocalDateTime = LocalDateTime.now()
-    )
-}
+//@RestControllerAdvice
+//class GlobalExceptionHandler {
+//
+//    @ExceptionHandler(Exception::class)
+//    fun handlerException(e: Exception): ResponseEntity<ErrorResponse> {
+//        return ResponseEntity(ErrorResponse(e.message!!), HttpStatus.INTERNAL_SERVER_ERROR)
+//    }
+//
+//    data class ErrorResponse(
+//        val message: String,
+//        val timestamp: LocalDateTime = LocalDateTime.now()
+//    )
+//}
