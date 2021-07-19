@@ -6,7 +6,11 @@ spring:
     profiles:
         active: default
 
-#    cloud:
+
+    cloud:
+        bus:
+            trace:
+                enabled: true
 #        config:
 #            uri: http://localhost:8888
 #
@@ -37,6 +41,7 @@ management:
                 include:
                     - "info"
                     - "bus-refresh"
+                    - "bus-env"
                     - "health"
                     - "hystrix.stream"
                     - "refresh"
