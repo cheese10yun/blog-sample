@@ -9,10 +9,60 @@ spring:
             server:
                 encrypt.enabled: true
                 git:
-                    uri: https://github.com/cheese10yun/msa-study-sample
-                    search-paths:
-                        - "order-service"
-                        - "cart-service"
+                    uri: git@github.com:cheese10yun/msa-study-sample.git
+                    ignoreLocalSshSettings: true
+                    private-key: |
+                        -----BEGIN RSA PRIVATE KEY-----
+                        MIIJKAIBAAKCAgEAwwhGRtqiVLU3mM0eAeftP9QMk42phGEeyg8MWuVN5C6ztEvl
+                        xAEj1J5Jzj/WkBn/SZ0uk/9nTWlXp+4WsFvJO5/W7Kgg3oHBDRt1GhyqX3B0IUXU
+                        opk5VsFXRpVKIFUsipR7vYPVzA7x6tAOJ+6rm80kR8G8BW3aSKGkItVpg1hiMBPk
+                        75JqoMUhaVN06HiKtGAWEtMRcEwTNeF8bxDwvX0kpGsA6UyFHONB5kSw1KUQ83gG
+                        vjfN7p88ZjO427SXeWgg8+2L9KUYghM5DaTvRcem5rIIb0keitoFSOC5xTxj9/U1
+                        xu24K/Rdl/oYTobHCkTeXzpEuqMOTjmNuq2W999tVugkpNZajJQZ2OLsZGEchdo+
+                        kyzYaSp8X/s590+e9o0mwPzmaDzEdAW5JAopYJXKfsWeSaQTjvwIZoJpMDZMpl00
+                        h1vDmaaNvslDqOXV/FayK/EroH6ExpHkYorvWaxVG48mc2YxEM4W4uyBOkArPwkL
+                        mc7cmYV7va2yS7kfZw+Ubx75tGBfyCwCTkPIaCXDZlzHg7/X/kuVQoCsY0L/D/e/
+                        qWA+L7f42sWomFFFQk4Z3Fnu2JwwDHByaDFD0Ly8SWHtVHISu9PnETKl0X7Qh0FS
+                        sId5UqdvgmsC5jRu5AlsS1HsjSZa2zEl3Fpzlu1yYJTRKsNyYGG1v+ePlncCAwEA
+                        AQKCAgBJ118sQmkFo1r6ama7GAGWkgV09ETDTzYmEI5/96OHCjuVvsqubDQRsyCE
+                        i10EUCN8zpstA50sDP9YIGfMu+OzxG/OSFWxiPT7rnKmwUWsPtppIpRAP70a4LbX
+                        jXx0Q2tKyK8U8M5IpTvoyH8jlVS593CODobOk2n65+BKI/z/8r2yMEYUgp4GYryk
+                        sSlpPwJdCqgw1mMa3mLDmqzPLF3JkJEIA09kBUm8xzpTIZzF1f1WARKkgGJivz1S
+                        ALEz1esn10nqsPy1UrC1xutqBBFnnRDO9YcGA2wh7CvmDNepGpVK8zc6KxT451ts
+                        SA9d49+GPs7mxRvygfvPmDDWBhVK+Lt2KEekY/AotG79CLPoxYc6AzLeu0v0Mc0f
+                        8IiCBJXujrTytY5nk/HHW4Yzlc08z1Sf7olpk9GjynxEsVMdDhUKevsACI/TNS55
+                        U5cXYNRyPKDs+8glddX0xKgcngAm6zIgZ1nJOskEALgFIZL3Y1dPJmMEeCEdk8ta
+                        sTN6eVQauyvKERv2/VgAo117TdQ2lPOPxv98m6rcEJRxfV02WsadoKIj4T5Hp1r3
+                        3uJ2UljIAjuv+qq4YGHQxPwGzhAztS7P27rN3nG5Y1jJgttfyOa5bJ5FwFK0/WZq
+                        Hngf9Y1pNxHZIndK2ZCP62/N54oJKE+as1HaKz8JECniVexZ4QKCAQEA5AuE+DYz
+                        WThT1MHgkph4jOCIiuTgnqo9yFoVIzadAOUX2mkaUlP/DFkVKGboY/RaW3JZAJI4
+                        rDT3T1F74r4jq6AiObE/uNESuUTlVdcxQdHKSBdjlj3VoXhKX+rK5vsVv/dBVbrl
+                        uEH41sah4JoDo3/Pak6UN31ZdUArtIks1APw332aAM8LTTfq6K1tygeyQDH/JNfJ
+                        ENN/Y3FCjooMf+1cm0Cdxtj81HDO7Gpuux2vk7+QjiCMco1nYTe29K7DTTB+o7nM
+                        3hJ5E3WX1dZv8M7aZY3jyULj9WCGVBxHi+JmaAqfsoX7AMdWTsyPquGVfXHiouR2
+                        TeHgafppkMTZhwKCAQEA2vDBXDZTksYACcO6X2bbz/FBsrdeKMFmmJr29Vm7llFD
+                        O4KnNTklNKf1z9yjAbOeuwFbVbYCcxh3LJ2rJXaXspxVQdxo5K32JVyXW8B1s63+
+                        r+QsNTKYXHDgFGrh5FiUfIxy7IDvWKEJPGMAfwLH/PPgzXaOmhGy93jhUSImTf75
+                        sAw2st4jD9gPqJqKtKs3Mz6XDa9VYLSU6Ka3t6DnDt6lqFRzYtDZZsJrI7gUDnuS
+                        aHAAT+ELGftxbzZHXGPXiOvDCnA4J2q++uYHVJvu2xn9TEU0GCSHZMyj08ZagajY
+                        QGD6H26v7xZGH/ScWfrM3jEYlwOqeKBlO93vl6DXkQKCAQByfnYcSNovCWDNiSm/
+                        cF3WHUVwtskv4Dl0xgWm0FyzflIjjnFwtEtxX6iHyGMVDDHxh8+3wbJCg7VHVZnl
+                        laFDIfsNDDj6Cb5k1npuRsSsTzBIUbXmUNVZZJOy5KdKoPWik/lxmYyMnlLZQpEz
+                        ux/ojtsMfLddxMmNXNKUqeqf5/qfuuf/T/RUqKaAe9KLhKGyKWf4j36bvBRRUSQh
+                        fJ4Z/IpqSF7u3zLRVnINsMI3oAfvHlbthNn/CY/F97sbzkKwFpD+kuKQ/KVdZ8T7
+                        z9YUCUcNhde/zJ23LOdEg45IZTsVMYBMmYgUNADZP0tCeFAd03f+YMYlBCswClHG
+                        JY8xAoIBAQCfWiQiTZg+d8aHVOJNlbvfeaVrwnLSDxHxeLjOkuUp3zOkGNBCuLkP
+                        vj/3botmLaoWSkKD+9mElAYJfyiWN97prUeQjC/8YXGKd/3iVg5VHQsGUniqr4yd
+                        m7o8oh6P6LkKfd8XrDCIvYzPWu99gjS1M3wnj2bzVHaCEIVOXCCtHCv3qqwVPAEh
+                        Aw1ClljmbsfakG+5Eih+HnFTdCS7jm0eMYc5IV5qScAyPsdkVBKlB+PkB8DyYsWF
+                        v7EsVMFTyYeSrKZk7pCwf81JKCultWkAJ8ZowOXNvKifASMsfG5beN0M3oiuYA3F
+                        YtzfXVZ/Vz/NaMaRA6YL7hJApKRCJFtBAoIBAFETA54o/BLyXp1vV5WW88aF4lbN
+                        7l0XxqJm8VFFKN0LAMF8vMJJCc4Q4iahKKLdAZ5kTAwCY86mvm9nzpKj2bupp29H
+                        Q/ZYNOWHC7DjY7MBm0jkSt0FPUOuKLSMlrwGb9uXHCGTpuZFsZGQ/zvtjkBULMUq
+                        DjQedYEIjHzDrcuTBcPlXIUk7lTgSU2e+XJ76cjZTrSyAjodWkE0xU0SRDtC8FFY
+                        0gvpt1UT8B9XKAtfb2fwBoDGlYkjNTri6pfDwx4MhXDzUTFSApNmocy4X1W6gebC
+                        TX2SjbXwYc4XXHjjMECIFKnM9z5aduK1SiZmuPu6g3BuKiSp6/aRTnRlhvI=
+                        -----END RSA PRIVATE KEY-----
 eureka:
     instance:
         prefer-ip-address: true

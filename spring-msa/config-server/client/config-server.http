@@ -1,0 +1,14 @@
+#
+
+GET {{config-server}}/microservice-a/default/master
+Accept: application/json
+
+###
+
+
+###
+/{application}/{profile}[/{label}]
+/{application}-{profile}.yml
+/{label}/{application}-{profile}.yml
+/{application}-{profile}.properties
+/{label}/{application}-{profile}.properties
