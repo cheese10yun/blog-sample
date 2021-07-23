@@ -3,16 +3,13 @@ server:
 spring:
     application:
         name: order-service
-    profiles:
-        active: default
-
 
     cloud:
         bus:
             trace:
                 enabled: true
-#        config:
-#            uri: http://localhost:8888
+    config:
+        import: "optional:configserver:http://localhost:8888"
 #
 #    rabbitmq:
 #        host: localhost
@@ -48,3 +45,7 @@ management:
     endpoint:
         refresh:
             enabled: true
+
+
+message:
+    profile: "default"

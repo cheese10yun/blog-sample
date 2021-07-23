@@ -1,0 +1,12 @@
+GET {{order-service}}/orders/profile
+Accept: application/json
+
+###
+
+GET {{order-service}}/actuator
+
+###
+
+POST {{order-service}}/actuator/refresh
+
+###

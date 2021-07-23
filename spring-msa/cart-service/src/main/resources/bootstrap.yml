@@ -3,12 +3,13 @@ server:
 spring:
     application:
         name: cart-service
-    profiles:
-        active: default
 
-#    cloud:
-#        config:
-#            uri: http://localhost:8888
+    cloud:
+        bus:
+            trace:
+                enabled: true
+    config:
+        import: "optional:configserver:http://localhost:8888"
 #
 #    rabbitmq:
 #        host: localhost

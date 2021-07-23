@@ -12,26 +12,26 @@ import javax.persistence.MappedSuperclass
 import javax.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.cloud.context.config.annotation.RefreshScope
 import org.springframework.cloud.netflix.ribbon.RibbonClient
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestController
 @RequestMapping("/orders")
+@RefreshScope
 class OrderApi(
     private val orderRepository: OrderRepository,
-    private val cartClient: CartClient
+    private val cartClient: CartClient,
+    @Value("\${message.profile}") val profile: String
 ) {
 
     var errorCount = 0
@@ -51,6 +51,10 @@ class OrderApi(
 
         return cartClient.getCart(1)
     }
+
+    @GetMapping("/profile")
+    fun getRepoProfile() = profile
+
 }
 
 

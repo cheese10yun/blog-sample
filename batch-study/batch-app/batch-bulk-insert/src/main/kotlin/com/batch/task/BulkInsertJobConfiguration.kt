@@ -25,8 +25,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Service
 
-const val GLOBAL_CHUNK_SIZE = 10_000
-const val DATA_SET_UP_SIZE = 1_000_000
+const val GLOBAL_CHUNK_SIZE = 1000
+const val DATA_SET_UP_SIZE = 10_000
 
 @Configuration
 class BulkInsertJobConfiguration(
