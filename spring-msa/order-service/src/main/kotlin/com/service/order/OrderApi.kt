@@ -12,6 +12,7 @@ import javax.persistence.MappedSuperclass
 import javax.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.context.config.annotation.RefreshScope
 import org.springframework.cloud.netflix.ribbon.RibbonClient
@@ -34,6 +35,8 @@ class OrderApi(
     @Value("\${message.profile}") val profile: String
 ) {
 
+    val log by logger()
+
     var errorCount = 0
 
     @GetMapping
@@ -53,7 +56,12 @@ class OrderApi(
     }
 
     @GetMapping("/profile")
-    fun getRepoProfile() = profile
+    fun getRepoProfile(): String {
+        log.info("==info==")
+        log.warn("==warn==")
+        log.debug("==debug==")
+        return profile
+    }
 
 }
 

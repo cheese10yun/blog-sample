@@ -10,3 +10,7 @@ GET {{order-service}}/actuator
 POST {{order-service}}/actuator/refresh
 
 ###
+
+
+GET {{config-server}}/env
+Accept: application/json

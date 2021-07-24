@@ -3,6 +3,3 @@ server:
 spring:
     application:
         name: order-service
-
-message:
-    profile: "local"
