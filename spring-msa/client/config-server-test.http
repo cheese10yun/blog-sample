@@ -11,6 +11,14 @@ POST {{order-service}}/actuator/refresh
 
 ###
 
+POST {{order-service}}/actuator/bus-refresh
+
+###
+
+POST {{order-service}}/actuator/bus-env
+
+###
+
 
 GET {{config-server}}/actuator/env
 Accept: application/json

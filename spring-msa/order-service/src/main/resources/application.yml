@@ -3,19 +3,21 @@ server:
 spring:
     application:
         name: order-service
-#
-#    rabbitmq:
-#        host: localhost
-#        port: 5672
-#        username: user
-#        password: user
 
     cloud:
         bus:
             trace:
                 enabled: true
+
+    kafka:
+        bootstrap-servers: localhost:29092
+        consumer:
+            group-id: "test"
+            enable-auto-commit: true
+
     config:
         import: "optional:configserver:http://localhost:8888"
+
 
 eureka:
     instance:
@@ -25,6 +27,7 @@ eureka:
         fetch-registry: true
         service-url:
             default-zone: http://localhost:8761/eureka/
+
 
 logging:
     level:
@@ -37,6 +40,7 @@ management:
             exposure:
                 include:
                     - "info"
+                    - "env"
                     - "bus-refresh"
                     - "bus-env"
                     - "health"

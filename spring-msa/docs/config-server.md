@@ -38,7 +38,7 @@
 * [ ] bootstrap.yml 설정 config 서버정도 설정하는듯
 * [ ] 애플리케이션 이름과 컨피스 서버의 config 이름과 동일 해야함
 * [ ] searchPath의미가 있나??
-* [ ] @RefreshScope
+* [ ] @RefreshScope, @ConfigurationProperties 도 자동으로 가능한듯?
 
 
 

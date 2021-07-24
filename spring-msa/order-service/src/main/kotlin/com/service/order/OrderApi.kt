@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController
 @RefreshScope
 class OrderApi(
     private val orderRepository: OrderRepository,
-    private val cartClient: CartClient,
+//    private val cartClient: CartClient,
     @Value("\${message.profile}") val profile: String
 ) {
 
@@ -44,16 +44,16 @@ class OrderApi(
         return orderRepository.findAll(pageable)
     }
 
-    @GetMapping("/carts/{id}")
-    fun getCarts(@PathVariable id: Long): CartClient.CartResponse {
-
-        orderRepository.findById(1)
-        orderRepository.findById(2)
-        orderRepository.findById(2)
-        orderRepository.findById(3)
-
-        return cartClient.getCart(1)
-    }
+//    @GetMapping("/carts/{id}")
+//    fun getCarts(@PathVariable id: Long): CartClient.CartResponse {
+//
+//        orderRepository.findById(1)
+//        orderRepository.findById(2)
+//        orderRepository.findById(2)
+//        orderRepository.findById(3)
+//
+//        return cartClient.getCart(1)
+//    }
 
     @GetMapping("/profile")
     fun getRepoProfile(): String {
@@ -78,17 +78,17 @@ class Order(
 
 interface OrderRepository : JpaRepository<Order, Long>
 
-@FeignClient(name = "cart-service")
-@RibbonClient(name = "cart-service")
-interface CartClient {
-
-    @GetMapping("/carts/{id}")
-    fun getCart(@PathVariable id: Long): CartResponse
-
-    data class CartResponse(
-        val productId: Long
-    )
-}
+//@FeignClient(name = "cart-service")
+//@RibbonClient(name = "cart-service")
+//interface CartClient {
+//
+//    @GetMapping("/carts/{id}")
+//    fun getCart(@PathVariable id: Long): CartResponse
+//
+//    data class CartResponse(
+//        val productId: Long
+//    )
+//}
 
 
 @EntityListeners(value = [AuditingEntityListener::class])
