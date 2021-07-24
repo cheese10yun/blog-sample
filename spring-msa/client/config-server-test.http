@@ -12,5 +12,5 @@ POST {{order-service}}/actuator/refresh
 ###
 
 
-GET {{config-server}}/env
+GET {{config-server}}/actuator/env
 Accept: application/json

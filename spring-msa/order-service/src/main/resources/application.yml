@@ -3,6 +3,12 @@ server:
 spring:
     application:
         name: order-service
+#
+#    rabbitmq:
+#        host: localhost
+#        port: 5672
+#        username: user
+#        password: user
 
     cloud:
         bus:
@@ -10,12 +16,6 @@ spring:
                 enabled: true
     config:
         import: "optional:configserver:http://localhost:8888"
-#
-#    rabbitmq:
-#        host: localhost
-#        port: 5672
-#        username: user
-#        password: user
 
 eureka:
     instance:
@@ -42,10 +42,7 @@ management:
                     - "health"
                     - "hystrix.stream"
                     - "refresh"
+                    - "logger"
     endpoint:
         refresh:
             enabled: true
-
-
-message:
-    profile: "default"

@@ -11,6 +11,10 @@ spring:
                 git:
                     uri: git@github.com:cheese10yun/msa-study-sample.git
                     ignoreLocalSshSettings: true
+                    timeout: 10
+                    hostKeyAlgorithm: ssh-rsa
+                    deleteUntrackedBranches: true
+                    search-paths: "order-service"
                     private-key: |
                         -----BEGIN RSA PRIVATE KEY-----
                         MIIJKAIBAAKCAgEAwwhGRtqiVLU3mM0eAeftP9QMk42phGEeyg8MWuVN5C6ztEvl
@@ -63,6 +67,16 @@ spring:
                         0gvpt1UT8B9XKAtfb2fwBoDGlYkjNTri6pfDwx4MhXDzUTFSApNmocy4X1W6gebC
                         TX2SjbXwYc4XXHjjMECIFKnM9z5aduK1SiZmuPu6g3BuKiSp6/aRTnRlhvI=
                         -----END RSA PRIVATE KEY-----
+
+
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include:
+                    - "*"
+
 eureka:
     instance:
         prefer-ip-address: true

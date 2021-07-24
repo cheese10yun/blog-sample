@@ -9,6 +9,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
+    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
 //    implementation("org.springframework.cloud:spring-cloud-starter-bus-kafka")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-ribbon:2.2.9.RELEASE")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
