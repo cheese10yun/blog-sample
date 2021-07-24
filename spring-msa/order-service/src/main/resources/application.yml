@@ -41,12 +41,10 @@ management:
                 include:
                     - "info"
                     - "env"
+                    - "refresh"
                     - "bus-refresh"
                     - "bus-env"
                     - "health"
-                    - "hystrix.stream"
-                    - "refresh"
-                    - "logger"
     endpoint:
         refresh:
             enabled: true
