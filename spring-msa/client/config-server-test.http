@@ -26,5 +26,10 @@ Accept: application/json
 ###
 
 
-GET {{config-server}}/order-service/local
+GET http://localhost:8181/orders/profile
+Accept: application/json
+
+###
+
+GET http://localhost:8585/orders/profile
 Accept: application/json
