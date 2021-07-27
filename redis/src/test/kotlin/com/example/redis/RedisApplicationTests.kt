@@ -18,7 +18,7 @@ class RedisApplicationTests(
     val redisTemplateWithTransaction: StringRedisTemplate
 ) {
 
-    private val memberCount = 10
+    private val memberCount = 1000
 
     @Test
     fun `members 저장 테스트`() {

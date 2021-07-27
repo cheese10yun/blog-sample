@@ -1,8 +1,8 @@
 spring:
     redis:
-        host: localhost
+        host: 124.80.103.104
         port: 6379
-        password: root
+        password: cheese10
 
 
 logging:
