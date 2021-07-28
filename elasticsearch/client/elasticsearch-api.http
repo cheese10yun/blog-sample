@@ -1,0 +1,117 @@
+GET {{server}}/books/book/_search?q=hamlet&pretty
+
+###
+
+GET {{server}}books/_search?q=hamlet&pretty
+
+###
+
+
+
+
+GET http://124.80.103.104:9200/books,magazines/_search?q=time&pretty
+
+###
+
+GET http://124.80.103.104:9200/_all/_search?q=time&pretty
+
+###
+
+GET http://124.80.103.104:9200/_search?q=title:time&pretty
+
+###
+
+###
+
+GET http://124.80.103.104:9200/_search?q=title:time%20AND%20machine&pretty
+
+###
+
+
+###
+
+GET http://124.80.103.104:9200/_search?q=time&df=title&pretty
+
+###
+
+
+
+###
+
+GET http://124.80.103.104:9200/_search?q=title:time%20machine&default_operator=AND&pretty
+
+###
+
+###
+
+###
+
+GET http://124.80.103.104:9200/_search?q=title:time&explain&pretty
+
+###
+
+GET http://124.80.103.104:9200/_search?q=title:time&_source=false&pretty
+
+###
+
+GET http://124.80.103.104:9200/_search?q=title:time&fields=title,author,category&pretty
+
+###
+
+GET http://124.80.103.104:9200/_search?q=title:time&_source=title,author,category&pretty
+
+###
+
+
+GET http://124.80.103.104:9200/books/_search?q=author:jules&sort=pages&pretty
+
+###
+
+
+GET http://124.80.103.104:9200/books/_search?q=author:jules&sort=pages:desc&pretty
+
+###
+
+GET http://124.80.103.104:9200/books/_search?q=author:jules&_source=title&from=1&pretty
+
+###
+
+
+
+GET http://124.80.103.104:9200/books/_search?size=1&q=author:William&search_type=query_then_fetch&_source=title,author&pretty
+
+###
+
+GET http://124.80.103.104:9200/books/_search?size=1&q=author:William&search_type=query_and_fetch&_source=title,author&pretty
+
+###
+
+GET http://124.80.103.104:9200/books/_search?size=1&q=author:William&search_type=query_and_fetch&_source=title,author&pretty
+
+###
+
+
+
+
+GET http://124.80.103.104:9200/books/_search?q=author:william&_source=title,author&search_type=dfs_query_and_fetch&pretty
+
+###
+
+
+
+
+
+
+
+
+
+
+
+
+###
+
+
+
+###
+
+
