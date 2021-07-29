@@ -15,13 +15,15 @@ POST {{order-service}}/actuator/busrefresh
 
 ###
 
-POST {{order-service}}/actuator/busenv
+
+
+
+GET {{config-server}}/actuator
+Accept: application/json
 
 ###
 
-
-GET {{config-server}}/actuator/env
-Accept: application/json
+POST {{order-service}}/actuator/busrefresh
 
 ###
 
@@ -33,3 +35,17 @@ Accept: application/json
 
 GET http://localhost:8585/orders/profile
 Accept: application/json
+
+
+###
+
+GET http://localhost:8181/actuator
+
+###
+
+GET http://localhost:8181/trace
+
+###
+
+POST http://localhost:8181/actuator/busenv
+Content-Type: application/vnd.spring-boot.actuator.v3+json

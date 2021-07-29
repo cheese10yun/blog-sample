@@ -6,8 +6,10 @@ import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.cloud.bus.event.RefreshRemoteApplicationEvent
 import org.springframework.cloud.context.config.annotation.RefreshScope
 import org.springframework.cloud.openfeign.EnableFeignClients
+import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 @SpringBootApplication
@@ -28,6 +30,22 @@ class OrderApplicationRunner(
         (1..10).map {
             orderRepository.save(Order(it.toLong()))
         }
+    }
+
+    @EventListener
+    // https://www.tabnine.com/code/java/classes/org.springframework.cloud.bus.event.RefreshRemoteApplicationEvent
+    // https://www.alibabacloud.com/blog/knowledge-sharing---introduction-to-the-spring-cloud-bus-message-bus_594823
+    // https://www.programmersought.com/article/86735377064/
+    fun onRefreshRemoteApplicationEvent(event: RefreshRemoteApplicationEvent) {
+        System.out.printf(
+            """
+            RefreshRemoteApplicationEvent -  Source : %s , originService : %s , destinationService : %s 
+            
+            """.trimIndent(),
+            event.source,
+            event.originService,
+            event.destinationService
+        )
     }
 }
 

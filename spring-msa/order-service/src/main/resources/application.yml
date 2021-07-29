@@ -8,12 +8,14 @@ spring:
         bus:
             trace:
                 enabled: true
+            enabled: true
+            refresh:
+                enabled: true
+            ack:
+                enabled: true
 
     kafka:
         bootstrap-servers: localhost:29092
-        consumer:
-            group-id: "test"
-            enable-auto-commit: true
 
     config:
         import: "optional:configserver:http://localhost:8888"
@@ -38,12 +40,14 @@ management:
         web:
             exposure:
                 include:
+                    - "*"
                     - "info"
                     - "env"
                     - "refresh"
                     - "bus-refresh"
                     - "bus-env"
                     - "health"
+                    - "trace"
     endpoint:
         refresh:
             enabled: true
