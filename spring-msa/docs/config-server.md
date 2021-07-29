@@ -216,3 +216,6 @@ SSH 주소는 Github Code 버튼을 누르면 확인할 수 있습니다.
 
 ## 정리
 Spring Config Server에 대해서 간단하게 알아봤습니다. 이후 포스팅에서는 각 애플리케이션(클라이언트)이 Config Server에 접속해서 설정값을 가져오는 방식, 배포 없이 Config 값을 변경하는 방법, 여러 서버가 구동 중인 경우 Kafka 기반으로 Broadcast 해서 Config 값 변경 전파하는 방식에 대해서 다뤄보겠습니다.
+
+## 참고
+* [Spring Cloud Config Reference](https://cloud.spring.io/spring-cloud-config/reference/html/)
