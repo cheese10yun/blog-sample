@@ -190,7 +190,7 @@ rsa
 
 `SSH and GPG keys` -> `New SSH Key`으로 SSH Key의 공개키를 등록합니다
 
-#### yml 설정
+### yml 설정
 
 ```yml
 spring:
@@ -207,7 +207,7 @@ spring:
 ```
 **uri 설정을 반드시 SSH 주소로 입력해야 합니다.** ignoreLocalSshSettings 설명은 아래 공식 레퍼런스를 확인해 주세요
 > [Git SSH configuration using properties](https://cloud.spring.io/spring-cloud-config/reference/html/#_git_ssh_configuration_using_properties)
-> 
+>
 >  For those cases, SSH configuration can be set by using Java properties. In order to activate property-based SSH configuration, the spring.cloud.config.server.git.ignoreLocalSshSettings property must be set to true, as shown in the following
 
 ![](https://github.com/cheese10yun/blog-sample/raw/master/spring-msa/docs/images/github-ssh-2.png)
