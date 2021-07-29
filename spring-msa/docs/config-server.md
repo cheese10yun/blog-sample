@@ -1,6 +1,6 @@
 # Spring Config Server
 
-![](images/config-server1.png)
+![](https://github.com/cheese10yun/blog-sample/raw/master/spring-msa/docs/images/config-server1.png)
 
 스프링 Config Server는 각 애플리케이션에의 Config 설정을 중앙 서버에서 관리를 하는 서비스입니다. 중앙 저장소로 Github Repository뿐만 아니라 아래와 같은 저장소 환경을 제공해 주고 있습니다.
 
@@ -184,9 +184,9 @@ rsa
 
 ### Github SSH Key 등록
 
-![](images/github-ssh.png)
+![](https://github.com/cheese10yun/blog-sample/raw/master/spring-msa/docs/images/github-ssh.png)
 
-![](images/github-ssh-1.png)
+![](https://github.com/cheese10yun/blog-sample/raw/master/spring-msa/docs/images/github-ssh-1.png)
 
 `SSH and GPG keys` -> `New SSH Key`으로 SSH Key의 공개키를 등록합니다
 
@@ -210,7 +210,7 @@ spring:
 > 
 >  For those cases, SSH configuration can be set by using Java properties. In order to activate property-based SSH configuration, the spring.cloud.config.server.git.ignoreLocalSshSettings property must be set to true, as shown in the following
 
-![](images/github-ssh-2.png)
+![](https://github.com/cheese10yun/blog-sample/raw/master/spring-msa/docs/images/github-ssh-2.png)
 
 SSH 주소는 Github Code 버튼을 누르면 확인할 수 있습니다.
 
