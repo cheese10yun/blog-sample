@@ -1,0 +1,21 @@
+# application}/{profile}[/{label}]
+
+GET http://localhost:8888/order-service/local/master
+
+###
+
+# /{application}-{profile}.yml
+GET http://localhost:8888/order-service-local.yml
+
+###
+
+# /{label}/{application}-{profile}.yml
+GET http://localhost:8888/master/order-service-local.yml
+
+###
+
+# /{label}/{application}-{profile}.properties
+
+GET http://localhost:8888/order-service-local.properties
+
+###
