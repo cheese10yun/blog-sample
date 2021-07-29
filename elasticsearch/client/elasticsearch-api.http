@@ -115,3 +115,131 @@ GET http://124.80.103.104:9200/books/_search?q=author:william&_source=title,auth
 ###
 
 
+POST http://124.80.103.104:9200/books/_search?pretty
+Content-Type: application/json
+
+{
+  "query": {
+    "term": {
+      "author": "william"
+    }
+  }
+}
+
+###
+
+POST http://124.80.103.104:9200/books/_search?pretty
+Content-Type: application/json
+
+{
+  "from": 1,
+  "size": 2,
+  "_source": [
+    "title",
+    "category"
+  ],
+  "query": {
+    "term": {
+      "_all": "time"
+    }
+  }
+}
+
+###
+
+# curl 'http://124.80.103.104:9200/_search?pretty' -d '
+#{
+#  from : 1,
+#  size : 2,
+#  fields : ["title","category"],
+#  "query" : {
+#    "term" : { "_all" : "time" }
+#  }
+#}'
+POST http://124.80.103.104:9200/_search?pretty
+Content-Type: application/json
+
+
+{
+  "from": 1,
+  "size": 2,
+  "_source": [
+    "title",
+    "category"
+  ],
+  "query": {
+    "term": {
+      "_all": "time"
+    }
+  }
+}
+
+###
+
+
+###
+
+
+POST http://124.80.103.104:9200/books/_search?pretty
+Content-Type: application/json
+
+{
+  "_source": [
+    "title",
+    "author",
+    "category",
+    "pages"
+  ],
+  "sort": [
+    {
+      "category": "desc"
+    },
+    "pages",
+    "title"
+  ],
+  "query": {
+    "term": {
+      "_all": "time"
+    }
+  }
+}
+
+###
+
+
+
+###
+
+
+POST http://124.80.103.104:9200/books/_search?pretty
+Content-Type: application/json
+
+
+{
+  "_source": [
+    "title",
+    "author",
+    "category",
+    "pages"
+  ],
+  "sort": [
+    {
+      "category": {
+        "order": "desc",
+        "mode": "min"
+      }
+    },
+    "pages",
+    "title"
+  ],
+  "query": {
+    "term": {
+      "category": "science"
+    }
+  }
+}
+
+###
+
+
+
