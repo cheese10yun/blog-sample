@@ -4,7 +4,6 @@
 
 [Yun Blog](https://cheese10yun.github.io) ***예제 코드 지속해서 해당 프로젝트를 이어 나아갈 예정이라 깃허브 Star, Watching 버튼을 누르시면 구독 신청받으실 수 있습니다.***
 
-## Node
 * [Loopback 게시판 만들기 (1)](https://github.com/cheese10yun/blog-sample/tree/master/loopback-boards)
 * [AWS S3 업로드시 이미지 최적화](https://github.com/cheese10yun/blog-sample/tree/master/AWS_S3_Image_Optimization_)
 * [Node.JS로 카카오봇 만들기](https://github.com/cheese10yun/KaKaoBot-Node)
@@ -15,8 +14,6 @@
 * [Node Passport를 이용한 Login + Mysql](https://cheese10yun.github.io/passport-mysql/)
 * [Node.JS + Mysql 연동](https://cheese10yun.github.io/mysql-node/)
 * [Passport를 이용한 Login](https://cheese10yun.github.io/Passport-part1/)
-
-## Spring
 * [Spring 으로 초간단 Slack Message 보내기](https://github.com/cheese10yun/slackbot)
 * [Spring OOP 프로그래밍 예제(1) - 내가 해석한 SOLID](https://github.com/cheese10yun/blog-sample/tree/master/notification)
 * [Spring OOP 프로그래밍 예제(2) - Value 클래스로 응집력 높이기](https://github.com/cheese10yun/blog-sample/tree/master/bankapi)
@@ -81,8 +78,8 @@
 * [Exposed](https://github.com/cheese10yun/blog-sample/blob/master/exposed-study/README.md)
 * [Spring Batch Reader 성능 측정 및 분석](https://github.com/cheese10yun/blog-sample/blob/master/batch-study/docs/item-reader-performance.md)
 * [JPA JPQL의 조회 동작 살펴보기](https://github.com/cheese10yun/blog-sample/blob/master/jpa-repeatable-read/README.md)
-
-## 기타
 * [GitHub로 프로젝트 관리하기](https://github.com/cheese10yun/github-project-management)
 * [IntelliJ 사용법](https://github.com/cheese10yun/IntelliJ)
 * [좋은 학습 자료 및 GitHub 정리](https://github.com/cheese10yun/dev-info)
+* [Spring Config Server 정리](https://cheese10yun.github.io/spring-config-server/)
+* [Elasticsearch APM 기본설정](https://cheese10yun.github.io/elk-apm-1/)
