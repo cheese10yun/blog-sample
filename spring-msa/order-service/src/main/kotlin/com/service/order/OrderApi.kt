@@ -34,6 +34,14 @@ class OrderApi(
 //    private val cartClient: CartClient,
     @Value("\${message.profile}") val profile: String
 ) {
+    @GetMapping("/profile")
+    fun getRepoProfile(): String {
+        log.info("==info==")
+        log.warn("==warn==")
+        log.debug("==debug==")
+        return profile
+    }
+
 
     val log by logger()
 
@@ -54,15 +62,6 @@ class OrderApi(
 //
 //        return cartClient.getCart(1)
 //    }
-
-    @GetMapping("/profile")
-    fun getRepoProfile(): String {
-        log.info("==info==")
-        log.warn("==warn==")
-        log.debug("==debug==")
-        return profile
-    }
-
 }
 
 
