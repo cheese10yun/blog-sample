@@ -1,10 +1,12 @@
 rootProject.name = "spring-msa"
 
-include("order-service")
-include("cart-service")
 include("eureka-server")
 include("gateway-server")
 include("config-server")
+
+include("order-service")
+include("cart-service")
+include("user-service")
 
 pluginManagement {
 

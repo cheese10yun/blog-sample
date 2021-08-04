@@ -1,0 +1,53 @@
+server:
+    port: 0
+spring:
+    application:
+        name: user-service
+
+    cloud:
+        bus:
+            trace:
+                enabled: true
+            enabled: true
+            refresh:
+                enabled: true
+            ack:
+                enabled: true
+
+    kafka:
+        bootstrap-servers: localhost:29092
+
+    config:
+        import: "optional:configserver:http://localhost:8888"
+
+eureka:
+    instance:
+        prefer-ip-address: true
+        instance-id: ${spring.cloud.client.hostname}:${spring.application.instance_id:${random.value}}
+    client:
+        register-with-eureka: true
+        fetch-registry: true
+        service-url:
+            default-zone: http://localhost:8761/eureka/
+
+
+logging:
+    level:
+        ROOT: info
+
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include:
+                    - "info"
+                    - "env"
+                    - "refresh"
+                    - "bus-refresh"
+                    - "bus-env"
+                    - "health"
+                    - "trace"
+    endpoint:
+        refresh:
+            enabled: true

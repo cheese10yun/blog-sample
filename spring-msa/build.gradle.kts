@@ -73,7 +73,7 @@ subprojects {
     }
 
     tasks.bootJar {
-        enabled = false
+        enabled = true
     }
 
     tasks.jar {
