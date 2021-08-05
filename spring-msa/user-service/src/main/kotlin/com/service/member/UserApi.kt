@@ -16,6 +16,3 @@ class UserApi(
         return environment.getProperty("getting.message")
     }
 }
-
-
-// 3
