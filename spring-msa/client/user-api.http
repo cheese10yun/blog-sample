@@ -1,6 +1,5 @@
 
-
-POST http://localhost:58761/api/v1/users
+POST {{gateway-server}}/user-service/api/v1/users
 Content-Type: application/json
 
 {
@@ -8,3 +7,9 @@ Content-Type: application/json
   "name": "123123",
   "password": "123123"
 }
+
+###
+
+
+GET {{gateway-server}}/user-service/api/v1/users
+Content-Type: application/json

@@ -5,6 +5,8 @@ spring:
     application:
         name: gateway-server
 
+    config:
+        import: "optional:configserver:http://localhost:8888"
     cloud:
         gateway:
             discovery:
@@ -67,9 +69,12 @@ management:
             exposure:
                 include:
                     - "info"
-                    - "health"
-                    - "gateway"
+                    - "env"
+                    - "refresh"
                     - "bus-refresh"
+                    - "bus-env"
+                    - "health"
+                    - "trace"
     endpoint:
         gateway:
             enabled: true

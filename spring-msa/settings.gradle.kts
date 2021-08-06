@@ -7,6 +7,7 @@ include("config-server")
 include("order-service")
 include("cart-service")
 include("user-service")
+include("catalog-service")
 
 pluginManagement {
 

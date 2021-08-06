@@ -11,38 +11,57 @@ import javax.persistence.MappedSuperclass
 import javax.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Entity
 @Table(name = "user")
 class User(
-    @Column(name= "email", nullable = false, length = 50)
+    @Column(name = "email", nullable = false, length = 50)
     val email: String,
-    @Column(name= "name", nullable = false, length = 50)
+    @Column(name = "name", nullable = false, length = 50)
     val name: String,
-    @Column(name= "userid", nullable = false, length = 50, unique = true)
-    val userid: String,
-    @Column(name= "password", nullable = false, length = 50)
+    @Column(name = "userid", nullable = false, length = 50, unique = true)
+    val userId: String,
+    @Column(name = "password", nullable = false, length = 255)
     val password: String,
-
-    ) : EntityAuditing() {
+) : EntityAuditing() {
 }
 
-interface UserRepository : JpaRepository<User, Long>
+interface UserRepository : JpaRepository<User, Long> {
+    fun findByUserId(userId: String): User
+}
 
 @Service
 class UserSignUpService(
-    val userRepository: UserRepository
-){
+    val userRepository: UserRepository,
+    val bCryptPasswordEncoder: BCryptPasswordEncoder
+) {
 
-    fun signUp(dto: UserSignUpRequest){
-
+    @Transactional
+    fun signUp(dto: UserSignUpRequest): User {
+        return userRepository.save(dto.toEntity(bCryptPasswordEncoder.encode(dto.password)))
     }
-
-
 }
+
+@Service
+@Transactional(readOnly = true)
+class UserFindService(
+    val userRepository: UserRepository
+) {
+
+    fun findById(id: Long) =
+        userRepository.findByIdOrNull(id)
+
+    fun findAll(pageAble: Pageable) =
+        userRepository.findAll(pageAble)
+}
+
 
 @EntityListeners(value = [AuditingEntityListener::class])
 @MappedSuperclass
