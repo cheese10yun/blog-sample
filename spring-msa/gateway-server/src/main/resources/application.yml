@@ -48,6 +48,13 @@ spring:
                         - RewritePath=/user-service/(?<path>.*),/$\{path}
 #                        - CustomFilter
 
+                -   id: catalog-service
+                    uri: lb://catalog-service
+                    predicates:
+                        - Path=/catalog-service/**
+                    filters:
+                        - RewritePath=/catalog-service/(?<path>.*),/$\{path}
+
 
 eureka:
     instance:
