@@ -18,7 +18,7 @@ spring:
 #            default-filters:
 #                -   name: GlobalFilter
 #                    args:
-#                        preLogger: true
+#                        preLogger: trrtue
 #                        postLogger: true
 
             routes:
@@ -28,7 +28,7 @@ spring:
                         - Path=/order-service/**
                     filters:
                         - RewritePath=/order-service/(?<path>.*),/$\{path}
-                        - CustomFilter
+#                        - CustomFilter
 
                 -   id: cart-service
                     uri: lb://cart-service
@@ -36,7 +36,7 @@ spring:
                         - Path=/cart-service/**
                     filters:
                         - RewritePath=/cart-service/(?<path>.*),/$\{path}
-                        - CustomFilter
+#                        - CustomFilter
 
                 -   id: user-service
                     uri: lb://user-service
@@ -44,7 +44,7 @@ spring:
                         - Path=/user-service/**
                     filters:
                         - RewritePath=/user-service/(?<path>.*),/$\{path}
-                        - CustomFilter
+#                        - CustomFilter
 
 
 eureka:
