@@ -4,7 +4,7 @@
 
 각 서비스 애플리케이션은 해당 애플리케이션이 구동시 Config Server에 자신의 Config의 설정 파일을 읽어 오며, **애플리케이션이 구동 중에도 Config 설정을 바꾸고 애플리케이션 재시작 없이 해당 변경 내용을 반영할 수 있습니다.**
 
-![](images/config-server1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/config-server1.png)
 
 
 ## Config Client 구성
@@ -82,7 +82,7 @@ public Environment defaultLabelIncludeOrigin(@PathVariable String name, @PathVar
 }
 ```
 
-![](images/config-debug.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/config-debug.png)
 
 `spring.application.name=order-service`, `profile=local` 설정을 기반으로 Config Server의 API를 호출하여 자신의 애플리케이션을 가져옵니다.
 
@@ -121,7 +121,7 @@ Response code: 200; Time: 198ms; Content length: 5 bytes
 
 Config 서버를 통해서 가져온 값이 정상적으로 order application에 가져온 것을 확인할 수 있습니다.
 
-![](images/config-debug-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/config-debug-1.png)
 
 
 Config Server를 통해해서 가져온 Confg 값을 다시 살펴보겠습니다. `message.profile=local`은 정상적으로 가져온 것을 확인할 수 있으며, local 프로필에는 `message.server-name`값이 없기 때문에 해당 값은 default config인 `order-service.yml`값의 `message.server-name=Config Server`의 설정값을 사용합니다. **즉 default 값도 확인해야 하기 때문에 profile, default profile을 조회합니다.**
@@ -269,7 +269,7 @@ Response code: 200; Time: 45ms; Content length: 10 bytes
 
 ### 서버가 여러대의 경우 Cloud Bus
 
-![](images/config-client-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/config-client-1.png)
 
 일반적으로 서비스 인스턴스들은 2대 이상으로 구성하게 됩니다. 그러기 때문에 `/actuator/refresh` 호출을 인스턴스 수에 따라서 N 번 해야 합니다. 컨테이너 환경에서는 해당 작업은 복잡합니다. 이러한 문제를 해결하기 위해서는 [Spring Cloud Bus](https://cloud.spring.io/spring-cloud-bus/reference/html/)를 이용해서 해결할 수 있습니다. Kafka를 이용해서 브로드캐스트 방식으로 변경을 모든 인스턴스에게 전달할 수 있습니다.
 
@@ -327,7 +327,7 @@ management:
 ```
 위에서 구성한 카프카 설정, actuator으로 `bus-refresh`을 노출시키는 설정을 완료합니다. 해당 설정을 완료했다면 인스턴스를 2대를 각각 다른 포트로 애플리케이션을 구동시킵니다.
 
-![](images/eureka.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/eureka.png)
 
 포스팅에서는 Eureka를 통해서 `order-service`를 랜덤 포트를 이용해서 2대를 구성했습니다. 포트가 각기 다르게 profile local으로 띄우기만 하면 되니 굳이 유레카에 해당 서버를 등록시킬 필요는 없습니다. 인스턴스가 2개를 띄웠다는 부분을 표시하기 위해서 이미지를 첨부했습니다.
 
