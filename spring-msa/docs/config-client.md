@@ -1,8 +1,10 @@
 # Spring Conig Client
 
-[Spring Config Server 정리](https://cheese10yun.github.io/spring-config-server/)를 통해서 Config Server에 대해서 알아봤습니다. 이제는 Config Client를 알아보겠습니다. 
+> 해당 코드는 [Github](https://github.com/cheese10yun/blog-sample/tree/master/spring-msa)에서 확인할 수 있으며 [Spring Config Server 정리](https://cheese10yun.github.io/spring-config-server) 글과 이어지는 글입니다.
 
-각 서비스 애플리케이션은 해당 애플리케이션이 구동시 Config Server에 자신의 Config의 설정 파일을 읽어 오며, **애플리케이션이 구동 중에도 Config 설정을 바꾸고 애플리케이션 재시작 없이 해당 변경 내용을 반영할 수 있습니다.**
+[Spring Config Server 정리](https://cheese10yun.github.io/spring-config-server/)를 통해서 Config Server에 대해서 알아봤습니다. 이번 포스팅에서는 Config Client를 알아보겠습니다.
+
+각 서비스 애플리케이션은 해당 애플리케이션이 구동시 Config Server에 자신의 Config의 설정 파일을 읽어 오며, **애플리케이션이 구동 중에도 Config 설정을 변경해도 애플리케이션 재시작 없이 해당 변경 내용을 반영할 수 있습니다.**
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/config-server1.png)
 
@@ -16,7 +18,7 @@ dependencies {
 }
 ```
 * config: Config Client 의존성
-* bus-kafka: Kafka 기반으로 Config 변경을 브로드캐스트로 전달, `1. 애플리케이션 구동시`에서는 사용하지 않을 예정이니 주석 처리하고 `3. Config 설정 및 추가 수정 Push` 할 때 사용 예정
+* bus-kafka: Cloud Bus를 이용해서 변경사항을 모든 인스턴스에게 전달하는 경우 사용
 
 ```yml
 server:
@@ -45,7 +47,7 @@ management:
 ```
 
 * (1): 애플리케이션 이름을 지정 `spring.application.name` 값을 기준으로 **Config Repositroy 저장소에 있는 Config 파일을 인식해서 가져오기 때문에 반드시 두 값을 일치 시켜야 합니다.**
-  * `spring.application.name=order-service`의 경우 `order-service-{evn}.yml`을 Config 파일로 인식함
+    * `spring.application.name=order-service`의 경우 `order-service-{evn}.yml`을 Config 파일로 인식함
 * (2): 변경사항을 전파하는 카프카 주소 작성
 * (3): Config Server 주소 작성, `optional:configserver:{address}`으로 작성
 * (4): `actuator`의 속성을 `*`으로 전체 공개, **실제 운영 애플리케이션에서는 필요한 부분만 공개해야 합니다.**
@@ -190,7 +192,7 @@ message:
     profile: "new local" # (2)
 ```
 
-* (1) `@RefreshScope` 어노테이션을 추가를 합니다. 
+* (1) `@RefreshScope` 어노테이션을 추가를 합니다.
 * (2) Config Repositroy에 있는 Config 설정을 위처럼 변경해서 Push 합니다.
 * (3) `POST /actuator/refresh` API를 호출하여 변경 내용을 반영합니다.
 * (4) `GET /orders/profile`을 호출하여 변경 내용은 확인합니다.
@@ -265,13 +267,13 @@ new local2
 Response code: 200; Time: 45ms; Content length: 10 bytes
 ```
 
-**`GET http://192.168.0.5:8585/orders/profile`을 호출해보면 본인 설정보다 Config Server 설정이 우선되는 것을 확인할 수 있습니다. 혹시 해당 설정을 로컬에도 가지고 있는 경우에는 이 점을 유의해야 합니다.**
+**`GET http://192.168.0.5:8585/orders/profile`을 호출해보면 본인 설정보다 Config Server 설정이 우선되는 것을 확인할 수 있습니다. 해당 설정을 로컬에도 가지고 있는 경우에는 이 점을 유의해야 합니다.**
 
 ### 서버가 여러대의 경우 Cloud Bus
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/config-client-1.png)
 
-일반적으로 서비스 인스턴스들은 2대 이상으로 구성하게 됩니다. 그러기 때문에 `/actuator/refresh` 호출을 인스턴스 수에 따라서 N 번 해야 합니다. 컨테이너 환경에서는 해당 작업은 복잡합니다. 이러한 문제를 해결하기 위해서는 [Spring Cloud Bus](https://cloud.spring.io/spring-cloud-bus/reference/html/)를 이용해서 해결할 수 있습니다. Kafka를 이용해서 브로드캐스트 방식으로 변경을 모든 인스턴스에게 전달할 수 있습니다.
+일반적으로 서비스 인스턴스들은 2대 이상으로 구성하게 됩니다. 그러기 때문에 `/actuator/refresh` 호출을 인스턴스 수에 따라서 N 번 해야 하며, 컨테이너 환경에서는 해당 작업은 더 복잡합니다. 이러한 문제는 [Spring Cloud Bus](https://cloud.spring.io/spring-cloud-bus/reference/html/)를 이용해서 Kafka으로 브로드캐스팅 방식으로 변경사항을 모든 인스턴스에게 전달하는 방식으로 해결할 수 있습니다.
 
 메시지 플랫폼으로는 `spring-cloud-starter-bus-amqp`, `spring-cloud-starter-bus-kafka`을 선택할 수 있습니다. `bus-amqp`는 Rabbit MQ를 사용하고, `kafka`는 Kafka를 사용합니다. 본 예제는 Kafka를 기준으로 설명드리겠습니다.
 
@@ -281,27 +283,27 @@ Response code: 200; Time: 45ms; Content length: 10 bytes
 # docker-compose.yaml
 version: '3'
 services:
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - 22181:2181
-  
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    depends_on:
-      - zookeeper
-    ports:
-      - 29092:29092
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    zookeeper:
+        image: confluentinc/cp-zookeeper:latest
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
+        ports:
+            - 22181:2181
+
+    kafka:
+        image: confluentinc/cp-kafka:latest
+        depends_on:
+            - zookeeper
+        ports:
+            - 29092:29092
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 ```
 
 ```
