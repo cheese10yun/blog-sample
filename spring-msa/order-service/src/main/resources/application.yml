@@ -1,5 +1,5 @@
 server:
-    port: 8181
+    port: 0
 spring:
     application:
         name: order-service
@@ -23,6 +23,7 @@ spring:
 eureka:
     instance:
         prefer-ip-address: true
+        instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
     client:
         register-with-eureka: true
         fetch-registry: true
