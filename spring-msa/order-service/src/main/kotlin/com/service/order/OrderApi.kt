@@ -1,39 +1,30 @@
 package com.service.order
 
-import java.time.LocalDateTime
 import java.util.UUID
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.EntityListeners
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.MappedSuperclass
-import javax.persistence.Table
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.context.config.annotation.RefreshScope
-import org.springframework.cloud.netflix.ribbon.RibbonClient
-import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/v1/orders")
 @RefreshScope
 class OrderApi(
     private val orderRepository: OrderRepository,
-//    private val cartClient: CartClient,
-    @Value("\${message.profile}") val profile: String
+    @Value("\${message.profile}") val profile: String,
+    private val orderRegistrationService: OrderRegistrationService,
+    private val orderFindService: OrderFindService
 ) {
+    val log by logger()
+
     @GetMapping("/profile")
     fun getRepoProfile(): String {
         log.info("==info==")
@@ -42,69 +33,64 @@ class OrderApi(
         return profile
     }
 
-
-    val log by logger()
-
-    var errorCount = 0
-
     @GetMapping
     fun getOrders(pageable: Pageable): Page<Order> {
         return orderRepository.findAll(pageable)
     }
 
-//    @GetMapping("/carts/{id}")
-//    fun getCarts(@PathVariable id: Long): CartClient.CartResponse {
-//
-//        orderRepository.findById(1)
-//        orderRepository.findById(2)
-//        orderRepository.findById(2)
-//        orderRepository.findById(3)
-//
-//        return cartClient.getCart(1)
-//    }
+    @PostMapping
+    fun register(@RequestBody dto: OrderRegistrationRequest) {
+        orderRegistrationService.register(dto)
+    }
+
+    @GetMapping("/{orderId}")
+    fun getOrder(@PathVariable orderId: String) = orderFindService.findByOrderById(orderId)
+
 }
 
+@Service
+class OrderRegistrationService(
+    private val orderRepository: OrderRepository
+) {
 
-@Entity
-@Table(name = "orders")
-class Order(
-    @Column(name = "product_id", nullable = false)
-    val productId: Long
-) : EntityAuditing() {
-    @Column(name = "order_number", nullable = false)
-    val orderNumber: String = UUID.randomUUID().toString()
+    @Transactional
+    fun register(dto: OrderRegistrationRequest) {
+        orderRepository.save(dto.toEntity(UUID.randomUUID().toString()))
+    }
 }
 
-interface OrderRepository : JpaRepository<Order, Long>
+@Service
+@Transactional(readOnly = true)
+class OrderFindService(
+    private val orderRepository: OrderRepository
+) {
+    fun findByOrderById(orderId: String) = orderRepository.findByOrderById(orderId)
 
-//@FeignClient(name = "cart-service")
-//@RibbonClient(name = "cart-service")
-//interface CartClient {
-//
-//    @GetMapping("/carts/{id}")
-//    fun getCart(@PathVariable id: Long): CartResponse
-//
-//    data class CartResponse(
-//        val productId: Long
-//    )
-//}
+    fun findByUserId(userId: String) = orderRepository.findByUserId(userId)
 
+}
 
-@EntityListeners(value = [AuditingEntityListener::class])
-@MappedSuperclass
-abstract class EntityAuditing {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null
-        internal set
+class OrderResponse(order: Order) {
+    val productId = order.productId
+    val userId = order.userId
+    val orderId = order.orderId
+    val qry = order.qty
+    val unitPrice = order.unitPrice
+    val totalPrice = order.totalPrice
+}
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    lateinit var createdAt: LocalDateTime
-        internal set
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    lateinit var updatedAt: LocalDateTime
-        internal set
+data class OrderRegistrationRequest(
+    val productId: String,
+    val orderId: String,
+    val qty: Int,
+    val unitPrice: Int,
+) {
+    fun toEntity(userId: String) = Order(
+        productId = productId,
+        userId = userId,
+        orderId = orderId,
+        qty = qty,
+        unitPrice = unitPrice,
+        totalPrice = qty * unitPrice
+    )
 }
