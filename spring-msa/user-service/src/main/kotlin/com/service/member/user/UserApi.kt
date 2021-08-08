@@ -1,11 +1,12 @@
 package com.service.member.user
 
+import com.service.member.client.OrderClient
+import com.service.member.client.OrderResponse
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.validation.Valid
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotEmpty
-import org.springframework.core.env.Environment
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
@@ -19,15 +20,11 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/users")
 class UserApi(
-    val environment: Environment,
-    val userSignUpService: UserSignUpService,
-    val userFindService: UserFindService
+    private val userSignUpService: UserSignUpService,
+    private val userFindService: UserFindService,
+    private val orderClient: OrderClient
 ) {
 
-    @GetMapping("/welcome")
-    fun welcome(): String? {
-        return environment.getProperty("getting.message")
-    }
 
     @PostMapping
     fun signUp(@RequestBody @Valid dto: UserSignUpRequest) =
@@ -44,6 +41,19 @@ class UserApi(
     fun getUser(
         @PathVariable id: Long
     ) = userFindService.findById(id)
+
+
+    @GetMapping("/{userId}/orders")
+    fun getUserWithOrderBy(
+        @PathVariable userId: String
+    ): UserWithOrderResponse {
+        val user = userFindService.findByUserId(userId)
+        val orders = orderClient.getOrderByUserId(user.userId)
+        return UserWithOrderResponse(
+            user = user,
+            orders = orders
+        )
+    }
 }
 
 data class UserSignUpRequest(
@@ -70,9 +80,19 @@ class UserResponse(user: User) {
     val password = user.password
 }
 
+class UserWithOrderResponse(
+    user: User,
+    val orders: List<OrderResponse>
+) {
+    val email = user.email
+    val name = user.name
+    val userid = user.userId
+    val password = user.password
+}
+
 class OrderResponse(
     val productId: String,
-    val qry: Int,
+    val qty: Int,
     val unitPrice: Int,
     val totalPrice: Int,
     val createdAt: LocalDateTime

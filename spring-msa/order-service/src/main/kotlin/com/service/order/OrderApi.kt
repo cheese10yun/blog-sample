@@ -46,8 +46,11 @@ class OrderApi(
     @GetMapping("/{orderId}")
     fun getOrder(@PathVariable orderId: String) = orderFindService.findByOrderById(orderId)
 
-}
+    @GetMapping("/users/{userId}")
+    fun getOrderBy(@PathVariable userId: String) = orderFindService.findByUserId(userId)
+        .map { OrderResponse(it) }
 
+}
 @Service
 class OrderRegistrationService(
     private val orderRepository: OrderRepository
@@ -64,17 +67,18 @@ class OrderRegistrationService(
 class OrderFindService(
     private val orderRepository: OrderRepository
 ) {
-    fun findByOrderById(orderId: String) = orderRepository.findByOrderById(orderId)
+    fun findByOrderById(orderId: String) = orderRepository.findByOrderId(orderId)
 
     fun findByUserId(userId: String) = orderRepository.findByUserId(userId)
 
 }
 
+
 class OrderResponse(order: Order) {
     val productId = order.productId
     val userId = order.userId
     val orderId = order.orderId
-    val qry = order.qty
+    val qty = order.qty
     val unitPrice = order.unitPrice
     val totalPrice = order.totalPrice
 }

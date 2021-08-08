@@ -26,7 +26,7 @@ class Order(
     @Column(name = "orderId", nullable = false, unique = true)
     val orderId: String,
 
-    @Column(name = "qry", nullable = false)
+    @Column(name = "qty", nullable = false)
     val qty: Int,
 
     @Column(name = "unit_price", nullable = false)
@@ -38,7 +38,7 @@ class Order(
 
 interface OrderRepository : JpaRepository<Order, Long> {
 
-    fun findByOrderById(orderId: String): Order
+    fun findByOrderId(orderId: String): Order
     fun findByUserId(userId: String): List<Order>
 }
 

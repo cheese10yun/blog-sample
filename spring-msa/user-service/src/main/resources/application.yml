@@ -30,12 +30,17 @@ eureka:
         service-url:
             default-zone: http://localhost:8761/eureka/
 
+feign:
+    metrics:
+        enabled: true
+
 getting:
     message: "Welcome to Simple E-Commerce"
 
 logging:
     level:
         ROOT: info
+        com.service.member.client: DEBUG
 
 management:
     endpoints:

@@ -28,7 +28,7 @@ class OrderApplicationRunner(
 
     override fun run(args: ApplicationArguments) {
         (1..10).map {
-            orderRepository.save(Order(it.toLong()))
+//            orderRepository.save(Order(it.toLong()))
         }
     }
 

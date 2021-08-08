@@ -58,6 +58,8 @@ class UserFindService(
     fun findById(id: Long) =
         userRepository.findByIdOrNull(id)
 
+    fun findByUserId(userId: String) = userRepository.findByUserId(userId)
+
     fun findAll(pageAble: Pageable) =
         userRepository.findAll(pageAble)
 }

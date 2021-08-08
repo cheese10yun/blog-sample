@@ -1,4 +1,3 @@
-
 POST {{gateway-server}}/user-service/api/v1/users
 Content-Type: application/json
 
@@ -12,4 +11,10 @@ Content-Type: application/json
 
 
 GET {{gateway-server}}/user-service/api/v1/users
+Content-Type: application/json
+
+###
+
+
+GET {{gateway-server}}/user-service/api/v1/users/5566da6f-3f03-4ce5-8863-3c142e452522/orders
 Content-Type: application/json
