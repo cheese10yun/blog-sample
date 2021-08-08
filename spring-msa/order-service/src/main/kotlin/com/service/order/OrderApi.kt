@@ -108,17 +108,3 @@ abstract class EntityAuditing {
     lateinit var updatedAt: LocalDateTime
         internal set
 }
-
-//@RestControllerAdvice
-//class GlobalExceptionHandler {
-//
-//    @ExceptionHandler(Exception::class)
-//    fun handlerException(e: Exception): ResponseEntity<ErrorResponse> {
-//        return ResponseEntity(ErrorResponse(e.message!!), HttpStatus.INTERNAL_SERVER_ERROR)
-//    }
-//
-//    data class ErrorResponse(
-//        val message: String,
-//        val timestamp: LocalDateTime = LocalDateTime.now()
-//    )
-//}
