@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 
-@FeignClient(name = "order-service", url = "http://localhost:5555/order-service")
+@FeignClient(name = "order-service")
 interface OrderClient {
 
     @GetMapping("/api/v1/orders/users/{userId}")

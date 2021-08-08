@@ -18,3 +18,7 @@ Content-Type: application/json
 
 GET {{gateway-server}}/user-service/api/v1/users/5566da6f-3f03-4ce5-8863-3c142e452522/orders
 Content-Type: application/json
+
+###
+GET {{gateway-server}}/user-service/api/v1/users/997a5a8b-80e4-4a5d-b5d1-14ee22be18da/orders
+Content-Type: application/json

@@ -27,9 +27,27 @@ class OrderApplicationRunner(
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments) {
-        (1..10).map {
-//            orderRepository.save(Order(it.toLong()))
-        }
+        orderRepository.saveAllAndFlush(
+            listOf(
+                Order(
+                    productId = "5566da6f-3f03-4ce5-8863-3c142e452522",
+                    userId = "5566da6f-3f03-4ce5-8863-3c142e452522",
+                    orderId = "5566da6f-3f03-4ce5-8863-3c142e452522",
+                    qty = 3,
+                    unitPrice = 100,
+                    totalPrice = 300
+                ),
+                Order(
+                    productId = "997a5a8b-80e4-4a5d-b5d1-14ee22be18da",
+                    userId = "997a5a8b-80e4-4a5d-b5d1-14ee22be18da",
+                    orderId = "997a5a8b-80e4-4a5d-b5d1-14ee22be18da",
+                    qty = 3,
+                    unitPrice = 100,
+                    totalPrice = 300
+                )
+            )
+        )
+
     }
 
     @EventListener
