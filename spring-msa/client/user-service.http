@@ -23,3 +23,7 @@ Content-Type: application/json
 
 GET {{gateway-server}}/user-service/api/v1/users/997a5a8b-80e4-4a5d-b5d1-14ee22be18da/orders
 Content-Type: application/json
+
+###
+
+GET {{gateway-server}}/user-service/actuator/metrics

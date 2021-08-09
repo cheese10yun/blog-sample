@@ -1,6 +1,7 @@
 package com.service.member.user
 
 import com.service.member.client.OrderResponse
+import io.micrometer.core.annotation.Timed
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.validation.Valid
@@ -42,6 +43,7 @@ class UserApi(
 
 
     @GetMapping("/{userId}/orders")
+    @Timed(value = "users.bbb", longTask = true)
     fun getUserWithOrderBy(
         @PathVariable userId: String
     ) = userFindService.findWithOrder(userId)

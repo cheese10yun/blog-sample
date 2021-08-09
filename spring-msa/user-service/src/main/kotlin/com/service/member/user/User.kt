@@ -70,7 +70,7 @@ class UserFindService(
 
     fun findWithOrder(userId: String): UserWithOrderResponse {
         val user = findByUserId(userId)
-        val circuitBreaker = circuitBreakerFactory.create("!2321")
+        val circuitBreaker = circuitBreakerFactory.create("circuitBreaker")
         val orders = circuitBreaker
             .run(
                 { orderClient.getOrderByUserId(userId) }

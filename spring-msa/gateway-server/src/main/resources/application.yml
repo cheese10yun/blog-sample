@@ -82,6 +82,8 @@ management:
                     - "bus-env"
                     - "health"
                     - "trace"
+                    - "prometheus"
+                    - "metrics"
     endpoint:
         gateway:
             enabled: true

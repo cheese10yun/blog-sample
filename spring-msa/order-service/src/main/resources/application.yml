@@ -49,6 +49,8 @@ management:
                     - "bus-env"
                     - "health"
                     - "trace"
+                    - "prometheus"
+                    - "metrics"
     endpoint:
         refresh:
             enabled: true

@@ -15,7 +15,7 @@ spring:
                 enabled: true
 
     kafka:
-        bootstrap-servers: localhost:29092
+        bootstrap-servers: 192.168.0.10:9092
 
     config:
         import: "optional:configserver:http://localhost:8888"
@@ -46,6 +46,10 @@ management:
                     - "bus-env"
                     - "health"
                     - "trace"
+                    - "prometheus"
+                    - "metrics"
     endpoint:
+        metrics:
+            enabled: true
         refresh:
             enabled: true
