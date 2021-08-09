@@ -28,9 +28,11 @@ GET http://192.168.0.5:58704/orders/profile
 Content-Type: application/json
 
 ###
-GET http://192.168.0.5:59013/orders/profile
+
+GET {{gateway-server}}/order-service/api/v1/orders/profile
 Content-Type: application/json
 
 ###
-POST http://192.168.0.5:60445/actuator/busrefresh
+
+POST {{gateway-server}}/order-service/actuator/busrefresh
 Content-Type: application/json

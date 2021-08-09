@@ -1,6 +1,5 @@
 package com.service.member.user
 
-import com.service.member.client.OrderClient
 import com.service.member.client.OrderResponse
 import java.time.LocalDateTime
 import java.util.UUID
@@ -21,8 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/users")
 class UserApi(
     private val userSignUpService: UserSignUpService,
-    private val userFindService: UserFindService,
-    private val orderClient: OrderClient
+    private val userFindService: UserFindService
 ) {
 
 
@@ -46,14 +44,7 @@ class UserApi(
     @GetMapping("/{userId}/orders")
     fun getUserWithOrderBy(
         @PathVariable userId: String
-    ): UserWithOrderResponse {
-        val user = userFindService.findByUserId(userId)
-        val orders = orderClient.getOrderByUserId(user.userId)
-        return UserWithOrderResponse(
-            user = user,
-            orders = orders
-        )
-    }
+    ) = userFindService.findWithOrder(userId)
 }
 
 data class UserSignUpRequest(

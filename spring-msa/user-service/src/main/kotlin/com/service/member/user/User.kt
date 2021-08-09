@@ -1,5 +1,6 @@
 package com.service.member.user
 
+import com.service.member.client.OrderClient
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -11,6 +12,8 @@ import javax.persistence.MappedSuperclass
 import javax.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
+import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreaker
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import org.springframework.data.jpa.repository.JpaRepository
@@ -52,7 +55,9 @@ class UserSignUpService(
 @Service
 @Transactional(readOnly = true)
 class UserFindService(
-    val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val orderClient: OrderClient,
+    private val circuitBreakerFactory: CircuitBreakerFactory<*, *>
 ) {
 
     fun findById(id: Long) =
@@ -62,6 +67,21 @@ class UserFindService(
 
     fun findAll(pageAble: Pageable) =
         userRepository.findAll(pageAble)
+
+    fun findWithOrder(userId: String): UserWithOrderResponse {
+        val user = findByUserId(userId)
+        val circuitBreaker = circuitBreakerFactory.create("!2321")
+        val orders = circuitBreaker
+            .run(
+                { orderClient.getOrderByUserId(userId) }
+            )
+            { emptyList() }
+
+        return UserWithOrderResponse(
+            user = user,
+            orders = orders
+        )
+    }
 }
 
 
