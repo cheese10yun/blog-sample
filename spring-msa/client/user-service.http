@@ -27,3 +27,12 @@ Content-Type: application/json
 ###
 
 GET {{gateway-server}}/user-service/actuator/metrics
+###
+
+GET {{gateway-server}}/user-service/actuator/info
+###
+
+GET {{gateway-server}}/user-service/actuator/metrics
+###
+
+

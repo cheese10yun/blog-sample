@@ -1,0 +1,11 @@
+###
+
+GET {{gateway-server}}/actuator/metrics
+Content-Type: application/json
+
+###
+
+GET {{gateway-server}}/actuator/prometheus
+Content-Type: application/json
+
+###
