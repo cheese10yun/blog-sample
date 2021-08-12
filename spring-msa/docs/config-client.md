@@ -424,9 +424,9 @@ Response code: 200; Time: 151ms; Content length: 5 bytes
 
 ### 이벤트 확인
 
-![](images/kafka-log.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/kafka-log.png)
 
-![](images/kafka-matric.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/kafka-matric.png)
 
 카프카 로그를 보면 정상적으로 이벤트가 발행된 부분을 확인할 수 있으며, 위에서 지정한 토픽 이름인 `${spring.application.name}config-bus-refesh-event`을 확인할 수 있습니다.
 
@@ -444,6 +444,7 @@ fun onRefreshRemoteEvent(event: RefreshRemoteApplicationEvent) {
 }
 ```
 
-![](images/bus-event.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/bus-event.png)
 
 디버깅 모드로 실제 값들을 확인할 수 있습니다.
+
