@@ -319,6 +319,12 @@ spring:
     kafka:
         bootstrap-servers: localhost:29092
 
+    cloud:
+        bus:
+            trace:
+                enabled: true
+            destination: ${spring.application.name}config-bus-refesh-event
+
 management:
     endpoints:
         web:
@@ -328,6 +334,9 @@ management:
                     - "bus-refresh"
 ```
 위에서 구성한 카프카 설정, actuator으로 `bus-refresh`을 노출시키는 설정을 완료합니다. 해당 설정을 완료했다면 인스턴스를 2대를 각각 다른 포트로 애플리케이션을 구동시킵니다.
+
+`cloud.bus.destination`으로 카프카 토픽의 이름을 지정합니다. 다른 서비스 토픽과 겹피지 않게 설정합니다.
+
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/eureka.png)
 
@@ -411,3 +420,30 @@ Response code: 200; Time: 151ms; Content length: 5 bytes
 
 ```
 **59013 서버에 이벤트를 반영했지만 58704 서버에도 해당 내용이 전파된 것을 확인할 수 있습니다.**
+
+
+### 이벤트 확인
+
+![](images/kafka-log.png)
+
+![](images/kafka-matric.png)
+
+카프카 로그를 보면 정상적으로 이벤트가 발행된 부분을 확인할 수 있으며, 위에서 지정한 토픽 이름인 `${spring.application.name}config-bus-refesh-event`을 확인할 수 있습니다.
+
+`@EventListener` 으로 `RefreshRemoteApplicationEvent` 이벤트를 코드레벨에서 구독 받을 수 있습니다.
+
+```kotlin
+@EventListener
+fun onRefreshRemoteEvent(event: RefreshRemoteApplicationEvent) {
+    log.info("Event....")
+    log.info(event.id)
+    log.info(event.source.toString())
+    log.info(event.originService)
+    log.info(event.destinationService)
+    log.info("Event....")
+}
+```
+
+![](images/bus-event.png)
+
+디버깅 모드로 실제 값들을 확인할 수 있습니다.

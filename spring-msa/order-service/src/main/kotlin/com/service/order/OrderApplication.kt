@@ -1,5 +1,6 @@
 package com.service.order
 
+import kotlin.math.log
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
@@ -25,6 +26,7 @@ fun main(args: Array<String>) {
 class OrderApplicationRunner(
     private val orderRepository: OrderRepository
 ) : ApplicationRunner {
+    private val log by logger()
 
     override fun run(args: ApplicationArguments) {
         orderRepository.saveAllAndFlush(
@@ -47,23 +49,19 @@ class OrderApplicationRunner(
                 )
             )
         )
-
     }
 
-    @EventListener
     // https://www.tabnine.com/code/java/classes/org.springframework.cloud.bus.event.RefreshRemoteApplicationEvent
     // https://www.alibabacloud.com/blog/knowledge-sharing---introduction-to-the-spring-cloud-bus-message-bus_594823
     // https://www.programmersought.com/article/86735377064/
-    fun onRefreshRemoteApplicationEvent(event: RefreshRemoteApplicationEvent) {
-        System.out.printf(
-            """
-            RefreshRemoteApplicationEvent -  Source : %s , originService : %s , destinationService : %s 
-            
-            """.trimIndent(),
-            event.source,
-            event.originService,
-            event.destinationService
-        )
+    @EventListener
+    fun onRefreshRemoteEvent(event: RefreshRemoteApplicationEvent) {
+        log.info("Event....")
+        log.info(event.id)
+        log.info(event.source.toString())
+        log.info(event.originService)
+        log.info(event.destinationService)
+        log.info("Event....")
     }
 }
 

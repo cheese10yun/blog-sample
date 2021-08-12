@@ -36,3 +36,10 @@ Content-Type: application/json
 
 POST {{gateway-server}}/order-service/actuator/busrefresh
 Content-Type: application/json
+
+###
+
+GET {{gateway-server}}/order-service/actuator
+Content-Type: application/json
+
+###
