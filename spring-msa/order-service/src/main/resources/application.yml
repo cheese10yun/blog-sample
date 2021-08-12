@@ -13,6 +13,8 @@ spring:
                 enabled: true
             ack:
                 enabled: true
+            id: ${spring.application.name}
+            destination: ${spring.application.name}config-bus
 
     kafka:
         bootstrap-servers: 192.168.0.10:9092

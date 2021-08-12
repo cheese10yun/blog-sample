@@ -243,3 +243,89 @@ Content-Type: application/json
 
 
 
+PUT http://192.168.0.10:9200/hotels
+Content-Type: application/json
+
+{
+  "mappings" : {
+    "hotel" : {
+      "properties" : {
+        "name" : { "type" : "string" },
+        "stars" : { "type" : "long" },
+        "rooms" : { "type" : "long" },
+        "location" : { "type" : "geo_point" },
+        "city" : { "type" : "string" },
+        "address" : { "type" : "string" },
+        "internet" : { "type" : "boolean" },
+        "service" : { "type" : "string", "index" : "not_analyzed" },
+        "checkin": { "type" : "date" , "format" : "dateOptionalTime"}
+      }
+    }
+  }
+}
+
+###
+
+PUT http://192.168.0.10:9200/hotels
+Content-Type: application/json
+
+{
+  "mappings" : {
+    "properties" : {
+      "name" : { "type" : "text" },
+      "stars" : { "type" : "long" },
+      "rooms" : { "type" : "long" },
+      "location" : { "type" : "geo_point" },
+      "city" : { "type" : "text" },
+      "address" : { "type" : "text" },
+      "internet" : { "type" : "boolean" },
+      "service" : { "type" : "keyword" },
+      "checkin": { "type" : "date" , "format" : "dateOptionalTime"}
+    }
+
+  }
+}
+
+###
+
+
+GET http://192.168.0.10:9200
+
+###
+
+# curl -XPOST localhost:9200/_bulk --data-binary @6_1_hotels.json
+POST http://192.168.0.10:9200/_bulk
+Content-Type: application/x-www-form-urlencoded
+
+< 6_1_hotels.json
+
+###
+POST http://192.168.0.10:9200/_bulk
+Content-Type: application/json
+
+< 6_1_hotels.json
+
+###
+
+
+# curl 'localhost:9200/hotels/_search?pretty' -d '
+#{
+#  "aggs" : {
+#    "price_min" : {
+#      "min" : { "field" : "price" }
+#    }
+#  }
+#}'
+POST localhost:9200/hotels/_search?pretty
+Content-Type: application/json
+
+{
+  "aggs" : {
+    "price_min" : {
+      "min" : { "field" : "price" }
+    }
+  }
+}
+
+###
+

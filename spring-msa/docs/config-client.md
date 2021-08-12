@@ -1,6 +1,4 @@
-# Spring Conig Client
-
-> 해당 코드는 [Github](https://github.com/cheese10yun/blog-sample/tree/master/spring-msa)에서 확인할 수 있으며 [Spring Config Server 정리](https://cheese10yun.github.io/spring-config-server) 글과 이어지는 글입니다.
+# Spring Config Client
 
 [Spring Config Server 정리](https://cheese10yun.github.io/spring-config-server/)를 통해서 Config Server에 대해서 알아봤습니다. 이번 포스팅에서는 Config Client를 알아보겠습니다.
 
@@ -128,7 +126,7 @@ Config 서버를 통해서 가져온 값이 정상적으로 order application에
 
 Config Server를 통해해서 가져온 Confg 값을 다시 살펴보겠습니다. `message.profile=local`은 정상적으로 가져온 것을 확인할 수 있으며, local 프로필에는 `message.server-name`값이 없기 때문에 해당 값은 default config인 `order-service.yml`값의 `message.server-name=Config Server`의 설정값을 사용합니다. **즉 default 값도 확인해야 하기 때문에 profile, default profile을 조회합니다.**
 
-### 재시작 없이 Config 변경
+## 재시작 없이 Config 변경
 
 Config Server의 가장 큰 장점 중 하나는 서버가 재시작 없이 Config 설정 파일을 바꿀 수 있다는 점입니다. 해당 기능에 대해서 살펴보겠습니다.
 
@@ -235,7 +233,7 @@ Response code: 200; Time: 186ms; Content length: 10 bytes
 
 `GET /orders/profile`을 호출하면 위에서 변경한 내용을 확인할 수 있습니다. 서버가 구동 중이라도 Config Server를 이용해서 설정 파일을 동적으로 변경할 수 있습니다.
 
-### 동일한 설정이 로컬 환경에도 있는 경우에는?
+## 동일한 설정이 로컬 환경에도 있는 경우에는?
 
 ```yml
 
@@ -269,7 +267,7 @@ Response code: 200; Time: 45ms; Content length: 10 bytes
 
 **`GET http://192.168.0.5:8585/orders/profile`을 호출해보면 본인 설정보다 Config Server 설정이 우선되는 것을 확인할 수 있습니다. 해당 설정을 로컬에도 가지고 있는 경우에는 이 점을 유의해야 합니다.**
 
-### 서버가 여러대의 경우 Cloud Bus
+## 서버가 여러대의 경우 Cloud Bus
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/config-client-1.png)
 
@@ -277,39 +275,41 @@ Response code: 200; Time: 45ms; Content length: 10 bytes
 
 메시지 플랫폼으로는 `spring-cloud-starter-bus-amqp`, `spring-cloud-starter-bus-kafka`을 선택할 수 있습니다. `bus-amqp`는 Rabbit MQ를 사용하고, `kafka`는 Kafka를 사용합니다. 본 예제는 Kafka를 기준으로 설명드리겠습니다.
 
-#### Kafka Docker
+### Kafka Docker
 
 ```yml
 # docker-compose.yaml
 version: '3'
 services:
-    zookeeper:
-        image: confluentinc/cp-zookeeper:latest
-        environment:
-            ZOOKEEPER_CLIENT_PORT: 2181
-            ZOOKEEPER_TICK_TIME: 2000
-        ports:
-            - 22181:2181
-
-    kafka:
-        image: confluentinc/cp-kafka:latest
-        depends_on:
-            - zookeeper
-        ports:
-            - 29092:29092
-        environment:
-            KAFKA_BROKER_ID: 1
-            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-            KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+  
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 ```
 
 ```
 $ docker-compose up -d
 ```
 위 처럼 카프카 도커를 구성해서 도커를 구동시킵니다.
+
+### 카프카 이벤트로 변경사항 전파
 
 ```yml
 # application.yml
