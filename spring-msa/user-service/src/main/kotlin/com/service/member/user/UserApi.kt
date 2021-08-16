@@ -1,12 +1,15 @@
 package com.service.member.user
 
 import com.service.member.client.OrderResponse
-import io.micrometer.core.annotation.Timed
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import java.time.LocalDateTime
+
 import java.util.UUID
 import javax.validation.Valid
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotEmpty
+import kotlin.random.Random
+
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -43,10 +47,34 @@ class UserApi(
 
 
     @GetMapping("/{userId}/orders")
-    @Timed(value = "users.bbb", longTask = true)
+//    @Timed(value = "users.bbb", longTask = true)
     fun getUserWithOrderBy(
         @PathVariable userId: String
     ) = userFindService.findWithOrder(userId)
+
+    @GetMapping("/{userId}/orders/test")
+    @CircuitBreaker(
+        name = "getUserWithOrderByTest",
+        fallbackMethod = "findWithOrderFallback"
+    )
+    fun getUserWithOrderByTest(
+        @PathVariable userId: String,
+        @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
+        @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
+    ): UserWithOrderResponse {
+        Thread.sleep(delay.toLong())
+        val random = Random.nextInt(0, 10)
+        if (faultPercentage > random) {
+            throw IllegalArgumentException("faultPercentage Error...")
+        }
+
+        return userFindService.findWithOrder(userId)
+    }
+
+    private fun findWithOrderFallback(): List<OrderResponse> {
+        return emptyList()
+    }
+
 }
 
 data class UserSignUpRequest(

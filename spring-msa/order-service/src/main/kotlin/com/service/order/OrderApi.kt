@@ -1,6 +1,8 @@
 package com.service.order
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import java.util.UUID
+import kotlin.random.Random
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.context.config.annotation.RefreshScope
 import org.springframework.data.domain.Page
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -49,6 +52,24 @@ class OrderApi(
     @GetMapping("/users/{userId}")
     fun getOrderBy(@PathVariable userId: String) = orderFindService.findByUserId(userId)
         .map { OrderResponse(it) }
+
+
+
+    @GetMapping("/users/{userId}/test")
+    fun getOrderByTest(
+        @PathVariable userId: String,
+        @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
+        @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
+    ): List<OrderResponse> {
+//        Thread.sleep(delay.toLong())
+//        val random = Random.nextInt(0, 10)
+//        if (faultPercentage > random) {
+//            throw RuntimeException("faultPercentage Error...")
+//        }
+
+        return orderFindService.findByUserId(userId)
+            .map { OrderResponse(it) }
+    }
 
 }
 @Service

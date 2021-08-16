@@ -34,6 +34,24 @@ feign:
     metrics:
         enabled: true
 
+resilience4j:
+    circuitbreaker:
+        backends:
+            getUserWithOrderByTest:
+                registerHealthIndicator: true
+                ringBufferSizeInClosedState: 5
+                failureRateThreshold: 50
+                waitInterval: 1000
+                ringBufferSizeInHalfOpenState: 3
+                automaticTransitionFromOpenToHalfOpenEnabled: true
+                ignoreExceptions:
+                    - java.lang.IllegalArgumentException
+
+
+        metrics:
+            enabled: true
+            legacy:
+                enabled: true
 getting:
     message: "Welcome to Simple E-Commerce"
 

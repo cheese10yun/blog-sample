@@ -1,6 +1,7 @@
 package com.service.member.user
 
 import com.service.member.client.OrderClient
+import com.service.member.client.OrderResponse
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -12,7 +13,6 @@ import javax.persistence.MappedSuperclass
 import javax.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreaker
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
@@ -76,6 +76,7 @@ class UserFindService(
                 { orderClient.getOrderByUserId(userId) }
             )
             { emptyList() }
+
 
         return UserWithOrderResponse(
             user = user,
