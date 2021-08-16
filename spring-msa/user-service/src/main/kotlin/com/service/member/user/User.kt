@@ -1,7 +1,5 @@
 package com.service.member.user
 
-import com.service.member.client.OrderClient
-import com.service.member.client.OrderResponse
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -13,11 +11,8 @@ import javax.persistence.MappedSuperclass
 import javax.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
-import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory
-import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -49,39 +44,6 @@ class UserSignUpService(
     @Transactional
     fun signUp(dto: UserSignUpRequest): User {
         return userRepository.save(dto.toEntity(bCryptPasswordEncoder.encode(dto.password)))
-    }
-}
-
-@Service
-@Transactional(readOnly = true)
-class UserFindService(
-    private val userRepository: UserRepository,
-    private val orderClient: OrderClient,
-    private val circuitBreakerFactory: CircuitBreakerFactory<*, *>
-) {
-
-    fun findById(id: Long) =
-        userRepository.findByIdOrNull(id)
-
-    fun findByUserId(userId: String) = userRepository.findByUserId(userId)
-
-    fun findAll(pageAble: Pageable) =
-        userRepository.findAll(pageAble)
-
-    fun findWithOrder(userId: String): UserWithOrderResponse {
-        val user = findByUserId(userId)
-        val circuitBreaker = circuitBreakerFactory.create("circuitBreaker")
-        val orders = circuitBreaker
-            .run(
-                { orderClient.getOrderByUserId(userId) }
-            )
-            { emptyList() }
-
-
-        return UserWithOrderResponse(
-            user = user,
-            orders = orders
-        )
     }
 }
 

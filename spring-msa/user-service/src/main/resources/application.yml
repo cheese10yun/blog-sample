@@ -34,19 +34,21 @@ feign:
     metrics:
         enabled: true
 
-resilience4j:
-    circuitbreaker:
-        backends:
-            getUserWithOrderByTest:
-                registerHealthIndicator: true
-                ringBufferSizeInClosedState: 5
-                failureRateThreshold: 50
-                waitInterval: 1000
-                ringBufferSizeInHalfOpenState: 3
-                automaticTransitionFromOpenToHalfOpenEnabled: true
-                ignoreExceptions:
-                    - java.lang.IllegalArgumentException
-
+resilience4j.circuitbreaker:
+    configs:
+        default:
+            failureRateThreshold: 50
+            slowCallRateThreshold: 100
+            slowCallDurationThreshold: 60000
+            permittedNumberOfCallsInHalfOpenState: 4
+            maxWaitDurationInHalfOpenState: 1000
+            slidingWindowType: COUNT_BASED
+            slidingWindowSize: 10
+            minimumNumberOfCalls: 10
+            waitDurationInOpenState: 10000
+    instances:
+        findWithOrder:
+            baseConfig: default
 
         metrics:
             enabled: true
@@ -65,7 +67,7 @@ management:
         web:
             exposure:
                 include:
-                    - "info"
+                    - "*"
                     - "env"
                     - "refresh"
                     - "bus-refresh"
