@@ -24,9 +24,10 @@ import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilde
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
-const val GLOBAL_CHUNK_SIZE = 1000
-const val DATA_SET_UP_SIZE = 10_000
+const val GLOBAL_CHUNK_SIZE = 100
+const val DATA_SET_UP_SIZE = 1000
 
 @Configuration
 class BulkInsertJobConfiguration(
@@ -54,15 +55,15 @@ class BulkInsertJobConfiguration(
     fun bulkInsertStep(
         stepBuilderFactory: StepBuilderFactory,
         bulkInsertReader: JpaCursorItemReader<Payment>,
-        writerWithExposed: ItemWriter<Payment>
+        writerWithExposed: ItemWriter<Payment>,
+        writerWithJpa: ItemWriter<Payment>
     ): Step =
         stepBuilderFactory["bulkInsertStep"]
             .chunk<Payment, Payment>(GLOBAL_CHUNK_SIZE)
             .reader(bulkInsertReader)
 //            .writer(writerWithStatement)
 //            .writer(writerWithExposed)
-            .writer(writerWithExposed)
-//            .writer(writerWithJpa)
+            .writer(writerWithJpa)
             .build()
 
     @Bean
@@ -101,18 +102,14 @@ class BulkInsertJobConfiguration(
         }
     }
 
-    private val writerWithJpa: ItemWriter<Payment> =
-        ItemWriter { payments ->
-            payments.map { payment ->
-                PaymentBackJpa(
-                    amount = payment.amount,
-                    orderId = payment.orderId
-                )
-            }
-                .also {
-                    paymentBackJpaRepository.saveAll(it)
-                }
-        }
+
+    @Bean
+    @StepScope
+    fun writerWithJpa(
+        txService: TxService
+    ): ItemWriter<Payment> = ItemWriter { payments ->
+        txService.writerWithJpa(payments)
+    }
 
     @Bean
     @StepScope
@@ -126,12 +123,13 @@ class BulkInsertJobConfiguration(
 
 @Service
 class TxService(
-    val exposedDataBase: Database,
+    private val exposedDataBase: Database,
+    private val paymentBackJpaRepository: PaymentBackJpaRepository,
 ) {
 
     @CaptureTransaction(type = "batchJob")
     fun writerWithExposed(payments: List<Payment>) {
-        transaction(exposedDataBase){
+        transaction(exposedDataBase) {
             PaymentBack.batchInsert(
                 data = payments,
                 shouldReturnGeneratedValues = false
@@ -140,5 +138,18 @@ class TxService(
                 this[PaymentBack.amount] = payment.amount
             }
         }
+    }
+
+    @CaptureTransaction(type = "writerWithJpa")
+    fun writerWithJpa(payments: List<Payment>) {
+        payments.map { payment ->
+            PaymentBackJpa(
+                amount = payment.amount,
+                orderId = payment.orderId
+            )
+        }
+            .also {
+                paymentBackJpaRepository.saveAll(it)
+            }
     }
 }

@@ -4,7 +4,7 @@
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
     <appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>124.80.103.104:5044</destination>
+        <destination>192.168.0.10:5044</destination>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>info</level>
         </filter>
