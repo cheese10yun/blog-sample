@@ -1,13 +1,16 @@
 package com.example.redis
 
+import java.util.UUID
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
 
 @SpringBootTest
+@ActiveProfiles("local")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class RedisApplicationTests(
@@ -15,7 +18,9 @@ class RedisApplicationTests(
 //    val redisTemplate: RedisTemplate<ByteArray, ByteArray>,
     val redisTemplate: RedisTemplate<String, Member>,
     val memberBulkInsertService: MemberBulkInsertService,
-    val redisTemplateWithTransaction: StringRedisTemplate
+    val redisTemplateWithTransaction: StringRedisTemplate,
+    val syncRedisRepository: SyncRedisRepository,
+    val syncPayoutGroupHashRepository: SyncPayoutGroupHashRepository
 ) {
 
     private val memberCount = 1000
@@ -96,6 +101,24 @@ class RedisApplicationTests(
 // returns null as values set within transaction are not visible
         redisTemplateWithTransaction.opsForValue().get("foo");
     }
-}
 
-// 37352
+    @Test
+    fun adasdasdasd() {
+        val map = (1..5).map {
+            SyncRedis(
+                id = it + 1.toLong(),
+                payoutGroupId = it.toLong(),
+                groupId = it.toString(),
+                partnerId = it.toLong()
+            )
+        }
+
+        syncRedisRepository.saveAll(map)
+
+        val findByPayoutGroupIdAndGroupId = syncRedisRepository.findByPayoutGroupIdAndGroupId(
+            payoutGroupId = 1L,
+            groupId = "123123"
+        )
+        println(findByPayoutGroupIdAndGroupId)
+    }
+}
