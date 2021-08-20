@@ -20,7 +20,6 @@ class AppRunner(
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments?) {
-
         (1..20).map {
             Member(
                 id = it.toLong(),
@@ -32,6 +31,4 @@ class AppRunner(
                 memberRepository.saveAll(it)
             }
     }
-
-
 }
