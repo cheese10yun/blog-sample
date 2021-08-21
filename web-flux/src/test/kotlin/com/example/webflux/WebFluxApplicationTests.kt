@@ -6,8 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootTest
 class WebFluxApplicationTests {
 
-    @Test
-    fun contextLoads() {
-    }
+	@Test
+	fun contextLoads() {
+	}
 
 }
