@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class WebFluxApplication
 
 fun main(args: Array<String>) {
-	runApplication<WebFluxApplication>(*args)
+    runApplication<WebFluxApplication>(*args)
 }
