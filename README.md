@@ -83,3 +83,4 @@
 * [좋은 학습 자료 및 GitHub 정리](https://github.com/cheese10yun/dev-info)
 * [Spring Config Server 정리](https://cheese10yun.github.io/spring-config-server/)
 * [Elasticsearch APM 기본설정](https://cheese10yun.github.io/elk-apm-1/)
+* [Spring Cloud Config & Cloud Bus 정리](https://cheese10yun.github.io/spring-config-client/)
