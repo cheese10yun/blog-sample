@@ -1,6 +1,7 @@
 package com.example.webflux
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 
 class Item(
@@ -12,6 +13,7 @@ class Item(
 }
 
 interface ItemRepository : ReactiveCrudRepository<Item, String>
+interface BlockingItemRepository: CrudRepository<Item, String>
 
 class CartItem(
     var item: Item,

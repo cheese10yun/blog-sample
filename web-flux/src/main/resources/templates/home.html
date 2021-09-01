@@ -6,11 +6,36 @@
 </head>
 <body>
 
-  <h1>Welcome to Hacking With Spring Boot!</h1>
+<h1>Welcome to Hacking with Spring Boot!</h1>
 
-  <P>
-    Over the span of this book, you`ll build different parts of an e-commerces system with will include fleshing out this web template with dynamic content, using the power of Spring Boot
-  </P>
+<!-- tag::1[] -->
+<h2>Inventory Management</h2>
+<table>
+  <thead>
+  <tr>
+    <th>Id</th>
+    <th>Name</th>
+    <th>Price</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="item : ${items}">
+    <td th:text="${item.id}"></td>
+    <td th:text="${item.name}"></td>
+    <td th:text="${item.price}"></td>
+    <td>
+      <form method="post" th:action="@{'/add/' + ${item.id}}">
+        <input type="submit" value="Add to Cart"/>
+      </form>
+    </td>
+    <td>
+      <form th:method="delete" th:action="@{'/delete/' + ${item.id}}">
+        <input type="submit" value="Delete"/>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
 
 </body>
 </html>

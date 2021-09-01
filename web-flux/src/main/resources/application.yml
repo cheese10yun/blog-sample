@@ -1,11 +1,12 @@
+spring:
+    webflux:
+        hiddenmethod:
+            filter:
+                enabled: true
+
 management:
     endpoints:
         web:
             exposure:
                 include:
                     - "*"
-#info:
-#    build:
-#        name: @project.name@
-#        description: @project.description@
-#        version: @project.version@
