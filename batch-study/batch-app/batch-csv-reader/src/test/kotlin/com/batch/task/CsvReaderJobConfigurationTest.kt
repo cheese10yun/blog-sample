@@ -7,9 +7,10 @@ import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.batch.core.Job
+import org.springframework.test.context.jdbc.Sql
+import org.springframework.test.context.jdbc.SqlConfig
+import org.springframework.test.context.jdbc.SqlGroup
 
-//@Transactional(propagation = Propagation.NOT_SUPPORTED)
-//@Transactional
 internal class CsvReaderJobConfigurationTest(
     private val csvReaderJob: Job,
     private val paymentRepository: PaymentRepository
@@ -20,6 +21,24 @@ internal class CsvReaderJobConfigurationTest(
         deleteAll(QPayment.payment)
     }
 
+    @SqlGroup(
+        Sql(
+            value = ["/data-setup.sql"],
+            config = SqlConfig(
+                dataSource = "dataSource",
+                transactionManager = "dataSource"
+            ),
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
+        ),
+        Sql(
+            value = ["/delete.sql"],
+            config = SqlConfig(
+                dataSource = "dataSource",
+                transactionManager = "transactionManager"
+            ),
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
+        )
+    )
     @Test
     internal fun `csvReaderJob JPAQueryFactory 기반 테스트`() {
         //given
