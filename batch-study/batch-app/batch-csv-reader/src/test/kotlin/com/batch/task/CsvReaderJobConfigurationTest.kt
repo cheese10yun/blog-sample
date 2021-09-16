@@ -26,7 +26,7 @@ internal class CsvReaderJobConfigurationTest(
             value = ["/data-setup.sql"],
             config = SqlConfig(
                 dataSource = "dataSource",
-                transactionManager = "dataSource"
+                transactionManager = "transactionManager"
             ),
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
         ),
