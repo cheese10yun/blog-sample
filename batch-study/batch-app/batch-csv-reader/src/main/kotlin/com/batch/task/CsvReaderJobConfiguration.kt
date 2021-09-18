@@ -3,6 +3,8 @@ package com.batch.task
 
 import com.batch.payment.domain.payment.Payment
 import com.batch.task.support.listener.JobReportListener
+import java.math.BigDecimal
+import javax.persistence.EntityManagerFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
@@ -18,8 +20,6 @@ import org.springframework.batch.item.file.transform.DelimitedLineTokenizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
-import java.math.BigDecimal
-import javax.persistence.EntityManagerFactory
 
 @Configuration
 class CsvReaderJobConfiguration(
@@ -79,3 +79,4 @@ data class PaymentCsv(
 ) {
     fun toEntity() = Payment(amount, orderId)
 }
+
