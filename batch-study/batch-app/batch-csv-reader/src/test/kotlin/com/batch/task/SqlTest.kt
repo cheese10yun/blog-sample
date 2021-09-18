@@ -26,18 +26,18 @@ class SqlTest(
         println("======AfterAll======")
     }
 
-    @Sql("/payment-setup.sql")
-    @Test
-    fun `sql test code`() {
-        //given
-
-        //when
-        val payments = paymentRepository.findAll().toList()
-
-        //then
-        then(payments).hasSize(12)
-        println("sql test code")
-    }
+//    @Sql("/payment-setup.sql")
+//    @Test
+//    fun `sql test code`() {
+//        //given
+//
+//        //when
+//        val payments = paymentRepository.findAll().toList()
+//
+//        //then
+//        then(payments).hasSize(12)
+//        println("sql test code")
+//    }
 
     @SqlGroup(
         Sql(
@@ -60,10 +60,8 @@ class SqlTest(
     @Test
     fun `sql test code2`() {
         //given
-
         //when
         val payments = paymentRepository.findAll().toList()
-
         //then
         then(payments).hasSize(12)
         println("sql test code")
