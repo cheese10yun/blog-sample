@@ -2,7 +2,6 @@
 
 데이터베이스와 의존성이 있는 테스트를 진행하는 경우 given 절에 해당하는 데이터를 set up 한 이후에 로직에 대한 검증을 진행하는 것이 일반적입니다. 이때 given 절에 대한 데이터 set up을 `*.sql` 파일 기반으로 작성하는 것입니다.
 
-
 ## @Sql 사용법
 
 ```sql
@@ -54,11 +53,11 @@ class SqlTest(
 
 사용방법은 간단합니다. `@Sql` 어노테이션을 작성하고 해당 경로에 `*.sql` 파일을 위치 시킵니다.
 
-![](img/test-result-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/test-result-1.png)
 
 테스트 코드는 통과했고, AfterAll 메서드를 로그를 보면 `payments size 12`으로 롤백이 진행되지 않는 것을 볼 수 있습니다. 테스트 클래스 상단에 `@Transactional` 어노테이션을 작성하면 자동 롤백 처리가 됩니다. 한 번 테스트해 보겠습니다.
 
-![](img/test-result-2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/test-result-2.png)
 
 `payments size 0` 으로 정상적으로 롤백된것 확인할 수 있습니다. 
 
@@ -183,7 +182,7 @@ class SqlTest(
 * (6): 모든 데이터를 제거하는 SQL을 지정합니다.
 * (7): `AFTER_TEST_METHOD`으로 테스트 코드가 동작 이후에 해당 Sql이 동작하게 정의합니다.
 
-![](img/test-result-3.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/test-result-3.png)
 
 테스트 코드가 통과했으니 `schema.sql`, `payment-setup.sql`이 정상적으로 동작 했고, AfterAll에서 `payments size 0`이 출력되었으니 `delete.sql`도 정사적으로 동작했다는 것을 확인 할 수 있습다.
 
