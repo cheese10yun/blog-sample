@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "2.5.5"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("org.asciidoctor.convert") version "1.5.8"
+    id("org.asciidoctor.jvm.convert") version "3.1.0"
     kotlin("jvm") version "1.5.31"
     kotlin("plugin.spring") version "1.5.31"
 }
@@ -16,7 +16,12 @@ repositories {
     mavenCentral()
 }
 
-extra["snippetsDir"] = file("build/generated-snippets")
+lateinit var asciidoctorExt: Configuration
+val snippetsDir = file("build/generated-snippets")
+
+asciidoctorj {
+    asciidoctorExt = configurations.create("asciidoctorExt")
+}
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -25,6 +30,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+
+    asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
 }
 
 tasks.withType<KotlinCompile> {
@@ -43,6 +50,18 @@ tasks.test {
 }
 
 tasks.asciidoctor {
-    inputs.dir(snippetsDir)
-    dependsOn(test)
+    dependsOn(tasks.test)
+    val snippets = file("build/generated-snippets")
+    configurations("asciidoctorExt")
+    attributes["snippets"] = snippets
+    inputs.dir(snippets)
+    sources { include("**/index.adoc") }
+    baseDirFollowsSourceFile()
+}
+
+tasks.bootJar {
+    dependsOn(tasks.asciidoctor)
+    from("${tasks.asciidoctor.get().outputDir}") {
+        into("static/docs")
+    }
 }

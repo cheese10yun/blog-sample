@@ -1,0 +1,10 @@
+|===
+|Field|RequestField|Descriotion|Required|TableName
+{{#fields}}
+|{{#tableCellContent}}`+{{path}}+`{{/tableCellContent}}
+|{{#tableCellContent}}{{requestField}}{{/tableCellContent}}
+|{{#tableCellContent}}{{description}}{{/tableCellContent}}
+|{{#tableCellContent}}{{^optional}}true{{/optional}}{{#optional}}false{{/optional}}{{/tableCellContent}}
+|{{#tableCellContent}}{{tableName}}{{/tableCellContent}}
+{{/fields}}
+|===

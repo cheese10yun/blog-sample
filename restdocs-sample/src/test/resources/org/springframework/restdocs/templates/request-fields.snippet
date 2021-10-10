@@ -1,0 +1,13 @@
+|===
+|Field|Type|Required|Format|Description|Column|Length
+
+{{#fields}}
+|{{#tableCellContent}}`+{{path}}+`{{/tableCellContent}}
+|{{#tableCellContent}}`+{{type}}+`{{/tableCellContent}}
+|{{#tableCellContent}}{{^optional}}true{{/optional}}{{#optional}}false{{/optional}}{{/tableCellContent}}
+|{{#tableCellContent}}{{#format}}{{.}}{{/format}}{{/tableCellContent}}
+|{{#tableCellContent}}{{description}}{{/tableCellContent}}
+|{{#tableCellContent}}{{#column}}{{.}}{{/column}}{{/tableCellContent}}
+|{{#tableCellContent}}{{#length}}{{.}}{{/length}}{{/tableCellContent}}
+{{/fields}}
+|===
