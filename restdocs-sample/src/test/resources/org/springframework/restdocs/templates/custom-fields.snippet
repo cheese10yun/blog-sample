@@ -1,10 +1,8 @@
 |===
-|Field|RequestField|Descriotion|Required|TableName
+|CustomField|Descriotion|Required
 {{#fields}}
-|{{#tableCellContent}}`+{{path}}+`{{/tableCellContent}}
-|{{#tableCellContent}}{{requestField}}{{/tableCellContent}}
+|{{#tableCellContent}}{{customField}}{{/tableCellContent}}
 |{{#tableCellContent}}{{description}}{{/tableCellContent}}
 |{{#tableCellContent}}{{^optional}}true{{/optional}}{{#optional}}false{{/optional}}{{/tableCellContent}}
-|{{#tableCellContent}}{{tableName}}{{/tableCellContent}}
 {{/fields}}
 |===
