@@ -1,4 +1,11 @@
 spring:
+    jpa:
+        show-sql: true
+        database: mysql
+        generate-ddl: true
+        hibernate:
+            ddl-auto: create
+
     datasource:
         url: jdbc:mysql://localhost:3366/exposed_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
         username: root
@@ -6,6 +13,7 @@ spring:
         driver-class-name: com.mysql.cj.jdbc.Driver
     exposed:
         generate-ddl: true
+
 #        excluded-packages: com.example.exposedstudy
 
 #logging.level.Exposed: debug

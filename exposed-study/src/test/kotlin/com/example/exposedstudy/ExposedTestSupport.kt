@@ -9,4 +9,4 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @ActiveProfiles("test")
-open class ExposedTestSupport
+abstract class ExposedTestSupport
