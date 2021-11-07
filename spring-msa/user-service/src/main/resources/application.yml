@@ -68,14 +68,14 @@ management:
             exposure:
                 include:
                     - "*"
-                    - "env"
-                    - "refresh"
-                    - "bus-refresh"
-                    - "bus-env"
-                    - "health"
-                    - "trace"
-                    - "prometheus"
-                    - "metrics"
+#                    - "env"
+#                    - "refresh"
+#                    - "bus-refresh"
+#                    - "bus-env"
+#                    - "health"
+#                    - "trace"
+#                    - "prometheus"
+#                    - "metrics"
     endpoint:
         metrics:
             enabled: true

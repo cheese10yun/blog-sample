@@ -12,7 +12,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j")
-    implementation("io.github.resilience4j:resilience4j-spring-boot2")
+//    implementation("io.github.resilience4j:resilience4j-spring-boot2")
 //    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
 //    implementation("org.springframework.cloud:spring-cloud-starter-bus-kafka")
 //    implementation("org.springframework.cloud:spring-cloud-config-monitor")

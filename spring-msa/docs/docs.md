@@ -1,0 +1,1 @@
+-javaagent:/Users/yun.cheese/yun/blog-sample/spring-msa/elk/elastic-apm-agent-1.24.0.jar -Delastic.apm.service_name=user-service -Delastic.apm.server_url=http://192.168.0.10:8200 -Delastic.apm.application_packages=com.service.user
