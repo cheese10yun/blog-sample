@@ -1,5 +1,5 @@
 server:
-    port: 0
+    port: 8787
 spring:
     application:
         name: user-service
@@ -34,22 +34,22 @@ feign:
     metrics:
         enabled: true
 
-resilience4j.circuitbreaker:
-    configs:
-        default:
-            failureRateThreshold: 50
-            slowCallRateThreshold: 100
-            slowCallDurationThreshold: 60000
-            permittedNumberOfCallsInHalfOpenState: 4
-            maxWaitDurationInHalfOpenState: 1000
-            slidingWindowType: COUNT_BASED
-            slidingWindowSize: 10
-            minimumNumberOfCalls: 10
-            waitDurationInOpenState: 10000
-    instances:
-        findWithOrder:
-            baseConfig: default
-
+resilience4j:
+    circuitbreaker:
+        configs:
+            default:
+                failureRateThreshold: 50
+                slowCallRateThreshold: 100
+                slowCallDurationThreshold: 60000
+                permittedNumberOfCallsInHalfOpenState: 4
+                maxWaitDurationInHalfOpenState: 1000
+                slidingWindowType: COUNT_BASED
+                slidingWindowSize: 10
+                minimumNumberOfCalls: 10
+                waitDurationInOpenState: 10000
+        instances:
+            findWithOrder:
+                baseConfig: default
         metrics:
             enabled: true
             legacy:
@@ -81,3 +81,8 @@ management:
             enabled: true
         refresh:
             enabled: true
+        circuitbreakers:
+            enabled: true
+        health:
+            enabled: true
+            show-details: always

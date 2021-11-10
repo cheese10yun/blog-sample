@@ -4,3 +4,9 @@
 
 -javaagent:/Users/yun.cheese/yun/blog-sample/elk-sample/api/elastic-apm-agent-1.24.0.jar -Delastic.apm.service_name=eureka-server -Delastic.apm.server_url=http://124.80.103.104:8200 -Delastic.apm.application_packages=com.server.eureka
 
+
+
+java -jar /Users/yun.cheese/yun/blog-sample/spring-msa/eureka-server/build/libs/eureka-server-0.0.1-SNAPSHOT.jar
+
+java -jar /Users/yun.cheese/yun/blog-sample/spring-msa/gateway-server/build/libs/gateway-server-0.0.1-SNAPSHOT.jar
+

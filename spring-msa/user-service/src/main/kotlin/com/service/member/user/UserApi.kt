@@ -46,11 +46,11 @@ class UserApi(
     ) = userFindService.findById(id)
 
 
-    @GetMapping("/{userId}/orders")
-//    @Timed(value = "users.bbb", longTask = true)
-    fun getUserWithOrderBy(
-        @PathVariable userId: String
-    ) = userFindService.findWithOrder(userId)
+//    @GetMapping("/{userId}/orders")
+////    @Timed(value = "users.bbb", longTask = true)
+//    fun getUserWithOrderBy(
+//        @PathVariable userId: String
+//    ) = userFindService.findWithOrder(userId)
 
     @GetMapping("/{userId}/orders/test")
     fun getUserWithOrderByTest(
@@ -58,12 +58,12 @@ class UserApi(
         @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
         @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
     ): UserWithOrderResponse {
-        Thread.sleep(delay.toLong())
-        val random = Random.nextInt(0, 10)
-        if (faultPercentage > random) {
-            throw IllegalArgumentException("faultPercentage Error...")
-        }
-        return userFindService.findWithOrder(userId)
+//        Thread.sleep(delay.toLong())
+//        val random = Random.nextInt(0, 10)
+//        if (faultPercentage > random) {
+//            throw IllegalArgumentException("faultPercentage Error...")
+//        }
+        return userFindService.findWithOrder(userId, faultPercentage)
     }
 
 }

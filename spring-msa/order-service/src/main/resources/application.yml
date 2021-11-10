@@ -1,5 +1,5 @@
 server:
-    port: 0
+    port: 8772
 spring:
     application:
         name: order-service
