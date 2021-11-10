@@ -8,7 +8,7 @@ Spring Batch의 킁 장점 중 하나는 Chunk 지향 처리에있습니다. Chu
 
 Spring Batch에서의 Chunk란 **데이터의 덩어리로 작업 할 때 각 커밋 사이의 처리되는 row수를 뜻합니다.**
 
-**Chunk 단위로 트랜잭션을 수행하기 때문에 실패할 경우 해당 Chunk 만큼 롤백이 되고, 이전에 커밋도니 트랜잭션 범위까지는 반영이 됩니다.**
+**Chunk 단위로 트랜잭션을 수행하기 때문에 실패할 경우 해당 Chunk 만큼 롤백이 되고, 이전에 커밋된 트랜잭션 범위까지는 반영이 됩니다.**
 
 ![](https://docs.spring.io/spring-batch/docs/4.0.x/reference/html/images/chunk-oriented-processing.png)
 

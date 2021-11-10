@@ -31,7 +31,7 @@ Resilience4j는 런타임에 다양한 방법으로 서킷 브레이커의 정�
 
 Resilience4j은 다음과같은 매개 변수를 사용한다.
 
-* ringBufferSizeInClosedState: 닫힌 상태에서의 호출 수로, 서킷을 열어애 할지 결정할 떄 사용한다.
+* ringBufferSizeInClosedState: 닫힌 상태에서의 호출 수로, 서킷을 열어애 할지 결정할 때 사용한다.
 * failureRateThreshold: 실패한 호출에 대한 임계값(백분율)으로 이 값을 초과하면 서킷이 열린다.
 * waitInterval: 반열림 상태로 전환하기 전에 시킷을 열린 사앹로 유지하는 시간
 * ringBufferSizeInHalfOpenState: 반열림 상태로 전환하기 전에 서킷을 열림 상태로 유지하는 시간
