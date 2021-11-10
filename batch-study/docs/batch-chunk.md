@@ -14,9 +14,9 @@ Spring Batch에서의 Chunk란 **데이터의 덩어리로 작업 할 때 각 �
 
 > 이미지 출처 [docs.spring.io](https://docs.spring.io/spring-batch/docs/4.0.x/reference/html/index-single.html#chunkOrientedProcessing)
 
-* Reader에서 데이터를 하나 일어 옵니다.
-* 일어온 데이터를 Processor에서 가공합니다.
-* 가공된 데이터들을 별도의 공간에 모은뒤, Chunk 단위만큼 쌓이게 되면 Writer에 전달하고 Wirter는 일괄 저장합니다.
+* Reader에서 데이터를 하나 읽어 옵니다.
+* 읽어온 데이터를 Processor에서 가공합니다.
+* 가공된 데이터들을 별도의 공간에 모은뒤, Chunk 단위만큼 쌓이게 되면 Writer에 전달하고 Writer는 일괄 저장합니다.
 
 **Reader와 Processor에서는 1건씩 다뤄지고, Writer에선 Chunk 단위로 처리된다는 것이 중요합니다.**
 
