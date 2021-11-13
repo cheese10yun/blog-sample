@@ -58,12 +58,11 @@ class OrderApi(
         @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
         @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
     ): List<OrderResponse> {
-        Thread.sleep(delay.toLong())
-        val random = Random.nextInt(0, 100)
-        if (faultPercentage > random) {
-            throw RuntimeException("faultPercentage Error...")
-        }
-
+//        Thread.sleep(delay.toLong())
+//        val random = Random.nextInt(0, 100)
+//        if (faultPercentage > random) {
+//            throw RuntimeException("faultPercentage Error...")
+//        }
         return orderFindService.findByUserId(userId)
             .map { OrderResponse(it) }
     }

@@ -35,25 +35,53 @@ feign:
         enabled: true
 
 resilience4j:
+    bulkhead:
+        instances:
+            findWithOrder:
+                maxConcurrentCalls: 25 #  허가된 동시 실행 수를 25로 지정
+                maxWaitDuration: 0 # 포화 상태의 Bulkhead에 진입하기 위해 block 되는 최대 시간, 값이 0이므로 바로 요청을 막는다.
+
+    ratelimiter:
+        instances:
+            findWithOrder:
+                limitForPeriod: 50
+                limitRefreshPeriod: 500ns # 기간 동안 허용되는 요청 수
+                timeoutDuration: 5s # 허가를 위해 쓰레드가 대기하는 기본 시간
+                registerHealthIndicator: true
+
+    timelimiter:
+        instances:
+            findWithOrder:
+                timeoutDuration: 1s # 원격 서버로부터 해당 시간안에 응답이 오는 것을 제한
+
     circuitbreaker:
         configs:
             default:
-                failureRateThreshold: 50
-                slowCallRateThreshold: 100
-                slowCallDurationThreshold: 60000
-                permittedNumberOfCallsInHalfOpenState: 4
-                maxWaitDurationInHalfOpenState: 1000
+                registerHealthIndicator: true
+                failureRateThreshold: 99
+                waitDurationInOpenState: 5s
                 slidingWindowType: COUNT_BASED
-                slidingWindowSize: 10
-                minimumNumberOfCalls: 10
-                waitDurationInOpenState: 10000
+                slidingWindowSize: 2
+        #                slowCallRateThreshold: 100
+        #                slowCallDurationThreshold: 60000
+        #                permittedNumberOfCallsInHalfOpenState: 4
+        #                maxWaitDurationInHalfOpenState: 1000
+        #                minimumNumberOfCalls: 10
+
         instances:
             findWithOrder:
                 baseConfig: default
+
+
+
+
         metrics:
             enabled: true
             legacy:
                 enabled: true
+
+
+
 getting:
     message: "Welcome to Simple E-Commerce"
 
@@ -68,14 +96,14 @@ management:
             exposure:
                 include:
                     - "*"
-#                    - "env"
-#                    - "refresh"
-#                    - "bus-refresh"
-#                    - "bus-env"
-#                    - "health"
-#                    - "trace"
-#                    - "prometheus"
-#                    - "metrics"
+    #                    - "env"
+    #                    - "refresh"
+    #                    - "bus-refresh"
+    #                    - "bus-env"
+    #                    - "health"
+    #                    - "trace"
+    #                    - "prometheus"
+    #                    - "metrics"
     endpoint:
         metrics:
             enabled: true
@@ -86,3 +114,9 @@ management:
         health:
             enabled: true
             show-details: always
+
+    health:
+        circuitbreakers:
+            enabled: true
+        db:
+            enabled: true

@@ -7,10 +7,10 @@ import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.cloud.bus.event.RefreshRemoteApplicationEvent
+//import org.springframework.cloud.bus.event.RefreshRemoteApplicationEvent
 import org.springframework.cloud.context.config.annotation.RefreshScope
 import org.springframework.cloud.openfeign.EnableFeignClients
-import org.springframework.context.event.EventListener
+//import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 @SpringBootApplication
@@ -54,15 +54,15 @@ class OrderApplicationRunner(
     // https://www.tabnine.com/code/java/classes/org.springframework.cloud.bus.event.RefreshRemoteApplicationEvent
     // https://www.alibabacloud.com/blog/knowledge-sharing---introduction-to-the-spring-cloud-bus-message-bus_594823
     // https://www.programmersought.com/article/86735377064/
-    @EventListener
-    fun onRefreshRemoteEvent(event: RefreshRemoteApplicationEvent) {
-        log.info("Event....")
-        log.info(event.id)
-        log.info(event.source.toString())
-        log.info(event.originService)
-        log.info(event.destinationService)
-        log.info("Event....")
-    }
+//    @EventListener
+//    fun onRefreshRemoteEvent(event: RefreshRemoteApplicationEvent) {
+//        log.info("Event....")
+//        log.info(event.id)
+//        log.info(event.source.toString())
+//        log.info(event.originService)
+//        log.info(event.destinationService)
+//        log.info("Event....")
+//    }
 }
 
 fun <A : Any> A.logger(): Lazy<Logger> = lazy { LoggerFactory.getLogger(this.javaClass) }

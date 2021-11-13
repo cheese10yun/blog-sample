@@ -4,14 +4,14 @@ spring:
     application:
         name: order-service
 
-    cloud:
-        bus:
-            trace:
-                enabled: true
-            destination: ${spring.application.name}-config-bus-refesh-event
-
-    kafka:
-        bootstrap-servers: 192.168.0.10:9092
+#    cloud:
+#        bus:
+#            trace:
+#                enabled: true
+#            destination: ${spring.application.name}-config-bus-refesh-event
+#
+#    kafka:
+#        bootstrap-servers: 192.168.0.10:9092
 
     config:
         import: "optional:configserver:http://localhost:8888"
@@ -52,3 +52,7 @@ management:
             enabled: true
         httptrace:
             enabled: true
+
+
+message:
+    profile: "default local"

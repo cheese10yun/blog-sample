@@ -1,9 +1,6 @@
 package com.service.member.user
 
 import com.service.member.client.OrderResponse
-import io.github.resilience4j.bulkhead.annotation.Bulkhead
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
-import io.micrometer.core.annotation.Timed
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.validation.Valid
@@ -58,11 +55,7 @@ class UserApi(
         @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
         @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
     ): UserWithOrderResponse {
-//        Thread.sleep(delay.toLong())
-//        val random = Random.nextInt(0, 10)
-//        if (faultPercentage > random) {
-//            throw IllegalArgumentException("faultPercentage Error...")
-//        }
+
         return userFindService.findWithOrder(userId, faultPercentage)
     }
 

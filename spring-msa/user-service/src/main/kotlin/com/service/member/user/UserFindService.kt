@@ -1,6 +1,7 @@
 package com.service.member.user
 
 import com.service.member.client.OrderClient
+import io.github.resilience4j.bulkhead.annotation.Bulkhead
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import kotlin.random.Random
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory
@@ -25,6 +26,7 @@ class UserFindService(
     fun findAll(pageAble: Pageable) =
         userRepository.findAll(pageAble)
 
+    @Bulkhead(name = "findWithOrder")
     @CircuitBreaker(
         name = "findWithOrder",
         fallbackMethod = "findWithOrderFallback"
@@ -33,11 +35,11 @@ class UserFindService(
         userId: String,
         faultPercentage: Int
     ): UserWithOrderResponse {
-//        val random = Random.nextInt(0, 100)
-//        if (faultPercentage > random) {
-//            throw IllegalArgumentException("faultPercentage Error...")
-//        }
-
+//        Thread.sleep(delay.toLong())
+        val random = Random.nextInt(0, 100)
+        if (faultPercentage > random) {
+            throw IllegalArgumentException("faultPercentage Error...")
+        }
         val user = findByUserId(userId)
         return UserWithOrderResponse(
             user = user,
@@ -45,7 +47,8 @@ class UserFindService(
         )
     }
 
-    private fun findWithOrderFallback(t: Throwable): UserWithOrderResponse {
+    private fun findWithOrderFallback(t: Exception): UserWithOrderResponse {
+        println("fallback 설정")
         return UserWithOrderResponse(
             user = User(
                 email = "2222222222@asd.cm",
