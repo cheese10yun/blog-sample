@@ -33,12 +33,12 @@ class UserFindService(
         userId: String,
         faultPercentage: Int
     ): UserWithOrderResponse {
-        val user = findByUserId(userId)
-        val random = Random.nextInt(0, 100)
-        if (faultPercentage > random) {
-            throw IllegalArgumentException("faultPercentage Error...")
-        }
+//        val random = Random.nextInt(0, 100)
+//        if (faultPercentage > random) {
+//            throw IllegalArgumentException("faultPercentage Error...")
+//        }
 
+        val user = findByUserId(userId)
         return UserWithOrderResponse(
             user = user,
             orders = orderClient.getOrderByUserId(userId)

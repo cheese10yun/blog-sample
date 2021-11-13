@@ -1,6 +1,5 @@
 package com.service.order
 
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import java.util.UUID
 import kotlin.random.Random
 import org.springframework.beans.factory.annotation.Value
@@ -49,13 +48,11 @@ class OrderApi(
     @GetMapping("/{orderId}")
     fun getOrder(@PathVariable orderId: String) = orderFindService.findByOrderById(orderId)
 
+//    @GetMapping("/users/{userId}")
+//    fun getOrderBy(@PathVariable userId: String) = orderFindService.findByUserId(userId)
+//        .map { OrderResponse(it) }
+
     @GetMapping("/users/{userId}")
-    fun getOrderBy(@PathVariable userId: String) = orderFindService.findByUserId(userId)
-        .map { OrderResponse(it) }
-
-
-
-    @GetMapping("/users/{userId}/test")
     fun getOrderByTest(
         @PathVariable userId: String,
         @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
@@ -70,8 +67,8 @@ class OrderApi(
         return orderFindService.findByUserId(userId)
             .map { OrderResponse(it) }
     }
-
 }
+
 @Service
 class OrderRegistrationService(
     private val orderRepository: OrderRepository

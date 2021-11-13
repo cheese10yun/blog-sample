@@ -52,7 +52,7 @@ class UserApi(
 //        @PathVariable userId: String
 //    ) = userFindService.findWithOrder(userId)
 
-    @GetMapping("/{userId}/orders/test")
+    @GetMapping("/{userId}/orders")
     fun getUserWithOrderByTest(
         @PathVariable userId: String,
         @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
