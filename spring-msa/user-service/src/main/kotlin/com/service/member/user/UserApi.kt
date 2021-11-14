@@ -56,7 +56,7 @@ class UserApi(
         @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
     ): UserWithOrderResponse {
 
-        return userFindService.findWithOrder(userId, faultPercentage)
+        return userFindService.findWithOrder(userId, faultPercentage, delay)
     }
 
 }

@@ -3,7 +3,6 @@ package com.service.member.user
 import com.service.member.client.OrderClient
 import io.github.resilience4j.bulkhead.annotation.Bulkhead
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
-import kotlin.random.Random
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -33,17 +32,22 @@ class UserFindService(
     )
     fun findWithOrder(
         userId: String,
-        faultPercentage: Int
+        faultPercentage: Int,
+        delay: Int
     ): UserWithOrderResponse {
 //        Thread.sleep(delay.toLong())
-        val random = Random.nextInt(0, 100)
-        if (faultPercentage > random) {
-            throw IllegalArgumentException("faultPercentage Error...")
-        }
+//        val random = Random.nextInt(0, 100)
+//        if (faultPercentage > random) {
+//            throw IllegalArgumentException("faultPercentage Error...")
+//        }
         val user = findByUserId(userId)
         return UserWithOrderResponse(
             user = user,
-            orders = orderClient.getOrderByUserId(userId)
+            orders = orderClient.getOrderByUserId(
+                userId = userId,
+                faultPercentage = faultPercentage,
+                delay = delay
+            )
         )
     }
 

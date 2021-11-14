@@ -58,11 +58,7 @@ class OrderApi(
         @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
         @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
     ): List<OrderResponse> {
-//        Thread.sleep(delay.toLong())
-//        val random = Random.nextInt(0, 100)
-//        if (faultPercentage > random) {
-//            throw RuntimeException("faultPercentage Error...")
-//        }
+
         return orderFindService.findByUserId(userId)
             .map { OrderResponse(it) }
     }
@@ -86,7 +82,14 @@ class OrderFindService(
 ) {
     fun findByOrderById(orderId: String) = orderRepository.findByOrderId(orderId)
 
-    fun findByUserId(userId: String) = orderRepository.findByUserId(userId)
+    fun findByUserId(userId: String, faultPercentage: Int, delay: Int): List<Order> {
+        Thread.sleep(delay.toLong())
+        val random = Random.nextInt(0, 100)
+        if (faultPercentage > random) {
+            throw RuntimeException("faultPercentage Error...")
+        }
+        return orderRepository.findByUserId(userId)
+    }
 
 }
 
