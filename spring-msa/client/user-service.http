@@ -24,3 +24,28 @@ Content-Type: application/json
 ###
 GET {{gateway-server}}/user-service/actuator/health
 Content-Type: application/json
+
+
+
+###
+GET {{gateway-server}}/order-service/actuator/
+Content-Type: application/json
+
+
+###
+GET {{gateway-server}}/order-service/actuator/circuitbreakers
+Content-Type: application/json
+
+
+###
+GET {{gateway-server}}/order-service/actuator/circuitbreakerevents
+Content-Type: application/json
+
+###
+GET {{gateway-server}}/order-service/actuator/circuitbreakers/findWithOrder
+Content-Type: application/json
+
+
+###
+GET {{gateway-server}}/order-service/actuator/health
+Content-Type: application/json

@@ -1,5 +1,6 @@
 package com.service.order
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import java.util.UUID
 import kotlin.random.Random
 import org.springframework.beans.factory.annotation.Value
@@ -59,7 +60,11 @@ class OrderApi(
         @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
     ): List<OrderResponse> {
 
-        return orderFindService.findByUserId(userId)
+        return orderFindService.findOderByUserId(
+            userId = userId,
+            faultPercentage = faultPercentage,
+            delay = delay
+        )
             .map { OrderResponse(it) }
     }
 }
@@ -82,7 +87,11 @@ class OrderFindService(
 ) {
     fun findByOrderById(orderId: String) = orderRepository.findByOrderId(orderId)
 
-    fun findByUserId(userId: String, faultPercentage: Int, delay: Int): List<Order> {
+    @CircuitBreaker(
+        name = "findOderByUserId",
+        fallbackMethod = "findOderByUserIdFallback"
+    )
+    fun findOderByUserId(userId: String, faultPercentage: Int, delay: Int): List<Order> {
         Thread.sleep(delay.toLong())
         val random = Random.nextInt(0, 100)
         if (faultPercentage > random) {
@@ -91,6 +100,10 @@ class OrderFindService(
         return orderRepository.findByUserId(userId)
     }
 
+    private fun findOderByUserIdFallback(e: Exception): List<Order> {
+        println("findOderByFallback 발생")
+        return emptyList<Order>()
+    }
 }
 
 

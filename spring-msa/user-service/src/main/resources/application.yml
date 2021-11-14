@@ -72,9 +72,6 @@ resilience4j:
             findWithOrder:
                 baseConfig: default
 
-
-
-
         metrics:
             enabled: true
             legacy:
