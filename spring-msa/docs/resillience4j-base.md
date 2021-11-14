@@ -38,16 +38,16 @@ Resilience4j는 런타임에 다양한 방법으로 서킷 브레이커의 정�
 
 다음과 같이 사용할 수 있다.
 
-* ringBufferSizeInClosedState = 5, failureRateThreshold = 50% : 마지막 5개의 호출중 3개 이상이 실패하면 서킷이 열린다.
+* ringBufferSizeInClosedState = 5, failureRateThreshold = 50% : 마지막 5개의 호출 중 3개 이상이 실패하면 서킷이 열린다.
 * waitInterval = 10000, automaticTransitionFromOpenToHalfOpenEnabled = true : 서킷 브레이커는 10초 동안 서킷을 열린 상태로 유지했다가 반열림 상태로 전환한다.
-* ringBufferSizeInHalfOpenState = 3 : 서킷 브레이커는 서킷 반열림 상태로 전환 후에 처음으로 유입된 3개의 호출을 기준 삼아 서킷의 열림 여부를 결정한다. failureRateThreshold = 50% 으로 설정돼 있기 때문에 2개이상 호출이  실패하면 서킷이 다시 열리며, 이 외 경우에는 서킷이 닫힌다.
+* ringBufferSizeInHalfOpenState = 3 : 서킷 브레이커는 서킷 반열림 상태로 전환 후에 처음으로 유입된 3개의 호출을 기준 삼아 서킷의 열림 여부를 결정한다. failureRateThreshold = 50%으로 설정돼 있기 때문에 2개 이상 호출이 실패하면 서킷이 다시 열리며, 이 외 경우에는 서킷이 닫힌다.
 * ignoreExceptions = InValidInputException, NotFoundException : 이 두 가지 비즈니스 예외는 서킷 브레이커에서 오류 여기지 않는다.
 
-## 재시도 매커니즘
+## 재시도 메커니즘
 
-재시도 매커니즘은 일시적인 네티워크 결함과 같음 무작위로 드물게 발생하는 오류에 매우 유용하다. 재시도 메커니즘은 설정된 대기 시간을 사이에 두고, 실패한 요청에 여러번 다시 시도하는 것이다. 재시도 메커니즘을 사용하기 위한 주요 요건 중 하나는 재시도 대상 서비스의 **멱등성**이 있어야 한다는 것이다. 만약 재시도 메커니즘에 의해 2개의 주문이 생성되는 일이 발생하지 않아야 하기 때문이다.
+재시도 메커니즘은 일시적인 네티워크 결함과 같음 무작위로 드물게 발생하는 오류에 매우 유용하다. 재시도 메커니즘은 설정된 대기 시간을 사이에 두고, 실패한 요청에 여러번 다시 시도하는 것이다. 재시도 메커니즘을 사용하기 위한 주요 요건 중 하나는 재시도 대상 서비스의 **멱등성**이 있어야 한다는 것이다. 만약 재시도 메커니즘에 의해 2개의 주문이 생성되는 일이 발생하지 않아야 하기 때문이다.
 
-Resilience4j는 서킷 브레이커와 같은 방시긍로 재시도 관련된 이벤트 및 메트릭 정보를 공개하지만 상태 정보는 전혀 공개하지 않으며, 재시도 이벤트에 관한 저옵는 Actuator 엔드포인트에서 얻을 수 있다. Resilience4j는 다음과 같은 매개변수를 사용한다.
+Resilience4j는 서킷 브레이커와 같은 방식으로 재시도 관련된 이벤트 및 메트릭 정보를 공개하지만 상태 정보는 전혀 공개하지 않으며, 재시도 이벤트에 관한 정보는 Actuator 엔드포인트에서 얻을 수 있다. Resilience4j는 다음과 같은 매개변수를 사용한다.
 
 
 | Properties       | Description                           |
@@ -58,9 +58,12 @@ Resilience4j는 서킷 브레이커와 같은 방시긍로 재시도 관련된 �
 
 다음과 같이 사용 가능하다.
 
-* maxRetryAttempts = 3: 최대 두 번의 재시도를 수랭한다.
+* maxRetryAttempts = 3: 최대 두 번의 재시도를 수행한다.
 * waitDuration = 1000: 재시도 사이의 대기 시간은 1초다.
 * retryExceptions = IntervalServerError:HTTP 요청에 대한 응답으로 500 상태 코가 오고, 발생한 예외가 IntervalServerError인 경우에만 재시도를 트리거 한다.
+
+
+## 테스트 시나리오
 
 
 ## 참고
