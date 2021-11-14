@@ -1,8 +1,40 @@
+GET {{gateway-server}}/user-service/api/v1/users/997a5a8b-80e4-4a5d-b5d1-14ee22be18da/orders?faultPercentage=100&delay=0
+Content-Type: application/json
+
+###
+
+
 GET {{gateway-server}}/user-service/api/v1/users/997a5a8b-80e4-4a5d-b5d1-14ee22be18da/orders?faultPercentage=0&delay=0
 Content-Type: application/json
 
 
 ###
+GET {{gateway-server}}/order-service/actuator/health
+Content-Type: application/json
+
+###
+GET {{gateway-server}}/order-service/actuator/circuitbreakers
+Content-Type: application/json
+
+###
+GET {{gateway-server}}/order-service/actuator/circuitbreakerevents
+Content-Type: application/json
+
+###
+GET {{gateway-server}}/order-service/actuator/
+Content-Type: application/json
+
+###
+GET {{gateway-server}}/order-service/actuator/circuitbreakers/findWithOrder
+Content-Type: application/json
+
+
+###
+GET {{gateway-server}}/user-service/actuator/health
+Content-Type: application/json
+
+###
+
 GET {{gateway-server}}/user-service/actuator/
 Content-Type: application/json
 
@@ -21,31 +53,3 @@ GET {{gateway-server}}/user-service/actuator/circuitbreakers/findWithOrder
 Content-Type: application/json
 
 
-###
-GET {{gateway-server}}/user-service/actuator/health
-Content-Type: application/json
-
-
-
-###
-GET {{gateway-server}}/order-service/actuator/
-Content-Type: application/json
-
-
-###
-GET {{gateway-server}}/order-service/actuator/circuitbreakers
-Content-Type: application/json
-
-
-###
-GET {{gateway-server}}/order-service/actuator/circuitbreakerevents
-Content-Type: application/json
-
-###
-GET {{gateway-server}}/order-service/actuator/circuitbreakers/findWithOrder
-Content-Type: application/json
-
-
-###
-GET {{gateway-server}}/order-service/actuator/health
-Content-Type: application/json

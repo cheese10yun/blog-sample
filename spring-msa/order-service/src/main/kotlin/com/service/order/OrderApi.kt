@@ -85,6 +85,8 @@ class OrderRegistrationService(
 class OrderFindService(
     private val orderRepository: OrderRepository
 ) {
+    private val log by logger()
+
     fun findByOrderById(orderId: String) = orderRepository.findByOrderId(orderId)
 
     @CircuitBreaker(
@@ -100,9 +102,9 @@ class OrderFindService(
         return orderRepository.findByUserId(userId)
     }
 
-    private fun findOderByUserIdFallback(e: Exception): List<Order> {
-        println("findOderByFallback 발생")
-        return emptyList<Order>()
+    private fun findOderByUserIdFallback(ex: Exception): List<Order> {
+        log.error("findOderByFallback 발생", ex)
+        return emptyList()
     }
 }
 

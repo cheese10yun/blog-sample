@@ -53,15 +53,15 @@ resilience4j:
         instances:
             findWithOrder:
                 timeoutDuration: 1s # 원격 서버로부터 해당 시간안에 응답이 오는 것을 제한
+                cancelRunningFuture: true # Timeout 발생 후 future를 취소할지 결정하는 Boolean 값
 
     circuitbreaker:
         configs:
             default:
                 registerHealthIndicator: true
                 failureRateThreshold: 99
-                waitDurationInOpenState: 5s
+                waitDurationInOpenState: 10s
                 slidingWindowType: COUNT_BASED
-                slidingWindowSize: 2
         #                slowCallRateThreshold: 100
         #                slowCallDurationThreshold: 60000
         #                permittedNumberOfCallsInHalfOpenState: 4
@@ -78,14 +78,6 @@ resilience4j:
                 enabled: true
 
 
-
-getting:
-    message: "Welcome to Simple E-Commerce"
-
-logging:
-    level:
-        ROOT: info
-        com.service.member.client: DEBUG
 
 management:
     endpoints:
@@ -117,3 +109,11 @@ management:
             enabled: true
         db:
             enabled: true
+
+getting:
+    message: "Welcome to Simple E-Commerce"
+
+logging:
+    level:
+        ROOT: info
+        com.service.member.client: DEBUG

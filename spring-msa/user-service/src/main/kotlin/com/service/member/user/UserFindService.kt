@@ -1,8 +1,10 @@
 package com.service.member.user
 
 import com.service.member.client.OrderClient
+import com.service.member.logger
 import io.github.resilience4j.bulkhead.annotation.Bulkhead
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
+import kotlin.random.Random
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -16,6 +18,7 @@ class UserFindService(
     private val orderClient: OrderClient,
     private val circuitBreakerFactory: CircuitBreakerFactory<*, *>
 ) {
+    private val log by logger()
 
     fun findById(id: Long) =
         userRepository.findByIdOrNull(id)
@@ -51,15 +54,15 @@ class UserFindService(
         )
     }
 
-    private fun findWithOrderFallback(t: Exception): UserWithOrderResponse {
-        println("fallback 설정")
+    private fun findWithOrderFallback(
+        userId: String,
+        faultPercentage: Int,
+        delay: Int,
+        ex: Exception
+    ): UserWithOrderResponse {
+        log.error("findWithOrderFallback 발생")
         return UserWithOrderResponse(
-            user = User(
-                email = "2222222222@asd.cm",
-                name = "22222222",
-                userId = "22222222",
-                password = "\$2a\$10\$Inf2wE5nDnN/4pynduvud.h7sVm5TuNcvPt5m9r8ZpCoJCiAWjWzu"
-            ),
+            user = findByUserId(userId),
             orders = emptyList()
         )
     }

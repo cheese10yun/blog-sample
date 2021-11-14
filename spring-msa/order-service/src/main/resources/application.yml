@@ -27,21 +27,16 @@ eureka:
             default-zone: http://localhost:8761/eureka/
 
 
-logging:
-    level:
-        ROOT: info
-
-
 resilience4j:
     bulkhead:
         instances:
-            findWithOrder:
+            findOderByUserId:
                 maxConcurrentCalls: 25 #  허가된 동시 실행 수를 25로 지정
                 maxWaitDuration: 0 # 포화 상태의 Bulkhead에 진입하기 위해 block 되는 최대 시간, 값이 0이므로 바로 요청을 막는다.
 
     ratelimiter:
         instances:
-            findWithOrder:
+            findOderByUserId:
                 limitForPeriod: 50
                 limitRefreshPeriod: 500ns # 기간 동안 허용되는 요청 수
                 timeoutDuration: 5s # 허가를 위해 쓰레드가 대기하는 기본 시간
@@ -49,17 +44,18 @@ resilience4j:
 
     timelimiter:
         instances:
-            findWithOrder:
+            findOderByUserId:
                 timeoutDuration: 1s # 원격 서버로부터 해당 시간안에 응답이 오는 것을 제한
+                cancelRunningFuture: true # Timeout 발생 후 future를 취소할지 결정하는 Boolean 값
 
     circuitbreaker:
         configs:
             default:
                 registerHealthIndicator: true
-                failureRateThreshold: 99
-                waitDurationInOpenState: 5s
+                minimumNumberOfCalls: 5
+                failureRateThreshold: 50
+                waitDurationInOpenState: 10s
                 slidingWindowType: COUNT_BASED
-                slidingWindowSize: 2
         #                slowCallRateThreshold: 100
         #                slowCallDurationThreshold: 60000
         #                permittedNumberOfCallsInHalfOpenState: 4
@@ -75,13 +71,13 @@ resilience4j:
             legacy:
                 enabled: true
 
+
 management:
     endpoints:
         web:
             exposure:
                 include:
                     - "*"
-    #                    - "info"
     #                    - "env"
     #                    - "refresh"
     #                    - "bus-refresh"
@@ -101,6 +97,15 @@ management:
             enabled: true
             show-details: always
 
+    health:
+        circuitbreakers:
+            enabled: true
+        db:
+            enabled: true
+
+logging:
+    level:
+        ROOT: info
 
 message:
     profile: "default local"

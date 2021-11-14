@@ -2,6 +2,8 @@ package com.service.member
 
 import com.service.member.user.User
 import com.service.member.user.UserRepository
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -10,6 +12,8 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient
 import org.springframework.cloud.context.config.annotation.RefreshScope
 import org.springframework.cloud.openfeign.EnableFeignClients
 import org.springframework.stereotype.Component
+
+fun <A : Any> A.logger(): Lazy<Logger> = lazy { LoggerFactory.getLogger(this.javaClass) }
 
 @SpringBootApplication
 @EnableFeignClients
