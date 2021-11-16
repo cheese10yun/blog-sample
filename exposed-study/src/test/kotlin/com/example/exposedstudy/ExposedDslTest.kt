@@ -39,7 +39,7 @@ class ExposedDslTest : ExposedTestSupport() {
         insertBook("name", BigDecimal.TEN, 1L)
 
         val map = Books
-                .slice(Books.id, Books.title)
+//                .slice(Books.id, Books.title)
                 .selectAll().map {
                     it[Books.id] to it[Books.title]
                 }
