@@ -307,7 +307,7 @@ content-length: 996
   }
 }
 ```
-### CircuitBreaker 발생
+### CircuitBreaker 테스트
 
 정상적인 상태입니다. 이상 태에서 `/user-service/api/v1/users/997a5a8b-80e4-4a5d-b5d1-14ee22be18da/orders?faultPercentage=100&delay=0`를 2번 호출해 보겠습니다. faultPercentage 100이기 때문에 2번 모두 실패하고 Fallback 메서드가 발생하게 됩니다.
 
@@ -404,7 +404,94 @@ CIRCUIT_OPEN 상태이기 때문에 정상적인 호출도 회로를 차단합�
   }
 }
 ```
-현재 CIRCUIT_HALF_OPEN 상태입니다. 다시 UP 상태로 변경하기 위해서는 ringBufferSizeInHalfOpenState 설정을 10으로 했기 때문에 정상적인 호출을 해당 조건에 만족시키면 다시 UP
+현재 CIRCUIT_HALF_OPEN 상태입니다. 다시 UP 상태로 변경하기 위해서는 ringBufferSizeInHalfOpenState 설정을 10으로 했기 때문에 정상적인 호출을 해당 조건에 만족시키면 다시 UP으로 변경됩니다.
+
+
+
+### CircuitBreaker 이벤트 확인
+
+
+http://localhost:5555/order-service/actuator/circuitbreakerevents API를 이용해서 CircuitBreaker 이벤트 내역을 확인할 수 있습니다.
+
+```json
+{
+  "circuitBreakerEvents": [
+    {
+      "circuitBreakerName": "findOderByUserId",
+      "type": "SUCCESS",
+      "creationTime": "2021-11-17T02:23:58.708812+09:00[Asia/Seoul]",
+      "errorMessage": null,
+      "durationInMs": 1,
+      "stateTransition": null
+    },
+    {
+      "circuitBreakerName": "findOderByUserId",
+      "type": "ERROR",
+      "creationTime": "2021-11-17T02:24:14.581976+09:00[Asia/Seoul]",
+      "errorMessage": "java.lang.RuntimeException: faultPercentage Error...",
+      "durationInMs": 0,
+      "stateTransition": null
+    },
+    {
+      "circuitBreakerName": "findOderByUserId",
+      "type": "ERROR",
+      "creationTime": "2021-11-17T02:24:19.442926+09:00[Asia/Seoul]",
+      "errorMessage": "java.lang.RuntimeException: faultPercentage Error...",
+      "durationInMs": 0,
+      "stateTransition": null
+    },
+    {
+      "circuitBreakerName": "findOderByUserId",
+      "type": "FAILURE_RATE_EXCEEDED",
+      "creationTime": "2021-11-17T02:24:19.937314+09:00[Asia/Seoul]",
+      "errorMessage": null,
+      "durationInMs": null,
+      "stateTransition": null
+    },
+    {
+      "circuitBreakerName": "findOderByUserId",
+      "type": "STATE_TRANSITION",
+      "creationTime": "2021-11-17T02:24:19.937352+09:00[Asia/Seoul]",
+      "errorMessage": null,
+      "durationInMs": null,
+      "stateTransition": "CLOSED_TO_OPEN"
+    },
+    {
+      "circuitBreakerName": "findOderByUserId",
+      "type": "NOT_PERMITTED",
+      "creationTime": "2021-11-17T02:24:20.103096+09:00[Asia/Seoul]",
+      "errorMessage": null,
+      "durationInMs": null,
+      "stateTransition": null
+    },
+    {
+      "circuitBreakerName": "findOderByUserId",
+      "type": "NOT_PERMITTED",
+      "creationTime": "2021-11-17T02:24:20.273400+09:00[Asia/Seoul]",
+      "errorMessage": null,
+      "durationInMs": null,
+      "stateTransition": null
+    },
+    {
+      "circuitBreakerName": "findOderByUserId",
+      "type": "NOT_PERMITTED",
+      "creationTime": "2021-11-17T02:24:20.610345+09:00[Asia/Seoul]",
+      "errorMessage": null,
+      "durationInMs": null,
+      "stateTransition": null
+    },
+    {
+      "circuitBreakerName": "findOderByUserId",
+      "type": "STATE_TRANSITION",
+      "creationTime": "2021-11-17T02:24:30.240276+09:00[Asia/Seoul]",
+      "errorMessage": null,
+      "durationInMs": null,
+      "stateTransition": "OPEN_TO_HALF_OPEN"
+    }
+  ]
+}
+  
+```
 
 
 
