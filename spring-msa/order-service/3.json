@@ -1,0 +1,22 @@
+{
+  "circuitBreakers": {
+    "status": "UP",
+    "details": {
+      "findOderByUserId": {
+        "status": "UP",
+        "details": {
+          "failureRate": "-1.0%",
+          "failureRateThreshold": "80.0%",
+          "slowCallRate": "-1.0%",
+          "slowCallRateThreshold": "100.0%",
+          "bufferedCalls": 3,
+          "slowCalls": 0,
+          "slowFailedCalls": 0,
+          "failedCalls": 2,
+          "notPermittedCalls": 0,
+          "state": "CLOSED"
+        }
+      }
+    }
+  }
+}

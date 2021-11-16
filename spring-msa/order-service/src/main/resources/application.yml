@@ -28,32 +28,33 @@ eureka:
 
 
 resilience4j:
-    bulkhead:
-        instances:
-            findOderByUserId:
-                maxConcurrentCalls: 25 #  허가된 동시 실행 수를 25로 지정
-                maxWaitDuration: 0 # 포화 상태의 Bulkhead에 진입하기 위해 block 되는 최대 시간, 값이 0이므로 바로 요청을 막는다.
-
-    ratelimiter:
-        instances:
-            findOderByUserId:
-                limitForPeriod: 50
-                limitRefreshPeriod: 500ns # 기간 동안 허용되는 요청 수
-                timeoutDuration: 5s # 허가를 위해 쓰레드가 대기하는 기본 시간
-                registerHealthIndicator: true
-
-    timelimiter:
-        instances:
-            findOderByUserId:
-                timeoutDuration: 1s # 원격 서버로부터 해당 시간안에 응답이 오는 것을 제한
-                cancelRunningFuture: true # Timeout 발생 후 future를 취소할지 결정하는 Boolean 값
+#    bulkhead:
+#        instances:
+#            findOderByUserId:
+#                maxConcurrentCalls: 25 #  허가된 동시 실행 수를 25로 지정
+#                maxWaitDuration: 0 # 포화 상태의 Bulkhead에 진입하기 위해 block 되는 최대 시간, 값이 0이므로 바로 요청을 막는다.
+#
+#    ratelimiter:
+#        instances:
+#            findOderByUserId:
+#                limitForPeriod: 50
+#                limitRefreshPeriod: 500ns # 기간 동안 허용되는 요청 수
+#                timeoutDuration: 5s # 허가를 위해 쓰레드가 대기하는 기본 시간
+#                registerHealthIndicator: true
+#
+#    timelimiter:
+#        instances:
+#            findOderByUserId:
+#                timeoutDuration: 1s # 원격 서버로부터 해당 시간안에 응답이 오는 것을 제한
+#                cancelRunningFuture: true # Timeout 발생 후 future를 취소할지 결정하는 Boolean 값
 
     circuitbreaker:
         configs:
             default:
                 registerHealthIndicator: true
+                ringBufferSizeInClosedState: 10
                 ringBufferSizeInHalfOpenState: 10
-                failureRateThreshold: 50
+                failureRateThreshold: 1
                 waitDurationInOpenState: 10s
                 slidingWindowType: COUNT_BASED
         #                slowCallRateThreshold: 100
@@ -89,8 +90,8 @@ management:
     endpoint:
         metrics:
             enabled: true
-        refresh:
-            enabled: true
+#        refresh:
+#            enabled: true
         circuitbreakers:
             enabled: true
         health:
@@ -100,8 +101,8 @@ management:
     health:
         circuitbreakers:
             enabled: true
-        db:
-            enabled: true
+#        db:
+#            enabled: true
 
 logging:
     level:
