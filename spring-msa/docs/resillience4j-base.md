@@ -65,6 +65,161 @@ Resilience4j는 서킷 브레이커와 같은 방식으로 재시도 관련된 �
 
 ## 테스트 시나리오
 
+![](images/flow-22.png)
+
+* User API에서 회원 정보 조회 이후 Order API를 통해서 주문 목록 조회
+* 정상적인 조회의 경우 정상적인 응답, 오류 발생시 **Fallback 으로 응답하고 빠른 실패**
+
+
+### Code
+
+코드는 대략적인 흐름에 이해를 돕기 위해 첨부합니다.
+
+```kotlin
+@RestController
+@RequestMapping("/api/v1/users")
+class UserApi {
+    
+    ...
+    @GetMapping("/{userId}/orders")
+    fun getUserWithOrderByTest(
+        @PathVariable userId: String,
+        @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
+        @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
+    ): UserWithOrderResponse {
+        return userFindService.findWithOrder(userId, faultPercentage, delay)
+    }
+}
+```
+* delay: 쓰레드 slip을 진행할 값, 특정 시간동안 API가 응답하지 않으면 Fallback 처리
+* faultPercentage: 예외가 발생할 퍼센트지, 100이면 100% 예외 발생 하고 Fallback 처리
+
+```kotlin
+@FeignClient(name = "order-service")
+interface OrderClient {
+
+    @GetMapping("/api/v1/orders/users/{userId}")
+    fun getOrderByUserId(
+        @PathVariable userId: String,
+        @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
+        @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
+    ): List<OrderResponse>
+}
+
+class UserFindService {
+    ...
+    
+    fun findWithOrder(
+        userId: String,
+        faultPercentage: Int,
+        delay: Int
+    ): UserWithOrderResponse {
+        val user = findByUserId(userId)
+        return UserWithOrderResponse(
+            user = user,
+            orders = orderClient.getOrderByUserId(
+                userId = userId,
+                faultPercentage = faultPercentage,
+                delay = delay
+            )
+        )
+    }
+}
+```
+* user를 데이터베이스에서 조회
+* order 조회는 FeignClient를 이용해, Order API를 호출
+
+```kotlin
+// (1)
+@RestController
+@RequestMapping("/api/v1/orders")
+class OrderApi {
+    ..
+
+    @GetMapping("/users/{userId}")
+    fun getOrderByTest(
+        @PathVariable userId: String,
+        @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
+        @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
+    ): List<OrderResponse> {
+        return orderFindService.findOderByUserId(
+            userId = userId,
+            faultPercentage = faultPercentage,
+            delay = delay
+        )
+            .map { OrderResponse(it) }
+    }
+}
+
+@Service
+@Transactional(readOnly = true)
+class OrderFindService(
+    private val orderRepository: OrderRepository
+) {
+
+    // (2)
+    @CircuitBreaker(
+        name = "findOderByUserId",
+        fallbackMethod = "findOderByUserIdFallback"
+    )
+    fun findOderByUserId(userId: String, faultPercentage: Int, delay: Int): List<Order> {
+        Thread.sleep(delay.toLong()) // (3)
+        val random = Random.nextInt(0, 100) // (4)
+        if (faultPercentage > random) {
+            throw RuntimeException("faultPercentage Error...")
+        }
+        return orderRepository.findByUserId(userId)
+    }
+
+    // (5)
+    private fun findOderByUserIdFallback(ex: Exception): List<Order> {
+        return emptyList()
+    }
+}
+
+```
+* (1) 주문 조회를 진행하는 컨트롤러 코드
+* (2) CircuitBreaker에 대한 name, fallbackMethod 지정
+* (3) 응답 시간 지연을 위한 스레드 대기, 특정 지연 시간 초과하는 경우 fallbackMethod 응답
+* (4) faultPercentage에 의해 예외 발생, 예외 발생시 fallbackMethod 응답
+* (5) fallBack 메서드 지정, 위에서 지정한 fallbackMethod와 메서드명이 일치 해야한다.
+
+
+### 정상 응답
+```json
+{
+  "orders": [
+    {
+      "productId": "123a5a8b-20w2-1223d-b5d1-14ssd2dbe18da",
+      "userId": "997a5a8b-80e4-4a5d-b5d1-14ee22be18da",
+      "orderId": "5566da6f-3f03-4ce5-8863-3c142e452522",
+      "qty": 3,
+      "unitPrice": 100,
+      "totalPrice": 300
+    }
+  ],
+  "email": "qwe@asd.cm",
+  "name": "Kim",
+  "userid": "997a5a8b-80e4-4a5d-b5d1-14ee22be18da"
+}
+```
+* 해당 유조의 주문 조회
+
+### Fallback 응답
+```json
+{
+  "orders": [],
+  "email": "qwe@asd.cm",
+  "name": "Kim",
+  "userid": "997a5a8b-80e4-4a5d-b5d1-14ee22be18da"
+}
+```
+* Fallback 응답으로 주문 목록 빈 배열로 응답
+
+
+
+
+
 
 ## 참고
 * [스프링으로 하는 마이크로서비스 구축](http://www.yes24.com/Product/Goods/95593443)
