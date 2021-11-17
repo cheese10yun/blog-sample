@@ -9,7 +9,7 @@
 
 ## Resilience4j 소개
 
-![](images/Resilience4j-1.png)
+![](https://github.com/cheese10yun/blog-sample/raw/master/spring-msa/docs/images/Resilience4j-1.png)
 
 * 서킷 브레이커는 다량의 오류를 감지하면 서킷을 열어 새 호출을 받지 않는다.
 * 서킷 브레이커는 서킷이 열려 있을 때 빠른 실패 로직을 수행한다. 즉 이어지는 호출에서 시간 초과, 예외 발생 등 오류가 발생하지 않게, 폴백 메서드 호출을 리다 디렉션을 한다. 폴백 메서드에서 다양한 비즈니스 로직을 적용하면 로컬 캐시의 데이터를 반환하거나 즉각적인 오류 메시지를 반환하는 등 최적화된 응답을 생성할 수 있다. 이로써 의존하는 서비스의 응답 중단 때문에 마이크로 서비스가 응답하지 못하게 되는 문제를 방지할 수 있는다.
@@ -63,7 +63,7 @@ Resilience4j는 서킷 브레이커와 같은 방식으로 재시도 관련된 �
 
 ## 테스트 시나리오
 
-![](images/flow-22.png)
+![](https://github.com/cheese10yun/blog-sample/raw/master/spring-msa/docs/images/flow-22.png)
 
 * User API에서 회원 정보 조회 이후 Order API를 통해서 주문 목록 조회
 * 정상적인 조회의 경우 정상적인 응답, 오류 발생시 **Fallback 으로 응답하고 빠른 실패**
@@ -311,7 +311,7 @@ content-length: 996
 
 정상적인 상태입니다. 이상 태에서 `/user-service/api/v1/users/997a5a8b-80e4-4a5d-b5d1-14ee22be18da/orders?faultPercentage=100&delay=0`를 2번 호출해 보겠습니다. faultPercentage 100이기 때문에 2번 모두 실패하고 Fallback 메서드가 발생하게 됩니다.
 
-![](images/circuit-diff.png)
+![](https://github.com/cheese10yun/blog-sample/raw/master/spring-msa/docs/images/circuit-diff.png)
 
 bufferedCalls, failedCalls 각각 증가한 것을 확인할 수 있습니다. bufferedCalls는 호출 수, failedCalls는 실패하여 Fallback 메서드가 내려간 수입니다.
 
@@ -343,7 +343,7 @@ bufferedCalls, failedCalls 각각 증가한 것을 확인할 수 있습니다. b
 ```
 bufferedCalls만 증가한 것을 확인할 수 있습니다. 그렇다면 계속 실패해서 위에서 설정한 failureRateThreshold 80%를 넘겨 보겠습니다.
 
-![](images/circuit-diff2.png)
+![](https://github.com/cheese10yun/blog-sample/raw/master/spring-msa/docs/images/circuit-diff2.png)
 
 findOderByUserId의 status가 UP -> CIRCUIT_OPEN으로 변경되었고 details의 state가 CLOSED -> OPEN으로 변경되었습니다.
 
