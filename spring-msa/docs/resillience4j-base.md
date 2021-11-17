@@ -410,9 +410,6 @@ CIRCUIT_OPEN 상태이기 때문에 정상적인 호출도 회로를 차단합�
 
 ### CircuitBreaker 이벤트 확인
 
-
-http://localhost:5555/order-service/actuator/circuitbreakerevents API를 이용해서 CircuitBreaker 이벤트 내역을 확인할 수 있습니다.
-
 ```json
 {
   "circuitBreakerEvents": [
@@ -490,14 +487,11 @@ http://localhost:5555/order-service/actuator/circuitbreakerevents API를 이용�
     }
   ]
 }
-  
 ```
 
-
+http://localhost:5555/order-service/actuator/circuitbreakerevents API를 이용해서 CircuitBreaker 이벤트 내역을 확인할 수 있습니다.
 
 ## 참고
 * [스프링으로 하는 마이크로서비스 구축](http://www.yes24.com/Product/Goods/95593443)
 * [Spring Boot에 Resilience4j (CircuitBreaker) 적용하기](https://leejongchan.tistory.com/100)
 * [Resilience4j Document](https://resilience4j.readme.io/docs/getting-started)
-
-
