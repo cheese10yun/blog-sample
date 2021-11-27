@@ -15,7 +15,7 @@
 * 서킷 브레이커는 서킷이 열려 있을 때 빠른 실패 로직을 수행한다. 즉 이어지는 호출에서 시간 초과, 예외 발생 등 오류가 발생하지 않게, 폴백 메서드 호출을 리다디렉션을 한다. 폴백 메서드에서 다양한 비즈니스 로직을 적용하면 로컬 캐시의 데이터를 반환하거나 즉각적인 오류 메시지를 반환하는 등 최적화된 응답을 생성할 수 있다. 이로써 의존하는 서비스의 응답 중단 때문에 마이크로 서비스가 응답하지 못하게 되는 문제를 방지할 수 있는다.
 * 시간이 지나면 서킷 브레이커는 반열림 상태로 전환돼 새로운 호출을 허용하며, 이를 통해 문제를 일으킨 원인이 사라졌는지 확인한다. 서킷 브레이커는 새로운 오류를 감지하면서 서킷을 다시 열고 빠른 실패 로직을 다시 수행하며, 오류가 사라졌으면 서킷을 닫고 정상 작동 상태로 돌아간다.
 
-Resilience4j는 런타임에 다양한 방법으로 서킷 브레가이커의 정보를 공개한다.
+Resilience4j는 런타임에 다양한 방법으로 서킷 브레이커의 정보를 공개한다.
 
 * 서킷 브레이커의 현재 상태를 마이크로 서비스 액추에이터 상태 점검 엔드 포인트(/actuator/health)를 사용해 모니터링할 수 있다.
 * 서킷 브레이커는 상태 전이 등의 이벤트 액추에이터 엔드 포인트(/actuator/citcuitbreakerevents)를 게시한다.
@@ -77,19 +77,19 @@ Resilience4j는 서킷 브레이커와 같은 방식으로 재시도 관련된 �
 @RestController
 @RequestMapping("/api/v1/users")
 class UserApi {
-
+    
     ...
     @GetMapping("/{userId}/orders")
     fun getUserWithOrderByTest(
-            @PathVariable userId: String,
-            @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
-            @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
+        @PathVariable userId: String,
+        @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
+        @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
     ): UserWithOrderResponse {
         return userFindService.findWithOrder(userId, faultPercentage, delay)
     }
 }
 ```
-* delay: 쓰레드 slip을 진행할 값, 특정 시간동안 API가 응답하지 않으면 Fallback 처리
+* delay: 쓰레드 sleep을 진행할 값, 특정 시간동안 API가 응답하지 않으면 Fallback 처리
 * faultPercentage: 예외가 발생할 퍼센트지, 100이면 100% 예외 발생 하고 Fallback 처리
 
 ```kotlin
@@ -98,28 +98,28 @@ interface OrderClient {
 
     @GetMapping("/api/v1/orders/users/{userId}")
     fun getOrderByUserId(
-            @PathVariable userId: String,
-            @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
-            @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
+        @PathVariable userId: String,
+        @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
+        @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
     ): List<OrderResponse>
 }
 
 class UserFindService {
     ...
-
+    
     fun findWithOrder(
-            userId: String,
-            faultPercentage: Int,
-            delay: Int
+        userId: String,
+        faultPercentage: Int,
+        delay: Int
     ): UserWithOrderResponse {
         val user = findByUserId(userId)
         return UserWithOrderResponse(
-                user = user,
-                orders = orderClient.getOrderByUserId(
-                        userId = userId,
-                        faultPercentage = faultPercentage,
-                        delay = delay
-                )
+            user = user,
+            orders = orderClient.getOrderByUserId(
+                userId = userId,
+                faultPercentage = faultPercentage,
+                delay = delay
+            )
         )
     }
 }
@@ -136,29 +136,29 @@ class OrderApi {
 
     @GetMapping("/users/{userId}")
     fun getOrderByTest(
-            @PathVariable userId: String,
-            @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
-            @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
+        @PathVariable userId: String,
+        @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
+        @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
     ): List<OrderResponse> {
         return orderFindService.findOderByUserId(
-                userId = userId,
-                faultPercentage = faultPercentage,
-                delay = delay
+            userId = userId,
+            faultPercentage = faultPercentage,
+            delay = delay
         )
-                .map { OrderResponse(it) }
+            .map { OrderResponse(it) }
     }
 }
 
 @Service
 @Transactional(readOnly = true)
 class OrderFindService(
-        private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository
 ) {
 
     // (2)
     @CircuitBreaker(
-            name = "findOderByUserId",
-            fallbackMethod = "findOderByUserIdFallback"
+        name = "findOderByUserId",
+        fallbackMethod = "findOderByUserIdFallback"
     )
     fun findOderByUserId(userId: String, faultPercentage: Int, delay: Int): List<Order> {
         Thread.sleep(delay.toLong()) // (3)
