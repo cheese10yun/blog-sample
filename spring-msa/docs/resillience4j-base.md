@@ -77,13 +77,13 @@ Resilience4j는 서킷 브레이커와 같은 방식으로 재시도 관련된 �
 @RestController
 @RequestMapping("/api/v1/users")
 class UserApi {
-    
+
     ...
     @GetMapping("/{userId}/orders")
     fun getUserWithOrderByTest(
-        @PathVariable userId: String,
-        @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
-        @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
+            @PathVariable userId: String,
+            @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
+            @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
     ): UserWithOrderResponse {
         return userFindService.findWithOrder(userId, faultPercentage, delay)
     }
@@ -98,28 +98,28 @@ interface OrderClient {
 
     @GetMapping("/api/v1/orders/users/{userId}")
     fun getOrderByUserId(
-        @PathVariable userId: String,
-        @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
-        @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
+            @PathVariable userId: String,
+            @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
+            @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
     ): List<OrderResponse>
 }
 
 class UserFindService {
     ...
-    
+
     fun findWithOrder(
-        userId: String,
-        faultPercentage: Int,
-        delay: Int
+            userId: String,
+            faultPercentage: Int,
+            delay: Int
     ): UserWithOrderResponse {
         val user = findByUserId(userId)
         return UserWithOrderResponse(
-            user = user,
-            orders = orderClient.getOrderByUserId(
-                userId = userId,
-                faultPercentage = faultPercentage,
-                delay = delay
-            )
+                user = user,
+                orders = orderClient.getOrderByUserId(
+                        userId = userId,
+                        faultPercentage = faultPercentage,
+                        delay = delay
+                )
         )
     }
 }
@@ -136,29 +136,29 @@ class OrderApi {
 
     @GetMapping("/users/{userId}")
     fun getOrderByTest(
-        @PathVariable userId: String,
-        @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
-        @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
+            @PathVariable userId: String,
+            @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
+            @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
     ): List<OrderResponse> {
         return orderFindService.findOderByUserId(
-            userId = userId,
-            faultPercentage = faultPercentage,
-            delay = delay
+                userId = userId,
+                faultPercentage = faultPercentage,
+                delay = delay
         )
-            .map { OrderResponse(it) }
+                .map { OrderResponse(it) }
     }
 }
 
 @Service
 @Transactional(readOnly = true)
 class OrderFindService(
-    private val orderRepository: OrderRepository
+        private val orderRepository: OrderRepository
 ) {
 
     // (2)
     @CircuitBreaker(
-        name = "findOderByUserId",
-        fallbackMethod = "findOderByUserIdFallback"
+            name = "findOderByUserId",
+            fallbackMethod = "findOderByUserIdFallback"
     )
     fun findOderByUserId(userId: String, faultPercentage: Int, delay: Int): List<Order> {
         Thread.sleep(delay.toLong()) // (3)
