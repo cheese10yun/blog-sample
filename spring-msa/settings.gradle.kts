@@ -10,7 +10,6 @@ include("user-service")
 include("catalog-service")
 
 pluginManagement {
-
     repositories {
         gradlePluginPortal()
     }
