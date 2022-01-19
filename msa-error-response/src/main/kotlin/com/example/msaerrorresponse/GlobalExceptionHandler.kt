@@ -1,6 +1,5 @@
 package com.example.msaerrorresponse
 
-import java.nio.file.AccessDeniedException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindException
@@ -38,7 +37,7 @@ class GlobalExceptionHandler {
      * 주로 @RequestParam enum으로 binding 못했을 경우 발생
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
-    protected fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException?): ResponseEntity<ErrorResponse> {
+    protected fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
         val response = ErrorResponse.of(e)
         return ResponseEntity<ErrorResponse>(response, HttpStatus.BAD_REQUEST)
     }
@@ -47,7 +46,7 @@ class GlobalExceptionHandler {
      * 지원하지 않은 HTTP method 호출 할 경우 발생
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
-    protected fun handleHttpRequestMethodNotSupportedException(e: HttpRequestMethodNotSupportedException?): ResponseEntity<ErrorResponse> {
+    protected fun handleHttpRequestMethodNotSupportedException(e: HttpRequestMethodNotSupportedException): ResponseEntity<ErrorResponse> {
         val response = ErrorResponse.of(ErrorCode.METHOD_NOT_ALLOWED)
         return ResponseEntity<ErrorResponse>(response, HttpStatus.METHOD_NOT_ALLOWED)
     }
