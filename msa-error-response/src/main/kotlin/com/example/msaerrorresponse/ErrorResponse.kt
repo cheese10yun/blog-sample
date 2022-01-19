@@ -25,10 +25,14 @@ class ErrorResponse {
         this.errors = ArrayList()
     }
 
-    class FieldError private constructor(private val field: String, private val value: String, private val reason: String?) {
+    class FieldError private constructor(
+        val field: String,
+        val value: String,
+        val reason: String
+    ) {
 
         companion object {
-            fun of(field: String, value: String, reason: String?): List<FieldError> {
+            fun of(field: String, value: String, reason: String): List<FieldError> {
                 val fieldErrors: MutableList<FieldError> = ArrayList()
                 fieldErrors.add(FieldError(field, value, reason))
                 return fieldErrors
@@ -40,8 +44,11 @@ class ErrorResponse {
                     .map { error: org.springframework.validation.FieldError ->
                         FieldError(
                             error.field,
-                            if (error.rejectedValue == null) "" else error.rejectedValue.toString(),
-                            error.defaultMessage
+                            when (error.rejectedValue) {
+                                null -> ""
+                                else -> error.rejectedValue.toString()
+                            },
+                            error.defaultMessage ?: "error message empty"
                         )
                     }
                     .collect(Collectors.toList())
