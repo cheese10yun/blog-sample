@@ -25,6 +25,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     runtimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    implementation("com.github.kittinunf.fuel:fuel:2.3.1")
 }
 
 tasks.withType<KotlinCompile> {
