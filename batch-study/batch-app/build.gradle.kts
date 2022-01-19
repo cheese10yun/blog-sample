@@ -17,7 +17,7 @@ subprojects {
         implementation("org.jetbrains.exposed:exposed-dao:${properties["exposed_version"]}")
         implementation("org.jetbrains.exposed:exposed-jdbc:${properties["exposed_version"]}")
         implementation("org.jetbrains.exposed:exposed-java-time:${properties["exposed_version"]}")
-
+        implementation("com.github.kittinunf.fuel:fuel:2.3.1")
         runtimeOnly("mysql:mysql-connector-java")
 
         testApi(project(":batch-support:batch-test"))
