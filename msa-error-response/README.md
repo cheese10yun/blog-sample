@@ -10,12 +10,12 @@
   "status": 400,
   "errors": [
     {
-      "field": "name.last",
+      "field": "name",
       "value": "",
       "reason": "must not be empty"
     },
     {
-      "field": "name.first",
+      "field": "email",
       "value": "",
       "reason": "must not be empty"
     }
@@ -24,4 +24,9 @@
 }
 ```
 first, last name이 비여있어서 예외가 발생하고 있습니다. 해당 예외를 A Server에게 그대로 전달하지 않은 경우 정확하게 전달하는 것이 바람직합니다. **물론 A, B, C API 서버가 우리가 직접 개발하는 서버로 Error Response를 통일 했을 경우입니다.**
+
+
+
+
+
 
