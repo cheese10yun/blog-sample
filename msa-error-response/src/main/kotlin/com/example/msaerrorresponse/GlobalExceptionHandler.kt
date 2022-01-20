@@ -56,22 +56,6 @@ class GlobalExceptionHandler {
         return ResponseEntity<ErrorResponse>(e.errorResponse, HttpStatus.valueOf(e.errorResponse.status))
     }
 
-//    /**
-//     * Authentication 객체가 필요한 권한을 보유하지 않은 경우 발생합
-//     */
-//    @ExceptionHandler(AccessDeniedException::class)
-//    fun handleAccessDeniedException(e: AccessDeniedException?): ResponseEntity<ErrorResponse?> {
-//        val response = ErrorResponse.of(ErrorCode.HANDLE_ACCESS_DENIED)
-//        return ResponseEntity<Any?>(response, HttpStatus.valueOf(ErrorCode.HANDLE_ACCESS_DENIED.getStatus()))
-//    }
-
-//    @ExceptionHandler(BusinessException::class)
-//    fun handleBusinessException(e: BusinessException): ResponseEntity<ErrorResponse?> {
-//        val errorCode: ErrorCode = e.getErrorCode()
-//        val response = ErrorResponse.of(errorCode)
-//        return ResponseEntity<Any?>(response, HttpStatus.valueOf(errorCode.getStatus()))
-//    }
-
     @ExceptionHandler(Exception::class)
     fun handleException(e: Exception?): ResponseEntity<ErrorResponse> {
         val response = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR)
