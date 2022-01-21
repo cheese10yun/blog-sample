@@ -6,7 +6,7 @@ import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.httpPost
 
 class UserClient(
-    private val host: String = "http://localhost:8787"
+    private val host: String = "http://localhost:8080"
 ) {
 
     fun registerUser() {
