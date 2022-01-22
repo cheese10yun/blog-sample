@@ -1,6 +1,8 @@
 package com.example.msaerrorresponse
 
 import javax.validation.Valid
+import javax.validation.constraints.Email
+import javax.validation.constraints.NotEmpty
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -13,6 +15,14 @@ class AServiceApi(
 ) {
 
     @PostMapping
-    fun aService(@RequestBody @Valid dto: UserRegistrationRequest) =
+    fun aService(@RequestBody dto: UserRegistrationRequest) =
         userRegistrationService.register(dto)
+
 }
+
+data class UserRegistrationRequest(
+    @field:NotEmpty
+    val name: String,
+    @field:Email
+    val email: String
+)

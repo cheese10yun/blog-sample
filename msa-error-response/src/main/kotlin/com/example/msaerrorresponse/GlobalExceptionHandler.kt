@@ -57,7 +57,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception::class)
-    fun handleException(e: Exception?): ResponseEntity<ErrorResponse> {
+    fun handleException(e: Exception): ResponseEntity<ErrorResponse> {
         val response = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR)
         return ResponseEntity<ErrorResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR)
     }

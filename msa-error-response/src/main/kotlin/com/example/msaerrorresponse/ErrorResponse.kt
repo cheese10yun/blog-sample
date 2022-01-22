@@ -2,30 +2,32 @@ package com.example.msaerrorresponse
 
 import java.util.stream.Collectors
 import org.springframework.validation.BindingResult
-import org.springframework.validation.FieldError
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 
-class ErrorResponse {
-    val message: String
-    val status: Int
-    val errors: List<FieldError>
-    val code: String
+class ErrorResponse(
+    val message: String,
+    val status: Int,
+    val errors: List<FieldError>,
+    val code: String,
+) {
 
-    private constructor(code: ErrorCode, errors: List<FieldError>) {
-        this.message = code.message
-        this.status = code.status
-        this.errors = errors
-        this.code = code.code
-    }
 
-    private constructor(code: ErrorCode) {
-        this.message = code.message
-        this.status = code.status
-        this.code = code.code
-        this.errors = ArrayList()
-    }
+    private constructor(errorCode: ErrorCode, errors: List<FieldError>) : this(
+        message = errorCode.message,
+        status = errorCode.status,
+        errors = errors,
+        code = errorCode.code
 
-    class FieldError private constructor(
+    )
+
+    private constructor(errorCode: ErrorCode) : this(
+        message = errorCode.message,
+        status = errorCode.status,
+        code = errorCode.code,
+        errors = ArrayList()
+    )
+
+    class FieldError(
         val field: String,
         val value: String,
         val reason: String
@@ -63,10 +65,6 @@ class ErrorResponse {
 
         fun of(code: ErrorCode): ErrorResponse {
             return ErrorResponse(code)
-        }
-
-        fun of(code: ErrorCode, errors: List<FieldError>): ErrorResponse {
-            return ErrorResponse(code, errors)
         }
 
         fun of(e: MethodArgumentTypeMismatchException): ErrorResponse {
