@@ -61,7 +61,7 @@ class UserRegistrationService(
                     }
                 )
             }
-        
+
         // 등록이 실패하는 경우는 어떻게 처리해야할까?
         // 서비스 레이어에서 b-service에서 발생한 예외를 어떻게 그대로 전달 할 수 있을까?
     }
@@ -87,9 +87,9 @@ class UserClient(
             .response()
 }
 ```
-a-service -> b-service 호출을 한다고 가정했을 경우 b-service에서 HTTP Status가 2xx가 아닌 경우, 특히 4xx가 발생하는 경우 요청한 여려의 필드 중에 1개 이상의 오류가 있는 경우가 빈번하게 있기 때문에 b-service의 Error 응답을 그대로 전달해 줘야 하는 경우가 있습니다.
+a-service -> b-service 호출을 한다고 가정했을 경우 b-service에서 HTTP Status가 2xx가 아닌 경우, 특히 4xx가 발생하는 경우로 요청한 여려의 필드 중에 1개 이상의 오류가 있는 경우가 빈번하게 있기 때문에 b-service의 Error 응답을 그대로 전달해 줘야 하는 경우가 있습니다.
 
-그런데 문제가 있습니다. 서비스 로직에서 b-service에서 발생한 Error 응답을 그대로 클라이언트에게 전달할 수 있을까요? [Spring Guide - Exception 전략](https://cheese10yun.github.io/spring-guide-exception/)에서 사용한 `@ControllerAdvice`을 통해서 예외를 핸들링을 진행해 보겠습니다.
+그런데 문제가 있습니다. 서비스 로직에서 b-service에서 발생한 Error 응답을 그대로 클라이언트에게 전달하기가 어렵습니다. 이 문제를 [Spring Guide - Exception 전략](https://cheese10yun.github.io/spring-guide-exception/)에서 사용한 `@ControllerAdvice`을 통해서 예외를 핸들링을 통해서 해결해 보겠습니다.
 
 ## 발생한 Error 응답을 그대로 전달 하기
 
@@ -195,4 +195,4 @@ ApiException에 대한 에러 핸들링이 GlobalExceptionHandler에서 정상�
 
 ## 정리
 
-여러 API를 호출하여 요구사항을 만족시키는 경우가 일반적입니다. 그러한 경우 Error Respone를 최초 호출한 클라이언트에게 전달해야 하는 경우가 있으며 이런 경우 위 같은 형식으로 해당 기능을 만족시킬 수 있습니다. 하지만 서버에 대한 통제권이 없고 Error Response에 대한 통일이 없다면 해당 방법은 어려운 부분이 있습니다. 또 Error Response에 대한 내용을 그대로 전달하는 것도 보안에 좋지 않기 때문에 회사 내부에서만 사용하는 경우가 아닌 유저향 서비스 시에는 조금 더 신중하게 Erro 응답을 전달해야 합니다.
+여러 API를 호출하여 요구사항을 만족시키는 경우가 일반적입니다. 그러한 경우 Error Respone를 최초 호출한 클라이언트에게 전달해야 하는 경우가 있으며 이런 경우 위 같은 형식으로 해당 기능을 만족시킬 수 있습니다. 하지만 서버에 대한 통제권이 없고 Error Response에 대한 통일이 없다면 해당 방법은 어려운 부분이 있습니다. 또 Error Response에 대한 내용을 그대로 전달하는 것도 보안에 좋지 않기 때문에 회사 내부에서만 사용하는 경우가 아닌 유저향 서비스 시에는 조금 더 신중하게 Error 응답을 전달해야 합니다.
