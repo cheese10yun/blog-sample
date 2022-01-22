@@ -184,11 +184,11 @@ Connection: close
 ```
 a-service -> b-service를 호출했고 요청 필드에 문제가 있어 b-service에서 내려준 응답을 그대로 a-service에서 내려주는 것을 디버깅 모드로 확인해 보겠습니다.
 
-![](/img/error-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/msa-error-response/img/error-1.png)
 
 서비스 코드에서 400 응답을 받는 것을 확인할 수 있습니다.
 
-![](/img/error-2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/msa-error-response/img/error-2.png)
 
 
 ApiException에 대한 에러 핸들링이 GlobalExceptionHandler에서 정상적으로 동작하는 것을 확인할 수 있습니다. 전달받은 Error Response 객체도 정확하게 바인딩 됐습니다.
