@@ -38,7 +38,7 @@ class UserClient(
 ) {
 
     fun postUser(name: String, email: String) =
-        "$host/api/v1/users"
+        "$host/b-service"
             .httpPost()
             .timeout(60000)
             .timeoutRead(60000)
