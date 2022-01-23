@@ -19,7 +19,6 @@ configurations {
 allprojects {
     repositories {
         mavenCentral()
-        jcenter()
         maven { url = uri("https://jitpack.io") }
     }
 }
@@ -28,7 +27,6 @@ subprojects {
     apply(plugin = "java")
     apply(plugin = "kotlin")
     apply(plugin = "kotlin-spring")
-    apply(plugin = "maven")
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
 
