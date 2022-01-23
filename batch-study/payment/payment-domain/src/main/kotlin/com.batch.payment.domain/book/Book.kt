@@ -24,7 +24,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 class Book(
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "status", nullable = false)
-    var status: BookStatus,
+    var status: BookStatus = BookStatus.AVAILABLE_RENTAL
 ) {
 
     @Id

@@ -1,30 +1,72 @@
 package com.batch.task
 
-import com.batch.payment.domain.payment.Payment
+import com.batch.payment.domain.book.Book
+import com.batch.task.support.listener.JobReportListener
+import com.batch.task.support.logger
 import java.time.LocalDateTime
 import javax.persistence.EntityManagerFactory
+import org.springframework.batch.core.Step
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
+import org.springframework.batch.core.configuration.annotation.JobScope
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepScope
+import org.springframework.batch.core.launch.support.RunIdIncrementer
+import org.springframework.batch.item.ItemWriter
+import org.springframework.batch.item.database.JpaPagingItemReader
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 const val CHUNK_SIZE = 10
+const val DATA_SET_UP_SIZE = 1_000
+
 private val localDateTime = LocalDateTime.of(2021, 6, 1, 0, 0, 0)
 
 @Configuration
-class PerformanceJobConfiguration {
+class PerformanceJobConfiguration(
+    private val jobBuilderFactory: JobBuilderFactory,
+    private val stepBuilderFactory: StepBuilderFactory
+) {
 
+    val log by logger()
+
+    @Bean
+    fun performanceJob(
+        jobDataSetUpListener: JobDataSetUpListener,
+        performanceStep: Step
+    ) =
+        jobBuilderFactory["readerPerformanceJob"]
+            .incrementer(RunIdIncrementer())
+            .listener(JobReportListener())
+            .listener(jobDataSetUpListener)
+            .start(performanceStep)
+            .build()
+
+    @Bean
+    @JobScope
+    fun performanceStep(
+        jpaPagingItemReader: JpaPagingItemReader<Book>
+    ) =
+        stepBuilderFactory["readerPerformanceStep"]
+            .chunk<Book, Book>(CHUNK_SIZE)
+            .reader(jpaPagingItemReader)
+            .writer(writer())
+            .build()
 
     @Bean
     @StepScope
     fun jpaPagingItemReader(
         entityManagerFactory: EntityManagerFactory
-    ) = JpaPagingItemReaderBuilder<Payment>()
+    ) = JpaPagingItemReaderBuilder<Book>()
         .name("jpaPagingItemReader")
         .pageSize(CHUNK_SIZE)
         .entityManagerFactory(entityManagerFactory)
-        .queryString("SELECT p FROM Payment p where p.createdAt >= :createdAt ORDER BY p.createdAt DESC")
+        .queryString("SELECT b FROM Book b where b.createdAt >= :createdAt ORDER BY b.createdAt DESC")
         .parameterValues(mapOf("createdAt" to localDateTime))
         .build()
 
+
+    fun writer() = ItemWriter<Book> {
+        log.info("item size ${it.size}")
+    }
 }
