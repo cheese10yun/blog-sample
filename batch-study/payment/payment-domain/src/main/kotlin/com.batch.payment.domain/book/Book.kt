@@ -22,7 +22,7 @@ import org.springframework.data.jpa.repository.JpaRepository
     ]
 )
 class Book(
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     var status: BookStatus = BookStatus.AVAILABLE_RENTAL
 ) {

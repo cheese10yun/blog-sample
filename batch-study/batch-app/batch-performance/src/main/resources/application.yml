@@ -1,0 +1,44 @@
+spring:
+    main:
+        allow-bean-definition-overriding: true
+        web-application-type: NONE
+
+    jpa:
+        database: mysql
+        generate-ddl: true
+        hibernate:
+            ddl-auto: create
+        properties:
+#            hibernate.hbm2ddl.auto: create
+#            hibernate.generate_statistics: true
+            hibernate.jdbc.batch_size: 100
+            hibernate.order_inserts: true
+            hibernate.order_updates: true
+            hibernate.show_sql: true
+#            hibernate.ddl-auto: create
+            hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+
+    datasource:
+        url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=Asia/Seoul&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false
+        username: root
+        password:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        initialization-mode: never
+        hikari:
+            maximum-pool-size: 50
+            minimum-idle: 25
+            connection-timeout: 90000
+            max-lifetime: 90000
+        dbcp2:
+            test-on-borrow: true
+            validation-query: select 1
+    batch:
+        initialize-schema: always
+        job:
+            names: ${job.name:NONE}
+
+logging:
+    level:
+        ROOT: info
+#        org.springframework.batch: DEBUG
+#        org.hibernate.type.descriptor.sql.BasicBinder: trace

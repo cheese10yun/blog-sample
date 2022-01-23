@@ -35,7 +35,7 @@ class PerformanceJobConfiguration(
         jobDataSetUpListener: JobDataSetUpListener,
         performanceStep: Step
     ) =
-        jobBuilderFactory["readerPerformanceJob"]
+        jobBuilderFactory["performanceJob"]
             .incrementer(RunIdIncrementer())
             .listener(JobReportListener())
             .listener(jobDataSetUpListener)

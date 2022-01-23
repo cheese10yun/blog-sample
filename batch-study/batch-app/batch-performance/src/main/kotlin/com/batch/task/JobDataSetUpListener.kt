@@ -2,10 +2,8 @@ package com.batch.task
 
 import com.batch.payment.domain.book.BookStatus
 import com.batch.payment.domain.book.Books
-import com.batch.payment.domain.payment.Payment
 import com.batch.task.support.logger
-import java.math.BigDecimal
-import javax.sql.DataSource
+import java.time.LocalDateTime
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -20,7 +18,6 @@ class JobDataSetUpListener(
     val log by logger()
 
     override fun beforeJob(jobExecution: JobExecution) {
-
         transaction(
             exposedDataBase
         ) {
@@ -29,6 +26,8 @@ class JobDataSetUpListener(
                 shouldReturnGeneratedValues = false
             ) { _ ->
                 this[Books.status] = BookStatus.AVAILABLE_RENTAL
+                this[Books.createdAt] = LocalDateTime.now()
+                this[Books.updatedAt] = LocalDateTime.now()
             }
         }
     }
