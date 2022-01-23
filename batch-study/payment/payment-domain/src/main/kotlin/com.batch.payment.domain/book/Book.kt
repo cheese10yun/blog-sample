@@ -13,6 +13,7 @@ import javax.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 
 @Entity
 @Table(
@@ -52,3 +53,15 @@ enum class BookStatus(
 }
 
 interface BookRepository : JpaRepository<Book, Long>
+
+interface BookCustomRepository
+
+class AccountCustomRepositoryImpl :
+    BookCustomRepository,
+    QuerydslRepositorySupport(Book::class.java) {
+
+    fun asdasd() {
+
+
+    }
+}
