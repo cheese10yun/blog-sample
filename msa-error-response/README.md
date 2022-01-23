@@ -2,7 +2,7 @@
 
 [Spring Guide - Exception 전략](https://cheese10yun.github.io/spring-guide-exception/) 이전에 API Server에 Exception handling에 대해서 정리한 적 있습니다. 이번 포스팅에서는 여러 서버를 호출해서 예외가 발생하는 경우 Exception handling에 대한 포팅입니다.
 
-더 A API -> B API -> C API 호출을 진행하는 경우 C API에서 아래와 같은 예외가 발생하는 경우 A API에게 그대로 전달해야 하는 경우가 있습니다.
+A API -> B API -> C API 호출을 진행하는 경우 C API에서 아래와 같은 예외가 발생하는 경우 A API에게 그대로 전달해야 하는 경우가 있습니다.
 
 ```json
 {
