@@ -6,6 +6,7 @@ include(
     "batch-app:batch-test-bandwidth",
     "batch-app:batch-csv-writer",
     "batch-app:batch-bulk-insert",
+    "batch-app:batch-performance",
     "batch-app:batch-reader-performance"
 )
 
