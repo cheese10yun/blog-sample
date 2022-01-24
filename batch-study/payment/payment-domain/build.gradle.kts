@@ -26,5 +26,5 @@ dependencies {
     runtimeOnly("com.h2database:h2")
     runtimeOnly("mysql:mysql-connector-java")
 
-    kapt("com.querydsl:querydsl-apt:4.3.1:jpa")
+    kapt("com.querydsl:querydsl-apt:5.0.0:jpa")
 }

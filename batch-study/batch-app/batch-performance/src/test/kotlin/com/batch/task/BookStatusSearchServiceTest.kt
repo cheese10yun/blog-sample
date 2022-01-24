@@ -1,6 +1,5 @@
 package com.batch.task
 
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 internal class BookStatusSearchServiceTest{
@@ -9,7 +8,7 @@ internal class BookStatusSearchServiceTest{
     internal fun asdasdasd() {
         val toList = (1..20L).toList()
 
-        val latestBookStatus = BookStatusSearchService()
+        val latestBookStatus = BookStatusLatestService()
             .getLatestBookStatus(toList)
 
         for (bookStatus in latestBookStatus) {

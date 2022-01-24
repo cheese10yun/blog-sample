@@ -1,6 +1,8 @@
 package com.batch.task
 
 import com.batch.payment.domain.config.EnablePaymentDomain
+import com.querydsl.jpa.impl.JPAQueryFactory
+import javax.persistence.EntityManager
 import javax.sql.DataSource
 import org.jetbrains.exposed.sql.Database
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
@@ -26,4 +28,12 @@ class ExposedConfig(
     @Bean
     fun exposedDataBase() =
         Database.connect(dataSource)
+}
+
+@Component
+class QueryFactoryConfig {
+
+    @Bean
+    fun query(entityManager: EntityManager) =
+        JPAQueryFactory(entityManager)
 }

@@ -17,6 +17,6 @@ class ExposedConfig(
     fun exposedDataBase() = Database.connect(dataSource)
 
     @Bean
-    fun springTransactionManager(dataSource: DataSource): SpringTransactionManager =
+    fun exposedTransactionManager(dataSource: DataSource): SpringTransactionManager =
         SpringTransactionManager(dataSource)
 }

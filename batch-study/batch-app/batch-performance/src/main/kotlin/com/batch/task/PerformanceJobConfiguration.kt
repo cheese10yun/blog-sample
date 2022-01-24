@@ -45,12 +45,13 @@ class PerformanceJobConfiguration(
     @Bean
     @JobScope
     fun performanceStep(
-        jpaPagingItemReader: JpaPagingItemReader<Book>
+        jpaPagingItemReader: JpaPagingItemReader<Book>,
+        bookStatusLatestWriter: ItemWriter<Book>
     ) =
         stepBuilderFactory["readerPerformanceStep"]
             .chunk<Book, Book>(CHUNK_SIZE)
             .reader(jpaPagingItemReader)
-            .writer(writer())
+            .writer(bookStatusLatestWriter)
             .build()
 
     @Bean
@@ -66,7 +67,14 @@ class PerformanceJobConfiguration(
         .build()
 
 
-    fun writer() = ItemWriter<Book> {
-        log.info("item size ${it.size}")
+    @Bean
+    @StepScope
+    fun bookStatusLatestWriter(
+        bookStatusLatestService: BookStatusLatestService
+    ) = ItemWriter<Book> { books ->
+
+        val bookIds = books.mapNotNull { it.id }
+        bookStatusLatestService.getLatestBookStatus(bookIds)
+        log.info("item size ${books.size}")
     }
 }
