@@ -5,7 +5,9 @@ import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.ResponseResultOf
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.core.isSuccessful
+import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
+import com.github.kittinunf.fuel.jackson.responseObject
 import org.springframework.stereotype.Service
 
 
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Service
 class UserRegistrationService(
     private val objectMapper: ObjectMapper
 ) {
+
+    private val host: String = "http://localhost:8080"
     fun register(dto: UserRegistrationRequest) {
         val response = UserClient()
             .postUser(dto.name, dto.email)
@@ -35,11 +39,25 @@ class UserRegistrationService(
             throw ApiException(response.second!!)
         }
     }
+
+
 }
+
+data class User(
+    val id: Long,
+    val name: String
+)
 
 class UserClient(
     private val host: String = "http://localhost:8080"
 ) {
+
+    fun getUser(userId: Long) =
+        "$host/api/v1/users/$userId"
+            .httpGet()
+            .responseObject<User>()
+            .third.get()
+
 
     fun postUser(name: String, email: String): ResponseResultOf<ByteArray> =
         "$host/b-service"

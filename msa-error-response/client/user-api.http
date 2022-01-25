@@ -18,3 +18,10 @@ Content-Type: application/json
 }
 
 ###
+
+
+GET http://localhost:8080/api/v1/users/test
+Content-Type: application/json
+
+
+###
