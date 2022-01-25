@@ -3,7 +3,7 @@ package com.batch.task
 import com.batch.payment.domain.book.BookStatus
 
 import com.batch.payment.domain.book.QBook.book as qBook
-import com.batch.payment.domain.config.paymentTransactionManager
+import com.batch.payment.domain.book.Book
 import com.querydsl.jpa.impl.JPAQueryFactory
 import kotlin.random.Random
 import org.springframework.stereotype.Service
@@ -17,9 +17,10 @@ class BookStatusLatestService(
     /**
      * 외부 인프라를 통해서 가쟈옴
      * API를 조회 한다고 가정하고 대략 400ms 발생한다고 가정한다.
+     * update where in 으로 업데이트
      */
     @Transactional(transactionManager = "transactionManager")
-    fun getLatestBookStatus(bookId: List<Long>) {
+    fun updateInLatestBookStatus(bookId: List<Long>) {
 //        Thread.sleep(400)
         val bookStatusGroupBy = bookId.groupBy {
             getBookStatus()
@@ -48,6 +49,13 @@ class BookStatusLatestService(
                 .set(qBook.status, BookStatus.AVAILABLE_RENTAL)
                 .where(qBook.id.`in`(bookAvailableRentalStatusIds))
                 .execute()
+        }
+    }
+
+    @Transactional(transactionManager = "transactionManager")
+    fun updateLatestBookStatus(books: List<Book>) {
+        for (book in books) {
+            book.status = getBookStatus()
         }
     }
 

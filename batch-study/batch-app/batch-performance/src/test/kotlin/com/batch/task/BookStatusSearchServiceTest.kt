@@ -9,7 +9,7 @@ internal class BookStatusSearchServiceTest{
         val toList = (1..20L).toList()
 
         val latestBookStatus = BookStatusLatestService()
-            .getLatestBookStatus(toList)
+            .updateInLatestBookStatus(toList)
 
         for (bookStatus in latestBookStatus) {
             println(bookStatus)
