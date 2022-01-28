@@ -150,7 +150,7 @@ class BookReservationFindService(
 
 JPA Repositroy에서 `findById` 메서드에서 특별히 예외를 발생시키지는 않습니다. 조회가 끝난 이후에 예외 발생 여부는 서비스 레이어로 넘어가게 됩니다. 없는 경우 어떤 예외를 발생할지는 서비스 레이어에서 결정하며, 그 결정은 비즈니스 로직에 의해 결정하게 됩니다.
 
-![](http-jpa-layar.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/msa-error-response/docs/http-jpa-layar.png)
 
 우리는 각 계층 별로 책임과 역할을 나누고 본인의 계층에서는 본인의 책임과 역할을 진행하고 상대적으로 Low 레이어에서는 비즈니스에 대한 로직이 없고, High 레이어에서는 비즈니스에 대한 로직이 들어가게 됩니다.
 
@@ -158,14 +158,13 @@ JPA Repositroy에서 `findById` 메서드에서 특별히 예외를 발생시키
 ## JPA Repositroy == HTTP Client
 
 
-![](http-client-layar.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/msa-error-response/docs/http-client-layar.png)
 
 저는 JPA Repositroy와 HTTP Client에 대한 레이어가 동일하다고 생각합니다. 위에서 언급했듯이
 상대적으로 Low 레이어에서는 본인이 담당하는 Low 레벨에 대한 책임만을 수행하며, 비즈니스에 대한 책임은 서비스 레이어에서 진행하는 것이 바람직합니다.
 
 
 ```kotlin
-
 @Service
 class BookReservationService3(
     private val objectMapper: ObjectMapper
@@ -368,7 +367,4 @@ class BookClientRegistrationService() {
 }
 ```
 그런 경우에는 이렇게 HTTP Client를 한 번 더 감싸 BookClientRegistrationService라는 서비스 영역에서 비즈니스 요구사항에 맞는 책임을 부여하는 것이 적절해 보입니다. 하지만 단순하게 null, empty 검증 정도로 단순한 검증이라면 서비스 영역을 별도로 만들지는 않을 거 같습니다.
-
-## 결론
-
 
