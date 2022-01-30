@@ -16,12 +16,10 @@ class BookStatusLatestService(
 
     /**
      * 외부 인프라를 통해서 가쟈옴
-     * API를 조회 한다고 가정하고 대략 400ms 발생한다고 가정한다.
      * update where in 으로 업데이트
      */
     @Transactional(transactionManager = "transactionManager")
     fun updateInLatestBookStatus(bookId: List<Long>) {
-//        Thread.sleep(400)
         val bookStatusGroupBy = bookId.groupBy {
             getBookStatus()
         }
@@ -52,6 +50,9 @@ class BookStatusLatestService(
         }
     }
 
+    /**
+     * 영속성 컨텍스트 기반으로 단일 업데이트
+     */
     @Transactional(transactionManager = "transactionManager")
     fun updateLatestBookStatus(books: List<Book>) {
         for (book in books) {
@@ -59,11 +60,16 @@ class BookStatusLatestService(
         }
     }
 
-    private fun getBookStatus() =
-        when (Random.nextInt(0, 3)) {
+    /**
+     * 외부 API를 통해서 최신 상태를 가져온다고 가정 하고 400ms에 응답 시간이 걸린다고 가정한다.
+     */
+    private fun getBookStatus(): BookStatus {
+//        Thread.sleep(400)
+        return when (Random.nextInt(0, 3)) {
             1 -> BookStatus.AVAILABLE_RENTAL
             2 -> BookStatus.RENTAL
             else -> BookStatus.LOST
         }
+    }
 
 }
