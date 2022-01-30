@@ -205,7 +205,7 @@ class BookClient(
         "$host/api/v1/books/$bookId"
             .httpGet()
             .responseObject<Book>()
-// 비지니스 예외는 서비스 레이어에서 책임 진다.
+// 비즈니스 예외는 서비스 레이어에서 책임 진다.
 //            .third
 //            .onError {
 //                if (it.response.isSuccessful.not()) {
@@ -237,7 +237,7 @@ class BookClient(
                     }
                 """.trimIndent()
             )
-// 비지니스 예외는 서비스 레이어에서 책임 진다.
+// 비즈니스 예외는 서비스 레이어에서 책임 진다.
 //            .response()
 //            .third
 //            .onError {
@@ -326,7 +326,7 @@ class BookBulkStatusUpdate() {
 조회 또한 마찬가지입니다. 조회해서 없는 경우 새로 Book를 생성할 수 있고, 아니면 기본 Book을 응답할 수 있습니다. 이 영역은 비즈니스 영역이기 때문에 HTTP Client에서는 해당 부분을 관여하지 않는 것이 바람직합니다.
 
 
-## 비지니스 코드가 있는 경우 HTTP Client를 한 번더 감싸야 하는가?
+## 비즈니스 코드가 있는 경우 HTTP Client를 한 번더 감싸야 하는가?
 
 HTTP Client에서는 응답/요청에 대한 책임과 역할만을 부여한다면, 비즈니스 로직이 필요한 경우에는 반드시 서비스로 감싸야 하는가라는 의문이 생깁니다.
 
@@ -337,7 +337,7 @@ class BookClient {
         bookCode: String,
         publisher: String
     ){
-        // bookCode가 publisher에 맞게 적절하게 생생했는지 비지니스 유효성 검증이 필요...
+        // bookCode가 publisher에 맞게 적절하게 생생했는지 비즈니스 유효성 검증이 필요...
         "$host/api/v1/books"
             .httpPost()
             .header(Headers.CONTENT_TYPE, "application/json")
@@ -356,7 +356,7 @@ class BookClientRegistrationService() {
         bookCode: String,
         publisher: String
     ) {
-        // 필요한 비지니스 로직 진행 ...
+        // 필요한 비즈니스 로직 진행 ...
         // 로직 진행 이후 HTTP Client 호출
         bookClient.registerBook(
             bookName = bookName,

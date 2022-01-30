@@ -148,7 +148,7 @@ class BookClientRegistrationService() {
         bookCode: String,
         publisher: String
     ) {
-        // 필요한 비지니스 로직 진행 ...
+        // 필요한 비즈니스 로직 진행 ...
         // 로직 진행 이후 HTTP Client 호출
         bookClient.registerBook(
             bookName = bookName,
@@ -167,7 +167,7 @@ class BookClient(
         "$host/api/v1/books/$bookId"
             .httpGet()
             .responseObject<Book>()
-// 비지니스 예외는 서비스 레이어에서 책임 진다.
+// 비즈니스 예외는 서비스 레이어에서 책임 진다.
 //            .third
 //            .onError {
 //                if (it.response.isSuccessful.not()) {
@@ -200,7 +200,7 @@ class BookClient(
                     }
                 """.trimIndent()
             )
-// 비지니스 예외는 서비스 레이어에서 책임 진다.
+// 비즈니스 예외는 서비스 레이어에서 책임 진다.
 //            .response()
 //            .third
 //            .onError {
@@ -229,7 +229,7 @@ class BookClient(
         bookCode: String,
         publisher: String
     ) {
-        // bookCode가 publisher에 맞게 적절하게 생생했는지 비지니스 유효성 검증이 필요..
+        // bookCode가 publisher에 맞게 적절하게 생생했는지 비즈니스 유효성 검증이 필요..
 
         "$host/api/v1/books"
             .httpPost()
