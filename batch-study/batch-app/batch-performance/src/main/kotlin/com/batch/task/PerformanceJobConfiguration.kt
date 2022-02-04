@@ -4,9 +4,10 @@ import com.batch.payment.domain.book.Book
 import com.batch.payment.domain.book.QBook
 import com.batch.task.support.listener.JobReportListener
 import com.batch.task.support.logger
+import com.querydsl.jpa.impl.JPAQueryFactory
 import java.time.LocalDateTime
-import javax.persistence.EntityManager
 import javax.persistence.EntityManagerFactory
+import javax.persistence.Query
 import org.springframework.batch.core.Step
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope
@@ -18,6 +19,7 @@ import org.springframework.batch.item.database.JpaCursorItemReader
 import org.springframework.batch.item.database.JpaPagingItemReader
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
+import org.springframework.batch.item.database.orm.AbstractJpaQueryProvider
 import org.springframework.batch.item.querydsl.reader.QuerydslNoOffsetPagingItemReader
 import org.springframework.batch.item.querydsl.reader.expression.Expression
 import org.springframework.batch.item.querydsl.reader.options.QuerydslNoOffsetNumberOptions
@@ -33,7 +35,8 @@ private val localDateTime = LocalDateTime.of(2021, 6, 1, 0, 0, 0)
 @Configuration
 class PerformanceJobConfiguration(
     private val jobBuilderFactory: JobBuilderFactory,
-    private val stepBuilderFactory: StepBuilderFactory
+    private val stepBuilderFactory: StepBuilderFactory,
+    private val query: JPAQueryFactory
 ) {
     val log by logger()
 
@@ -63,8 +66,8 @@ class PerformanceJobConfiguration(
         stepBuilderFactory["readerPerformanceStep"]
             .chunk<Book, Book>(CHUNK_SIZE)
 //            .reader(jpaPagingItemReader)
-//            .reader(jpaCursorItemReader)
-            .reader(queryDslNoOffsetPagingReader)
+            .reader(jpaCursorItemReader)
+//            .reader(queryDslNoOffsetPagingReader)
 //            .writer(bookStatusLatestBulkWriter)
             .writer(bookStatusLatestWriter)
             .transactionManager(transactionManager)
@@ -86,12 +89,27 @@ class PerformanceJobConfiguration(
     @StepScope
     fun jpaCursorItemReader(
         entityManagerFactory: EntityManagerFactory
-    ) = JpaCursorItemReaderBuilder<Book>()
-        .name("jpaCursorItemReader")
-        .entityManagerFactory(entityManagerFactory)
-        .queryString("SELECT b FROM Book b where b.createdAt >= :createdAt ORDER BY b.createdAt DESC")
-        .parameterValues(mapOf("createdAt" to localDateTime))
-        .build()
+    ): JpaCursorItemReader<Book> {
+
+        val createQuery = query.selectFrom(QBook.book)
+            .where(QBook.book.createdAt.goe(localDateTime))
+            .orderBy(QBook.book.id.desc())
+            .createQuery()
+//            .createQuery()
+
+//        JpaCursorItemReaderBuilder.
+
+        val aaa = AAA(createQuery)
+
+
+        return JpaCursorItemReaderBuilder<Book>()
+            .name("jpaCursorItemReader")
+            .entityManagerFactory(entityManagerFactory)
+            .queryProvider(aaa)
+//            .queryString("SELECT b FROM Book b where b.createdAt >= :createdAt ORDER BY b.createdAt DESC")
+//            .parameterValues(mapOf("createdAt" to localDateTime))
+            .build()
+    }
 
 
     @Bean
@@ -132,6 +150,19 @@ class PerformanceJobConfiguration(
         bookStatusLatestService.updateLatestBookStatus(books)
         log.info("item size ${books.size}")
     }
+}
 
+class AAA(
+    private val createQuery: Query
+) : AbstractJpaQueryProvider() {
+    override fun createQuery(): Query {
+//        val manager = entityManager
+
+        return createQuery
+
+    }
+
+    override fun afterPropertiesSet() {
+    }
 
 }
