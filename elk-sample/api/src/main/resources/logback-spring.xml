@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-  <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
-  <appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-    <destination>124.80.103.104:5044</destination>
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>info</level>
-    </filter>
-    <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
-  </appender>
+    <appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>192.168.0.10:5044</destination>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>info</level>
+        </filter>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
 
-  <root level="info">
-    <appender-ref ref="stash"/>
-  </root>
+    <root level="info">
+        <appender-ref ref="stash"/>
+    </root>
 
 </configuration>

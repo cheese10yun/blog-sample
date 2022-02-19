@@ -9,7 +9,7 @@ spring:
 
 
     jpa:
-        database: mysql
+        database: h2
         properties:
             hibernate.hbm2ddl.auto: create
             #            hibernate.generate_statistics: true
@@ -18,13 +18,13 @@ spring:
             #            hibernate.order_updates: true
             hibernate.show_sql: true
             hibernate.ddl-auto: create
-            hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+#            hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
 
-    datasource:
-        url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
-        username: root
-        password:
-        driver-class-name: com.mysql.cj.jdbc.Driver
+#    datasource:
+#        url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
+#        username: root
+#        password:
+#        driver-class-name: com.mysql.cj.jdbc.Driver
 
 logging:
     level:
