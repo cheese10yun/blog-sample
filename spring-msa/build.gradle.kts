@@ -25,7 +25,7 @@ allprojects{
     }
 }
 
-extra["springCloudVersion"] = "2020.0.3"
+extra["springCloudVersion"] = "2021.0.1"
 
 subprojects {
     apply(plugin = "java")
@@ -91,14 +91,14 @@ subprojects {
 
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=compatibility")
-            jvmTarget = "1.8"
+            jvmTarget = "11"
         }
     }
 
     tasks.compileTestKotlin {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=compatibility")
-            jvmTarget = "1.8"
+            jvmTarget = "11"
         }
     }
 

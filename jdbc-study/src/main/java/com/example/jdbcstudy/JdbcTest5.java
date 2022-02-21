@@ -17,6 +17,7 @@ public class JdbcTest5 {
             connection = (new JdbcTest()).getConnection();
             connection.setAutoCommit(false); // (1)
             statement = connection.createStatement();
+            statement.execute("BEGIN");
 
             statement.executeUpdate("UPDATE payment SET amount = 1.00 WHERE id = 1;");
             statement.executeUpdate("UPDATE payment SET amount = 1.00 WHERE id = 2;");
@@ -40,3 +41,35 @@ public class JdbcTest5 {
         return DriverManager.getConnection(url, user, password);
     }
 }
+
+
+//class Foo {
+//    fun doSomething() {
+//        try {
+//            val connection = getConntetion()...
+//            val statement = connection.createStatement()...
+//            // 트랜잭션 1 새로 시작
+//            statement.execute("BEGIN")
+//            statement.executeUpdate("UPDATE payment SET amount = 1.00 WHERE id = 1;");
+//
+//            try {
+//                // 트랜잭션 1 진행 일시 정지
+//                val connection = getConntetion()...
+//                val statement = connction.createStatement()...
+//                // 트랜잭션 2 트랜잭션 새로 시작
+//                statement.execute("BEGIN")
+//                statement.executeUpdate("UPDATE member SET username = 'test' WHERE id = 1;");
+//                // 트랜잭션 2 종료
+//                connection.commit()
+//
+//            }catch (e: Exception){
+//                // 트랜잭션 2 예외발생시 롤백, 트랜잭션 1은 try catch로 분리되어 있기 떄문에 영향 없음
+//                connection.rollback()
+//            }
+//            // 트랜잭션 1 종료
+//            connection.commit();
+//        } catch (e: Exception) {
+//            connection.rollback()
+//        }
+//    }
+//}
