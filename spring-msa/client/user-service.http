@@ -9,6 +9,18 @@ Content-Type: application/json
 
 
 ###
+
+POST {{gateway-server}}/user-service/api/v1/users
+Content-Type: application/json
+
+{
+  "email": "asd@asd.com",
+  "name": "asd",
+  "password": "asdasd"
+}
+
+
+###
 GET {{gateway-server}}/order-service/actuator/health
 Content-Type: application/json
 
