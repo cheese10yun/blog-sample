@@ -1,4 +1,4 @@
-package com.example.msaerrorresponse.`1`
+package com.example.msaerrorresponse
 
 import com.example.msaerrorresponse.ErrorResponse
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -10,11 +10,15 @@ import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.fuel.httpPut
 import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.kittinunf.result.onError
+import org.hibernate.annotations.GeneratorType
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.Table
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.stereotype.Service
 
 @Service
 class BookReservationService() {
@@ -124,12 +128,15 @@ data class BookReservation(
     val userId: Long
 ) {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 }
 
 interface BookReservationRepository : JpaRepository<BookReservation, Long> {
 
 }
+
+
 
 @Service
 class BookReservationFindService(
