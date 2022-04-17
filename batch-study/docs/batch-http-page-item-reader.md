@@ -212,7 +212,7 @@ data class BookReservation(
 ```
 Local API를 호출하여 로그를 찍는 간단한 애플리케이션입니다.
 
-![](img/http-reader-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/http-reader-1.png)
 
 1~20 개의 모든 데이터를 조회하고 로그를 찍는 것을 확인할 수 있습니다.
 
