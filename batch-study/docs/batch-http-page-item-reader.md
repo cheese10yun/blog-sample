@@ -9,11 +9,34 @@ Spring Batch로 애플리케이션을 작성하는 경우 내부 데이터가 �
 
 * 읽기(read) : 데이터 저장소(일반적으로 데이터베이스)에서 특정 데이터 레코드를 읽습니다.
 * 처리(processing) : 원하는 방식으로 데이터 가공/처리합니다.
-* 쓰기(write) : 수정된 데이터를 다시 저장소(데이터베이스)에 저장합니다.
+* 쓰기(write) : 수정된 데이터를 다시 저장소에 저장합니다.
 
 ![](https://raw.githubusercontent.com/cheese10yun/TIL/master/assets/chun-process.png)
 
-Item Reader에서 1개씩 읽어서 Item Processor에서 데이터 가공을 진행합니다. 해당 반복을 청크 사이즈만큼 진행하며 그 사이즈를 만족하면 ItemWriter로 해당 리스트를 넘겨 이후 Writer를 진행합니다.
+
+* Reader에서 데이터를 하나 읽어 옵니다.
+* 읽어온 데이터를 Processor에서 가공합니다.
+* 가공된 데이터들을 별도의 공간에 모은뒤, Chunk 단위만큼 쌓이게 되면 Writer에 전달하고 Writer는 일괄 저장합니다.
+
+**Reader와 Processor에서는 1건씩 다뤄지고, Writer에선 Chunk 단위로 처리된다는 것이 중요합니다.**
+
+Chunk 지향 처리를 Java 코드로 표현하면 아래처럼 될 것 같습니다.
+
+```java
+public void Chunk_처리_방법(int chunkSize, int totalSize){
+    for (int i= 0; i < totalSize; i = i + chunkSize){
+        List items = new ArrayList();
+        for(int j = 0; j < chunkSize; j++){
+            Object item = itemReader.read();
+            Object processedItem = itemProcessor.process(item);
+            items.add(processedItem);
+        }
+        itemWriter.write(items);
+    }
+}
+```
+
+**즉 chunkSize 별로 묶는 다는 것은 total_size에서 chunk_size 만큼 읽어 자장한다는 의미입니다.**
 
 ### HttpPageItemReader
 
@@ -73,7 +96,7 @@ open class HttpPageItemReader<T : Any>(
     }
 
     // (2)
-    override fun doOpen() { 
+    override fun doOpen() {
         log.info("HttpPageItemReader doOpen page: $page, size: $size")
     }
 
