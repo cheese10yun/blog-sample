@@ -43,10 +43,10 @@ Page | size | URL | Content
 -----|------|-----|--------
 0 | 10 | http://localhost:8080/api/members?page=0&size=10 | 10 | 
 1 | 10 | http://localhost:8080/api/members?page=1&size=10 | 10 | 
-2 | 10 | http://localhost:8080/api/members?page=2&size=10 | 0 | 
+2 | 10 | http://localhost:8080/api/members?page=2&size=10 | 3 | 
+3 | 10 | http://localhost:8080/api/members?page=2&size=10 | 0 | 
 
-
-실제 값은 rows 20개가 저장되어 있으며 size를 10을 기준으로 1페이지까지 읽으면 모든 데이터를 읽으며 2페이지부터는 더 이상 데이터가 없기 때문에 `content`는 빈 배열로 응답을 받게 됩니다. 즉 HttpPageItemReader는 `content`가 빈 배열이 나올 때까지 page를 1식 증가시키며 다음 페이지를 계속 읽어 나가는 형태로 구성됩니다.
+실제 데이터는 rows 23개가 저장되어 있다면 size를 10을 기준으로 2페이지 까지 읽으면 모든 데이터를 다 읽게 됩니다. 2페이지에서는 남은 데이터 rows 2개가 응답되며 3페이지를 조회하면 빈 응답 페이지가 넘어오게 됩니다. 즉 HttpPageItemReader는 `content`가 빈 배열이 나올 때까지 page를 1식 증가시키며 다음 페이지를 계속 읽어 나가는 형태로 구성됩니다.
 
 ## Code
 
@@ -143,12 +143,13 @@ open class HttpPageItemReader<T : Any>(
     }
 }
 ```
-* (1), (2) 커넥션을 맺거나 자원을 할당하고 해제하는 케이스가 없기 때문에 단 순리 로그만 작성
+* (1), (2) 커넥션을 맺거나 자원을 할당하고 해제하는 케이스가 없기 때문에 단순히 로그만 작성
 * (3) 1건식 읽어서 처리합니다. 해당 1건을 읽어 처리한 부분은 item processor로 넘어갈 수 있게 합니다.
 * (4) 실제로 HTTP 통신을 진행합니다.
 * (5) page, size 외 쿼리 파라미터를 처리합니다.
 * (6) HTTP Response Body를 객체로 시리얼라이즈 작업을 진행합니다. 이때 예외 처리를 진행하게 합니다.
 * (7) content 리스트 시리얼라이즈 진행
+
 ```json
 {
   "content": [
@@ -186,7 +187,7 @@ class HttpPageReaderJobConfiguration(
     ) = HttpPageItemReader(
         url = "http://localhost:8080/api/members", // API 주소 
         size = 10, // 응답받을 content size로 대부분 chunk size와 동일하게 구성
-        page = 0, // page start 값으로 대부분 0 붙터 시작
+        page = 0, // page start 값으로 대부분 0 부터 시작
         parameters = listOf(
             "age" to 10,
             "email" to "1232@asd.com"
