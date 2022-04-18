@@ -46,7 +46,7 @@ Page | size | URL | Content
 2 | 10 | http://localhost:8080/api/members?page=2&size=10 | 3 | 
 3 | 10 | http://localhost:8080/api/members?page=2&size=10 | 0 | 
 
-실제 데이터는 rows 23개가 저장되어 있다면 size를 10을 기준으로 2페이지 까지 읽으면 모든 데이터를 다 읽게 됩니다. 2페이지에서는 남은 데이터 rows 2개가 응답되며 3페이지를 조회하면 빈 응답 페이지가 넘어오게 됩니다. 즉 HttpPageItemReader는 `content`가 빈 배열이 나올 때까지 page를 1식 증가시키며 다음 페이지를 계속 읽어 나가는 형태로 구성됩니다.
+실제 데이터는 rows 23개가 저장되어 있다면 size를 10을 기준으로 2페이지 까지 읽으면 모든 데이터를 다 읽게 됩니다. 2페이지에서는 남은 데이터 rows 2개가 응답되며 3페이지를 조회하면 빈 응답 페이지가 넘어오게 됩니다. 즉 HttpPageItemReader는 `content`가 빈 배열이 나올 때까지 page를 1식 증가 시키며 다음 페이지를 계속 읽어 나가는 형태로 구성됩니다.
 
 ## Code
 
