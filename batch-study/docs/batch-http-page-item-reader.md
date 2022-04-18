@@ -23,15 +23,17 @@ Spring Batch로 애플리케이션을 작성하는 경우 내부 데이터가 �
 Chunk 지향 처리를 Java 코드로 표현하면 아래처럼 될 것 같습니다.
 
 ```java
-public void Chunk_처리_방법(int chunkSize, int totalSize){
-    for (int i= 0; i < totalSize; i = i + chunkSize){
-        List items = new ArrayList();
-        for(int j = 0; j < chunkSize; j++){
-            Object item = itemReader.read();
-            Object processedItem = itemProcessor.process(item);
-            items.add(processedItem);
+fun Chunk_처리_방법(chunkSize: Int, totalSize: Int) {
+    var i = 0
+    while (i < totalSize) {
+        val items: MutableList<*> = ArrayList<Any?>()
+        for (j in 0 until chunkSize) {
+            val item: Any = itemReader.read()
+            val processedItem: Any = itemProcessor.process(item)
+            items.add(processedItem)
         }
-        itemWriter.write(items);
+        itemWriter.write(items)
+        i = i + chunkSize
     }
 }
 ```
@@ -96,7 +98,7 @@ open class HttpPageItemReader<T : Any>(
     }
 
     // (2)
-    override fun doOpen() {
+    override fun doOpen() { 
         log.info("HttpPageItemReader doOpen page: $page, size: $size")
     }
 
@@ -243,3 +245,4 @@ Local API를 호출하여 로그를 찍는 간단한 애플리케이션입니다
 
 ## 참고
 * [처음 배우는 스프링 부트 2](https://kyobobook.co.kr/product/detailViewKor.laf?mallGb=KOR&ejkGb=KOR&barcode=9791162241264&orderClick=JAj)
+* [Spring Batch 가이드 - Chunk 지향 처리](https://jojoldu.tistory.com/331)
