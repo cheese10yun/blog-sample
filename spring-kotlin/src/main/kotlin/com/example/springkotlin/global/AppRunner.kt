@@ -44,7 +44,7 @@ class AppRunner(val transactionRepository: TransactionRepository) : ApplicationR
         return when (Random().nextInt(4)) {
             1 -> PaymentMethodType.CARD
             2 -> PaymentMethodType.CASH
-            3 -> PaymentMethodType.KAKAOPAY
+            3 -> PaymentMethodType.BANKPAY
             else -> PaymentMethodType.TOSS
         }
     }

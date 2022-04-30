@@ -6,7 +6,7 @@ enum class PaymentMethodType {
 
     CARD,
     CASH,
-    KAKAOPAY,
+    BANKPAY,
     TOSS
     ;
 
@@ -14,7 +14,7 @@ enum class PaymentMethodType {
         return when (Random().nextInt(4)) {
             1 -> CARD
             2 -> CASH
-            3 -> KAKAOPAY
+            3 -> BANKPAY
             else -> TOSS
         }
     }
