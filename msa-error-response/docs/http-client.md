@@ -21,43 +21,43 @@ class BookReservationService() {
 
     fun doReservation(bookId: Long, userId: Long) {
         val book = "$BOOK_SERVICE_HOST/api/v1/books/$bookId"
-            .httpGet()
-            .responseObject<Book>()
-            .third
-            .onError {
-                if (it.response.isSuccessful.not()) {
-                    throw IllegalArgumentException("bookId: $bookId not found")
+                .httpGet()
+                .responseObject<Book>()
+                .third
+                .onError {
+                    if (it.response.isSuccessful.not()) {
+                        throw IllegalArgumentException("bookId: $bookId not found")
+                    }
                 }
-            }
-            .get()
+                .get()
 
         val bookReservation = BookReservation(
-            bookId = book.id,
-            bookStatus = book.status,
-            userId = userId
+                bookId = book.id,
+                bookStatus = book.status,
+                userId = userId
         )
         // bookReservationRepository.save(bookReservation) JPA를 사용한다고 가정하고 책 예약 반영
 
 
         // Book Service API에 책 상태 업데이트
         "$BOOK_SERVICE_HOST/api/v1/books"
-            .httpPost()
-            .header(Headers.CONTENT_TYPE, "application/json")
-            .jsonBody(
-                """
+                .httpPost()
+                .header(Headers.CONTENT_TYPE, "application/json")
+                .jsonBody(
+                        """
                     {
                       "status": "RESERVATION"
                     }
                 """.trimIndent()
-            )
-            .response()
-            .third
-            .onError {
-                if (it.response.isSuccessful.not()) {
-                    throw IllegalArgumentException("Book Status Failed")
+                )
+                .response()
+                .third
+                .onError {
+                    if (it.response.isSuccessful.not()) {
+                        throw IllegalArgumentException("Book Status Failed")
+                    }
                 }
-            }
-            .get()
+                .get()
 
     }
 }
@@ -78,57 +78,57 @@ class BookReservationService2() {
 
     fun doReservation(bookId: Long, userId: Long) {
 
-        val boo = bookClient.getBook(bookId)
+        val book = bookClient.getBook(bookId)
 
         val bookReservation = BookReservation(
-            bookId = boo.id,
-            bookStatus = boo.status,
-            userId = userId
+                bookId = boo.id,
+                bookStatus = boo.status,
+                userId = userId
         )
         // bookReservationRepository.save(bookReservation) JPA를 사용한다고 가정하고 책 예약 반영
-        
+
         // Book Service API에 책 상태 업데이트
         bookClient.updateBookStatus(status = "RESERVATION")
     }
 }
 
 class BookClient(
-    private val host: String = "http://book-service.copm"
+        private val host: String = "http://book-service.copm"
 ) {
 
     fun getBook(bookId: Long) =
-        "$host/api/v1/books/$bookId"
-            .httpGet()
-            .responseObject<Book>()
-            .third
-            .onError {
-                if (it.response.isSuccessful.not()) {
-                    throw IllegalArgumentException("bookId: $bookId not found")
-                }
-            }
-            .get()
+            "$host/api/v1/books/$bookId"
+                    .httpGet()
+                    .responseObject<Book>()
+                    .third
+                    .onError {
+                        if (it.response.isSuccessful.not()) {
+                            throw IllegalArgumentException("bookId: $bookId not found")
+                        }
+                    }
+                    .get()
 
     fun updateBookStatus(
-        status: String
+            status: String
     ) =
-        "$host/api/v1/books"
-            .httpPost()
-            .header(Headers.CONTENT_TYPE, "application/json")
-            .jsonBody(
-                """
+            "$host/api/v1/books"
+                    .httpPost()
+                    .header(Headers.CONTENT_TYPE, "application/json")
+                    .jsonBody(
+                            """
                     {
                       "status": "$status"
                     }
                 """.trimIndent()
-            )
-            .response()
-            .third
-            .onError {
-                if (it.response.isSuccessful.not()) {
-                    throw IllegalArgumentException("Book Status Failed")
-                }
-            }
-            .get()
+                    )
+                    .response()
+                    .third
+                    .onError {
+                        if (it.response.isSuccessful.not()) {
+                            throw IllegalArgumentException("Book Status Failed")
+                        }
+                    }
+                    .get()
 }
 ```
 
@@ -197,7 +197,7 @@ class BookReservationService3(
 
 
 class BookClient(
-    private val host: String = "http://book-service.copm",
+    private val host: String = "http://book-service.com",
     private val objectMapper: ObjectMapper
 ) {
 
@@ -260,8 +260,7 @@ class BookClient(
                     }
                 )
             }
-}
-
+    }
 }
 ```
 
@@ -367,4 +366,3 @@ class BookClientRegistrationService() {
 }
 ```
 그런 경우에는 이렇게 HTTP Client를 한 번 더 감싸 BookClientRegistrationService라는 서비스 영역에서 비즈니스 요구사항에 맞는 책임을 부여하는 것이 적절해 보입니다. 하지만 단순하게 null, empty 검증 정도로 단순한 검증이라면 서비스 영역을 별도로 만들지는 않을 거 같습니다.
-
