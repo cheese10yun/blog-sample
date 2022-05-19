@@ -1,0 +1,23 @@
+GET http://localhost:5555/sleuth-service/a-service/test
+Content-Type: application/json
+
+te: gzip, deflate; q=0.5, user-agent: Java/11.0.13, host: localhost:8080, accept: text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2, connection: keep-alive
+
+
+
+content-type: application/json,
+user-agent: Apache-HttpClient/4.5.13 (Java/11.0.14.1),
+accept-encoding: gzip, deflate,
+forwarded: proto=http;host="localhost:5555";for="127.0.0.1:60059",
+x-forwarded-for: 127.0.0.1,
+x-forwarded-proto: http,
+x-forwarded-prefix: /sleuth-service,
+x-forwarded-port: 5555,
+x-forwarded-host: localhost:5555,
+host: localhost:8080,
+accept: */*,
+x-b3-traceid: 3fdd8e5fb8e7cda3,
+x-b3-spanid: 5ac962abd21980b4,
+x-b3-parentspanid: 3fdd8e5fb8e7cda3,
+x-b3-sampled: 1,
+content-length: 0

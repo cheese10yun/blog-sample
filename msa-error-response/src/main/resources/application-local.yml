@@ -1,0 +1,7 @@
+
+
+logging:
+    level:
+        ROOT: info
+server:
+    port: 8181

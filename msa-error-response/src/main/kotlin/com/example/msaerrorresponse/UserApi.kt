@@ -28,14 +28,33 @@ class UserApi {
 @RequestMapping("/api/v1/users")
 class UserApi2(
     private val userRegistrationService: UserRegistrationService,
-    private val tracer: Tracer
+    private val tracer: Tracer,
+    private val userClient: UserClient
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @GetMapping("/{userId}")
     fun register(
         @PathVariable userId: Long
-    ) = User(id = userId, name = "test")
+    ): User {
+        val currentSpan = tracer.currentSpan()
+        val nextSpan = tracer.nextSpan()
+        val span = currentSpan ?: nextSpan
+        val context = span.context()
+
+        log.info("=======register======")
+        log.error("current traceId: ${currentSpan?.context()?.traceId()}")
+        log.error("current spanId: ${currentSpan?.context()?.spanId()}")
+        log.error("current parentId: ${currentSpan?.context()?.parentId()}")
+        log.error("current sampled: ${currentSpan?.context()?.sampled()}")
+
+        log.error("next traceId: ${nextSpan.context().traceId()}")
+        log.error("next spanId: ${nextSpan.context().spanId()}")
+        log.error("next parentId: ${nextSpan.context().parentId()}")
+        log.error("next sampled: ${nextSpan.context().sampled()}")
+        log.info("=======register======")
+        return User(id = userId, name = "test")
+    }
 
 
     @GetMapping("/test")
@@ -43,7 +62,7 @@ class UserApi2(
 
         val traceId = (tracer.currentSpan() ?: tracer.nextSpan()).context().traceId()
         log.error("traceId: $traceId")
-        return UserClient()
+        return userClient
                 .getUser(1)
     }
 
