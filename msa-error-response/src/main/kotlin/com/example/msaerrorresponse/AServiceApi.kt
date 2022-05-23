@@ -20,13 +20,9 @@ class AServiceApi(
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-
-
-
     @PostMapping
     fun aService(@RequestBody dto: UserRegistrationRequest) =
         userRegistrationService.register(dto)
-
 
     @GetMapping("/test")
     fun test(){
@@ -35,12 +31,8 @@ class AServiceApi(
         val span = currentSpan ?: nextSpan
         val context = span.context()
 
-
-
         userClient.getUser(1)
     }
-
-
 }
 
 data class UserRegistrationRequest(
