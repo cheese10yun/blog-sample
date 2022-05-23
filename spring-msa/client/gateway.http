@@ -1,4 +1,4 @@
-GET {{gateway-server}}/order/orders?page=0&size=5
+GET {{gateway-server}}/order-service/api/v1/orders
 Accept: application/json
 
 ###

@@ -10,6 +10,13 @@ Content-Type: application/json
 
 ###
 
+
+GET http://172.20.10.5:8787/api/v1/users/997a5a8b-80e4-4a5d-b5d1-14ee22be18da/orders?faultPercentage=0&delay=0
+Content-Type: application/json
+
+
+###
+
 POST {{gateway-server}}/user-service/api/v1/users
 Content-Type: application/json
 
@@ -18,7 +25,6 @@ Content-Type: application/json
   "name": "asd",
   "password": "asdasd"
 }
-
 
 ###
 GET {{gateway-server}}/order-service/actuator/health
