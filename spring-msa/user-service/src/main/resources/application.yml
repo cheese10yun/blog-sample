@@ -1,3 +1,5 @@
+
+
 server:
     port: 8787
 spring:
@@ -33,6 +35,10 @@ eureka:
 feign:
     metrics:
         enabled: true
+    client:
+        config:
+            default:
+                loggerLevel: full
 
 resilience4j:
     bulkhead:

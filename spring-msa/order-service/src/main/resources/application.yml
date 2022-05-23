@@ -110,3 +110,11 @@ logging:
 
 message:
     profile: "default local"
+
+feign:
+    metrics:
+        enabled: true
+    client:
+        config:
+            default:
+                loggerLevel: headers
