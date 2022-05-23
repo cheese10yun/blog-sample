@@ -20,29 +20,29 @@ class UserRegistrationService(
 ) {
 
 
-    private val host: String = "http://localhost:8080"
-    fun register(dto: UserRegistrationRequest) {
-        val response = userClient
-            .postUser(dto.name, dto.email)
-            .run {
-                Pair(
-                    second.isSuccessful,
-                    when {
-                        second.isSuccessful -> null
-                        else -> {
-                            objectMapper.readValue(
-                                String(second.body().toByteArray()),
-                                ErrorResponse::class.java
-                            )
-                        }
-                    }
-                )
-            }
-
-        if (response.first.not()) {
-            throw ApiException(response.second!!)
-        }
-    }
+//    private val host: String = "http://localhost:8080"
+//    fun register(dto: UserRegistrationRequest) {
+//        val response = userClient
+//            .postUser(dto.name, dto.email)
+//            .run {
+//                Pair(
+//                    second.isSuccessful,
+//                    when {
+//                        second.isSuccessful -> null
+//                        else -> {
+//                            objectMapper.readValue(
+//                                String(second.body().toByteArray()),
+//                                ErrorResponse::class.java
+//                            )
+//                        }
+//                    }
+//                )
+//            }
+//
+//        if (response.first.not()) {
+//            throw ApiException(response.second!!)
+//        }
+//    }
 
 
 }
@@ -82,7 +82,7 @@ class UserClient(
 
         return "$host/api/v1/users/$userId"
                 .httpGet()
-                .header(Headers.CONTENT_TYPE, "application/json")
+                .header("Content-Type", "application/json")
                 .header("x-b3-traceid", context.traceId())
                 .header("x-b3-spanid", nextSpan.context().spanId())
                 .header("x-b3-parentspanid", context.parentId()?: "null")
@@ -94,7 +94,7 @@ class UserClient(
     fun postUser(name: String, email: String): ResponseResultOf<ByteArray> =
         "$host/b-service"
             .httpPost()
-            .header(Headers.CONTENT_TYPE, "application/json")
+            .header("Content-Type", "application/json")
             .jsonBody(
                 """
                     {

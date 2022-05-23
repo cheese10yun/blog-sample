@@ -1,8 +1,6 @@
 package com.example.msaerrorresponse
 
-import com.example.msaerrorresponse.ErrorResponse
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.core.isSuccessful
 import com.github.kittinunf.fuel.httpGet
@@ -10,7 +8,6 @@ import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.fuel.httpPut
 import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.kittinunf.result.onError
-import org.hibernate.annotations.GeneratorType
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
@@ -47,7 +44,7 @@ class BookReservationService() {
         // Book Service API에 책 상태 업데이트
         "$BOOK_SERVICE_HOST/api/v1/books"
             .httpPost()
-            .header(Headers.CONTENT_TYPE, "application/json")
+            .header("Content-Type", "application/json")
             .jsonBody(
                 """
                     {
@@ -199,7 +196,7 @@ class BookClient(
     ) =
         "$host/api/v1/books/$bookId"
             .httpPut()
-            .header(Headers.CONTENT_TYPE, "application/json")
+            .header("Content-Type", "application/json")
             .jsonBody(
                 """
                     {
@@ -240,7 +237,7 @@ class BookClient(
 
         "$host/api/v1/books"
             .httpPost()
-            .header(Headers.CONTENT_TYPE, "application/json")
+            .header("Content-Type", "application/json")
             .jsonBody("...")
     }
 }

@@ -3,10 +3,10 @@
 ## https://github.com/elastic/logstash/blob/master/docker/data/logstash/config/logstash-full.yml
 #
 http.host: "0.0.0.0"
-xpack.monitoring.elasticsearch.hosts: [ "http://es01:9200","http://es02:9201","http://es03:9202" ]
+xpack.monitoring.elasticsearch.hosts: [ "http://192.168.0.10:9200" ]
 
 ## X-Pack security credentials
 #
 xpack.monitoring.enabled: true
-xpack.monitoring.elasticsearch.username: elastic
-xpack.monitoring.elasticsearch.password: changeme
+#xpack.monitoring.elasticsearch.username: elastic
+#xpack.monitoring.elasticsearch.password: changeme
