@@ -24,6 +24,13 @@ spring:
 #                        postLogger: true
 
             routes:
+                -   id: sleuth-service
+                    uri: http://localhost:8080
+                    predicates:
+                        - Path=/sleuth-service/**
+                    filters:
+                        - RewritePath=/sleuth-service/(?<path>.*),/$\{path}
+
                 -   id: order-service
                     uri: lb://order-service
                     predicates:
