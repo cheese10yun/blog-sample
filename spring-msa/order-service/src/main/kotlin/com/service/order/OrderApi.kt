@@ -5,6 +5,7 @@ import java.util.UUID
 import kotlin.random.Random
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.context.config.annotation.RefreshScope
+import org.springframework.cloud.sleuth.Tracer
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -21,10 +22,11 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/orders")
 @RefreshScope
 class OrderApi(
-    private val orderRepository: OrderRepository,
-    @Value("\${message.profile}") val profile: String,
-    private val orderRegistrationService: OrderRegistrationService,
-    private val orderFindService: OrderFindService
+        private val orderRepository: OrderRepository,
+        @Value("\${message.profile}") val profile: String,
+        private val orderRegistrationService: OrderRegistrationService,
+        private val orderFindService: OrderFindService,
+        private val tracer: Tracer
 ) {
     val log by logger()
 
@@ -59,6 +61,23 @@ class OrderApi(
         @RequestParam(value = "delay", defaultValue = "0") delay: Int = 0,
         @RequestParam(value = "faultPercentage", defaultValue = "0") faultPercentage: Int = 0
     ): List<OrderResponse> {
+
+        val currentSpan = tracer.currentSpan()
+        val nextSpan = tracer.nextSpan()
+        val span = currentSpan ?: nextSpan
+        val context = span.context()
+
+        log.info("=======register======")
+        log.error("current traceId: ${currentSpan?.context()?.traceId()}")
+        log.error("current spanId: ${currentSpan?.context()?.spanId()}")
+        log.error("current parentId: ${currentSpan?.context()?.parentId()}")
+        log.error("current sampled: ${currentSpan?.context()?.sampled()}")
+
+        log.error("next traceId: ${nextSpan.context().traceId()}")
+        log.error("next spanId: ${nextSpan.context().spanId()}")
+        log.error("next parentId: ${nextSpan.context().parentId()}")
+        log.error("next sampled: ${nextSpan.context().sampled()}")
+        log.info("=======register======")
 
         return orderFindService.findOderByUserId(
             userId = userId,

@@ -11,7 +11,10 @@ import org.springframework.boot.runApplication
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient
 import org.springframework.cloud.context.config.annotation.RefreshScope
 import org.springframework.cloud.openfeign.EnableFeignClients
+import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
+import org.springframework.web.client.RestTemplate
+
 
 fun <A : Any> A.logger(): Lazy<Logger> = lazy { LoggerFactory.getLogger(this.javaClass) }
 
@@ -29,6 +32,12 @@ fun main(args: Array<String>) {
 class AppRunner(
     private val userRepository: UserRepository
 ) : ApplicationRunner {
+
+    @Bean
+    fun restTemplate(): RestTemplate {
+        return RestTemplate()
+    }
+
     override fun run(args: ApplicationArguments) {
         userRepository.saveAllAndFlush(
             listOf(
@@ -47,5 +56,4 @@ class AppRunner(
             )
         )
     }
-
 }
