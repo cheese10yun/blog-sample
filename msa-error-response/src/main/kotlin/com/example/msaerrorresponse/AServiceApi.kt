@@ -10,12 +10,29 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/a-service")
-class AServiceApi {
+class AServiceApi(
+    private val tracer: Tracer
+) {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
     @GetMapping
     fun a() {
+        val currentSpan = tracer.currentSpan()
+        val nextSpan = tracer.nextSpan()
+        val span = currentSpan ?: nextSpan
+
+        log.info("=======a-service======")
+        log.error("current traceId: ${currentSpan?.context()?.traceId()}")
+        log.error("current spanId: ${currentSpan?.context()?.spanId()}")
+        log.error("current parentId: ${currentSpan?.context()?.parentId()}")
+        log.error("current sampled: ${currentSpan?.context()?.sampled()}")
+
+        log.error("next traceId: ${nextSpan.context().traceId()}")
+        log.error("next spanId: ${nextSpan.context().spanId()}")
+        log.error("next parentId: ${nextSpan.context().parentId()}")
+        log.error("next sampled: ${nextSpan.context().sampled()}")
+        log.info("=======a-service======")
 
         val header = "http://localhost:8686/b-service"
             .httpGet()

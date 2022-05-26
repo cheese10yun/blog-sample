@@ -1,2 +1,7 @@
 GET http://localhost:8787/a-service
 Content-Type: application/json
+
+
+###
+GET http://localhost:5555/a-service/a-service
+Content-Type: application/json
