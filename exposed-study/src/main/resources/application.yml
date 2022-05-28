@@ -13,6 +13,7 @@ spring:
         driver-class-name: com.mysql.cj.jdbc.Driver
     exposed:
         generate-ddl: true
+        show-sql: true
 
 #        excluded-packages: com.example.exposedstudy
 

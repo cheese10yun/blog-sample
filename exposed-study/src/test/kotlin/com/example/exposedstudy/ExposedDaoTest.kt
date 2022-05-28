@@ -33,7 +33,7 @@ class ExposedDaoTest : ExposedTestSupport() {
         (1..10).map { insertWriter("$it asd", "$it asd@asd") }
 
         Writer.all().sortedByDescending { it.id }
-                .forEach { println(it) }
+            .forEach { println(it) }
     }
 
     @Test
@@ -49,7 +49,7 @@ class ExposedDaoTest : ExposedTestSupport() {
         }
 
         Writer.all().sortedByDescending { it.id }
-                .forEach { println(it) }
+            .forEach { println(it) }
 
     }
 
@@ -60,7 +60,7 @@ class ExposedDaoTest : ExposedTestSupport() {
         }
 
         Writer.all()
-                .forEach { it.delete() }
+            .forEach { it.delete() }
     }
 
     @Test
@@ -83,20 +83,21 @@ class ExposedDaoTest : ExposedTestSupport() {
         val query = Writers.selectAll()
 
         Writer.wrapRows(query)
-                .forEach { println(it) }
+            .forEach { println(it) }
 
     }
 
 
     private fun batchInsertBook(
-            data: List<Int> = (1..10).map { it },
-            writerId: Long,
+        data: List<Int> = (1..10).map { it },
+        writerId: Long,
     ) {
         Books.batchInsert(
-                data
+            data
         ) {
             this[Books.writer] = writerId
             this[Books.title] = "$it-title"
+            this[Books.status] = BookStatus.NONE
             this[Books.price] = it.toBigDecimal()
             this[Books.createdAt] = LocalDateTime.now()
             this[Books.updatedAt] = LocalDateTime.now()
@@ -104,20 +105,23 @@ class ExposedDaoTest : ExposedTestSupport() {
     }
 
     private fun insertBook(
-            title: String,
-            price: BigDecimal,
-            writerId: Long = 1L
+        title: String,
+        price: BigDecimal,
+        writerId: Long = 1L,
+        bookStatus: BookStatus = BookStatus.NONE
+
     ) = Books.insert { book ->
         book[this.writer] = writerId
         book[this.title] = title
+        book[this.status] = bookStatus
         book[this.price] = price
         book[this.createdAt] = LocalDateTime.now()
         book[this.updatedAt] = LocalDateTime.now()
     }
 
     private fun insertWriter(
-            name: String,
-            email: String
+        name: String,
+        email: String
     ) = Writers.insert { writer ->
         writer[this.name] = name
         writer[this.email] = email

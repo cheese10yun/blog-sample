@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.batchInsert
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
 
@@ -35,8 +36,15 @@ internal class BatchInsertServiceTest2(){
                         ignore = false,
                         shouldReturnGeneratedValues = false
                 ) {
+                    Writers.insert {
+
+
+                    }
+
+
                     this[Books.writer] = 1L
                     this[Books.title] = "$it-title"
+                    this[Books.status] = BookStatus.NONE
                     this[Books.price] = it.toBigDecimal()
                     this[Books.createdAt] = LocalDateTime.now()
                     this[Books.updatedAt] = LocalDateTime.now()

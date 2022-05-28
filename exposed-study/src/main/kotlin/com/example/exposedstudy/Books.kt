@@ -11,9 +11,16 @@ import org.jetbrains.exposed.sql.javatime.datetime
 object Books : LongIdTable("book") {
     val writer = reference("writer_id", Writers)
     val title = varchar("title", 150)
+    val status = enumerationByName("status", 150, BookStatus::class)
     val price = decimal("price", 10, 4)
     val createdAt = datetime("created_at")
     val updatedAt = datetime("updated_at")
+}
+
+enum class BookStatus{
+    READY,
+    NONE
+
 }
 
 class Book(id: EntityID<Long>) : LongEntity(id) {
@@ -21,6 +28,7 @@ class Book(id: EntityID<Long>) : LongEntity(id) {
 
     var writer by Writer referencedOn Books.writer
     var title by Books.title
+    var status by Books.status
     var price by Books.price
     var createdAt by Books.createdAt
     var updatedAt by Books.updatedAt

@@ -17,6 +17,7 @@ class BatchInsertService {
         ) {
             this[Books.writer] = 1L
             this[Books.title] = "$it-title"
+            this[Books.status] = BookStatus.NONE
             this[Books.price] = it.toBigDecimal()
             this[Books.createdAt] = LocalDateTime.now()
             this[Books.updatedAt] = LocalDateTime.now()
