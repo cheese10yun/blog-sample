@@ -26,3 +26,7 @@ Accept: application/json
 GET {{cart-service}}/carts
 
 ###
+
+
+GET http://localhost:5555/a-service/a-service
+Content-Type: application/json

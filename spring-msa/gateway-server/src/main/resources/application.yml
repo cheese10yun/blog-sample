@@ -17,11 +17,11 @@ spring:
                 connect-timeout: 10000
                 response-timeout: 10s
 
-#            default-filters:
-#                -   name: GlobalFilter
-#                    args:
-#                        preLogger: trrtue
-#                        postLogger: true
+            default-filters:
+                -   name: GlobalFilter
+                    args:
+                        preLogger: trrtue
+                        postLogger: true
 
             routes:
                 -   id: a-service

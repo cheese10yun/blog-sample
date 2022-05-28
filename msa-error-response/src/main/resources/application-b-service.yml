@@ -1,2 +1,5 @@
 server:
     port: 8686
+
+
+spring.application.name: service-b

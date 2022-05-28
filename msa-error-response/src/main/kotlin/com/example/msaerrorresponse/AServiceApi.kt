@@ -38,7 +38,5 @@ class AServiceApi(
             .httpGet()
             .header(CONTENT_TYPE to "application/json")
             .response()
-
-
     }
 }
