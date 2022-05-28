@@ -88,3 +88,4 @@
 * [Resilience4j를 이용한 서킷 브레이커 기초](https://cheese10yun.github.io/resilience4j-basic/)
 * [MSA 환경에서 Error Response 서버로 전달하기](https://cheese10yun.github.io/error-response-2/)
 * [HTTP Client 책임 분리하기](https://cheese10yun.github.io/http-client/)
+* [Spring Cloud Sleuth 분산 환경 트래킹](https://github.com/cheese10yun/blog-sample/blob/master/msa-error-response/docs/sleuth.md)
