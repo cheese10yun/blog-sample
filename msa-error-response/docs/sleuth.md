@@ -19,7 +19,7 @@ dependencies {
 
 Sleuth 의존성을 추가하는 것만으로도 logback 설정과 연계되어 애플리케이션 로그에 바로 적용이 됩니다.
 
-![](log.png)
+![](https://github.com/cheese10yun/blog-sample/raw/master/msa-error-response/docs/log.png)
 
 기본 설정은 [application name, Trance ID, Span ID] 형식으로 적용됩니다. Application name은 `spring.application.name: xxx` 설정값을 기준으로 지정됩니다. 로그 형식을 바꾸고 싶은 경우에는 loback 설정을 직접 하여 변경이 가능합니다.
 
@@ -32,7 +32,7 @@ Span ID | 전체 Request중 일부의 일부의 고유한 값
 Parent Span ID | 이전 Request의 Span ID로 요청의 흐름을 파악을 위한 값
 
 
-![](draw-MSA.drawio.png)
+![](https://github.com/cheese10yun/blog-sample/raw/master/msa-error-response/docs/draw-MSA.drawio.png)
 
 1. API Gateway에서 Request를 받아 Trace ID, Span ID를 동일한 값으로 생성하며 Parent Span ID는 null으로 지정
 2. A Service에서는 Trace ID는 동일하게 설정, Span ID는 Request의 중 일부로 고유한 값을 설정, Parent Span ID는 이전 Request의 Span ID로 지정
@@ -129,7 +129,7 @@ Keep-Alive : timeout=60
 
 모든 Request는 Trace ID: 757d0493f099b94b으로 그룹화가 가능하며 각 서비스마다 Span ID마다 고유한 값으로 트래킹이 가능합니다. 또 Parent Span ID를 통해서 Request의 상관관계를 파악할 수 있습니다.
 
-![](apm-logging.png)
+![](https://github.com/cheese10yun/blog-sample/raw/master/msa-error-response/docs/apm-logging.png)
 
 이렇게 Slueth를 통해서 Request의 상관관계를 로깅을하면 해당 정보를 활용하여 시각화가 가능합니다. 해당 이미지는 Elastic Search APM를 사용했습니다.
 
