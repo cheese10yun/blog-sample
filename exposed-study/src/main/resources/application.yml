@@ -16,4 +16,7 @@ spring:
 
 #        excluded-packages: com.example.exposedstudy
 
-#logging.level.Exposed: debug
+logging:
+    level:
+        root: info
+        Exposed: debug

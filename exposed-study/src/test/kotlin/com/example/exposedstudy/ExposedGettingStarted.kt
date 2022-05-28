@@ -136,7 +136,7 @@ class ExposedGettingStarted {
     fun `read`() {
         Database.connect(dataSource)
         transaction {
-            val payment = Payments.select { Payments.id eq 1 }.forEach { println(it) }
+            val payment = Payments.select { Payments.id eq 1L }.forEach { println(it) }
         }
     }
 
