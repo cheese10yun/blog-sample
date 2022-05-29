@@ -8,6 +8,7 @@ import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
 
@@ -20,9 +21,6 @@ internal class BatchInsertServiceTest2(){
         password = ""
         maximumPoolSize = 12
     }
-
-
-
 
     @Test
     fun `datasource`() {
@@ -42,7 +40,8 @@ internal class BatchInsertServiceTest2(){
                     }
 
 
-                    this[Books.writer] = 1L
+                    val insertWriter = insertWriter("asd", "asd")
+                    this[Books.writer] = insertWriter[Writers.id]
                     this[Books.title] = "$it-title"
                     this[Books.status] = BookStatus.NONE
                     this[Books.price] = it.toBigDecimal()
@@ -53,4 +52,18 @@ internal class BatchInsertServiceTest2(){
             }
         }
     }
+
+    fun insertWriter(
+        name: String,
+        email: String
+    ): InsertStatement<Number> {
+
+        return Writers.insert { writer ->
+            writer[this.name] = name
+            writer[this.email] = email
+            writer[this.createdAt] = LocalDateTime.now()
+            writer[this.updatedAt] = LocalDateTime.now()
+        }
+    }
+
 }

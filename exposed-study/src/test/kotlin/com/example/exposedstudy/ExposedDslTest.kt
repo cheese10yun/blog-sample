@@ -198,7 +198,7 @@ class ExposedDslTest : ExposedTestSupport() {
             ignore = false,
             shouldReturnGeneratedValues = false
         ) {
-            this[Books.writer] = 1L
+            this[Books.writer] = insertWriter("asd", "asd")[Writers.id]
             this[Books.title] = "$it-title"
             this[Books.status] = BookStatus.NONE
             this[Books.price] = it.toBigDecimal()
@@ -221,7 +221,7 @@ class ExposedDslTest : ExposedTestSupport() {
         Books.batchInsert(
             data
         ) {
-            this[Books.writer] = 1L
+            this[Books.writer] = insertWriter("asd", "asd")[Writers.id]
             this[Books.title] = "$it-title"
             this[Books.status] = BookStatus.NONE
             this[Books.price] = it.toBigDecimal()
@@ -235,8 +235,7 @@ class ExposedDslTest : ExposedTestSupport() {
         price: BigDecimal,
         writerId: Long = 1L
     ) = Books.insert { book ->
-        val insertWriter = insertWriter("asd", "asd")
-        book[this.writer] = insertWriter[Writers.id]
+        book[this.writer] = insertWriter("asd", "asd")[Writers.id]
         book[this.title] = title
         book[this.price] = price
         book[this.status] = BookStatus.NONE
@@ -253,5 +252,6 @@ class ExposedDslTest : ExposedTestSupport() {
         writer[this.createdAt] = LocalDateTime.now()
         writer[this.updatedAt] = LocalDateTime.now()
     }
+
 
 }
