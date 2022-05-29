@@ -2,6 +2,7 @@ package com.example.exposedstudy
 
 import com.example.exposedstudy.Books.clientDefault
 import com.example.exposedstudy.Orders.clientDefault
+import com.example.exposedstudy.Writers.clientDefault
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -47,17 +48,29 @@ object Writers : LongIdTable("writer") {
     val updatedAt = datetime("updated_at").clientDefault { LocalDateTime.now() }
 }
 
+object Publishers: LongIdTable("publisher") {
+    val writerId = long("writer_id")
+    val corpName = varchar("corp_name", 150)
+    val createdAt = datetime("created_at").clientDefault { LocalDateTime.now() }
+    val updatedAt = datetime("updated_at").clientDefault { LocalDateTime.now() }
+}
+
 class Writer(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<Writer>(Writers)
 
     var name by Writers.name
-        private set
+//        private set
     var email by Writers.email
-        private set
+//        private set
     var createdAt by Writers.createdAt
-        private set
+//        private set
     var updatedAt by Writers.updatedAt
-        private set
+//        private set
+
+    fun instance(name: String, email: String){
+        this.name = name
+        this.email = email
+    }
 
     fun updateProfile(name: String, email: String) {
         this.name = name

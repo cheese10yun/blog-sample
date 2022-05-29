@@ -7,7 +7,7 @@ spring:
             ddl-auto: create
 
     datasource:
-        url: jdbc:mysql://localhost:3366/exposed_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
+        url: jdbc:mysql://localhost:3366/exposed_study?useSSL=false&serverTimezone=Asia/Seoul&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
         username: root
         password:
         driver-class-name: com.mysql.cj.jdbc.Driver
