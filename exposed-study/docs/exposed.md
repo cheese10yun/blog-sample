@@ -194,7 +194,6 @@ fun `연관관계 객체 잠조 조인`() {
 ```
 연관관계를 객체 기반으로 설정한 경우 위 코드 처럼 어렴지 않게 조인을 진행할 수 있습니다. 하지만 객체 연관관계를 설정 하지 않는 경우에는 위 처럼 조인을 진행할 수 없고 아래와 같은 방법으로 진행 해야합니다.
 
-
 ```kotlin
 object Publishers: LongIdTable("publisher") {
     val writerId = long("writer_id")
@@ -202,7 +201,11 @@ object Publishers: LongIdTable("publisher") {
     val createdAt = datetime("created_at").clientDefault { LocalDateTime.now() }
     val updatedAt = datetime("updated_at").clientDefault { LocalDateTime.now() }
 }
+```
 
+연관관계를 객체 기반으로 하는 것이 아니라 단순 long type으로 지정하여 테이블 객체를 선언합니다. JPA에서도 연관관계 탐색의 오용을 경계 하는 것처럼 Exposed에서도 동일하게 무리한 객체 연결은 지양하는 것이 바람직하다고 생각 합니다.
+
+```kotlin
 class ExposedTest : ExposedTestSupport() {
     @Test
     fun `연관관계 없는 조인`() {
@@ -262,3 +265,93 @@ WHERE publisher.id = 4
 ```
 
 실제 원하는 방식으로 조인이 진행되는 것을 확인할 수 있습니다.
+
+
+특정 조건에 따라 join을 해야하는 경우가 있습니다. 그런 경우에는 Exposed는 다음과 같이 진행할 수 있습니다. 
+
+
+```kotlin
+class ExposedTest : ExposedTestSupport() {
+
+    @Test
+    fun `연관관계 없는 조인2`() {
+        val connect = Database.connect(dataSource)
+        transaction(connect) {
+            val writer = Writers.insert {
+                it[this.name] = "name"
+                it[this.email] = "name@add.cpm"
+            }
+            val publisher = Publishers.insert {
+                it[this.writerId] = writer[Writers.id].value
+                it[this.corpName] = "corp name"
+            }
+
+            val needJoin = true // (1) 
+
+            Publishers
+                .slice(
+                    Publishers.id,
+                    Publishers.corpName,
+                    Publishers.writerId
+                )
+                .select {
+                    Publishers.id eq publisher[Publishers.id].value
+                }
+                .apply {
+                    // (2)
+                    if (needJoin) {
+                        this.adjustColumnSet {
+                            join(
+                                otherTable = Writers,
+                                joinType = JoinType.LEFT,
+                                additionalConstraint = {
+                                    Publishers.writerId eq Writers.id
+                                }
+                            )
+                        }
+                        this.adjustSlice {
+                            // (3)
+                            slice(it.fields + Writers.id + Writers.name + Writers.email)
+                        }
+                    }
+                }
+                .forEach {
+                    println("Publishers.id : ${it[Publishers.id]}")
+                    println("Publishers.corpName : ${it[Publishers.corpName]}")
+                    println("Publishers.writerId : ${it[Publishers.writerId]}")
+                    if (needJoin) {
+                        println("Writers.id : ${it[Writers.id]}")
+                        println("Writers.name : ${it[Writers.name]}")
+                        println("Writers.email : ${it[Writers.email]}")
+                    }
+                }
+        }
+    }
+}
+
+```
+* (1): 특정 조건에 따라 조인 여부를 결정하는 분기 값
+* (2): 조건에 만족하는 경우 조인을 진행
+* (3): 조인을 진행한 경우 필요한 칼럼을 추가
+
+
+```sql
+# needJoin = false 경우
+SELECT publisher.id,
+       publisher.corp_name,
+       publisher.writer_id
+FROM publisher
+WHERE publisher.id = 7;
+
+# needJoin = true 경우
+SELECT publisher.id,
+       publisher.corp_name,
+       publisher.writer_id,
+       writer.id,
+       writer.`name`,
+       writer.email
+FROM publisher
+         LEFT JOIN writer ON (publisher.writer_id = writer.id)
+WHERE publisher.id = 8
+```
+needJoin 분기에 따라 쿼리문이 달라지는 것을 확인 할 수 있습니다.

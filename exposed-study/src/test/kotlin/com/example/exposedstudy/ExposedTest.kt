@@ -6,7 +6,6 @@ import org.assertj.core.api.BDDAssertions.then
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.JoinType
-import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
@@ -83,7 +82,6 @@ class ExposedTest(
                 writer[this.name] = "name"
                 writer[this.email] = "asd@asd.com"
             }
-
             //when
             val id = insert[Writers.id]
 
@@ -176,6 +174,59 @@ class ExposedTest(
                     println("Writers.id : ${it[Writers.id]}")
                     println("Writers.name : ${it[Writers.name]}")
                     println("Writers.email : ${it[Writers.email]}")
+                }
+        }
+    }
+
+    @Test
+    fun `연관관계 없는 조인2`() {
+        val connect = Database.connect(dataSource)
+        transaction(connect) {
+            val writer = Writers.insert {
+                it[this.name] = "name"
+                it[this.email] = "name@add.cpm"
+            }
+            val publisher = Publishers.insert {
+                it[this.writerId] = writer[Writers.id].value
+                it[this.corpName] = "corp name"
+            }
+
+            val needJoin = true
+
+            Publishers
+                .slice(
+                    Publishers.id,
+                    Publishers.corpName,
+                    Publishers.writerId
+                )
+                .select {
+                    Publishers.id eq publisher[Publishers.id].value
+                }
+                .apply {
+                    if (needJoin) {
+                        this.adjustColumnSet {
+                            join(
+                                otherTable = Writers, // (1)
+                                joinType = JoinType.LEFT, //(2)
+                                additionalConstraint = { // (3)
+                                    Publishers.writerId eq Writers.id
+                                }
+                            )
+                        }
+                        this.adjustSlice {
+                            slice(it.fields + Writers.id + Writers.name + Writers.email)
+                        }
+                    }
+                }
+                .forEach {
+                    println("Publishers.id : ${it[Publishers.id]}")
+                    println("Publishers.corpName : ${it[Publishers.corpName]}")
+                    println("Publishers.writerId : ${it[Publishers.writerId]}")
+                    if (needJoin) {
+                        println("Writers.id : ${it[Writers.id]}")
+                        println("Writers.name : ${it[Writers.name]}")
+                        println("Writers.email : ${it[Writers.email]}")
+                    }
                 }
         }
     }
