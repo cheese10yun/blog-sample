@@ -168,12 +168,12 @@ class ExposedTest(
                     Publishers.id eq publisher[Publishers.id].value
                 }
                 .forEach {
-                    println("Publishers.id : ${it[Publishers.id]}")
-                    println("Publishers.corpName : ${it[Publishers.corpName]}")
-                    println("Publishers.writerId : ${it[Publishers.writerId]}")
-                    println("Writers.id : ${it[Writers.id]}")
-                    println("Writers.name : ${it[Writers.name]}")
-                    println("Writers.email : ${it[Writers.email]}")
+                    println("Publishers.id : ${it[Publishers.id]}") // Publishers.id : 7
+                    println("Publishers.corpName : ${it[Publishers.corpName]}") // Publishers.corpName : corp name
+                    println("Publishers.writerId : ${it[Publishers.writerId]}") // Publishers.writerId : 44
+                    println("Writers.id : ${it[Writers.id]}") // Writers.id : 44
+                    println("Writers.name : ${it[Writers.name]}") // Writers.name : name
+                    println("Writers.email : ${it[Writers.email]}") // Writers.email : name@add.cpm
                 }
         }
     }
@@ -219,18 +219,17 @@ class ExposedTest(
                     }
                 }
                 .forEach {
-                    println("Publishers.id : ${it[Publishers.id]}")
-                    println("Publishers.corpName : ${it[Publishers.corpName]}")
-                    println("Publishers.writerId : ${it[Publishers.writerId]}")
+                    println("Publishers.id : ${it[Publishers.id]}") // Publishers.id : 8
+                    println("Publishers.corpName : ${it[Publishers.corpName]}") // Publishers.corpName : corp name
+                    println("Publishers.writerId : ${it[Publishers.writerId]}") // Publishers.writerId : 45
                     if (needJoin) {
-                        println("Writers.id : ${it[Writers.id]}")
-                        println("Writers.name : ${it[Writers.name]}")
-                        println("Writers.email : ${it[Writers.email]}")
+                        println("Writers.id : ${it[Writers.id]}") // Writers.id : 45
+                        println("Writers.name : ${it[Writers.name]}") // Writers.name : name
+                        println("Writers.email : ${it[Writers.email]}") // Writers.email : name@add.cpm
                     }
                 }
         }
     }
-
 
     private fun insertWriter(
         name: String,
