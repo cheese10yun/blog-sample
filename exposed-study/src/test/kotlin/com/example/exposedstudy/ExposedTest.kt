@@ -7,7 +7,6 @@ import org.jetbrains.exposed.sql.selectAll
 import org.junit.jupiter.api.Test
 
 class ExposedTest: ExposedTestSupport() {
-
     @Test
     internal fun `book insert`() {
 
@@ -20,18 +19,14 @@ class ExposedTest: ExposedTestSupport() {
             book[this.updatedAt] = LocalDateTime.now()
         }
 
-        val toList = Books.selectAll().forEach {
-            Book.
+        Book.all().toList().forEach {
+            println(it)
         }
+
+
 
     }
 
-
-//    private fun insertBook(
-//        title: String,
-//        price: BigDecimal,
-//        writerId: Long = 1L
-//    ) =
     private fun insertWriter(
         name: String,
         email: String

@@ -1,6 +1,9 @@
 package com.example.exposedstudy
 
+import com.example.exposedstudy.Books.clientDefault
+import com.example.exposedstudy.Orders.clientDefault
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.LocalDateTime
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
@@ -13,14 +16,13 @@ object Books : LongIdTable("book") {
     val title = varchar("title", 150)
     val status = enumerationByName("status", 150, BookStatus::class)
     val price = decimal("price", 10, 4)
-    val createdAt = datetime("created_at")
-    val updatedAt = datetime("updated_at")
+    val createdAt = datetime("created_at").clientDefault { LocalDateTime.now() }
+    val updatedAt = datetime("updated_at").clientDefault { LocalDateTime.now() }
 }
 
-enum class BookStatus{
+enum class BookStatus {
     READY,
     NONE
-
 }
 
 class Book(id: EntityID<Long>) : LongEntity(id) {
@@ -41,8 +43,8 @@ class Book(id: EntityID<Long>) : LongEntity(id) {
 object Writers : LongIdTable("writer") {
     val name = varchar("name", 150)
     val email = varchar("email", 150)
-    val createdAt = datetime("created_at")
-    val updatedAt = datetime("updated_at")
+    val createdAt = datetime("created_at").clientDefault { LocalDateTime.now() }
+    val updatedAt = datetime("updated_at").clientDefault { LocalDateTime.now() }
 }
 
 class Writer(id: EntityID<Long>) : LongEntity(id) {
@@ -76,10 +78,10 @@ class Writer(id: EntityID<Long>) : LongEntity(id) {
 }
 
 data class BookWithWriter(
-        val title: String,
-        val price: BigDecimal,
-        val email: String,
-        val name: String
+    val title: String,
+    val price: BigDecimal,
+    val email: String,
+    val name: String
 )
 
 object Orders : LongIdTable(name = "orders") {
