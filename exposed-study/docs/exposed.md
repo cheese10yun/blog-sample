@@ -356,3 +356,6 @@ FROM publisher
 WHERE publisher.id = 8
 ```
 needJoin 분기에 따라 쿼리문이 달라지는 것을 확인할 수 있습니다.
+
+## 참고
+* [Exposed Wiki](https://github.com/JetBrains/Exposed/wiki)
