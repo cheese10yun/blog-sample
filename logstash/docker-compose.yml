@@ -3,9 +3,12 @@ services:
     logstash:
         image: docker.elastic.co/logstash/logstash:7.17.1-arm64
         container_name: logstash
-        command: logstash -f /usr/share/logstash/pipeline/logstash.conf
-        volumes:
+        command: >
+            bash -c " logstash-plugin install logstash-filter-date_formatter
+            && logstash -f /usr/share/logstash/pipeline/logstash.conf
+            "
 
+        volumes:
             -   type: bind
                 source: ./logstash/pipeline
                 target: /usr/share/logstash/pipeline
@@ -19,4 +22,4 @@ services:
                 target: /usr/share/logstash/lib/mysql-connector-java-8.0.27.jar
 
         environment:
-            LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+            LS_JAVA_OPTS: "-Xmx1024m -Xms1024m"
