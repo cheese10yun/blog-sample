@@ -1,9 +1,15 @@
 package com.server.gateway
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler
 import org.springframework.cloud.gateway.filter.GatewayFilter
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory
 import org.springframework.cloud.sleuth.Tracer
+import org.springframework.core.annotation.Order
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
+import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 
 //@Component
@@ -58,3 +64,56 @@ class GlobalFilter(
 
     class Config
 }
+
+
+@Component
+@Order(-1)
+class GlobalExceptionHandler(
+    private val objectMapper: ObjectMapper
+) : ErrorWebExceptionHandler {
+    override fun handle(exchange: ServerWebExchange, ex: Throwable): Mono<Void> {
+        val response = exchange.response
+        var statusCode = 0;
+
+        if (response.isCommitted) {
+            return Mono.error(ex)
+        }
+
+        response.headers.contentType = MediaType.APPLICATION_JSON
+        if (ex is ResponseStatusException) {
+            response.statusCode = ex.status
+            statusCode = ex.rawStatusCode
+        }
+
+        return response.writeWith(Mono.fromSupplier {
+            val bufferFactory = response.bufferFactory()
+            try {
+
+                val errorResponse = objectMapper.writeValueAsBytes(
+                    ErrorResponse(
+                        message = ex.message ?: "error message",
+                        status = statusCode,
+                        errors = listOf(),
+                        code = "C001",
+                    )
+                )
+                return@fromSupplier bufferFactory.wrap(errorResponse)
+            } catch (e: Exception) {
+                return@fromSupplier bufferFactory.wrap(ByteArray(0))
+            }
+        })
+    }
+}
+
+class ErrorResponse(
+    val message: String,
+    val status: Int,
+    val errors: List<FieldError>,
+    val code: String,
+)
+
+class FieldError(
+    val field: String,
+    val value: String,
+    val reason: String
+)

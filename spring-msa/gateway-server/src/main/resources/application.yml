@@ -5,8 +5,9 @@ spring:
     application:
         name: gateway-server
 
-    config:
-        import: "optional:configserver:http://localhost:8888"
+#    config:
+#        import: "optional:configserver:http://localhost:8888"
+
     cloud:
         gateway:
             discovery:
@@ -63,14 +64,14 @@ spring:
                         - RewritePath=/catalog-service/(?<path>.*),/$\{path}
 
 
-eureka:
-    instance:
-        prefer-ip-address: true
-    client:
-        register-with-eureka: true
-        fetch-registry: true
-        service-url:
-            default-zone: http://localhost:8761/eureka/
+#eureka:
+#    instance:
+#        prefer-ip-address: true
+#    client:
+#        register-with-eureka: true
+#        fetch-registry: true
+#        service-url:
+#            default-zone: http://localhost:8761/eureka/
 
 logging:
     level:
