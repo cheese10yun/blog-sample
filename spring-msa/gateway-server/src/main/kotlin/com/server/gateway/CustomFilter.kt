@@ -5,8 +5,12 @@ import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler
 import org.springframework.cloud.gateway.filter.GatewayFilter
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory
 import org.springframework.cloud.sleuth.Tracer
+import org.springframework.core.ResolvableType
 import org.springframework.core.annotation.Order
+import org.springframework.core.codec.Hints
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.http.codec.json.Jackson2JsonEncoder
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.server.ServerWebExchange
@@ -67,48 +71,50 @@ class GlobalFilter(
 
 
 @Component
-@Order(-1)
+@Order(-1)// 내부 bean 보다 우선 순위를 높여 해당 빈이 동작하게 설정
 class GlobalExceptionHandler(
     private val objectMapper: ObjectMapper
 ) : ErrorWebExceptionHandler {
+
     override fun handle(exchange: ServerWebExchange, ex: Throwable): Mono<Void> {
         val response = exchange.response
-        var statusCode = 0;
-
-        if (response.isCommitted) {
-            return Mono.error(ex)
-        }
-
         response.headers.contentType = MediaType.APPLICATION_JSON
-        if (ex is ResponseStatusException) {
-            response.statusCode = ex.status
-            statusCode = ex.rawStatusCode
+
+        val errorResponse = when (ex) {
+            // Spring Web Server 관련 오류의 경우 Spring 오류 메시지를 사용
+            is ResponseStatusException ->
+                ErrorResponse(
+                    message = ex.message,
+                    status = ex.rawStatusCode,
+                    code = "C001"
+                )
+            // 그외 오류는 ErrorCode.UNDEFINED_ERROR 기반으로 메시지를 사용
+            else -> {
+                response.statusCode = HttpStatus.INTERNAL_SERVER_ERROR
+                ErrorResponse(
+                    message = ex.message ?: "asd",
+                    status = HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    code = "C002"
+                )
+            }
         }
 
-        return response.writeWith(Mono.fromSupplier {
-            val bufferFactory = response.bufferFactory()
-            try {
-
-                val errorResponse = objectMapper.writeValueAsBytes(
-                    ErrorResponse(
-                        message = ex.message ?: "error message",
-                        status = statusCode,
-                        errors = listOf(),
-                        code = "C001",
-                    )
-                )
-                return@fromSupplier bufferFactory.wrap(errorResponse)
-            } catch (e: Exception) {
-                return@fromSupplier bufferFactory.wrap(ByteArray(0))
-            }
-        })
+        return response.writeWith(
+            Jackson2JsonEncoder(objectMapper).encode(
+                Mono.just(errorResponse),
+                response.bufferFactory(),
+                ResolvableType.forInstance(errorResponse),
+                MediaType.APPLICATION_JSON,
+                Hints.from(Hints.LOG_PREFIX_HINT, exchange.logPrefix)
+            )
+        )
     }
 }
 
 class ErrorResponse(
     val message: String,
     val status: Int,
-    val errors: List<FieldError>,
+    val errors: List<FieldError> = emptyList(),
     val code: String,
 )
 
