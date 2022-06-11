@@ -90,3 +90,4 @@
 * [HTTP Client 책임 분리하기](https://cheese10yun.github.io/http-client/)
 * [Spring Cloud Sleuth 분산 환경 트래킹](https://github.com/cheese10yun/blog-sample/blob/master/msa-error-response/docs/sleuth.md)
 * [Exposed 추가 정리](https://github.com/cheese10yun/blog-sample/blob/master/exposed-study/docs/exposed.md)
+* [Spring Cloud Gateway Error Handling & Filter](https://github.com/cheese10yun/blog-sample/blob/master/spring-msa/docs/cloud-gateway.md)
