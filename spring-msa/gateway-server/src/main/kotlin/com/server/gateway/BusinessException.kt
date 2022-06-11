@@ -31,9 +31,12 @@ enum class ErrorCode(
 ) {
     FRAME_WORK_INTERNAL_ERROR(500, "C001", "프레임워크 내부 예외"),
     UNDEFINED_ERROR(500, "C002", "정의하지 않은 예외"),
+    UNAUTHORIZED_ERROR(401, "C003", "인증에 실패했습니다"),
 }
 
-class BusinessException(
-    override val message: String?,
+open class BusinessException(
+    override val message: String? = null,
     val errorCode: ErrorCode
 ) : RuntimeException()
+
+class UnauthorizedException(errorCode: ErrorCode) : BusinessException(errorCode = errorCode)

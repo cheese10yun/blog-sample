@@ -21,7 +21,7 @@ spring:
             default-filters:
                 -   name: GlobalFilter
                     args:
-                        preLogger: true
+                        preLogger: false
                         postLogger: true
 
             routes:

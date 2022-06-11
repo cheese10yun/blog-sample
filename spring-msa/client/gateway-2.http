@@ -1,0 +1,21 @@
+GET http://localhost:5555/actuator
+Content-Type: application/json
+
+
+###
+
+GET http://localhost:5555/ASDASD
+Content-Type: application/json
+
+###
+
+POST http://localhost:5555/actuator
+Content-Type: application/json
+
+###
+
+
+GET http://localhost:5555/a-service/actuator
+Content-Type: application/json
+
+###

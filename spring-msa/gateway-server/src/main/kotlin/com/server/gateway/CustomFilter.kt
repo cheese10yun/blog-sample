@@ -6,44 +6,21 @@ import org.springframework.cloud.sleuth.Tracer
 import org.springframework.stereotype.Component
 
 @Component
-class GlobalFilter(
-    private val tracer: Tracer
-) : AbstractGatewayFilterFactory<GlobalFilter.Config>(Config::class.java) {
-    val log by logger()
+class GlobalFilter : AbstractGatewayFilterFactory<GlobalFilter.Config>(Config::class.java) {
+
+    private val log by logger()
 
     override fun apply(config: Config): GatewayFilter {
         return GatewayFilter { exchange, chain ->
-            val request = exchange.request
-            val response = exchange.response
-
-            val currentSpan = tracer.currentSpan()
-            val nextSpan = tracer.nextSpan()
-            val span = currentSpan ?: nextSpan
-            val context = span.context()
-
-
-
-            log.info("=======test======")
-            log.error("current traceId: ${currentSpan?.context()?.traceId()}")
-            log.error("current spanId: ${currentSpan?.context()?.spanId()}")
-            log.error("current parentId: ${currentSpan?.context()?.parentId()}")
-            log.error("current sampled: ${currentSpan?.context()?.sampled()}")
-
-            log.error("next traceId: ${nextSpan.context().traceId()}")
-            log.error("next spanId: ${nextSpan.context().spanId()}")
-            log.error("next parentId: ${nextSpan.context().parentId()}")
-            log.error("next sampled: ${nextSpan.context().sampled()}")
-            log.info("=======test======")
-
-            log.info("GlobalFilter request id: ${request.id}")
-
-//            if (true) {
-//                throw IllegalArgumentException("adasdasd")
-//            }
+            // 인증 관련 로직이 있다고 가정 하고, 인증이 실패하는 경우 라고 가정
+            check(config.preLogger) { "check 메서드..." }
 
             chain.filter(exchange)
         }
     }
 
-    class Config
+    class Config(
+        val preLogger: Boolean,
+        val postLogger: Boolean
+    )
 }
