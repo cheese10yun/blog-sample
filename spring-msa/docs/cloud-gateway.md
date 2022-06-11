@@ -91,7 +91,7 @@ Code C001은 스프링 게이트웨이 내부에서 발생하는 내부 예외, 
 
 Spring Cloud Gateway에서는 `@ControllerAdvice`와 같은 것을 지원해주지 않아 `ErrorWebExceptionHandler`를 구현하는 것으로 직접 만들어야 합니다.
 
-![](/docs/images/ErrorWebExceptionHandler.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/ErrorWebExceptionHandler.png)
 
 
 ```kotlin
@@ -138,7 +138,7 @@ class GlobalExceptionHandler(
 
 `ResponseStatusException`는 게이트웨이 내부 예외 중 HTTP와 관련된 예외 객체로 예를 들어 게이트웨이에서 라우팅에 등록하지 않거나 없는 주소로 접근하는 경우, 등록되지 않은 HTTP method로 요청하는 경우 등 HTTP와 관련된 예외의 경우 사용되는 예외 객체입니다.
 
-![](images/404.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/404.png)
 
 브레이크 포인트를 걸고 없는 페이지를 호출하면 `ex` 객체에 `ResponseStatusException`는 객체가 있는 것을 확인할 수 있습니다. 해당 객체로 위에서 정의한 ErrorResponse를 생성하여 아래와 같은 형식으로 응답합니다.
 
@@ -224,7 +224,7 @@ class GlobalFilter : AbstractGatewayFilterFactory<GlobalFilter.Config>(Config::c
 
 `application.yml`에서 정의한 이름인 GlobalFilter으로 클래스명을 지정하고 `args`에서 정의한 Argument를 할당할 클래스인 Config 클래스를 지정하고 해당 필드 이름으로 변수를 지정합니다.
 
-![](images/config.png) 
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/config.png) 
 
 해당 필터와 Argument가 정상적으로 동작하는 것을 확인할 수 있습니다. 해당 필터에 인증 관련된 비즈니스 로직이 있다고 가정하고 간단하게 샘플 코드를 만들어 만들어 보겠습니다.
 
@@ -254,7 +254,7 @@ class GlobalFilter : AbstractGatewayFilterFactory<GlobalFilter.Config>(Config::c
 해당 해당 예외가 발생하면 `GlobalExceptionHandler` 객체에서 `BusinessException` 객체로 예외 객체가 할당되어 핸들링됩니다.
 
 
-![](images/error-code.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/error-code.png)
 
 `BusinessException`을 상속한 `UnauthorizedException` 객체와 해당 객체에 
 `UNAUTHORIZED_ERROR` ErrorCode 값이 할당되어 있는 것을 확인할 수 있습니다. 해당 정보 기반으로 최종적으로 Error Response는 다음과 같이 내려지게 됩니다.
@@ -314,7 +314,7 @@ class GlobalFilter : AbstractGatewayFilterFactory<GlobalFilter.Config>(Config::c
 
 필요하다면 `IllegalStateException` 객체를 분기문에 추가하여 핸들링 할 수도 있습니다. 하지만 모든 예외에 대한 핸들링을 할 수 없기 때문에 우리가 정의하지 않은 예외에 대해서는 메시지를 통일화하는 작업은 필요합니다.
 
-![](images/error-code-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-msa/docs/images/error-code-1.png)
 
 
 `check`메서드로 발생시킨 `IllegalStateException` 객체와 해당 메시지가 보이는 것을 확인할 수 있습니다. 해당 객체로 최종적으로 아래와 같은 메시지로 응답을 내려줍니다.
