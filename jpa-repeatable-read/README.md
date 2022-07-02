@@ -228,8 +228,8 @@ REPEATABLE READ는 MySQL의 InnoDB 스토리지 엔진에서 기본적으로 사
 
 
 1. 이미 TRX-ID: 6 INSERT 되어 있다고 가정한다.
-2. 사용자 A의 TRX-ID: 10번으로 emp_no=5000 조회, Han 응답
-3. 사용자 B의 TRX-ID: 12번으로 emp_no=5000 first_name Han -> Yun으로 변경하고 최종 COMMIT, UNDO 영역의 이전 데이터 Yun 백업
+2. 사용자 B의 TRX-ID: 10번으로 emp_no=5000 조회, Han 응답
+3. 사용자 A의 TRX-ID: 12번으로 emp_no=5000 first_name Han -> Yun으로 변경하고 최종 COMMIT, UNDO 영역의 이전 데이터 Yun 백업
 4. **사용자 B의 TRX-ID: 10번으로 emp_no=5000 조회 다시 조회, 10번 트랜잭션 안에서 실행되는 모든 SELECT 쿼리는 트랜잭션 번호가 10보다 작은 트랜잭션 번호에서 변경한 것만 본다 즉, 동일하게 Han 응답.**
 
 4번에서 데이터를 다시 조회하지만 트랜잭션 번호가 12번으로 자신의 트랜잭션 번호 6번 보다 크기 때문에 UNDO 영역의 데이터를 선택하게 되어 동일한 트랜잭션에서 반복적인 읽기를 하더라도 동일한 결과를 보장받습니다. `SELECT ... FOR UPDATE` 조회 시에는 그 결과가 다르겠지만 여기까지는 더 설명하지는 않겠습니다.
