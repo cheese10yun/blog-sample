@@ -7,9 +7,9 @@ import java.time.LocalDate
 internal class KotlinTest {
 
     data class Person(
-            val first: String,
-            val middle: String?,
-            val last: String
+        val first: String,
+        val middle: String?,
+        val last: String
     )
 
     @Test
@@ -107,7 +107,7 @@ internal class Fold {
     }
 
     fun sum(vararg nums: Int) =
-            nums.fold(0) { acc, n -> acc + n }
+        nums.fold(0) { acc, n -> acc + n }
 
     @Test
     internal fun `reduce sum`() {
@@ -117,10 +117,10 @@ internal class Fold {
 
 
     fun sumReduce(vararg nums: Int) =
-            nums.reduce { acc, i ->
-                println("acc: $acc, i: $i")
-                acc + i
-            }
+        nums.reduce { acc, i ->
+            println("acc: $acc, i: $i")
+            acc + i
+        }
 
 
     @Test
@@ -135,18 +135,18 @@ internal class Fold {
     }
 
     data class Product(
-            val name: String,
-            var price: Double,
-            var onSale: Boolean = false
+        val name: String,
+        var price: Double,
+        var onSale: Boolean = false
     )
 
     @Test
     internal fun ifEmpty() {
         val products = listOf(Product("goods", 1000.0, false))
         val joinToString = products.filter { it.onSale }
-                .map { it.name }
-                .ifEmpty { listOf("none") }
-                .joinToString(separator = ", ")
+            .map { it.name }
+            .ifEmpty { listOf("none") }
+            .joinToString(separator = ", ")
 
         println(joinToString)
     }
@@ -169,8 +169,8 @@ class Camera : Snappable {
 }
 
 class SmartPhone(
-        private val phone: Dialable = Phone(),
-        private val camera: Snappable = Camera()
+    private val phone: Dialable = Phone(),
+    private val camera: Snappable = Camera()
 ) : Dialable by phone, Snappable by camera
 
 class SmartPhoneTest {
@@ -199,22 +199,16 @@ data class Project(val map: MutableMap<String, Any>) {
 class ProjectTest {
 
     @Test
-    internal fun `use map delegate for project`() {
+    fun `use map delegate for project`() {
         val project = Project(
-                mutableMapOf(
-                        "name" to "Lean Kotlin",
-                        "priority" to 5,
-                        "completed" to true
-                )
+            mutableMapOf(
+                "name" to "Lean Kotlin",
+                "priority" to 5,
+                "completed" to true
+            )
         )
 
         println(project)
     }
 }
 
-class JPA {
-    data class Person(
-            val name: String,
-            val dob: LocalDate
-    )
-}
