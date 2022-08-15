@@ -1,5 +1,6 @@
 package com.kotlin.cookbook.step6
 
+import java.util.Locale
 import org.junit.jupiter.api.Test
 
 class AAA {
@@ -16,5 +17,16 @@ class AAA {
             .map { println("doubling $it"); it * 2 }
             .filter { println("filtering $it"); it % 3 == 0 }
             .first()
+    }
+
+    @Test
+    fun processString(str: String?) {
+        str?.let { it ->
+            when {
+                it.isEmpty() -> "Empty"
+                it.isBlank() -> "Blank"
+                else -> it.capitalize()
+            }
+        } ?: "Null"
     }
 }

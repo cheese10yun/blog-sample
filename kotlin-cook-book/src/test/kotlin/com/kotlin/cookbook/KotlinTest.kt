@@ -3,6 +3,7 @@ package com.kotlin.cookbook
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.util.Locale
 
 internal class KotlinTest {
 
@@ -127,7 +128,7 @@ internal class Fold {
     internal fun associateWith() {
         val keys = 'a'..'f'
         val associate = keys.associate {
-            it to it.toString().repeat(5).capitalize()
+            it to it.toString().repeat(5).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
         }
 
         // {a=Aaaaa, b=Bbbbb, c=Ccccc, d=Ddddd, e=Eeeee, f=Fffff}
