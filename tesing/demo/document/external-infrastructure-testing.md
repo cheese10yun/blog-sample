@@ -119,7 +119,7 @@ internal fun `환율 정보 기반으로 주문 금액 계산하여 주문 생�
 
 결과적으로 다양한 케이스를 커버하기 위해서는 실제 Mock 서버로 커버하는 것은 비효율적이고 무엇보다 중요한 것은 **order라는 관점에서 실제 외부 HTTP 통신이 큰 관심사가 아니라고 생각합니다.** 그렇다면 Mocking을 진행한다면 HTTP 통신에 대한 Mocking을 하는 것보다 객체 자체를 Mocking 하는 것이 더 좋다고 생각합니다.
 
-![](../images/http-mock.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/tesing/demo/images/http-mock.png)
 
 Interface를 두고 실제 HTTP 통신을 하는 실제 구현체는 ExchangeRateClientImpl에서 진행하고, 테스트 코드 또는 일부 환경에서 구현체는 ExchangeRateClientMock을 사용하게 합니다. 
 
