@@ -93,8 +93,8 @@ class OrderServiceTest(
         @JvmStatic
         fun providerExchangeRate() = listOf(
             Arguments.of(ExchangeRateProvider(12000.toBigDecimal(), LocalDate.of(2022, 2, 2), "USD", "KRW")),
-            Arguments.of(ExchangeRateProvider(12000.toBigDecimal(), LocalDate.of(2022, 2, 3), "USD", "KRW")),
-            Arguments.of(ExchangeRateProvider(12000.toBigDecimal(), LocalDate.of(2022, 2, 4), "USD", "KRW"))
+            Arguments.of(ExchangeRateProvider(13000.toBigDecimal(), LocalDate.of(2022, 2, 3), "USD", "KRW")),
+            Arguments.of(ExchangeRateProvider(14000.toBigDecimal(), LocalDate.of(2022, 2, 4), "USD", "KRW"))
         )
     }
 
