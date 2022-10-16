@@ -161,10 +161,28 @@ data class Coupon(
     val expiryDate: LocalDate
 )
 
+/**
+ *
+ */
 data class Order(
     val amount: BigDecimal
 ) {
+    var status: OrderStatus
 
+    init {
+        this.status = OrderStatus.READY
+    }
+
+    fun changeStatusShipping() {
+        // 방어 적인 로직
+        this.status = OrderStatus.READY
+    }
+}
+
+enum class OrderStatus(val desc: String) {
+    READY("준비"),
+    DELIVERING("준비"),
+    DELIVERY_COMPLETED("준비")
 }
 
 data class Product(
