@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+/src/test/kotlin/com/example/exposedstudy/Test.kt

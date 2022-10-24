@@ -13,9 +13,9 @@ class BatchInsertService {
     @Transactional
     fun batch(ids: List<Int>) {
         Books.batchInsert(
-                data = ids,
-                ignore = false,
-                shouldReturnGeneratedValues = false
+            data = ids,
+            ignore = false,
+            shouldReturnGeneratedValues = false
         ) {
             val insertWriter = insertWriter("asd", "asd")
             this[Books.writer] = insertWriter[Writers.id]
