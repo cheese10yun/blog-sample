@@ -4,14 +4,11 @@ import com.example.exposedstudy.Payments.amount
 import com.example.exposedstudy.Payments.orderId
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import java.math.BigDecimal
-import org.jetbrains.exposed.dao.LongEntity
-import org.jetbrains.exposed.dao.LongEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.batchInsert
@@ -25,6 +22,7 @@ import org.jetbrains.exposed.sql.update
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.util.StopWatch
+import java.math.BigDecimal
 
 
 class ExposedGettingStarted {
@@ -62,17 +60,17 @@ class ExposedGettingStarted {
             // UPDATE payment SET amount=0 WHERE id = 1
             // ...
             Payment.all()
-                    .forEach { it.amount = BigDecimal.ZERO }
+                .forEach { it.amount = BigDecimal.ZERO }
 
             // SELECT payment.id, payment.order_id, payment.amount FROM payment WHERE payment.amount >= 1
             // Payment(amount=1.0000, orderId=1)
             Payment.find { amount eq BigDecimal.ONE }
-                    .forEach { println(it) }
+                .forEach { println(it) }
 
             // DELETE FROM payment WHERE payment.id = 1
             // ...
             Payment.all()
-                    .forEach { it.delete() }
+                .forEach { it.delete() }
 
             // DROP TABLE IF EXISTS payment
             SchemaUtils.drop(Payments)
@@ -109,7 +107,7 @@ class ExposedGettingStarted {
             // SELECT payment.id, payment.order_id, payment.amount FROM payment WHERE payment.amount = 0
             // Payment(amount=1.0000, orderId=1)
             Payments.select { amount eq BigDecimal.ZERO }
-                    .forEach { println(it) }
+                .forEach { println(it) }
 
             // DELETE FROM payment WHERE payment.amount >= 1
             Payments.deleteWhere { amount greaterEq BigDecimal.ONE }
@@ -145,11 +143,11 @@ class ExposedGettingStarted {
         Database.connect(dataSource)
         transaction {
             val map = Payments
-                    .slice(amount, Payments.id)
-                    .selectAll()
-                    .map {
-                        it[amount] to it[Payments.id]
-                    }
+                .slice(amount, Payments.id)
+                .selectAll()
+                .map {
+                    it[amount] to it[Payments.id]
+                }
 
             println(map)
         }
@@ -160,11 +158,11 @@ class ExposedGettingStarted {
         Database.connect(dataSource)
         transaction {
             val result = Payments
-                    .slice(amount)
-                    .select { Payments.id less 5 }
-                    .withDistinct().map {
-                        it[amount]
-                    }
+                .slice(amount)
+                .select { Payments.id less 5 }
+                .withDistinct().map {
+                    it[amount]
+                }
             println(result)
         }
     }
@@ -237,9 +235,11 @@ class ExposedGettingStarted {
         val query = when {
             targetAmount != null ->
                 Payments.select { amount eq 10.toBigDecimal() }
+
             targetAmount > 100.toBigDecimal() -> {
                 Payments.select { amount eq 20.toBigDecimal() }
             }
+
             else -> {
                 Payments.select { amount eq 30.toBigDecimal() }
             }
@@ -255,17 +255,17 @@ class ExposedGettingStarted {
 //            SchemaUtils.create(PaymentTable)
 
             val selectAll =
-                    Payments.join(Orders, JoinType.INNER, additionalConstraint = { Orders.id eq orderId })
-                            .selectAll()
-                            .forEach {
-                                val bigDecimal = it[amount]
-                                println(bigDecimal)
-                            }
+                Payments.join(Orders, JoinType.INNER, additionalConstraint = { Orders.id eq orderId })
+                    .selectAll()
+                    .forEach {
+                        val bigDecimal = it[amount]
+                        println(bigDecimal)
+                    }
 
 
             Payment.all()
-                    .toList()
-                    .forEach { println(it.amount) }
+                .toList()
+                .forEach { println(it.amount) }
         }
 
     }
