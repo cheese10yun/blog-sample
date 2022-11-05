@@ -1,6 +1,7 @@
 package com.example.exposedstudy
 
 import com.example.exposedstudy.Payments.amount
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
 import java.math.BigDecimal
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert

@@ -4,6 +4,7 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
 import org.jetbrains.exposed.sql.alias
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.count
