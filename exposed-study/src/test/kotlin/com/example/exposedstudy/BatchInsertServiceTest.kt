@@ -24,37 +24,6 @@ class BatchInsertServiceTest(
 
 
     @Test
-    fun `bulk update`() {
-        // 50 23 ms
-        // 100 40 ms
-        // 500 135 ms
-        // 1_000 381 ms
-        // 5_000 1127 ms
-        // 10_000 2227 ms
-        // 50_000 10355 ms
-        // 100_000 21370 ms
-        val totalCount = 500
-        val ids = (1..totalCount).map { it.toLong() }
-
-        setup(ids, "old")
-
-        val stopWatch = StopWatch()
-        stopWatch.start()
-
-        BatchUpdateStatement(Writers).apply {
-            ids.forEach {
-                addBatch(EntityID(it, Writers))
-                this[Writers.email] = "update"
-            }
-        }
-            .execute(TransactionManager.current())
-
-        stopWatch.stop()
-
-        result(ids, stopWatch)
-    }
-
-    @Test
     fun `update`() {
         // 50 80 ms
         // 100 130 ms
@@ -64,11 +33,13 @@ class BatchInsertServiceTest(
         // 10_000 10094 ms
         // 50_000 46506 ms
         // 100_000 99349 ms
+        // 업데이트 대상 rows, 50, 100, 500, 1,000, 5,000, 10,000, 50,000, 100,000
         val totalCount = 500
         val ids = (1..totalCount).map { it.toLong() }
+        // 데이터 셋업, 속도 측정 포함 X
+        setup(ids)
 
-        setup(ids, "old")
-
+        // 데이터 셋업, 속도 측정 포함 X
         val stopWatch = StopWatch()
         stopWatch.start()
         for (writerId in ids) {
@@ -79,11 +50,41 @@ class BatchInsertServiceTest(
                 }
         }
         stopWatch.stop()
-
-        result(ids, stopWatch)
+        println("${ids.size} update, ${stopWatch.lastTaskTimeMillis}")
     }
 
-    private fun setup(ids: List<Long>, name: String) {
+    @Test
+    fun `bulk update`() {
+        // 50 23 ms
+        // 100 40 ms
+        // 500 135 ms
+        // 1_000 381 ms
+        // 5_000 1127 ms
+        // 10_000 2227 ms
+        // 50_000 10355 ms
+        // 100_000 21370 ms
+        // 업데이트 대상 rows, 50, 100, 500, 1,000, 5,000, 10,000, 50,000, 100,000
+        val totalCount = 500
+        val ids = (1..totalCount).map { it.toLong() }
+        // 데이터 셋업, 속도 측정 포함 X
+        setup(ids)
+
+        // 업데이트 속도 측정
+        val stopWatch = StopWatch()
+        stopWatch.start()
+        BatchUpdateStatement(Writers).apply {
+            ids.forEach {
+                addBatch(EntityID(it, Writers))
+                this[Writers.email] = "update"
+            }
+        }
+            .execute(TransactionManager.current())
+
+        stopWatch.stop()
+        println("${ids.size} update, ${stopWatch.lastTaskTimeMillis}")
+    }
+
+    private fun setup(ids: List<Long>) {
         ids
             .chunked(50_000)
             .forEach {
@@ -92,15 +93,10 @@ class BatchInsertServiceTest(
                     ignore = false,
                     shouldReturnGeneratedValues = false
                 ) {
-                    this[Writers.email] = name
-                    this[Writers.name] = name
+                    this[Writers.email] = "old"
+                    this[Writers.name] = "old"
                 }
             }
     }
 
-    private fun result(ids: List<Long>, stopWatch: StopWatch) {
-        println("================")
-        println("${ids.size} update, ${stopWatch.lastTaskTimeMillis}")
-        println("================")
-    }
 }

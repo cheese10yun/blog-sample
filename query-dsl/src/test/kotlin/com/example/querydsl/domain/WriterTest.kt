@@ -28,7 +28,7 @@ internal class WriterTest(
      * rows 100,000, 1196 ms
      */
     @Test
-    internal fun `update test`() {
+    internal fun `dirty checking update test`() {
         // 업데이트 대상 rows, 50, 100, 500, 1,000, 5,000, 10,000, 50,000, 100,000
         val total = 500
         val map = (1..total).map {
