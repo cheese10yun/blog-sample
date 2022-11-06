@@ -175,7 +175,7 @@ Update 쿼리는 형식의 변경은 없지만 레코드를 모아서 한 번에
 
 ## Performance 측정 및 분석
 
-![](images/batch-update.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/exposed-study/docs/images/batch-update.png)
 
 | rows    | JPA Dirty Checking Update | JPA None Persistence Context | Exposed Update | Exposed Bulk Update |
 |---------|:--------------------------|:-----------------------------|----------------|---------------------|
