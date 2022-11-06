@@ -1,9 +1,4 @@
-# Mysql Batch Update 성능
-
-
-
-
-
+# Mysql Batch Update With Exposed 성능 측정
 
 ```kotlin
 
@@ -11,16 +6,16 @@
 
 ## Performance
 
-![](images/bulk-update-1.png)
-![](images/bulk-update-2.png)
+![](images/batch-update.png)
 
-| rows    | update   | bulk update | 차이   |
-| ------- | -------- | ----------- | ------ |
-| 50      | 80ms     | 23ms        | 28.75% |
-| 100     | 130ms    | 40ms        | 30.76% |
-| 500     | 596ms    | 135ms       | 22.65% |
-| 1,000   | 1,130ms  | 381ms       | 33.71% |
-| 5,000   | 5,121ms  | 1,127ms     | 22.00% |
-| 10,000  | 10,094ms | 2,227ms     | 22.06% |
-| 50,000  | 46,506ms | 10,355ms    | 22.26% |
-| 100,000 | 99,349ms | 21,370ms    | 21.51% |
+
+| rows    | JPA Update | Exposed Update | Exposed Bulk Update |
+|---------|:-----------|----------------|---------------------|
+| 50      | 337ms      | 80ms           | 23ms                |
+| 100     | 327ms      | 130ms          | 40ms                |
+| 500     | 908ms      | 596ms          | 135ms               |
+| 1,000   | 1,491ms    | 1,130ms        | 381ms               |
+| 5,000   | 5,848ms    | 5,121ms        | 1,127ms             |
+| 10,000  | 10,927ms   | 10,094ms       | 2,227ms             |
+| 50,000  | 51,429ms   | 46,506ms       | 10,355ms            |
+| 100,000 | 101,595ms  | 99,349ms       | 21,370ms            |
