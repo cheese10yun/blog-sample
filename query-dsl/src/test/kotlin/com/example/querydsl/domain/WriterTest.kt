@@ -2,6 +2,7 @@ package com.example.querydsl.domain
 
 import com.example.querydsl.SpringBootTestSupport
 import org.junit.jupiter.api.Test
+import org.springframework.test.annotation.Rollback
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.StopWatch
 import java.sql.Timestamp
@@ -9,6 +10,7 @@ import java.time.LocalDateTime
 import javax.sql.DataSource
 
 //@Transactional
+@Rollback(false)
 internal class WriterTest(
     private val writerRepository: WriterRepository,
     private val writerService: WriterService,
@@ -16,30 +18,67 @@ internal class WriterTest(
 ) : SpringBootTestSupport() {
 
     /**
-     * rows 50, batch_size 1,000, 337 ms
-     * rows 100, batch_size 1,000, 327 ms
-     * rows 500, batch_size 1,000, 908 ms
-     * rows 1,000, batch_size 1,000, 1491 ms
-     * rows 5,000, batch_size 1,000, 5,662 ms
-     * rows 10,000, batch_size 1,000, 10927 ms
-     * rows 50,000, batch_size 1,000, 51429 ms
-     * rows 100,000, batch_size 10,000, 101595 ms
+     * rows 50, 0 ms
+     * rows 100, 0 ms
+     * rows 500, 10 ms
+     * rows 1,000, 1491 ms
+     * rows 5,000, 5,662 ms
+     * rows 10,000, 10927 ms
+     * rows 50,000, 51429 ms
+     * rows 100,000, 1196 ms
      */
     @Test
     internal fun `update test`() {
+        // 업데이트 대상 rows, 50, 100, 500, 1,000, 5,000, 10,000, 50,000, 100,000
         val total = 500
         val map = (1..total).map {
             Writer(
-                name = "123",
-                email = "123@asd.com"
+                name = "old",
+                email = "old"
             )
         }
-
+        // 데이터 셋업, 속도 측정 포함 X
         setup(map)
+        // 데이터 조회, 속도 특정 X
+        val writers = writerService.findAll()
 
         val stopWatch = StopWatch()
+        // 업데이트 속도 측정
         stopWatch.start()
-        writerService.update()
+        writerService.update(writers)
+        stopWatch.stop()
+
+        println("${map.size}, ${stopWatch.lastTaskTimeMillis}")
+    }
+
+    /**
+     * rows 50, 167 ms
+     * rows 100, 242 ms
+     * rows 500, 994 ms
+     * rows 1,000, 1540 ms
+     * rows 5,000, 6441 ms
+     * rows 10,000, 12209 ms
+     * rows 50,000, 56295 ms
+     * rows 100,000, 113194 ms
+     */
+    @Test
+    internal fun `none persist context update test`() {
+        // 업데이트 대상 rows, 50, 100, 500, 1,000, 5,000, 10,000, 50,000, 100,000
+        val total = 500
+        val map = (1..total).map {
+            Writer(
+                name = "old",
+                email = "old"
+            )
+        }
+        // 데이터 셋업, 속도 측정 포함 X
+        setup(map)
+        val findAll = writerService.findAll()
+
+        // 업데이트 속도 측정
+        val stopWatch = StopWatch()
+        stopWatch.start()
+        writerService.nonPersistContestUpdate(findAll.map { it.id!! })
         stopWatch.stop()
 
         println("${map.size}, ${stopWatch.lastTaskTimeMillis}")

@@ -44,7 +44,7 @@ class BatchInsertServiceTest(
         BatchUpdateStatement(Writers).apply {
             ids.forEach {
                 addBatch(EntityID(it, Writers))
-                this[Writers.email] = "bulk update"
+                this[Writers.email] = "update"
             }
         }
             .execute(TransactionManager.current())

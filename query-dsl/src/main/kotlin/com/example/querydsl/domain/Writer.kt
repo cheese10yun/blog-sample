@@ -1,10 +1,12 @@
 package com.example.querydsl.domain
 
+import com.example.querydsl.repository.support.QuerydslCustomRepositorySupport
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.util.StopWatch
 import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -12,6 +14,7 @@ import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.Table
+import com.example.querydsl.domain.QWriter.writer as qWriter
 
 @Entity
 @Table(name = "writer")
@@ -38,7 +41,25 @@ class Writer(
         internal set
 }
 
-interface WriterRepository : JpaRepository<Writer, Long>
+interface WriterRepository : JpaRepository<Writer, Long>, WriterCustomRepository
+
+interface WriterCustomRepository {
+
+    fun update(ids: List<Long>)
+}
+
+class WriterCustomRepositoryImpl : QuerydslCustomRepositorySupport(Writer::class.java), WriterCustomRepository {
+
+    @Transactional
+    override fun update(ids: List<Long>) {
+        for (id in ids) {
+            update(qWriter)
+                .set(qWriter.name, "update")
+                .where(qWriter.id.eq(id))
+                .execute()
+        }
+    }
+}
 
 
 @Service
@@ -47,13 +68,20 @@ class WriterService(
     private val writerRepository: WriterRepository
 ) {
 
-    fun update() {
 
-        val writers = writerRepository.findAll()
+    @Transactional
+    fun findAll(): List<Writer> = writerRepository.findAll()
+
+    @Transactional
+    fun update(writers: List<Writer>) {
         for (writer in writers) {
-            writer.name = "new"
+            writer.name = "update"
         }
+    }
 
+    @Transactional
+    fun nonPersistContestUpdate(ids: List<Long>) {
+        writerRepository.update(ids)
     }
 
 }
