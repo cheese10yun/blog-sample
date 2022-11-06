@@ -12,6 +12,7 @@ import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.transaction.annotation.Transactional
+import java.util.function.Consumer
 import javax.persistence.EntityManager
 import com.example.querydsl.domain.QMember.member as qMember
 import com.example.querydsl.domain.QTeam.team as qTeam
@@ -79,12 +80,12 @@ class MemberTest(
     fun `query dsl search`() {
         //@formatter:off
         val member = query
-                .selectFrom(qMember)
-                .where(
-                        qMember.username.eq("member1")
-                        .and(qMember.age.eq(10))
-                )
-                .fetchOne()!!
+            .selectFrom(qMember)
+            .where(
+                qMember.username.eq("member1")
+                    .and(qMember.age.eq(10))
+            )
+            .fetchOne()!!
         //@formatter:on
 
         then(member.username).isEqualTo("member1")
@@ -227,10 +228,13 @@ class MemberTest(
             .where(qTeam.name.eq("teamA"))
             .fetch()
 
-        then(members).anySatisfy {
-            then(it.username).isIn("member1", "member2")
-            then(it.team.name).isEqualTo("teamA")
-        }
+        then(members).allSatisfy(
+            Consumer {
+                then(it.username).isIn("member1", "member2")
+                then(it.team.name).isEqualTo("teamA")
+            }
+
+        )
     }
 
     @Test
@@ -250,9 +254,11 @@ class MemberTest(
             .leftJoin(qMember.team, qTeam).on(qTeam.name.eq("teamA"))
             .fetch()
 
-        then(members).anySatisfy {
-            then(it.team.name).isEqualTo("teamA")
-        }
+        then(members).allSatisfy(
+            Consumer {
+                then(it.team.name).isEqualTo("teamA")
+            }
+        )
     }
 
     @Test
@@ -307,9 +313,11 @@ class MemberTest(
             )
             .fetch()!!
 
-        then(members).anySatisfy {
-            then(it.age).isIn(30, 40)
-        }
+        then(members).allSatisfy(
+            Consumer {
+                then(it.age).isIn(30, 40)
+            }
+        )
     }
 
     @Test
