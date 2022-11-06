@@ -27,12 +27,13 @@ class BatchInsertServiceTest(
     fun `bulk update`() {
         // 50 23 ms
         // 100 40 ms
+        // 500 135 ms
         // 1_000 381 ms
         // 5_000 1127 ms
         // 10_000 2227 ms
         // 50_000 10355 ms
         // 100_000 21370 ms
-        val totalCount = 100
+        val totalCount = 500
         val ids = (1..totalCount).map { it.toLong() }
 
         setup(ids, "old")
@@ -57,12 +58,13 @@ class BatchInsertServiceTest(
     fun `update`() {
         // 50 80 ms
         // 100 130 ms
+        // 500 596 ms
         // 1_000 1130 ms
         // 5_000 5121 ms
         // 10_000 10094 ms
         // 50_000 46506 ms
         // 100_000 99349 ms
-        val totalCount = 100
+        val totalCount = 500
         val ids = (1..totalCount).map { it.toLong() }
 
         setup(ids, "old")
