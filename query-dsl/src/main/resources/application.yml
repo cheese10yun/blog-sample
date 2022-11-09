@@ -6,17 +6,23 @@ spring:
         generate-ddl: true
         hibernate:
             ddl-auto: create
-    #    show-sql: true
-    #    database-platform: com.example.querydsl.config.MysqlCustomDialect
-    #    properties:
-    #      hibernate:
-    #        format_sql: true
+
+        #    show-sql: true
+        #    database-platform: com.example.querydsl.config.MysqlCustomDialect
+        properties:
+            hibernate:
+                hibernate.jdbc.batch_size: 1000
+                hibernate.order_inserts: true
+                hibernate.order_updates: true
+
     datasource:
-        url: jdbc:mysql://localhost:3366/sample?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
+        url: jdbc:mysql://localhost:3366/jpa_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
         username: root
         password:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        initialization-mode: never
+    sql:
+        init:
+            mode: never
 
 
 logging:

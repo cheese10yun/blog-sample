@@ -5,6 +5,7 @@ import com.example.querydsl.domain.Team
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import org.springframework.transaction.annotation.Transactional
+import java.util.function.Consumer
 import javax.persistence.EntityManager
 import com.example.querydsl.domain.QMember.member as qMember
 import com.example.querydsl.domain.QTeam.team as qTeam
@@ -41,8 +42,10 @@ class PersistenceContextTest(
 
         //then
         val members = team.members
-        then(members).anySatisfy {
-            then(it.username).isIn("member1", "member2")
-        }
+        then(members).anySatisfy (
+            Consumer {
+                then(it.username).isIn("member1", "member2")
+            }
+        )
     }
 }

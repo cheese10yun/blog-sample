@@ -2,7 +2,9 @@ package com.example.querydsl.repository.payment
 
 import com.example.querydsl.SpringBootTestSupport
 import org.assertj.core.api.BDDAssertions
+import org.assertj.core.api.BDDAssertions.*
 import org.junit.jupiter.api.Test
+import java.util.function.Consumer
 
 internal class PaymentRepositoryTest(
     private val paymentRepository: PaymentRepository
@@ -17,9 +19,11 @@ internal class PaymentRepositoryTest(
         val payments = paymentRepository.findUseFrom(targetAmount)
 
         //then
-        BDDAssertions.then(payments).anySatisfy {
-            BDDAssertions.then(it.amount).isGreaterThan(targetAmount)
-        }
+        then(payments).allSatisfy(
+            Consumer {
+                then(it.amount).isGreaterThan(targetAmount)
+            }
+        )
     }
 
     @Test
@@ -31,9 +35,11 @@ internal class PaymentRepositoryTest(
         val payments = paymentRepository.findUseSelectFrom(targetAmount)
 
         //then
-        BDDAssertions.then(payments).anySatisfy {
-            BDDAssertions.then(it.amount).isGreaterThan(targetAmount)
-        }
+        then(payments).allSatisfy(
+            Consumer{
+                then(it.amount).isGreaterThan(targetAmount)
+            }
+        )
     }
 
     @Test
@@ -45,6 +51,6 @@ internal class PaymentRepositoryTest(
         val ids = paymentRepository.findUseSelect(targetAmount)
 
         //then
-        BDDAssertions.then(ids).hasSizeGreaterThan(1)
+        then(ids).hasSizeGreaterThan(1)
     }
 }

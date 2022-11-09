@@ -1,9 +1,13 @@
 package com.example.exposedstudy
 
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.Transaction
 import java.time.LocalDateTime
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.statements.BatchUpdateStatement
 import org.jetbrains.exposed.sql.statements.InsertStatement
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -38,5 +42,20 @@ class BatchInsertService {
             writer[this.createdAt] = LocalDateTime.now()
             writer[this.updatedAt] = LocalDateTime.now()
         }
+    }
+
+    @Transactional
+    fun batchUpdate(
+        ids: List<Long>
+    ) {
+
+        BatchUpdateStatement(Books).apply {
+            ids.forEach {
+                addBatch(EntityID(it, Books))
+                this[Books.title] = "bul update"
+            }
+        }
+            .execute(TransactionManager.current())
+
     }
 }

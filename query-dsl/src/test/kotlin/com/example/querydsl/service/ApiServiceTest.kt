@@ -14,6 +14,7 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers.method
 import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
 import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import org.springframework.web.client.RestTemplate
+import java.util.function.Consumer
 import kotlin.properties.Delegates.notNull
 
 
@@ -60,8 +61,10 @@ internal class ApiServiceTest(
 
         // (9)
         then(teams).hasSize(10)
-        then(teams).anySatisfy {
-            then(it.name).startsWith("team")
-        }
+        then(teams).allSatisfy(
+            Consumer {
+                then(it.name).startsWith("team")
+            }
+        )
     }
 }
