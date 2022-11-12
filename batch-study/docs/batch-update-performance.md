@@ -199,7 +199,7 @@ class UpdatePerformanceJobConfiguration(
 class StoreCustomRepositoryImpl :
     StoreCustomRepository,
     QuerydslRepositorySupport(Store::class.java) {
-    
+
     override fun updateStatus(id: Long, status: StoreStatus) =
         update(qStore)
             .set(qStore.status, status)
@@ -218,11 +218,9 @@ class StoreCustomRepositoryImpl :
 
 Writer에서 넘겨받은 stores 객체를 병렬 처리하기 때문에 더 이상 Proccsor가 필요하지 않습니다. **배치 애플리케이션에서 Proccsor에서 데이터 가공 처리하는 것은 역할 책임의 분리로는 적절하나 I/O 작업처럼 상대적으로 느린 작업이 있으면 Proccsor에서 처리하지 않고 Writer에서 병렬 처리하는 것이 성능적으로 큰 이점이 있습니다.**
 
-
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/update-batch-2.png)
 
 `RxCachedThreadScheduler-1~10`으로 10개의 스레드로 데이터를 사업자 최산 상태 조회를 하고 있으며 이후 `blockingSubscribe`의 `onNext`는 메인 스레드로 다시 전달받는 것을 확인할 수 있습니다. `runOn()`에 각자 환경에 맞는 Schedulers를 적절하게 이용하면 됩니다. 모든 테스트는 10개의 스케줄러 스레드 기반으로 테스트를 진행했습니다.
-
 
 ## Rx 기반 멀티 스레드 & Bulk Update Writer 처리
 
@@ -297,38 +295,43 @@ class StoreCustomRepositoryImpl :
 * (3): ids 객체 기반으로 업데이트
 * (4): Query DSL `where id in` 기반으로 일괄 업데이트, 디비 서버와 네트워크 I/O 최소화
 
-
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/update-batch-3.png)
 
 `onComplete`으로 최종 결과를 main Thread로 받는 것을 확인했습니다.
 
-
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/update-batch-4.png)
-
 
 이전 Rx과 거의 동일하며 Query DSL 업데이트 처리하는 방식만 달라졌습니다. Chunk 단위로 데이터를 모아서 가맹점 상태를 기준으로 그룹화를 진행하며, 그룹화를 통해서 ids 통해서 DB 업데이트를 진행합니다. **Chunk 단위로는 DB 서버와 최대 2번의 통신을 하기 때문에 기존 방식 대비 네트워크 I/O가 크게 줄어들게 됩니다. 모든 테스트는 로컬 DB 서버와 통신을 했기 때문에 JpaWriter, RxWriter 방식에서 네트워크 I/O에 비용이 크게 발생하지 않았지만 실제 운영 환경에서는 네트워크 I/O 비용이 커짐에 따라 더 안 좋은 성능을 보여주게 되며, RxAndBulkWriter와의 차이는 더 발생할 것으로 보입니다.**
 
 ```sql
-# 실제 SQL log, where id in 절로 업데이트 진행
+#
+실제 SQL log, where id in 절로 업데이트 진행
 Time                 Id Command    Argument
-2022-11-12T05:33:58.608788Z	 4242 Query	update store set status='CLOSE' where id in (600 , 598 , 596 , 594 , 592 , 590 , 588 , 586 , 584 , 582 , 580 , 578 , 576 , 574 , 572 , 570 , 568 , 566 , 564 , 562 , 560 , 558 , 556 , 554 , 552 , 550 , 548 , 546 , 544 , 542 , 540 , 538 , 536 , 534 , 532 , 530 , 528 , 526 , 524 , 522 , 520 , 518 , 516 , 514 , 512 , 510 , 508 , 506 , 504 , 502)
-2022-11-12T05:33:58.614597Z	 4242 Query	update store set status='OPEN' where id in (599 , 597 , 595 , 593 , 591 , 589 , 587 , 585 , 583 , 581 , 579 , 577 , 575 , 573 , 571 , 569 , 567 , 565 , 563 , 561 , 559 , 557 , 555 , 553 , 551 , 549 , 547 , 545 , 543 , 541 , 539 , 537 , 535 , 533 , 531 , 529 , 527 , 525 , 523 , 521 , 519 , 517 , 515 , 513 , 511 , 509 , 507 , 505 , 503 , 501)
+2022-11-12T05:33:58.608788Z	 4242 Query
+update store
+set status='CLOSE'
+where id in (600, 598, 596, 594, 592, 590, 588, 586, 584, 582, 580, 578, 576, 574, 572, 570, 568, 566, 564, 562, 560, 558, 556, 554, 552, 550, 548, 546, 544, 542, 540, 538, 536, 534, 532, 530, 528, 526, 524, 522, 520, 518, 516, 514, 512, 510, 508, 506, 504, 502) 2022-11-12T05:33:58.614597Z	 4242 Query
+update store
+set status='OPEN'
+where id in (599, 597, 595, 593, 591, 589, 587, 585, 583, 581, 579, 577, 575, 573, 571, 569, 567, 565, 563, 561, 559, 557, 555, 553, 551, 549, 547, 545, 543, 541, 539, 537, 535, 533, 531, 529, 527, 525, 523, 521, 519, 517, 515, 513, 511, 509, 507, 505, 503, 501)
 ```
-
 
 ## Performance 측정 및 분석
 
-| Rows    | ChunkSize | JpaWriter | RxWriter | RxAndBulkWriter |
-|---------|:----------|-----------|----------|-----------------|
-| 50      | 10        | 8252      | 1406     | 1258            |
-| 100     | 20        | 16207     | 2357     | 2078            |
-| 500     | 100       | 78738     | 9106     | 8268            |
-| 1,000   | 200       | 156420    | 17751    | 16001           |
-| 5,000   | 1000      | 776786    | 83670    | 77732           |
-| 10,000  | 1000      | 1556775   | 169473   | 155777          |
-| 50,000  | 1000      | 7781424   | 881320   | 774789          |
-| 100,000 | 1000      | 15622542  |          | 1581545         |
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/update-batch-5.png)
 
+| Rows    | ChunkSize | JpaWriter            | RxWriter           | RxAndBulkWriter    |
+|---------|:----------|----------------------|--------------------|--------------------|
+| 50      | 10        | 8252 ms              | 1406 ms            | 1258 ms            |
+| 100     | 20        | 16207 ms             | 2357 ms            | 2078 ms            |
+| 500     | 100       | 78738 ms             | 9106 ms            | 8268 ms            |
+| 1,000   | 200       | 156420 ms            | 17751 ms           | 16001 ms           |
+| 5,000   | 1,000     | 776786 ms(12 min)    | 83670 ms(1.3 min)  | 77732 ms(1.2 min)  |
+| 10,000  | 1,000     | 1556775 ms(25 min)   | 169473 ms(2.8 min) | 155777 ms(2.5 min) |
+| 50,000  | 1,000     | 7781424 ms(129 min)  | 881320 ms(14 min)  | 774789 ms(12 min)  |
+| 100,000 | 1,000     | 15622542 ms(260 min) | 1699994 ms(28 min) | 1581545 ms(26 min) |
 
 JpaWriter는 단일 스레드, RxWriter는 10 스레드로 진행하여 대략적인 수치는 스레드 차이만큼의 결과를 보여주는 것을 확인할 수 있습니다. RxWriter와 RxAndBulkWriter의 차이는 대략 10% 정도 차이가 있습니다. 이 차이는 배치 애플리케이션과 DB 서버가 로컬에 있어 루프 백으로 통신을 진행하여 차이가 크게 발생하지 않았으나 실제 환경에서는 더 유의미한 차이가 있을 것으로 보입니다. 네트워크 I/O 비용뿐만 아니라 트랜잭션을 점유하는 시간, 커넥션을 맺고 있는 시간 등등 그룹화하여 where in 절로 처리가 가능하다면 이렇게 처리하는 것이 훨씬 더 효율적이라고 판단됩니다.
+
+또 RxAndBulkWriter 경우 where in으로 처리하기 때문에 ChunkSize를 늘리면 더 성능이 좋을 것으로 생각했지만 5,000 보다 1,000 Chunk가 더 좋은 성능이 좋았습니다. 아마 Rx에서 스레드를 알맞게 나누고 그것을 다시 병합하는 과정의 비용이 비싸기 때문이라고 추정됩니다. 대량 처리를 진행하는 경우는 각 환경에 맞는 ChunkSize를 측정하여 사용하는 것이 바람직해 보입니다.
 
