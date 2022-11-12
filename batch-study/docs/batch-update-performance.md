@@ -1,8 +1,10 @@
 # Batch Update Performance
 
+아래와 같은 시나리오의 경우 배치 애플리케이션 성능을 높이기 위한 방법에 대한 내용을 정리했습니다.
+
 ## 시나리오
 
-해당 배치 애플리케이션은 등록되어 있는 가맹점(Store)에 대한 상태를 외부 API를 단건으로 조회하여 가맹점 상태를 `OPEN("오픈"),`, `CLOSE("폐업"),` 업데이트하는 애플리케이션입니다.
+해당 배치 애플리케이션은 등록되어 있는 가맹점(Store)에 대한 상태를 외부 API를 단건으로 조회하여(단건 API만 존재) 가맹점 상태를 `OPEN("오픈"),`, `CLOSE("폐업"),` 업데이트하는 애플리케이션입니다.
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/update-batch-1.png)
 
