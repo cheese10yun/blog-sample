@@ -104,7 +104,7 @@ class UpdatePerformanceJobConfiguration(
 }
 ```
 
-JpaCursorItemReader 기반으로 리더로 지정했습니다. 모두 성능 측정에서 동일한 리더를 사용했습니다. **JPA를 사용한다면 배치 애플리케이션에는 대량 처리 시 Entity 객체를 리턴하는 것이 아니라 Projections 객체를 리턴하는 것을 권장합니다.** JPA에서 지원해 주는 Dirty Checking 기반으로 업데이트를 진행할 이는 거의 없으며, 있더라도 merger 기능이 동작할 때 select 쿼리가 한 번 더 발생할 위험도 있으며 Lazy Loading으로 추가 조회를 하는 경우도 거의 없습니다. 무엇보다도 처리할 데이터 rows가 많고 해당 테이블에 칼럼이 맞은 경우 JPA에서 이전에 언급한 기능들 및 다른 기타 기능들을 사용하기 위해서 더 많은 메모리를 사용하게 되기 때문에 가능하면 Projections 객체를 리턴하는 것이 효율 적입니다.
+JpaCursorItemReader 기반으로 리더로 지정했습니다. 성능 측정에서 모두 동일한 리더를 사용했습니다. **JPA를 사용한다면 배치 애플리케이션에는 대량 처리 시 Entity 객체를 리턴하는 것이 아니라 Projections 객체를 리턴하는 것을 권장합니다.** JPA에서 지원해 주는 Dirty Checking 기반으로 업데이트를 진행할 이는 거의 없으며, 있더라도 merger 기능이 동작할 때 select 쿼리가 한 번 더 발생할 위험도 있으며 Lazy Loading으로 추가 조회를 하는 경우도 거의 없습니다. 무엇보다도 처리할 데이터 rows가 많고 해당 테이블에 칼럼이 맞은 경우 JPA에서 이전에 언급한 기능들 및 다른 기타 기능들을 사용하기 위해서 더 많은 메모리를 사용하게 되기 때문에 가능하면 Projections 객체를 리턴하는 것이 효율 적입니다.
 
 CursorItemReader와 Reader에 대한 성능 분석은 [Spring Batch Reader 성능 분석 및 측정 part 1](https://cheese10yun.github.io/spring-batch-reader-performance/), [Spring Batch Reader 성능 분석 및 측정 part 2](https://cheese10yun.github.io/spring-batch-reader-performance-2/)를 참고해 주세요. 본 포스팅에서는 Reader에 대해서는 깊게 다루지 않겠습니다.
 
@@ -336,4 +336,3 @@ where id in (599, 597, 595, 593, 591, 589, 587, 585, 583, 581, 579, 577, 575, 57
 JpaWriter는 단일 스레드, RxWriter는 10 스레드로 진행하여 대략적인 수치는 스레드 차이만큼의 결과를 보여주는 것을 확인할 수 있습니다. RxWriter와 RxAndBulkWriter의 차이는 대략 10% 정도 차이가 있습니다. 이 차이는 배치 애플리케이션과 DB 서버가 로컬에 있어 루프 백으로 통신을 진행하여 차이가 크게 발생하지 않았으나 실제 환경에서는 더 유의미한 차이가 있을 것으로 보입니다. 네트워크 I/O 비용뿐만 아니라 트랜잭션을 점유하는 시간, 커넥션을 맺고 있는 시간 등등 그룹화하여 where in 절로 처리가 가능하다면 이렇게 처리하는 것이 훨씬 더 효율적이라고 판단됩니다.
 
 또 RxAndBulkWriter 경우 where in으로 처리하기 때문에 ChunkSize를 늘리면 더 성능이 좋을 것으로 생각했지만 5,000 보다 1,000 Chunk가 더 좋은 성능이 좋았습니다. 아마 Rx에서 스레드를 알맞게 나누고 그것을 다시 병합하는 과정의 비용이 비싸기 때문이라고 추정됩니다. 대량 처리를 진행하는 경우는 각 환경에 맞는 ChunkSize를 측정하여 사용하는 것이 바람직해 보입니다.
-
