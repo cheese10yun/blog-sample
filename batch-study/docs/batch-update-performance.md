@@ -4,7 +4,7 @@
 
 해당 배치 애플리케이션은 등록되어 있는 가맹점(Store)에 대한 상태를 외부 API를 단건으로 조회하여 가맹점 상태를 `OPEN("오픈"),`, `CLOSE("폐업"),` 업데이트하는 애플리케이션입니다.
 
-![](img/update-batch-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/update-batch-1.png)
 
 1. Reader에서 Store(Item)을 ChunkSize 만큼 읽어 옵니다.
 2. 읽어온 Store(Item)을 한 건씩 Processor에서 외부 API를 호출하여 최신 가맹점 상태를 응답받아 가공 처리합니다.
@@ -219,7 +219,7 @@ class StoreCustomRepositoryImpl :
 Writer에서 넘겨받은 stores 객체를 병렬 처리하기 때문에 더 이상 Proccsor가 필요하지 않습니다. **배치 애플리케이션에서 Proccsor에서 데이터 가공 처리하는 것은 역할 책임의 분리로는 적절하나 I/O 작업처럼 상대적으로 느린 작업이 있으면 Proccsor에서 처리하지 않고 Writer에서 병렬 처리하는 것이 성능적으로 큰 이점이 있습니다.**
 
 
-![](img/update-batch-2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/update-batch-2.png)
 
 `RxCachedThreadScheduler-1~10`으로 10개의 스레드로 데이터를 사업자 최산 상태 조회를 하고 있으며 이후 `blockingSubscribe`의 `onNext`는 메인 스레드로 다시 전달받는 것을 확인할 수 있습니다. `runOn()`에 각자 환경에 맞는 Schedulers를 적절하게 이용하면 됩니다. 모든 테스트는 10개의 스케줄러 스레드 기반으로 테스트를 진행했습니다.
 
@@ -298,12 +298,12 @@ class StoreCustomRepositoryImpl :
 * (4): Query DSL `where id in` 기반으로 일괄 업데이트, 디비 서버와 네트워크 I/O 최소화
 
 
-![](img/update-batch-3.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/update-batch-3.png)
 
 `onComplete`으로 최종 결과를 main Thread로 받는 것을 확인했습니다.
 
 
-![](img/update-batch-4.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/update-batch-4.png)
 
 
 이전 Rx과 거의 동일하며 Query DSL 업데이트 처리하는 방식만 달라졌습니다. Chunk 단위로 데이터를 모아서 가맹점 상태를 기준으로 그룹화를 진행하며, 그룹화를 통해서 ids 통해서 DB 업데이트를 진행합니다. **Chunk 단위로는 DB 서버와 최대 2번의 통신을 하기 때문에 기존 방식 대비 네트워크 I/O가 크게 줄어들게 됩니다. 모든 테스트는 로컬 DB 서버와 통신을 했기 때문에 JpaWriter, RxWriter 방식에서 네트워크 I/O에 비용이 크게 발생하지 않았지만 실제 운영 환경에서는 네트워크 I/O 비용이 커짐에 따라 더 안 좋은 성능을 보여주게 되며, RxAndBulkWriter와의 차이는 더 발생할 것으로 보입니다.**
