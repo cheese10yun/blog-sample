@@ -224,7 +224,7 @@ Writer에서 넘겨받은 stores 객체를 병렬 처리하기 때문에 더 이
 
 `RxCachedThreadScheduler-1~10`으로 10개의 스레드로 데이터를 사업자 최산 상태 조회를 하고 있으며 이후 `blockingSubscribe`의 `onNext`는 메인 스레드로 다시 전달받는 것을 확인할 수 있습니다. `runOn()`에 각자 환경에 맞는 Schedulers를 적절하게 이용하면 됩니다. 모든 테스트는 10개의 스케줄러 스레드 기반으로 테스트를 진행했습니다.
 
-## Rx 기반 멀티 스레드 & Bulk Update Writer 처리
+### Rx 기반 멀티 스레드 & Bulk Update Writer 처리
 
 ```kotlin
 @Configuration
