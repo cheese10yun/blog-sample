@@ -1,4 +1,4 @@
-# Batch Update Performance
+# Spring Batch 업데이트 성능 최적화 및 분석
 
 아래와 같은 시나리오의 경우 배치 애플리케이션 성능을 높이기 위한 방법에 대한 내용을 정리했습니다.
 
@@ -12,7 +12,7 @@
 2. 읽어온 Store(Item)을 한 건씩 Processor에서 외부 API를 호출하여 최신 가맹점 상태를 응답받아 가공 처리합니다.
 3. 가공된 데이터를 Chunk 단위만큼 쌓이면 Writer에 전달하고 Writer는 업데이트 작업을 진행합니다.
 
-위와 같은 Step의 Job이 있는 경우 단일 스레드 기반의 가장 직관적인 JpaWriter 방법, RxKotlin을 이용한 멀티 스레드 방식의 RxWriter, 마지막으로 RxKotlin과 BulkUpdate를 진행하는 RxAndBulkWriter 방식에 대한 Step 코드 샘플과, 실제 성능 측정한 것을 정리해 보습니다.
+위와 같은 Step의 Job이 있는 경우 단일 스레드 기반의 가장 직관적인 JpaWriter 방법, RxKotlin을 이용한 멀티 스레드 방식의 RxWriter, 마지막으로 RxKotlin과 BulkUpdate를 진행하는 RxAndBulkWriter 방식에 대한 Step 코드 샘플과, 실제 성능 측정 정리 하였습니다.
 
 ## Batch Code
 
@@ -104,7 +104,7 @@ class UpdatePerformanceJobConfiguration(
 }
 ```
 
-JpaCursorItemReader 기반으로 리더로 지정했습니다. 성능 측정에서 모두 동일한 리더를 사용했습니다. **JPA를 사용한다면 배치 애플리케이션에는 대량 처리 시 Entity 객체를 리턴하는 것이 아니라 Projections 객체를 리턴하는 것을 권장합니다.** JPA에서 지원해 주는 Dirty Checking 기반으로 업데이트를 진행할 이는 거의 없으며, 있더라도 merger 기능이 동작할 때 select 쿼리가 한 번 더 발생할 위험도 있으며 Lazy Loading으로 추가 조회를 하는 경우도 거의 없습니다. 무엇보다도 처리할 데이터 rows가 많고 해당 테이블에 칼럼이 맞은 경우 JPA에서 이전에 언급한 기능들 및 다른 기타 기능들을 사용하기 위해서 더 많은 메모리를 사용하게 되기 때문에 가능하면 Projections 객체를 리턴하는 것이 효율 적입니다.
+JpaCursorItemReader 기반으로 성능 측정에서 모드 동일한 리더를 사용했습니다. **JPA를 사용한다면 배치 애플리케이션에는 대량 처리 시 Entity 객체를 리턴하는 것이 아니라 Projections 객체를 리턴하는 것을 권장합니다.** JPA에서 지원해 주는 Dirty Checking 기반으로 업데이트를 진행할 이는 거의 없으며, 있더라도 merger 기능이 동작할 때 select 쿼리가 한 번 더 발생할 위험도 있으며 Lazy Loading으로 추가 조회를 하는 경우도 거의 없습니다. 무엇보다도 처리할 데이터 rows가 많고 해당 테이블에 칼럼이 맞은 경우 JPA에서 이전에 언급한 기능들 및 다른 기타 기능들을 사용하기 위해서 더 많은 메모리를 사용하게 되기 때문에 성능적인 측면에 유의미한 차이가 있어 가능하면 Projections 객체를 리턴하는 것이 좋습니다.
 
 CursorItemReader와 Reader에 대한 성능 분석은 [Spring Batch Reader 성능 분석 및 측정 part 1](https://cheese10yun.github.io/spring-batch-reader-performance/), [Spring Batch Reader 성능 분석 및 측정 part 2](https://cheese10yun.github.io/spring-batch-reader-performance-2/)를 참고해 주세요. 본 포스팅에서는 Reader에 대해서는 깊게 다루지 않겠습니다.
 
@@ -150,7 +150,7 @@ class StoreCustomRepositoryImpl :
 
 ### Rx 기반 멀티 스레드 Writer 처리
 
-total rows * 150ms만큼 소요되기 때문에 처리할 수 있는 스레드 수만큼 작업 시간이 줄어들 수 있습니다. 이론 상 rows 1,000 * 150ms / 10 Thread(Parallel(10)) 만큼 처리 시간을 단축시킬 수 있습니다. 해당 포스팅은 [RxKotlin](https://github.com/ReactiveX/RxKotlin) 기반으로 스레드 처리를 진행합니다.
+total rows * 150ms만큼 소요되기 때문에 처리할 수 있는 스레드 수만큼 작업 시간이 줄어들며 이론 상 rows 1,000 * 150ms / 10 Thread(Parallel(10)) 만큼 처리 시간을 단축시킬 수 있습니다. 해당 포스팅은 [RxKotlin](https://github.com/ReactiveX/RxKotlin) 기반으로 스레드 처리를 진행합니다.
 
 ![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/parallelflowable.sequential.png)
 
@@ -214,17 +214,17 @@ class StoreCustomRepositoryImpl :
 
 * (1): stores를 병렬화하여 위 이미지처럼 레일을 만들며 레일에게 발송할 수 있게 합니다.
 * (2): Schedulers.io()를 통해서 ParallelFlowable의 병렬 처리 수준만큼 Scheduler.createWorker를 호출해서 스레드를 생성합니다.
-* (3): parallel 메서 여러 레일을 생성하는 것을 다시 단일 시퀀스로 병합합니다.
+* (3): sequential를 통해서 parallel에서 여러 레일을 생성하는 것을 다시 단일 시퀀스로 병합합니다.
 * (4): 해당 레일이 정상 종료, 오류가 발생하기 전까지 Blocking 합니다.
 * (5): 단일 시퀀스로 병합이 완료되고 Query DSL 기반으로 업데이트를 진행합니다.
 
-Writer에서 넘겨받은 stores 객체를 병렬 처리하기 때문에 더 이상 Proccsor가 필요하지 않습니다. **배치 애플리케이션에서 Proccsor에서 데이터 가공 처리하는 것은 역할 책임의 분리로는 적절하나 I/O 작업처럼 상대적으로 느린 작업이 있으면 Proccsor에서 처리하지 않고 Writer에서 병렬 처리하는 것이 성능적으로 큰 이점이 있습니다.**
+Writer에서 넘겨받은 stores 객체를 병렬 처리하기 때문에 더 이상 Proccsor가 필요하지 않습니다. **배치 애플리케이션에서 Proccsor에서 데이터 가공 처리하는 것은 역할 책임의 분리로는 적절하나 I/O 작업처럼 상대적으로 느린 작업이 있으면 Proccsor에서 처리하지 않고 가능하면 Writer에서 벌크(병렬) 처리하는 것이 성능적으로 큰 이점이 있습니다.**
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/update-batch-2.png)
 
-`RxCachedThreadScheduler-1~10`으로 10개의 스레드로 데이터를 사업자 최산 상태 조회를 하고 있으며 이후 `blockingSubscribe`의 `onNext`는 메인 스레드로 다시 전달받는 것을 확인할 수 있습니다. `runOn()`에 각자 환경에 맞는 Schedulers를 적절하게 이용하면 됩니다. 모든 테스트는 10개의 스케줄러 스레드 기반으로 테스트를 진행했습니다.
+`RxCachedThreadScheduler-1~10`으로 10개의 스레드로 데이터를 사업자 최산 상태 조회를 하고 있으며 이후 `blockingSubscribe`의 `onNext`는 메인 스레드로 다시 전달받는 것을 확인할 수 있습니다. `runOn()`에 각자 환경에 맞는 Schedulers를 적절하게 사용하면 되며 모든 테스트는 10개의 스케줄러 스레드 기반으로 테스트를 진행했습니다.
 
-### Rx 기반 멀티 스레드 & Bulk Update Writer 처리
+## Rx 기반 멀티 스레드 & Bulk Update Writer 처리
 
 ```kotlin
 @Configuration
@@ -294,8 +294,8 @@ class StoreCustomRepositoryImpl :
 
 * (1): 단일 시퀀스로 병합된 stores를 StoreStatus 값으로 그룹화 진행
 * (2): `OPEN("오픈"),`, `CLOSE("폐업"),` 기반으로 ids 객체 생성
-* (3): ids 객체 기반으로 업데이트
-* (4): Query DSL `where id in` 기반으로 일괄 업데이트, 디비 서버와 네트워크 I/O 최소화
+* (3): ids 객체 기반으로 업데이트 진행
+* (4): Query DSL `where id in` 기반으로 일괄 업데이트, **디비 서버와 네트워크 I/O 최소화**
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/update-batch-3.png)
 
@@ -333,6 +333,6 @@ where id in (599, 597, 595, 593, 591, 589, 587, 585, 583, 581, 579, 577, 575, 57
 | 50,000  | 1,000     | 7,781,424 ms(129 min)  | 881,320 ms(14 min)   | 774,789 ms(12 min)   |
 | 100,000 | 1,000     | 15,622,542 ms(260 min) | 1,699,994 ms(28 min) | 1,581,545 ms(26 min) |
 
-JpaWriter는 단일 스레드, RxWriter는 10 스레드로 진행하여 대략적인 수치는 스레드 차이만큼의 결과를 보여주는 것을 확인할 수 있습니다. RxWriter와 RxAndBulkWriter의 차이는 대략 10% 정도 차이가 있습니다. 이 차이는 배치 애플리케이션과 DB 서버가 로컬에 있어 루프 백으로 통신을 진행하여 차이가 크게 발생하지 않았으나 실제 환경에서는 더 유의미한 차이가 있을 것으로 보입니다. 네트워크 I/O 비용뿐만 아니라 트랜잭션을 점유하는 시간, 커넥션을 맺고 있는 시간 등등 그룹화하여 where in 절로 처리가 가능하다면 이렇게 처리하는 것이 훨씬 더 효율적이라고 판단됩니다.
+JpaWriter는 단일 스레드, RxWriter는 10 스레드로 진행하여 대략적인 수치는 스레드 차이만큼의 결과를 보여주는 것을 확인할 수 있습니다. RxWriter와 RxAndBulkWriter의 차이는 대략 10% 정도 차이가 있습니다. 이 차이는 배치 애플리케이션과 DB 서버가 로컬에 있어 루프백으로 통신을 진행하여 차이가 크게 발생하지 않았으나 실제 환경에서는 더 유의미한 차이가 있을 것으로 보입니다. 네트워크 I/O 비용뿐만 아니라 트랜잭션을 점유하는 시간, 커넥션을 맺고 있는 시간 등등 그룹화하여 where in 절로 처리가 가능하다면 이렇게 처리하는 것이 훨씬 더 효율적이라고 판단됩니다.
 
 또 RxAndBulkWriter 경우 where in으로 처리하기 때문에 ChunkSize를 늘리면 더 성능이 좋을 것으로 생각했지만 5,000 보다 1,000 Chunk가 더 좋은 성능이 좋았습니다. 아마 Rx에서 스레드를 알맞게 나누고 그것을 다시 병합하는 과정의 비용이 비싸기 때문이라고 추정됩니다. 대량 처리를 진행하는 경우는 각 환경에 맞는 ChunkSize를 측정하여 사용하는 것이 바람직해 보입니다.
