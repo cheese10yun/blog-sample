@@ -30,9 +30,9 @@ dependencies {
 }
 
 dependencyManagement {
-	imports {
-		mavenBom("com.vaadin:vaadin-bom:${property("vaadinVersion")}")
-	}
+//	imports {
+//		mavenBom("com.vaadin:vaadin-bom:${property("vaadinVersion")}")
+//	}
 }
 
 tasks.withType<KotlinCompile> {

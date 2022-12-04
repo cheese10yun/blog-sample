@@ -20,7 +20,7 @@ class RedisApplicationTests(
     val memberBulkInsertService: MemberBulkInsertService,
     val redisTemplateWithTransaction: StringRedisTemplate,
     val syncRedisRepository: SyncRedisRepository,
-    val syncPayoutGroupHashRepository: SyncPayoutGroupHashRepository
+//    val syncPayoutGroupHashRepository: SyncPayoutGroupHashRepository
 ) {
 
     private val memberCount = 1000
