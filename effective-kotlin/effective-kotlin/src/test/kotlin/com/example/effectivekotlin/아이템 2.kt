@@ -1,10 +1,7 @@
 package com.example.effectivekotlin
 
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileReader
 
 class `아이템 2` {
 
@@ -71,21 +68,21 @@ class `아이템 2` {
 
     }
 
-    inline fun <reified T> String.readObjectOrNull(): T? {
-        if (...) {
-            return null
-        }
+//    inline fun <reified T> String.readObjectOrNull(): T? {
+//        if (...) {
+//            return null
+//        }
+//
+//        return result
+//    }
 
-        return result
-    }
-
-    inline fun <reified T> String.readObject(): Result<T> {
-        if (...){
-            return Failure(JsonParsingException())
-        }
-
-        return Success(result)
-    }
+//    inline fun <reified T> String.readObject(): Result<T> {
+//        if (...){
+//            return Failure(JsonParsingException())
+//        }
+//
+//        return Success(result)
+//    }
 
     sealed class Result<out T>
     class Success<out T>(val result: T) : Result<T>()
