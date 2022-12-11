@@ -132,16 +132,20 @@ class Collection {
         )
 
         val flatMap = orderNumbers.flatMap { it.orderNumbers }
-        val groupBys = orderNumbers
-            .groupBy { it.orderStatus }
-            .flatMap { it.value }
-            .groupBy { it.orderStatus }
+
+
+//        val reduce = orderNumbers
+//            .groupingBy { it.orderStatus }
+//            .reduce { key, accumulator, element ->
+//                OrderNumbers(
+//                    orderStatus = key,
+//                    orderNumbers = accumulator.orderNumbers + element.orderNumbers
+//                )
+//            }
+//            .map { it.value }
 
 
 
-
-//        orderNumbers.flatten()
-//        orderNumbers.flatten()
 
 
         println("")
