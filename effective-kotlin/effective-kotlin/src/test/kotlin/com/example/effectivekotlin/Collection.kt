@@ -1,27 +1,33 @@
-# Collection 가공
+package com.example.effectivekotlin
 
-사용하는 시나리오와 실제 값들
 
-* [ ] map
-* [ ] chunked
-* [ ] flatMap
-* [ ] flatten
-* [ ] fold
+import org.junit.jupiter.api.Test
 
-## groupBy
+class Collection {
 
-```kotlin
-data class Member(
+
+    data class Member(
         val name: String,
         val status: MemberStatus
     )
 
-enum class MemberStatus(description: String) {
-    NORMAL("정산"),
-    VAN("정지")
-}
+    enum class MemberStatus(description: String) {
+        NORMAL("정산"),
+        VAN("정지")
+    }
 
-class Collection {
+    data class Order(
+        val orderNumber: String,
+        val status: OrderStatus,
+        val price: Int
+    )
+
+
+    data class OrderPrice(
+        val orderStatus: OrderStatus,
+        val price: Int
+    )
+
     @Test
     fun groupBy() {
         val members = (1..50).map {
@@ -35,40 +41,15 @@ class Collection {
         }
 
         val groupBy = members.groupBy { it.status }
-        val vanMembers = groupBy[MemberStatus.VAN] // (1)
-        val normalMembers = groupBy[MemberStatus.NORMAL] // (2)
-        // (3)
+        val vanMembers = groupBy[MemberStatus.VAN]
+        val normalMembers = groupBy[MemberStatus.NORMAL]
         val groupBy1 = members.groupBy(
             { it.status },
             { it.name }
         )
+
     }
-}
 
-```
-![](images/kotlin-1.png)
-
-컬렉션의 특정 값으로 그룹화를 진행이 가능하다. 그룹화 한 값은 LinkedHashMap 컬렉션으로 리턴되며 (1),(2) 처럼 Key 값으로 리턴할 수 있다. 
-
-![](images/kotlin-2.png)
-만약 리턴되는 객체를 컬렉션 요소의 객체가 아닌 객체를 리턴받고 싶다면 (3) 처럼도 가능하다. 해당 객체는 Member 객체가 아닌 name 필드만 추출한 코드이다.
-
-## groupingBy
-
-```kotlin
-
-data class Order(
-    val orderNumber: String,
-    val status: OrderStatus,
-    val price: Int
-)
-
-enum class OrderStatus(description: String) {
-    COMPLETE_ORDER("주문 완료"),
-    COMPLETE_PAYMENT("결제 완료"),
-}
-
-class Collection {
     @Test
     fun groupingBy() {
         val orders = (1..10).map {
@@ -102,21 +83,11 @@ class Collection {
         val eachCount = groupingBy.eachCount()
         val count1 = eachCount[OrderStatus.COMPLETE_ORDER]
         val count2 = eachCount[OrderStatus.COMPLETE_PAYMENT]
+
+        println("")
     }
-}
-```
 
-groupingBy는 컬랙에 대해서 그룹화하여 이후 다양한 연산을 편리하 제공할 수 있는 Grouping 객체로 리턴 해줍니다.
 
-![](images/kotlin-3.png)
-
-(1) groupingBy 으로 Grouping 객체로 응답 받고 해당 확장함수로 다양한 연산 작업이 가능합니다. (2) aggregate 으로 그룹핑된 값 기반으로 가격에 대한 sum 작업, (3) eachCount 으로 그룹핑된 카운트를 조회 가능합니다.
-
-## chunked
-
-```kotlin
-
-class Collection {
     @Test
     fun chunked() {
         val orders = (1..100).map {
@@ -132,30 +103,13 @@ class Collection {
 
         val chunked = orders.chunked(10)
     }
-}
-```
-chunked는 컬렉션 객체를 넘겨받은 인자 크기 만큼 컬렉션을 나눕니다.
 
-![](images/kotlin-3.png)
-
-100개의 orders 객체러를 10개로 나누면 10개 컬렉션이 10개가 됩니다. 말그대로 청크를 나누는 컬렉션 객체입니다. 처리 해야할 데이터가 너무 크다면 적절한 청크 처리하는 경우 유용합니다.
-
-## flatMap
-
-
-```kotlin
-class Collection {
 
     data class OrderNumbers(
         val orderStatus: OrderStatus,
         val orderNumbers: Set<String>
     )
 
-    enum class OrderStatus(description: String) {
-        COMPLETE_ORDER("주문 완료"),
-        COMPLETE_PAYMENT("결제 완료"),
-    }
-    
     @Test
     fun flatMap() {
         val orderNumbers = listOf(
@@ -182,6 +136,19 @@ class Collection {
             .groupBy { it.orderStatus }
             .flatMap { it.value }
             .groupBy { it.orderStatus }
+
+
+
+
+//        orderNumbers.flatten()
+//        orderNumbers.flatten()
+
+
+        println("")
     }
 }
-```
+
+enum class OrderStatus(description: String) {
+    COMPLETE_ORDER("주문 완료"),
+    COMPLETE_PAYMENT("결제 완료"),
+}
