@@ -8,6 +8,12 @@ class StockApplicationTests {
 
     @Test
     fun contextLoads() {
+        println("===============")
+        println("===============")
+        println("===============")
+        println("===============")
+        println("===============")
+        println("===============")
     }
 
 }

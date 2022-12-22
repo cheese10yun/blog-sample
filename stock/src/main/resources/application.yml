@@ -10,12 +10,11 @@ spring:
         password:
         hikari:
             maximum-pool-size: 40
+
 logging:
     level:
-        org:
-            hibernate:
-                SQL: DEBUG
-                type:
-                    descriptor:
-                        sql:
-                            BasicBinder: TRACE
+        root: info
+#        org.springframework.orm.jpa: DEBUG
+#        org.springframework.transaction: DEBUG
+#        org.hibernate.SQL: DEBUG
+#        org.hibernate.type.descriptor.sql.BasicBinder: TRACE
