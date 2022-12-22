@@ -12,7 +12,6 @@ class RedisLockRepository(
     private val redisTemplate: RedisTemplate<String, String>,
 ) {
 
-
     fun lock(key: Long) =
         redisTemplate
             .opsForValue()
