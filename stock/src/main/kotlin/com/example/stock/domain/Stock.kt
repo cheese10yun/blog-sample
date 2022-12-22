@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import javax.persistence.Column
@@ -39,7 +38,7 @@ class Stock constructor(
     @Version
     @Column(name = "version", nullable = false)
     var version: Int
-//        internal set
+        internal set
 
 
     fun decrease(quantity: Long) {
@@ -74,8 +73,10 @@ class StockService(
     private val entityManager: EntityManager,
 ) {
 
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    @Synchronized
+    //    @Transactional(isolation = Isolation.REPEATABLE_READ)
+//    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+//    @Synchronized
     fun decrease(stockId: Long, quantity: Long) {
         val stock = stockRepository.findByIdOrNull(stockId)!!
         stock.decrease(quantity)
@@ -127,6 +128,50 @@ class OptimisticLockStockFaceService(
             } catch (e: Exception) {
                 Thread.sleep(50)
             }
+        }
+    }
+}
+
+//interface LockRepository : JpaRepository<Stock, Long> {
+//
+//    @Query(name = "select get_lock(:key, 3000)", nativeQuery = true)
+//    fun getLock(key: String): Int
+////
+////    @Query(name = "select release_lock(:key)", nativeQuery = true)
+////    fun releaseLock(key: String): Int
+//}
+
+interface LockRepository : JpaRepository<Stock?, Long?> {
+    @Query(value = "select get_lock(:key, 3000)", nativeQuery = true)
+    fun getLock(key: String): Int
+
+    @Query(value = "select release_lock(:key)", nativeQuery = true)
+    fun releaseLock(key: String): Int
+}
+
+
+@Service
+class NamedLockStockFacadeService(
+    private val lockRepository: LockRepository,
+    private val stockService: StockService,
+) {
+
+    @Transactional
+    fun decrease(stockId: Long, quantity: Long) {
+        try {
+            val lock = lockRepository.getLock(stockId.toString())
+            println("==========")
+            println("lock: $lock")
+            println("==========")
+            stockService.decrease(
+                stockId = stockId,
+                quantity = quantity
+            )
+        } finally {
+            val release = lockRepository.releaseLock(stockId.toString())
+            println("==========")
+            println("release: $release")
+            println("==========")
         }
     }
 }

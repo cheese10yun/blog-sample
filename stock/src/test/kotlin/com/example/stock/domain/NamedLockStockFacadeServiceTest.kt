@@ -1,7 +1,7 @@
 package com.example.stock.domain
 
 import org.assertj.core.api.BDDAssertions
-import org.assertj.core.api.BDDAssertions.*
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
@@ -12,8 +12,8 @@ import java.util.concurrent.Executors
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-class OptimisticLockStockFaceServiceTest(
-    private val optimisticLockStockFaceService: OptimisticLockStockFaceService,
+class NamedLockStockFacadeServiceTest(
+    private val namedLockStockFacadeService: NamedLockStockFacadeService,
     private val stockRepository: StockRepository,
 ) {
 
@@ -35,7 +35,7 @@ class OptimisticLockStockFaceServiceTest(
         (1..threadCount).forEach { _ ->
             executorService.submit {
                 try {
-                    optimisticLockStockFaceService.decrease(stockId, 1L)
+                    namedLockStockFacadeService.decrease(stockId, 1L)
                 } finally {
                     latch.countDown()
                 }
@@ -48,7 +48,7 @@ class OptimisticLockStockFaceServiceTest(
         val stock = stockRepository.findByIdOrNull(stockId)!!
         println("quantity ${stock.quantity}")
 
-        then(stock.quantity).isEqualTo(quantity - threadCount)
+        BDDAssertions.then(stock.quantity).isEqualTo(quantity - threadCount)
 
     }
 }
