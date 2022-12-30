@@ -9,27 +9,27 @@ class `아이템 2` {
         val name: String
     )
 
-    @Test
-    internal fun `변수의 스코프를 최소화하라`(users: List<User>) {
-        // 나쁜예
-        var user: User
-        for (index in users.indices) {
-            user = users[index]
-            println("User at $index is $user")
-
-        }
-
-        // 조금 더 좋은 예
-        for (index in users.indices) {
-            val user = users[index]
-            println("User at $index is $user")
-        }
-
-        // 제일 좋은 예
-        for ((index, user) in users.withIndex()) {
-            println("User at $index is $user")
-        }
-    }
+//    @Test
+//    internal fun `변수의 스코프를 최소화하라`(users: List<User>) {
+//        // 나쁜예
+//        var user: User
+//        for (index in users.indices) {
+//            user = users[index]
+//            println("User at $index is $user")
+//
+//        }
+//
+//        // 조금 더 좋은 예
+//        for (index in users.indices) {
+//            val user = users[index]
+//            println("User at $index is $user")
+//        }
+//
+//        // 제일 좋은 예
+//        for ((index, user) in users.withIndex()) {
+//            println("User at $index is $user")
+//        }
+//    }
 
 //    @Test
 //    internal fun `구조 분해 선언`() {

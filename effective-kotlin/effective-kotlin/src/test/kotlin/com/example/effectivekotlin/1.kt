@@ -59,22 +59,22 @@ class `item 1 가변성을 제한하라` {
         val subName: String
     )
 
-    @Test
-    fun `hash immutable`() {
-
-        val names: SortedSet<FullName> = TreeSet()
-        val person = FullName("AAA", "AAA")
-        names.add(person)
-        names.add(FullName("Jon", "Jon"))
-        names.add(FullName("David", "David"))
-
-        println(names) // [AAA AAA, Jon Jon, David]
-        println(person in names) // true
-
-        person.name = "ZZZ"
-        println(names) // [AAA ZZZ, Jon Jon, David]
-        println(person in names) // false
-    }
+//    @Test
+//    fun `hash immutable`() {
+//
+//        val names: SortedSet<FullName> = TreeSet()
+//        val person = FullName("AAA", "AAA")
+//        names.add(person)
+//        names.add(FullName("Jon", "Jon"))
+//        names.add(FullName("David", "David"))
+//
+//        println(names) // [AAA AAA, Jon Jon, David]
+//        println(person in names) // true
+//
+//        person.name = "ZZZ"
+//        println(names) // [AAA ZZZ, Jon Jon, David]
+//        println(person in names) // false
+//    }
 
     @Test
     internal fun properties() {
