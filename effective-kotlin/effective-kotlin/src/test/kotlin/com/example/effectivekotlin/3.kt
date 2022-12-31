@@ -4,6 +4,7 @@ import kotlin.properties.Delegates
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.jvm.isAccessible
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class `3` {
@@ -177,7 +178,7 @@ interface MyList<T> {
 class MyLinkedList<T>(
     val head: T,
     val tail: MyLinkedList<T>?,
-) : MyList<T>{
+) : MyList<T> {
     // ...
 }
 
@@ -185,3 +186,109 @@ fun `of test`() {
     MyList.of(123)
 }
 
+class `6` {
+
+    data class Player(
+        val id: Int,
+        val name: String,
+        val pints: Int,
+    )
+
+    @Test
+    fun `copy fun`() {
+        val player = Player(
+            id = 1,
+            name = "Jin",
+            pints = 150,
+        )
+
+        val copyPlayer = player.copy(name = "Kean")
+
+        // Player(id=1, name=Kean, pints=150)
+        println(copyPlayer)
+    }
+
+    @Test
+    fun `componentN fun`() {
+        val player = Player(
+            id = 1,
+            name = "Jin",
+            pints = 150,
+        )
+
+        val (id, name, pts) = player
+
+        val payerId = id
+        val payerName = name
+        val payerPoints = pts
+
+        println("payerId: $payerId")
+        println("payerName: $payerName")
+        println("payerPoints: $payerPoints")
+    }
+
+    @Test
+    fun `componentN fun2`() {
+        val visited = listOf("China", "Russia", "India")
+        val (first, second, third) = visited
+        // China, Russia, India
+        println("$first, $second, $third")
+
+        val trip = mapOf(
+            "China" to "Tianjin",
+            "Russia" to "Petersburg",
+            "India" to "Rishikesh",
+        )
+
+        for ((country, city) in trip) {
+            // We loved Tianjin in China
+            // We loved Petersburg in Russia
+            // We loved Rishikesh in India
+            println("We loved $city in $country")
+        }
+    }
+}
+
+class `컬랙션 처리 단수를 제한 하라` {
+
+    data class Student(val name: String?)
+
+//    // 작동합니다.
+//    fun List<Student>.getNames(): List<String> = this
+//        .map { it.name }
+//        .filter { it != null }
+//        .map { it!! }
+//
+//    // 더 좋습니다.
+//    fun List<Student>.getNames(): List<String> = this
+//        .map { it.name }
+//        .filterNotNull()
+//
+//    // 가장 좋습니다.
+//    fun List<Student>.getNames(): List<String> = this
+//        .mapNotNull { it.name }
+}
+
+class `성능 테스트` {
+    lateinit var list: List<Int>
+    lateinit var array: IntArray
+
+    @BeforeEach
+    fun setUp() {
+
+        list = List(1_000_000) { it }
+        array = IntArray(1_000_000) { it }
+    }
+
+    @Test
+    fun `list`() {
+        // 평균 적으로 1,260,593 ns
+         list.average()
+    }
+
+    @Test
+    fun `array`() {
+        // 평균 적으로 868 509 ns
+        array.average()
+    }
+}
