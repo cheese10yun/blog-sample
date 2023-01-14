@@ -9,8 +9,23 @@
 <body>
 
 <div id="app">
-    <p>{{ num }}</p>
+    <p v-bind:id="uuid" v-bind:class="name">{{ num }}</p>
     <p>{{ doubleNum }}</p>
+
+    <div v-if="loading">
+        Loading...
+    </div>
+
+    <div v-else>
+        test user login bean logged in
+    </div>
+
+    <div v-show="loading">
+        Loading...
+    </div>
+
+    <input type="text" v-model="message">
+    <p>{{ message }}</p>
 </div>
 
 
@@ -20,7 +35,11 @@
     new Vue({
         el: '#app',
         data: {
-            num: 10
+            num: 10,
+            uuid: 'abc1234',
+            name: 'text-blue',
+            loading: true,
+            message: ''
         },
         computed: {
             doubleNum: function () {
