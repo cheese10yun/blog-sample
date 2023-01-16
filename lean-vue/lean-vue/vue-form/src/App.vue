@@ -13,8 +13,10 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
-  data: function (){
+  data: function () {
     return {
       username: '',
       password: ''
@@ -22,8 +24,21 @@ export default {
   },
   methods: {
     submitForm: function () {
-
       console.log(this.username, this.password);
+      const url = 'https://jsonplaceholder.typicode.com/users';
+      const data = {
+        username: this.username,
+        password: this.password,
+      }
+
+      axios.post(url, data)
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          })
+      ;
     }
   }
 }
