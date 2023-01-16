@@ -1,28 +1,35 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <!--  html-->
+  <div>
+    <app-header v-bind:propsdata='str' v-on:renew='renewStr'></app-header>
   </div>
+
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 
+import AppHeader from './components/AppHeader.vue';
+
+// JS
 export default {
-  name: 'App',
+  // JS - 인스턴스 옵션
+  data: function () {
+    return {
+      str: 'Header 123'
+    }
+  },
   components: {
-    HelloWorld
+    'app-header': AppHeader
+  },
+  methods: {
+    renewStr: function () {
+      this.str = 'hi'
+    }
   }
 }
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<!--CSS-->
+<style scoped>
+
 </style>
