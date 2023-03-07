@@ -84,7 +84,7 @@ ResultSet의 `next()` 함수는 결과 셋에 아직 읽지 않은 레코드가 
 
 **SELECT 쿼리와는 달리 INSERT, UPDATE, DELETE 문장은 별도의 결과 셋을 반환하지 않으므로 `Statement.executeQuery()`함수 대신 `Statement.executeUpdate()` 함수를 사용해서 실행한다.** DDL이나 MySQL의 SET 명령과 같이 결과 셋을 변환하지 않는 SQL 명령으 모두 `excecuteUpdate()` 함수를 사용해 실행할 수 있다.
 
-`excecuteUpdate()` 함수는 INSERT, UPDATE, DELETE 문장에 의해 변경된 레코드 건수를 반환한다. `excecuteUpdate()` 함수의 반환값은 별도로 확인하지 않고 무시해버릴 때가 많다. 하지만 실제로 DELETE 쿼리로 단 한 건만 삭제돼야 하는데, 한 건도 삭제되지 않았거나 두 건 이상의 레코드가 삭제됐다면 어떻게 해야할까? 만약 이런 상황ㅇ이 문제가 될 수지가 있다면 변경된 레코드 건수를 체크해서 COMMIT이나 ROLLBACK을 수행하게 해주는 것이 좋다.
+`excecuteUpdate()` 함수는 INSERT, UPDATE, DELETE 문장에 의해 변경된 레코드 건수를 반환한다. `excecuteUpdate()` 함수의 반환값은 별도로 확인하지 않고 무시해버릴 때가 많다. 하지만 실제로 DELETE 쿼리로 단 한 건만 삭제돼야 하는데, 한 건도 삭제되지 않았거나 두 건 이상의 레코드가 삭제됐다면 어떻게 해야할까? 만약 이런 상황이 문제가 될 수지가 있다면 변경된 레코드 건수를 체크해서 COMMIT이나 ROLLBACK을 수행하게 해주는 것이 좋다.
 
 ```java
 public static void main(String[] args) throws Exception {
