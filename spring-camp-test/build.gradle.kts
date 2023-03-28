@@ -2,11 +2,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java-test-fixtures")
-    id("org.springframework.boot") version "2.7.11-SNAPSHOT"
-    id("io.spring.dependency-management") version "1.0.15.RELEASE"
-    kotlin("jvm") version "1.6.21"
-    kotlin("plugin.spring") version "1.6.21"
-    kotlin("plugin.jpa") version "1.6.21"
+    id("org.springframework.boot")
+    id("io.spring.dependency-management")
+    kotlin("jvm")
+    kotlin("plugin.spring")
+    kotlin("plugin.jpa")
 }
 
 group = "com.example"
@@ -19,7 +19,7 @@ configurations {
     }
 }
 
-allprojects{
+allprojects {
     repositories {
         mavenCentral()
         maven { url = uri("https://repo.spring.io/milestone") }
@@ -36,25 +36,16 @@ subprojects {
     apply(plugin = "java-test-fixtures")
 
 
-//    allOpen {
-//        annotation("javax.persistence.Entity")
-//        annotation("javax.persistence.Embeddable")
-//        annotation("javax.persistence.MappedSuperclass")
-//    }
+    allOpen {
+        annotation("javax.persistence.Entity")
+        annotation("javax.persistence.Embeddable")
+        annotation("javax.persistence.MappedSuperclass")
+    }
 
 
     dependencies {
 
-//        implementation("org.springframework.boot:spring-boot-starter-actuator")
-//        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-//        implementation("org.springframework.boot:spring-boot-starter-validation")
-//        implementation("org.springframework.boot:spring-boot-starter-web")
-//        implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
         implementation("org.jetbrains.kotlin:kotlin-reflect")
-//        developmentOnly("org.springframework.boot:spring-boot-devtools")
-//        runtimeOnly("com.h2database:h2")
-//        annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-//        testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     }
 
