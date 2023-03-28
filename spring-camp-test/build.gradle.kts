@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    id("java-test-fixtures")
     id("org.springframework.boot") version "2.7.11-SNAPSHOT"
     id("io.spring.dependency-management") version "1.0.15.RELEASE"
     kotlin("jvm") version "1.6.21"
@@ -32,6 +33,8 @@ subprojects {
     apply(plugin = "kotlin-spring")
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
+    apply(plugin = "java-test-fixtures")
+
 
 //    allOpen {
 //        annotation("javax.persistence.Entity")
