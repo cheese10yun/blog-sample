@@ -1,14 +1,13 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-//plugins {
-//    id("org.springframework.boot") version "2.7.11-SNAPSHOT"
-//    id("io.spring.dependency-management") version "1.0.15.RELEASE"
-//    kotlin("jvm") version "1.6.21"
-//    kotlin("plugin.spring") version "1.6.21"
-//    kotlin("plugin.jpa") version "1.6.21"
-//}
+plugins {
+    id("org.springframework.boot")
+    id("io.spring.dependency-management")
+    kotlin("jvm")
+    kotlin("plugin.spring")
+    kotlin("plugin.jpa")
+}
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -25,5 +24,8 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testApi(testFixtures(project(":io")))
+
+    testFixturesImplementation("org.springframework.boot:spring-boot-starter")
+    testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

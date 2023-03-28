@@ -32,22 +32,22 @@ package com.spring.camp.api
 import com.spring.camp.io.PartnerClient
 import com.spring.camp.io.PartnerResponse
 import com.spring.camp.io.ClientTestConfiguration
-import org.assertj.core.api.BDDAssertions
+import org.assertj.core.api.BDDAssertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito
 import org.springframework.context.annotation.Import
 
-
+@Import(ClientTestConfiguration::class)
 class ShopRegistrationServiceMockBeanTest(
     private val shopRegistrationService: ShopRegistrationService,
-    private val mockPartnerClient: PartnerClient
+    private val partnerClient: PartnerClient
 ): TestSupport() {
 
     @BeforeEach
     fun resetMock(){
-        Mockito.reset(mockPartnerClient)
+        Mockito.reset(partnerClient)
     }
 
     @Test
@@ -55,16 +55,17 @@ class ShopRegistrationServiceMockBeanTest(
         //given
         val brn = "000-00-0000"
         val name = "주식회사 XXX"
-        given(mockPartnerClient.getPartnerBy(brn))
+        given(partnerClient.getPartnerBy(brn))
             .willReturn(PartnerResponse(brn, name))
 
         //when
         val shop = shopRegistrationService.register(brn)
 
         //then
-        BDDAssertions.then(shop.name).isEqualTo(name)
-        BDDAssertions.then(shop.brn).isEqualTo(brn)
+        then(shop.name).isEqualTo(name)
+        then(shop.brn).isEqualTo(brn)
     }
+
 }
 
 

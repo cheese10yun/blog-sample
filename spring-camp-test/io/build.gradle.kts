@@ -12,11 +12,5 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
-
-
-//    testImplementation("org.springframework.boot:spring-boot-starter-validation")
-//    testImplementation("org.springframework.boot:spring-boot-starter-web")
-//    testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-//    testImplementation("org.jetbrains.kotlin:kotlin-reflect")
 }
 
