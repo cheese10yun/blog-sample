@@ -1,5 +1,6 @@
 package com.spring.camp.api
 
+import com.spring.camp.io.PartnerClient
 import org.springframework.stereotype.Service
 
 @Service
