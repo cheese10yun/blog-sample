@@ -44,8 +44,8 @@ subprojects {
 
 
     dependencies {
-
         implementation("org.jetbrains.kotlin:kotlin-reflect")
+        compileOnly("org.springframework.boot:spring-boot-configuration-processor")
 
     }
 

@@ -1,14 +1,15 @@
 plugins {
     id("org.springframework.boot")
     id("java-test-fixtures")
+    kotlin("jvm")
+    kotlin("plugin.spring")
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    api("org.springframework.boot:spring-boot-starter-validation")
+    api("org.springframework.boot:spring-boot-starter-web")
+    api("com.fasterxml.jackson.module:jackson-module-kotlin")
+    api("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
