@@ -2,6 +2,7 @@ package com.spring.camp.io
 
 import org.springframework.web.client.RestTemplate
 
+@AllOpen
 class PartnerClient(
     private val restTemplate: RestTemplate,
 ) {

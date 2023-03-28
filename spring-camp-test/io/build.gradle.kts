@@ -15,3 +15,7 @@ dependencies {
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
+
+allOpen {
+    annotation("com.spring.camp.io.AllOpen")
+}
