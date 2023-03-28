@@ -1,4 +1,4 @@
-package com.example.springcamptest
+package com.spring.camp.api
 
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate

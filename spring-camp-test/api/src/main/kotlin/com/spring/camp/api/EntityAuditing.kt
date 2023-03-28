@@ -1,4 +1,4 @@
-package com.example.springcamptest
+package com.spring.camp.api
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import javax.persistence.EntityListeners

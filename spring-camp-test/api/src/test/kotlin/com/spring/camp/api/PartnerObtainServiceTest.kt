@@ -1,11 +1,11 @@
-package com.example.springcamptest
+package com.spring.camp.api
 
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import org.springframework.boot.test.mock.mockito.MockBean
 
 
-class BService(
+class PartnerObtainServiceTest(
     private val partnerObtainService: PartnerObtainService,
 ): TestSupport() {
 

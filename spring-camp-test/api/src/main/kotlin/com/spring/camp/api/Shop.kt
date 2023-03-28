@@ -1,4 +1,4 @@
-package com.example.springcamptest
+package com.spring.camp.api
 
 import org.springframework.data.jpa.repository.JpaRepository
 import javax.persistence.Column

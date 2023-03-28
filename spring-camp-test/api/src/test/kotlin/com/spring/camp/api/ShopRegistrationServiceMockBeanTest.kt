@@ -1,4 +1,4 @@
-package com.example.springcamptest
+package com.spring.camp.api
 
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test

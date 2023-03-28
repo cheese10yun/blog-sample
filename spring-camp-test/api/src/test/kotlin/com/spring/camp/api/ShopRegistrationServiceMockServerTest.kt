@@ -1,4 +1,4 @@
-package com.example.springcamptest
+package com.spring.camp.api
 
 import kotlin.properties.Delegates
 import org.assertj.core.api.BDDAssertions.*

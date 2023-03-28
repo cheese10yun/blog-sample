@@ -18,32 +18,70 @@ configurations {
     }
 }
 
-repositories {
-    mavenCentral()
-    maven { url = uri("https://repo.spring.io/milestone") }
-    maven { url = uri("https://repo.spring.io/snapshot") }
-}
-
-dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
-    runtimeOnly("com.h2database:h2")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "11"
+allprojects{
+    repositories {
+        mavenCentral()
+        maven { url = uri("https://repo.spring.io/milestone") }
+        maven { url = uri("https://repo.spring.io/snapshot") }
     }
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+subprojects {
+    apply(plugin = "java")
+    apply(plugin = "kotlin")
+    apply(plugin = "kotlin-spring")
+    apply(plugin = "org.springframework.boot")
+    apply(plugin = "io.spring.dependency-management")
+
+//    allOpen {
+//        annotation("javax.persistence.Entity")
+//        annotation("javax.persistence.Embeddable")
+//        annotation("javax.persistence.MappedSuperclass")
+//    }
+
+
+    dependencies {
+
+//        implementation("org.springframework.boot:spring-boot-starter-actuator")
+//        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+//        implementation("org.springframework.boot:spring-boot-starter-validation")
+//        implementation("org.springframework.boot:spring-boot-starter-web")
+//        implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+        implementation("org.jetbrains.kotlin:kotlin-reflect")
+//        developmentOnly("org.springframework.boot:spring-boot-devtools")
+//        runtimeOnly("com.h2database:h2")
+//        annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+//        testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    }
+
+    tasks.bootJar {
+        enabled = false
+    }
+
+    tasks.jar {
+        enabled = true
+    }
+
+
+    tasks.test {
+        useJUnitPlatform()
+        systemProperty("spring.profiles.active", "test")
+        maxHeapSize = "1g"
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "11"
+        }
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
+
 }
+
+
+

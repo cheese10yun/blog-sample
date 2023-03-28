@@ -1,19 +1,19 @@
-package com.example.springcamptest
+package com.spring.camp.api
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.stereotype.Service
 
 @SpringBootApplication
-class SpringCampTestApplication
+class ApiApplication
 
 fun main(args: Array<String>) {
-    runApplication<SpringCampTestApplication>(*args)
+    runApplication<ApiApplication>(*args)
 }
 
 @Service
 class PartnerObtainService(
-    private val obtainService:ObtainService
+    private val obtainService: ObtainService
 ) {
 
     fun syncPartner(){
