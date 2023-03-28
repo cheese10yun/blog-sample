@@ -12,8 +12,8 @@ import org.springframework.test.web.servlet.post
 
 internal class PartnerApiTest : SpringApiTestSupport() {
 
-//    @MockBean
-//    private lateinit var shinChanBankApiImpl: ShinChanBankApiImpl
+    @MockBean
+    private lateinit var shinChanBankApiImpl: ShinChanBankApiImpl
 
     @Test
     internal fun `파트너 등록`() {
