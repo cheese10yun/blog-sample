@@ -33,8 +33,4 @@ class ShopRegistrationServiceMockBeanTest(
         then(shop.name).isEqualTo(name)
         then(shop.brn).isEqualTo(brn)
     }
-
 }
-
-
-

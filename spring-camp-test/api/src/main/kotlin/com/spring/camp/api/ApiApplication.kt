@@ -14,10 +14,10 @@ fun main(args: Array<String>) {
 
 @Service
 class PartnerObtainService(
-    private val obtainService: ObtainService
+    private val obtainService: ObtainService,
 ) {
 
-    fun syncPartner(){
+    fun syncPartner() {
         obtainService.syncPartner()
     }
 
@@ -26,7 +26,7 @@ class PartnerObtainService(
 @Service
 class ObtainService(
     private val partnerClient: PartnerClient,
-){
+) {
 
     fun syncPartner(): Boolean {
         partnerClient.syncPartner()
