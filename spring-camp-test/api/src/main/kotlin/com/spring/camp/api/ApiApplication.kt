@@ -29,7 +29,7 @@ class ObtainService(
 ) {
 
     fun syncPartner(): Boolean {
-        partnerClient.syncPartner()
+//        partnerClient.getPartnerStatus()
         return true
     }
 }
