@@ -1,2 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.spring.camp.io.ClientTestConfiguration
+#org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+#  com.spring.camp.io.ClientTestConfiguration

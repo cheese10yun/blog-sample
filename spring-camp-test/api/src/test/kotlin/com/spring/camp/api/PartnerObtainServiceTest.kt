@@ -1,6 +1,6 @@
 package com.spring.camp.api
 
-import com.spring.camp.io.ClientTestConfiguration
+//import com.spring.camp.io.ClientTestConfiguration
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import org.springframework.boot.test.mock.mockito.MockBean

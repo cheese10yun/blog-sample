@@ -33,4 +33,18 @@ class ShopRegistrationServiceMockBeanTest(
         then(shop.name).isEqualTo(name)
         then(shop.brn).isEqualTo(brn)
     }
+
+//    @Test
+//    fun `Shop 등록 테스트 케이스`() {
+//        //given
+//        val brn = "000-00-0000"
+//        val name = "주식회사 XXX"
+//
+//        //when
+//        val shop = shopRegistrationService.register(brn, name)
+//
+//        //then
+//        then(shop.name).isEqualTo(name)
+//        then(shop.brn).isEqualTo(brn)
+//    }
 }
