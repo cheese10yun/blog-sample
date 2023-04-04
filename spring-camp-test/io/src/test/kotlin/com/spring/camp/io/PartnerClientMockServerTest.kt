@@ -4,14 +4,11 @@ import kotlin.properties.Delegates
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.web.client.MockRestServiceServer
-import org.springframework.test.web.client.match.MockRestRequestMatchers
 import org.springframework.test.web.client.match.MockRestRequestMatchers.*
-import org.springframework.test.web.client.response.MockRestResponseCreators
 import org.springframework.test.web.client.response.MockRestResponseCreators.*
 import org.springframework.web.client.RestTemplate
 
