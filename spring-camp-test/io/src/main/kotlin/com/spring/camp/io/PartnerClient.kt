@@ -14,6 +14,7 @@ class PartnerClient(
     }
 
     fun getPartnerByResponse(brn: String): ResponseEntity<PartnerResponse> {
+        restTemplate.getForEntity("/api/v1/partner/${brn}", PartnerResponse::class.java, mapOf("asd" to "ads"))
         return restTemplate.getForEntity("/api/v1/partner/${brn}", PartnerResponse::class.java)
     }
 
@@ -31,7 +32,7 @@ class PartnerResponse(
 
 class PartnerStatusResponse(
     val status: PartnerStatus,
-    val closeBusinessDate: LocalDate?
+    val closeBusinessDate: LocalDate?,
 )
 
 enum class PartnerStatus(desc: String) {
