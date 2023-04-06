@@ -1,6 +1,7 @@
 package com.spring.camp.api
 
 import com.spring.camp.io.PartnerClient
+import com.spring.camp.io.PartnerClientService
 import com.spring.camp.io.PartnerStatus
 import org.springframework.stereotype.Service
 
@@ -8,20 +9,41 @@ import org.springframework.stereotype.Service
 class ShopRegistrationService(
     private val shopRepository: ShopRepository,
     private val partnerClient: PartnerClient,
+    private val partnerClientService: PartnerClientService,
 ) {
+
+//    fun register(
+//        brn: String,
+//    ): Shop {
+//        val response = partnerClient.getPartnerByResponse(brn)
+//        // 2xx가 아닌 경우는 예외 발생
+//        require(!response.statusCode.is2xxSuccessful.not()) { "error message ..." }
+//        return shopRepository.save(
+//            Shop(
+//                brn = brn,
+//                name = response.body!!.name
+//            )
+//        )
+//    }
 
     fun register(
         brn: String,
     ): Shop {
-        val response = partnerClient.getPartnerByResponse(brn)
-        // 2xx가 아닌 경우는 예외 발생
-        require(!response.statusCode.is2xxSuccessful.not()) { "error message ..." }
-        return shopRepository.save(
-            Shop(
+        val partnerResponse = partnerClientService.getPartner(brn)
+        val shop = when {
+            partnerResponse.statusCode.is2xxSuccessful.not() -> {
+                // 조회 실패시 추가 질의 로직...
+                Shop(
+                    brn = brn,
+                    name = "응답받은 가맹점명"
+                )
+            }
+            else -> Shop(
                 brn = brn,
-                name = response.body!!.name
+                name = partnerResponse.body!!.name
             )
-        )
+        }
+        return shopRepository.save(shop)
     }
 }
 
