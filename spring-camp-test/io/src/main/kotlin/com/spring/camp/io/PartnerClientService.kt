@@ -25,4 +25,15 @@ class PartnerClientService(
     fun getPartner(brn: String): ResponseEntity<PartnerResponse> {
         return partnerClient.getPartnerByResponse(brn)
     }
+
+//    /**
+//     * Pair<Int, PartnerResponse?> 리턴
+//     */
+//    fun getPartner(brn: String): Pair<Int, PartnerResponse?> {
+//        val partnerByResponse = partnerClient.getPartnerByResponse(brn)
+//        return Pair(
+//            first = partnerByResponse.statusCode.value(),
+//            second = partnerByResponse.body
+//        )
+//    }
 }

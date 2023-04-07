@@ -9,8 +9,16 @@ class PartnerClient(
     private val restTemplate: RestTemplate,
 ) {
 
+//    fun getPartnerBy(brn: String): PartnerResponse {
+//        return restTemplate.getForObject("/api/v1/partner/${brn}", PartnerResponse::class.java)!!
+//    }
+
     fun getPartnerBy(brn: String): PartnerResponse {
-        return restTemplate.getForObject("/api/v1/partner/${brn}", PartnerResponse::class.java)!!
+        val response = restTemplate.getForEntity("/api/v1/partner/${brn}", PartnerResponse::class.java)
+        if (response.statusCode.is2xxSuccessful.not()){
+            throw IllegalArgumentException("....")
+        }
+        return response.body!!
     }
 
     fun getPartnerByResponse(brn: String): ResponseEntity<PartnerResponse> {

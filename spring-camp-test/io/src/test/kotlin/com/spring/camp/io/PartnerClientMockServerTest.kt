@@ -1,7 +1,8 @@
 package com.spring.camp.io
 
 import kotlin.properties.Delegates
-import org.assertj.core.api.BDDAssertions.then
+import org.assertj.core.api.BDDAssertions
+import org.assertj.core.api.BDDAssertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpMethod
@@ -27,7 +28,7 @@ class PartnerClientMockServerTest(
     }
 
     @Test
-    fun `getPartnerBy test`() {
+    fun `2xx가 아닌 경우 IllegalArgumentException 발생`() {
         //given
         val brn = "000-00-0000"
         val name = "주식회사 XXX"
@@ -49,11 +50,10 @@ class PartnerClientMockServerTest(
                     )
             )
 
-        //when
-        val partner = partnerClient.getPartnerBy(brn)
-
-        //then
-        then(partner.name).isEqualTo(name)
-        then(partner.brn).isEqualTo(brn)
+        //when & then
+        thenThrownBy {
+            partnerClient.getPartnerBy(brn)
+        }
+            .isInstanceOf(IllegalArgumentException::class.java)
     }
 }

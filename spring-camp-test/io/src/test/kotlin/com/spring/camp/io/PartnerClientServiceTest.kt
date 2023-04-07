@@ -52,6 +52,21 @@ class PartnerClientServiceTest(
 
 
     @Test
+    fun `PartnerResponse의 JOSN을 Deserialize 테스트`() {
+        //given
+        val brn = "000-00-0000"
+        val name = "주식회사 XXX"
+        val response = PartnerResponse(brn, name)
+
+        given(partnerClient.getPartnerByResponse(brn))
+            .willReturn(ResponseEntity(response, HttpStatus.OK))
+
+        //when
+        partnerClientService.getPartnerBy(brn)
+    }
+
+
+    @Test
     fun `getPartner ResponseEntity 응답`() {
         //given
         val brn = "000-00-0000"
