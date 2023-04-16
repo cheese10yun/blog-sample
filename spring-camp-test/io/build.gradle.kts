@@ -10,7 +10,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-web")
     api("com.fasterxml.jackson.module:jackson-module-kotlin")
     api("org.jetbrains.kotlin:kotlin-reflect")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    api("org.springframework.boot:spring-boot-starter-test")
 
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
 }

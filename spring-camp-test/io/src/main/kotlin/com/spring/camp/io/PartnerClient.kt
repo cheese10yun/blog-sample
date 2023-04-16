@@ -10,7 +10,11 @@ class PartnerClient(
 ) {
 
 //    fun getPartnerBy(brn: String): PartnerResponse {
-//        return restTemplate.getForObject("/api/v1/partner/${brn}", PartnerResponse::class.java)!!
+//        return restTemplate
+//            .getForObject(
+//                "/api/v1/partner/${brn}",
+//                PartnerResponse::class.java
+//            )!!
 //    }
 
     fun getPartnerBy(brn: String): PartnerResponse {

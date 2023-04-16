@@ -29,7 +29,7 @@ class ShopRegistrationServiceMockServerTest(
     }
 
     @Test
-    fun `register case 1`() {
+    fun `가맹점 등록 Mock HTTP Test`() {
         //given
         val brn = "000-00-0000"
         val name = "주식회사 XXX"
