@@ -1,3 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.spring.camp.io.ClientConfiguration\
-  com.spring.camp.io.PartnerClientService
+  com.spring.camp.io.ClientConfiguration

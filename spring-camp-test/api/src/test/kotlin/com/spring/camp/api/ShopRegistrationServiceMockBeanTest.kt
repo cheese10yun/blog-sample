@@ -67,7 +67,7 @@ class ShopRegistrationServiceMockBeanTest(
         val name = "주식회사 XXX"
 
         //when
-        val shop = shopRegistrationService.register(brn, name)
+        val shop = shopRegistrationService.register(brn)
 
         //then
         then(shop.name).isEqualTo(name)

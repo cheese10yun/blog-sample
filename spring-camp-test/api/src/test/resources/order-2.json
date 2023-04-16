@@ -1,0 +1,26 @@
+{
+  "orderNumber": "A00001",
+  "status": "READY",
+  "price": 1000,
+  "address": {
+    "zipCode": "023",
+    "address": "서울 중구 을지로 65",
+    "detail": "SK텔레콤빌딩 4층 수펙스홀"
+  },
+  "products": [
+    {
+      "name": "에어 조던 XXXVII 로우 PF",
+      "size": "230",
+      "tags": [
+        "신발", "나이키", "에어 조던"
+      ]
+    },
+    {
+      "name": "나이키 에어맥스 1 '86 OG G",
+      "size": "240",
+      "tags": [
+        "신발", "나이키", "에어맥스"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "order_number": "A00001",
+  "status": "READY",
+  "price": 1000,
+  "address": {
+    "zip_code": "023",
+    "address": "서울 중구 을지로 65",
+    "detail": "SK텔레콤빌딩 4층 수펙스홀"
+  }
+}
