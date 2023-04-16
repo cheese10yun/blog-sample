@@ -5,3 +5,5 @@ spring:
 
     jackson:
         property-naming-strategy: SNAKE_CASE
+    jpa:
+        show-sql: true

@@ -26,4 +26,18 @@ class PartnerObtainServiceTest(
         //then
 //        then(shop.name).isEqualTo("주식회사 XXX")
     }
+
+//    @Test
+//    fun `상품 준비중 to 배송 시작 status 변경 테스트`() {
+//        //given
+//        val orderNumber = "order-number-123"
+//        val order = Order(orderNumber)
+//
+//        order.status = OrderStatus.COMPLETE_PAYMENT
+//
+//        //when
+//
+//        //then
+//
+//    }
 }
