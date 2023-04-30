@@ -13,32 +13,47 @@ class OrderApiTest(
 ) : TestSupport() {
 
 
-@Test
-internal fun `주문 API TEST`() {
-    //given
-    val dto = OrderRequest(
-        orderNumber = "A00001",
-        status = "READY",
-        price = 1000L,
-        address = Address(
-            zipCode = "023",
-            address = "서울 중구 을지로 65",
-            detail = "SK텔레콤빌딩 4층 수펙스홀"
+    @Test
+    internal fun `주문 API TEST`() {
+        //given
+        val dto = OrderRequest(
+            orderNumber = "A00001",
+            status = "READY",
+            price = 1000L,
+            address = Address(
+                zipCode = "023",
+                address = "서울 중구 을지로 65",
+                detail = "SK텔레콤빌딩 4층 수펙스홀"
+            )
         )
-    )
 
 //    val requestBody = objectMapper.writeValueAsString(dto)
-    val requestBody = readJson("/order-1.json")
+        val requestBody = readJson("/order-1.json")
 
 
-    //when & then
-    mockMvc.post("/v1/orders") {
-        contentType = MediaType.APPLICATION_JSON
-        content = requestBody
-    }.andExpect {
-        status { isOk() }
+        //when & then
+        mockMvc.post("/v1/orders") {
+            contentType = MediaType.APPLICATION_JSON
+            content = requestBody
+        }.andExpect {
+            status { isOk() }
+        }
+
+
     }
-}
+
+    @Test
+    fun ㅁㄴㅇㄴㅁㅇ() {
+
+        var asd: String? = ""
+        asd = null
+
+        val toString = asd.toString()
+
+        println(toString)
+
+
+    }
 
 //    @Test
 //    internal fun `test`() {
