@@ -5,5 +5,26 @@ spring:
 
     jackson:
         property-naming-strategy: SNAKE_CASE
+
     jpa:
-        show-sql: true
+        database: mysql
+        generate-ddl: true
+        hibernate:
+            ddl-auto: create
+
+    datasource:
+        url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=Asia/Seoul&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false
+        username: root
+        password:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        hikari:
+            maximum-pool-size: 50
+            minimum-idle: 25
+            connection-timeout: 90000
+            max-lifetime: 90000
+        dbcp2:
+            test-on-borrow: true
+            validation-query: select 1
+    sql:
+        init:
+            mode: never

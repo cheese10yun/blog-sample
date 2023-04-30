@@ -22,10 +22,10 @@ class ClientConfiguration {
     )
 
 
-    @Bean
-    @Primary
-    @Profile("test")
-    fun mockPartnerClientService() =
-        mock(PartnerClientService::class.java)!!
+//    @Bean
+//    @Primary
+//    @Profile("test")
+//    fun mockPartnerClientService() =
+//        mock(PartnerClientService::class.java)!!
 
 }
