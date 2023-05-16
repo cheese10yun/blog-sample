@@ -1,0 +1,9 @@
+management:
+    endpoints:
+        web:
+            exposure:
+                include:
+                    - "*"
+                    - "health"
+                    - "metrics"
+                    - "prometheus"
