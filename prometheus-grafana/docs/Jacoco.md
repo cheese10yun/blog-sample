@@ -47,11 +47,11 @@ Jacoco Report 설정 (1) 설정은 리포트를 받은 파일일에 대한 설�
 
 ### 리포트 결과물
 
-![](img/jacoco-2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/prometheus-grafana/docs/img/jacoco-2.png)
 
 ### HTML 리포트
 
-![](img/jacoco-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/prometheus-grafana/docs/img/jacoco-1.png)
 
 HTML 리포트으로 로컬에서 주로 확인 진행
 
@@ -59,7 +59,7 @@ HTML 리포트으로 로컬에서 주로 확인 진행
 
 (3) 설정으로 특정 클래스에 대한 테스트 커버리지를 제외 가능 대표적으로 main 클래스, 각종 Config 설정등이 여기에 해당 `exclude`를 통해서 제외 가능 `PrometheusGrafanaApplication`을 제외하면
 
-![](img/jacoco-3.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/prometheus-grafana/docs/img/jacoco-3.png)
 
 최종 결과물에서 제외
 
