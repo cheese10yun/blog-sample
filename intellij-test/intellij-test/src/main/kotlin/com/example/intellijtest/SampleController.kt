@@ -16,4 +16,13 @@ class SampleController {
 
 data class Sample(
     val name: String,
-)
+){
+    fun asd(): Unit {
+
+        //@formatter:off
+        //@formatter:on
+        //@formatter:off
+        //@formatter:on
+
+    }
+}
