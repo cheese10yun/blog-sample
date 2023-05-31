@@ -4,14 +4,14 @@
 
 ### Tab Limit
 
-![](images/tib-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tib-1.png)
 
 * settings -> Edit tabs -> Tab Limit 으로 Tab limit 설정 가능
 * 여러 Tab을 켜도 Limit한 설정 값으로 유지, Limit 1을 추천
 
 ### Tab 이동
 
-![](images/tip-2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-2.png)
 
 | Name                     | Hot Key         | Desc                                         |
 |--------------------------|-----------------| -------------------------------------------- |
@@ -32,7 +32,7 @@
 
 ### Find Action
 
-![](images/tip-3.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-3.png)
 
 * 특정한 기능을 찾고 싶은 경우 단축키 `shfit + cmd + a`  Find Action 으로 해당 기능을 찾을 수 있음
 * 대충 이런 기능이 있지 않을까 하는 기능을 검색을 통해서 해당 기능의 유무를 빠르게 파악 가능 ex) git stash
@@ -40,7 +40,7 @@
 
 ### Key map
 
-![](images/tip-4.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-4.png)
 
 * Key map 통해서 Hot Key 조회 및 등록 가능
 * 키워드를 통해 검색 or 단축 키를 통한 검색도 지원
