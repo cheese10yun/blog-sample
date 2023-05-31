@@ -1,0 +1,20 @@
+# Config Server
+GET {{config-server}}/licensing-service/default
+Accept: application/json
+
+###
+GET {{config-server}}/licensing-service/dev
+Accept: application/json
+
+###
+POST {{config-server}}/encrypt
+Accept: text/plain
+
+legendaiwjgnz;6icnzl1
+
+###
+
+GET {{config-server}}/licensing-service/default
+Accept: application/json
+
+###
