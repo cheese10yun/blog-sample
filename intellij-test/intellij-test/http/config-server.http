@@ -14,7 +14,7 @@ legendaiwjgnz;6icnzl1
 
 ###
 
-GET {{config-server}}/licensing-service/default
+GET {{config-server}}/licensing-service/default?page=10&size=10&name=123&email=123@asd.com
 Accept: application/json
 
 ###

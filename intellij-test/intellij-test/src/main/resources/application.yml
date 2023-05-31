@@ -1,4 +1,5 @@
 management:
+
     endpoints:
         web:
             exposure:
@@ -7,3 +8,8 @@ management:
                     - "health"
                     - "metrics"
                     - "prometheus"
+    endpoint:
+        health:
+            probes:
+                enabled: true
+            show-details: always
