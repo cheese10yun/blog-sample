@@ -92,15 +92,32 @@
 
 * Switch는 다양한 문자열 포맷으로 쉽게 변경이 가능합니다.
 
+## HTTP Client
+* [ ] env post
+* [ ] query parameter
+* [ ] curl copy & paste
 
-## Refactoring
 
-* [ ] move
-* [ ] copy
-* [ ] introduce variable
-* [ ] Property
-* [ ] introduce Parameter
-* [ ] Pull Members Up
+## Spring
+
+### Debug
+
+* [ ] Beans
+* [ ] Health
+* [ ] Mappings
+
+### Spring
+* [ ] Beans
+* [ ] MVC
+* [ ] Data
+
+### Endpoints
+* [ ] Bean
+* [ ] MVC
+
+
+### Dependencies
+* [ ] Version
 
 ## Github Code Review
 
@@ -113,12 +130,11 @@
 * [ ] Stash, UnStash
 * [ ] Branch, Branch Diff, Merge, Checkout
 
+## Refactoring
 
-## HTTP Client
-* [ ] env post
-* [ ] query parameter
-* [ ] curl copy & paste
-
-## Spring 
-* [ ] Bean
-* [ ] MVC
+* [ ] move
+* [ ] copy
+* [ ] introduce variable
+* [ ] Property
+* [ ] introduce Parameter
+* [ ] Pull Members Up
