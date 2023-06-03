@@ -3,7 +3,7 @@
 ## Presentation
 
 <p align="center">
-<img src="images/tip-6.png" width="600">
+<img src="images/tip-6.png" width="800">
 </p>
 
 
@@ -15,7 +15,7 @@
 ### Tab Limit
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tib-1.png" width="600">
+<img src="https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-1.png" width="800">
 </p>
 
 
@@ -26,7 +26,7 @@
 
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-2.png" width="600">
+<img src="https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-2.png" width="800">
 </p>
 
 | Name                     | Hot Key         | Desc                                         |
@@ -48,7 +48,9 @@
 
 ### Find Action
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-3.png)
+<p align="center">
+<img src="https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-3.png" width="800">
+</p>
 
 * 특정한 기능을 찾고 싶은 경우 단축키 `shfit + cmd + a`  Find Action 으로 해당 기능을 찾을 수 있음
 * 대충 이런 기능이 있지 않을까 하는 기능을 검색을 통해서 해당 기능의 유무를 빠르게 파악 가능 ex) git stash
@@ -56,7 +58,9 @@
 
 ### Key map
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-4.png)
+<p align="center">
+<img src="https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-4.png" width="800">
+</p>
 
 * Key map 통해서 Hot Key 조회 및 등록 가능
 * 키워드를 통해 검색 or 단축 키를 통한 검색도 지원
@@ -94,10 +98,9 @@
 
 ### 복사 히스토리 command + shift + v
 
-![](images/tip-7.png | width=100)
-
-<img src="images/tip-7.png" width="600">
-
+<p align="center">
+<img src="https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-7.png" width="800">
+</p>
 
 
 
