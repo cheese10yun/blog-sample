@@ -1,17 +1,33 @@
 # Intelli J
 
+## Presentation
+
+<p align="center">
+<img src="images/tip-6.png" width="600">
+</p>
+
+
+[Presentation Assistant](https://plugins.jetbrains.com/plugin/7345-presentation-assistant) 플러그인을 통해서 단축키 정보는 하단에 출력 됩니다.
+
+
 ## Tab
 
 ### Tab Limit
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tib-1.png)
+<p align="center">
+<img src="https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tib-1.png" width="600">
+</p>
+
 
 * settings -> Edit tabs -> Tab Limit 으로 Tab limit 설정 가능
 * 여러 Tab을 켜도 Limit한 설정 값으로 유지, Limit 1을 추천
 
 ### Tab 이동
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-2.png)
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-2.png" width="600">
+</p>
 
 | Name                     | Hot Key         | Desc                                         |
 |--------------------------|-----------------| -------------------------------------------- |
@@ -67,9 +83,24 @@
 
 ## 문자열
 
-* [ ] 동일 문자열 ⌘ + ⌃ + g
-* [ ] 동일 위치열 ⌥ + drag
-* [ ] 복사 히스토리 command + shift + v
+### 동일 문자열 ⌘ + ⌃ + g
+
+![](https://camo.githubusercontent.com/6980a81c4101651570d8f5d1d5f0ccfe951ec6c37af4b7856b4486ec5d92bdd3/68747470733a2f2f692e696d6775722e636f6d2f66414d41364f722e676966)
+
+
+### 동일 위치열 ⌥ + drag or ⌥⌥  
+
+![](https://camo.githubusercontent.com/208370c96ef96e70a051b984025f8d954679d08cb32abbe724f6a39f5cb0ffb1/68747470733a2f2f692e696d6775722e636f6d2f5a3549596736772e676966)
+
+### 복사 히스토리 command + shift + v
+
+![](images/tip-7.png | width=100)
+
+<img src="images/tip-7.png" width="600">
+
+
+
+
 
 ## Plugins
 * [ ] grep
