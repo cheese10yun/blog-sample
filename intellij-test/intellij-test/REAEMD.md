@@ -15,8 +15,8 @@
 
 | Name                     | Hot Key         | Desc                                         |
 |--------------------------|-----------------| -------------------------------------------- |
-| `Split Right`            | fn + cmd +  ➡️  | 현재 화면 오른 쪽으로 분활                   |
-| `Split Down`             | fn + cmd +  ⬇️  | 현재 화면 아래 쪽으로 분할                   |
+| `Split Right`            | fn + ctr +  ➡️  | 현재 화면 오른 쪽으로 분활                   |
+| `Split Down`             | fn + ctr +  ⬇️  | 현재 화면 아래 쪽으로 분할                   |
 | `Goto Next Splitter`     | shfit + cmd  ➡️ | 현재 포커싱 화면애서 다음 Tab으로 이동       |
 | `Goto Previous Splitter` | shfit + cmd  ⬅️ | 현재 포커싱 화면애서 이전 다음 Tab으로 이동  |
 | `<- Back`                | cmd + [         | 현재 Tab의 이전 Tab, tab limit 1 지정시 유용 |
