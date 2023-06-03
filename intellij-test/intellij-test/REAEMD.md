@@ -97,6 +97,11 @@
 * [ ] query parameter
 * [ ] curl copy & paste
 
+```
+curl -X GET --location "http://localhost:8080/actuator/health" \
+-H "Accept: application/json"
+```
+
 
 ## Spring
 

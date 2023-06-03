@@ -22,10 +22,5 @@ class ShopApi(
 }
 
 class ShopResponse(shop: Shop) {
-    val brn = shop.brn
-    val name = shop.name
-    val address = shop.address
-    val addressDetail = shop.addressDetail
-    val zipCode = shop.zipCode
-    val rank = shop.rank
+
 }
