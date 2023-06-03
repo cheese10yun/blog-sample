@@ -68,14 +68,35 @@
 
 ### Live Template
 
-![](https://camo.githubusercontent.com/05c612752077fb8488efe81f76609936965dfeb0340540bdc7b45d8040cd5524/68747470733a2f2f692e696d6775722e636f6d2f483471523461612e706e67)
-
 ![](https://camo.githubusercontent.com/5471e679d04d13a643230014376ab5e736a72b4252a10e644eb41e158b3e5ea4/68747470733a2f2f692e696d6775722e636f6d2f6d5a75444d64552e676966)
 
 * 코드 템플릿을 미리 지정해서 편하게 코드를 작성할 수 있는 기능입니다.
 * `sout`, `psvm` 등이 여기에 해당 합니다.
-* `ss`, `tdd`, `comment-formatter` `sf` 등등을 커스텀해서 사용 
+* `ss`, `tdd`, `jobc`, `jobcode`, `comment-formatter` `sf` 등등을 커스텀해서 사용
 
+#### 등록 방법
+
+![](https://camo.githubusercontent.com/05c612752077fb8488efe81f76609936965dfeb0340540bdc7b45d8040cd5524/68747470733a2f2f692e696d6775722e636f6d2f483471523461612e706e67)
+
+* Settings -> Live Templates
+
+### formatter 코드 정렬 제외
+
+![](images/tip-8.png)
+
+```kotlin
+fun asd(): Unit {
+    //@formatter:off
+    val a = 10
+        val b = 10
+        val c = 10
+        val d = 10
+    val e = 10
+    val f = 10
+    //@formatter:on
+}
+``` 
+* 특정한 이유로 코드 정렬을 제외하고 싶을 때 `@formatter:off ~ @formatter:on`을 활용하여 제외할 수 있다.
 
 ### Gradle Task
 
@@ -127,6 +148,9 @@
 * Switch는 다양한 문자열 포맷으로 쉽게 변경이 가능합니다.
 
 ## HTTP Client
+
+HTTP Client는 Postman 처럼 HTTP 호출을 도와주는 도구로 IntelliJ에서 사용 가능
+
 * [ ] env post
 * [ ] query parameter
 * [ ] curl copy & paste
