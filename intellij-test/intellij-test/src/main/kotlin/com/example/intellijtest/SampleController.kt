@@ -16,13 +16,15 @@ class SampleController {
 
 data class Sample(
     val name: String,
-){
+) {
     fun asd(): Unit {
-
         //@formatter:off
         //@formatter:on
-        //@formatter:off
-        //@formatter:on
-
+        val a = 10
+            val b = 10
+            val c = 10
+            val d = 10
+        val e = 10
+        val f = 10
     }
 }
