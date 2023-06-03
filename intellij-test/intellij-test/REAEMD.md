@@ -19,7 +19,7 @@
 </p>
 
 
-* settings -> Edit tabs -> Tab Limit 으로 Tab limit 설정 가능
+* settings -> editor tabs -> Tab Limit 으로 Tab limit 설정 가능
 * 여러 Tab을 켜도 Limit한 설정 값으로 유지, Limit 1을 추천
 
 ### Tab 이동
