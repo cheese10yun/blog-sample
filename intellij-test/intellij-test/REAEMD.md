@@ -123,6 +123,9 @@ fun asd(): Unit {
 <img src="https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-7.png" width="800">
 </p>
 
+### 활용 방법
+
+
 
 ## Plugins
 * [ ] grep
@@ -179,7 +182,13 @@ HTTP Client는 Postman 처럼 HTTP 호출을 도와주는 도구로 IntelliJ에�
 
 ![](images/tip-12.gif)
 
-* HTTP Client를 Curl 형식으로 변환하여 복사할 수 있습니다. 
+* HTTP Client를 Curl 형식으로 변환하여 복사할 수 있습니다.
+
+### Query parameter 정리
+
+![](images/tip-13.gif)
+
+* Query parameter를 쉽게 정리할 수 있습니다.
 
 
 ## Spring

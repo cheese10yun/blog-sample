@@ -15,7 +15,7 @@ Accept: application/json
 
 
 # Shop 조회
-GET {{shop-service}}/api/v1/shop
+GET {{shop-service}}/api/v1/shop?page=1&size=10&name=test&email=test@ad.com&address=xxxxx&zipCode=xxxxxx
 Accept: application/json
 
 ###
