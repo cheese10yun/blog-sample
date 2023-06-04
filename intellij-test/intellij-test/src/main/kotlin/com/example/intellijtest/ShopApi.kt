@@ -30,6 +30,7 @@ class ShopApi(
     }
 }
 
+
 class ShopRegistrationRequest(
     val brn: String,
     val name: String,
@@ -44,7 +45,3 @@ class ShopRegistrationRequest(
     val addressDetail: String,
     val zipCode: String,
 )
-
-class ShopResponse(shop: Shop) {
-
-}
