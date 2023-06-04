@@ -125,6 +125,9 @@ fun asd(): Unit {
 
 ### 활용 방법
 
+![](images/tip-14.gif)
+
+특정 Entity를 응답 객체로 만들어야하는 경우 동일 문자열을 복사해서 보다 쉽게 Response 객체를 만들수 있습니다.
 
 
 ## Plugins
