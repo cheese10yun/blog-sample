@@ -1,6 +1,35 @@
-# Config Server
+# health
 GET {{shop-service}}/actuator/health
 Accept: application/json
+
+###
+
+
+# Shop 조회
+GET {{shop-service}}/api/v1/shop
+Accept: application/json
+
+###
+
+# Shopt 등록
+POST {{shop-service}}/api/v1/shop
+Content-Type: application/json
+
+{
+  "brn": "brn$-{it}",
+  "name": "name$-{it}",
+  "band": "band$-{it}",
+  "category": "category$-{it}",
+  "email": "email$-{it}",
+  "website": "website$-{it}",
+  "openingHours": "openingHours$-{it}",
+  "seatingCapacity": 1,
+  "rating": 1,
+  "address": "address$-{it}",
+  "addressDetail": "addressDetail$-{it}",
+  "zipCode": "zipCode$-{it}"
+}
+
 
 ###
 
