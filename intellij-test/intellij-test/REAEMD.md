@@ -107,9 +107,7 @@ fun asd(): Unit {
 
 ### 복사 히스토리 command + shift + v
 
-<p align="center">
-<img src="https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-7.png" width="800">
-</p>
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-7.png)
 
 ### 활용 방법
 
