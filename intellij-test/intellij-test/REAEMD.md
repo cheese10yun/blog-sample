@@ -149,9 +149,7 @@ IDE에서 마우스를 사용하면 대체 가능한 단축키를 알려주는 �
 
 ### [Presentation Assistant](https://plugins.jetbrains.com/plugin/7345-presentation-assistant)
 
-<p align="center">
-<img src="images/tip-6.png" width="800">
-</p>
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-6.png)
 
 사용하는 단축키와 기능 명을 디스플레이 해주는 플러그인
 
