@@ -2,7 +2,7 @@
 
 ## Presentation
 
-![](images/tip-6.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-6.png)
 
 [Presentation Assistant](https://plugins.jetbrains.com/plugin/7345-presentation-assistant) 플러그인을 통해서 단축키 정보는 하단에 출력 됩니다.
 
@@ -70,7 +70,7 @@
 
 ### formatter 코드 정렬 제외
 
-![](images/tip-8.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-8.png)
 
 ```kotlin
 fun asd(): Unit {
@@ -113,7 +113,7 @@ fun asd(): Unit {
 
 ### 활용 방법
 
-![](images/tip-14.gif)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-14.gif)
 
 특정 Entity를 응답 객체로 만들어야 하는 경우 동일 문자열을 복사해서 보다 쉽게 Response 객체를 만들 수 있습니다.
 
@@ -158,19 +158,19 @@ IDE에서 마우스를 사용하면 대체 가능한 단축키를 알려주는 �
 
 ### 플러그인 찾는 방법
 
-![](images/tip-15.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-15.png)
 
 플러그인 검색을 `/sortBy:downloads`으로 다운로드가 높은 순으로 정렬하고 필요한 플러그인을 선택
 
 ## HTTP Client
 
-![](images/tip-9.gif)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-9.gif)
 
 HTTP Client는 Postman처럼 HTTP 호출을 도와주는 도구로 IntelliJ에서 사용 가능
 
 ### HTTP Env
 
-![](images/tip-10.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-10.png)
 
 ```json
 {
@@ -190,17 +190,17 @@ HTTP 호출 환경을 JSON으로 관리할 수 있습니다. HTTP 호출에 대�
 
 ### HTTP Curl Copy & Paste
 
-![](images/tip-11.gif)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-11.gif)
 
 Curl을 붙여넣기를 하면 HTTP Client에 맞는 형식으로 자동으로 변환 됩니다.
 
-![](images/tip-12.gif)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-12.gif)
 
 반대로 HTTP Client를 Curl 형식으로 변환하여 복사할 수 있습니다.
 
 ### Query parameter 정리
 
-![](images/tip-13.gif)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-13.gif)
 
 Query parameter를 쉽게 정리할 수 있습니다.
 
