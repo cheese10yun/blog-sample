@@ -2,16 +2,10 @@ package com.example.intellijtest
 
 import org.junit.jupiter.api.Test
 
-private val s = "openingHours"
 
 class RefactoringTest {
 
-
-    private val s1 = "band"
-
     /**
-     *
-     *
      * | Name                | Hot Key   | Desc           |
      * |---------------------|-----------|----------------|
      * | Move                | F6        | 파일 이동          |
@@ -19,7 +13,8 @@ class RefactoringTest {
      * | Property Extract    | ⌥ + ⌘ + F | Property 으로 분리 |
      * | Introduce Variable  | ⌥ + ⌘ + V | 변수로 분리         |
      * | Introduce Parameter | ⌥ + ⌘ + P | Parameter 분리   |
-     * | Inline              | ⌥ + ⌘ + N | 변수 머지          |
+     * | Inline              | ⌥ + ⌘ + N | Inline          |
+     * | Function Extract    | ⌥ + ⌘ + M | Function 추출    |
      */
     @Test
     fun `Refactoring`(address: String?) {
