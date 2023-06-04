@@ -18,7 +18,6 @@ class ShopApi(
     fun getShop(
         @PageableDefault pageable: Pageable,
     ): List<Shop> {
-
         return shopRepository.findAll()
     }
 
