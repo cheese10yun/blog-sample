@@ -124,8 +124,6 @@ fun asd(): Unit {
 </p>
 
 
-
-
 ## Plugins
 * [ ] grep
 * [ ] git tool box
@@ -149,16 +147,39 @@ fun asd(): Unit {
 
 ## HTTP Client
 
+![](images/tip-9.gif)
+
 HTTP Client는 Postman 처럼 HTTP 호출을 도와주는 도구로 IntelliJ에서 사용 가능
 
-* [ ] env post
-* [ ] query parameter
-* [ ] curl copy & paste
+### HTTP Env
 
+![](images/tip-10.png)
+
+```json
+{
+  "local": {
+    "shop-service": "http://localhost:8080"
+  },
+  "sandbox": {
+    "shop-service": "http://snadbox-xxxx"
+  },
+  "beta": {
+    "shop-service": "http://beta-xxxx"
+  }
+}
 ```
-curl -X GET --location "http://localhost:8080/actuator/health" \
--H "Accept: application/json"
-```
+
+* HTTP 호출 환경을 JSON으로 관리할 수 있습니다.
+
+### HTTP Curl Copy & Paste
+
+![](images/tip-11.gif)
+
+* Curl을 붙여넣를 진행하면 HTTP Client에 맞는 형식으로 붙여 자동으로 변환 됩니다.
+
+![](images/tip-12.gif)
+
+* HTTP Client를 Curl 형식으로 변환하여 복사할 수 있습니다. 
 
 
 ## Spring
