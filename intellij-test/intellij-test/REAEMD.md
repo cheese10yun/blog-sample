@@ -158,6 +158,16 @@ Console Log를 Grep 해서 보다 쉽게 로그 확인을 도와주는 플러그
 
 IDE에서 마우스를 사용하면 대체 가능한 단축키를 알려주는 플러그인
 
+
+### [Presentation Assistant](https://plugins.jetbrains.com/plugin/7345-presentation-assistant)
+
+<p align="center">
+<img src="images/tip-6.png" width="800">
+</p>
+
+사용하는 단축키와 기능명을 디스플레이 해주는 플러그인
+
+
 ### 플러그인 찾는 방법
 
 ![](images/tip-15.png)
@@ -207,6 +217,23 @@ HTTP Client는 Postman 처럼 HTTP 호출을 도와주는 도구로 IntelliJ에�
 * Query parameter를 쉽게 정리할 수 있습니다.
 
 
+## GitHub Code Review
+
+* [ ] CMD + 3
+* [ ] comment
+* [ ] Approve
+
+
+## Refactoring
+
+* [ ] move
+* [ ] copy
+* [ ] introduce variable
+* [ ] Property
+* [ ] introduce Parameter
+* [ ] Pull Members Up
+
+
 ## Spring
 
 ### Debug
@@ -228,22 +255,11 @@ HTTP Client는 Postman 처럼 HTTP 호출을 도와주는 도구로 IntelliJ에�
 ### Dependencies
 * [ ] Version
 
-## Github Code Review
-
-* [ ] CMD + 3
-* [ ] comment
-* [ ] Approve
 
 ## Git
 * [ ] Commit, Push, Pull
 * [ ] Stash, UnStash
 * [ ] Branch, Branch Diff, Merge, Checkout
 
-## Refactoring
 
-* [ ] move
-* [ ] copy
-* [ ] introduce variable
-* [ ] Property
-* [ ] introduce Parameter
-* [ ] Pull Members Up
+
