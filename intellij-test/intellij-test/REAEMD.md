@@ -131,17 +131,8 @@ fun asd(): Unit {
 
 
 ## Plugins
-* [ ] grep
-* [ ] git tool box
-* [ ] string manipulation
-* [ ] Rainbow
-* [ ] Key Promoter X
-* [ ] GitToolbox
 
-
-### String Manipulation Plugin
-
-[](https://plugins.jetbrains.com/plugin/2162-string-manipulation/)
+### [String Manipulation Plugin](https://plugins.jetbrains.com/plugin/2162-string-manipulation/)
 
 ![](https://raw.githubusercontent.com/cheese10yun/IntelliJ/master/assets/string-manipulation-1.gif)
 
@@ -150,6 +141,28 @@ fun asd(): Unit {
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-jpa/docs/string-manipulation-3.gif)
 
 * Switch는 다양한 문자열 포맷으로 쉽게 변경이 가능합니다.
+
+### [Grep Console](https://plugins.jetbrains.com/plugin/7125-grep-console)
+
+> ![](https://plugins.jetbrains.com/files/7125/screenshot_16117.png)
+> ![](https://plugins.jetbrains.com/files/7125/screenshot_17407.png)
+> 출처 [Grep Console](https://plugins.jetbrains.com/plugin/7125-grep-console)
+
+Console Log를 Grep 해서 보다 쉽게 로그 확인을 도와주는 플러그인
+
+
+### [Key Promoter X](https://plugins.jetbrains.com/plugin/9792-key-promoter-x)
+
+> ![](https://plugins.jetbrains.com/files/9792/screenshot_17105.png)
+> 출처 [Key Promoter X](https://plugins.jetbrains.com/plugin/9792-key-promoter-x)
+
+IDE에서 마우스를 사용하면 대체 가능한 단축키를 알려주는 플러그인
+
+### 플러그인 찾는 방법
+
+![](images/tip-15.png)
+
+플러그인 검색을 `/sortBy:downloads` 으로 다운로드가 높은 순으로 정렬하고 필요한 플러그인을 선택
 
 ## HTTP Client
 
