@@ -235,10 +235,7 @@ Pull Request 항목들을 필터를 통해서 검색도 가능합니다.
 ![](images/tip-16.png)
 
 Refactoring 기능을 막강하게 지원 해주고 있습니다.
-⇧
-⌥
-⌘
-
+⇧  ⌥  ⌘
 
 | Name                | Hot Key   | Desc           |
 |---------------------|-----------|----------------|
@@ -248,7 +245,6 @@ Refactoring 기능을 막강하게 지원 해주고 있습니다.
 | Introduce Variable  | ⌥ + ⌘ + V | 변수로 분리         |
 | Introduce Parameter | ⌥ + ⌘ + P | Parameter 분리   |
 | Inline              | ⌥ + ⌘ + N | 변수 머지          |
-| Inl# Intelli J
 
 ## Presentation
 
