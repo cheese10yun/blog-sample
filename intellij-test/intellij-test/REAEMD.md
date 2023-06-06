@@ -114,8 +114,8 @@ fun asd(): Unit {
 
 * [ ] Entity -> Response, ShopResponse
 * [ ] Column, Order
-* [ ] SQL -> increment
-* [ ] Json -> Object
+* [ ] SQL -> increment, test
+* [ ] Json -> Object, JsonToObject
 
 
 ## Plugins
