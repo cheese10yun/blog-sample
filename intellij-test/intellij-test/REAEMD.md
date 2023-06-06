@@ -488,54 +488,20 @@ Pull Request 항목들을 필터를 통해서 검색도 가능합니다.
 
 ## Spring
 
-### Debug
-
-* [ ] Beans
-* [ ] Health
-* [ ] Mappings
-
 ### Spring
 * [ ] Beans
 * [ ] MVC
 * [ ] Data
 
 ### Endpoints
-* [ ] Bean
-* [ ] MVC
+
+![](images/tip-18.png)
+
+Endpoints을 통해 api 전체를 볼 수 있으며, HTTP Client, OpenAPI를 쉽게 구성할 수 있습니다.
 
 
 ### Dependencies
-* [ ] Version
 
+![](images/tip-17.png)
 
-## Git
-* [ ] Commit, Push, Pull
-* [ ] Stash, UnStash
-* [ ] Branch, Branch Diff, Merge, Checkoutine              | ⌥ + ⌘ + M | 변수 머지          |
-
-## Spring
-
-### Debug
-
-* [ ] Beans
-* [ ] Health
-* [ ] Mappings
-
-### Spring
-* [ ] Beans
-* [ ] MVC
-* [ ] Data
-
-### Endpoints
-* [ ] Bean
-* [ ] MVC
-
-
-### Dependencies
-* [ ] Version
-
-
-## Git
-* [ ] Commit, Push, Pull
-* [ ] Stash, UnStash
-* [ ] Branch, Branch Diff, Merge, Checkout
+Dependencies통해서 특정 의존성에 대한 버전을 보다 쉽게 변경 가능
