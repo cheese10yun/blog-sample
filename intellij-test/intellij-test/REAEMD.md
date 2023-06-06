@@ -112,6 +112,11 @@ fun asd(): Unit {
 특정 Entity를 응답 객체로 만들어야 하는 경우 동일 문자열을 복사해서 보다 쉽게 Response 객체를 만들 수 있습니다.
 
 
+* [ ] Entity -> Response, ShopResponse
+* [ ] Column, Order
+* [ ] SQL 
+
+
 ## Plugins
 
 ### [String Manipulation Plugin](https://plugins.jetbrains.com/plugin/2162-string-manipulation/)
