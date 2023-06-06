@@ -1,0 +1,16 @@
+{
+  "shop_id": "test",
+  "customer_name": "test",
+  "phone_number": "test",
+  "email": "test",
+  "order_time": "test",
+  "total_price": "test",
+  "is_completed": "test",
+  "delivery_address": "test",
+  "delivery_time": "test",
+  "payment_method": "test",
+  "coupon_code": "test",
+  "discount_amount": "test",
+  "order_items": "test",
+  "additional_notes": "test"
+}
