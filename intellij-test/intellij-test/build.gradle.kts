@@ -7,6 +7,7 @@ plugins {
     kotlin("jvm") version "1.8.21"
     kotlin("plugin.spring") version "1.8.21"
     kotlin("plugin.jpa") version "1.8.21"
+    kotlin("kapt") version "1.8.21"
 }
 
 group = "com.example"
@@ -19,6 +20,16 @@ repositories {
 
 extra["snippetsDir"] = file("build/generated-snippets")
 extra["springCloudVersion"] = "2022.0.3"
+
+allOpen {
+
+
+    // Spring Boot 3.0.0
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.MappedSuperclass")
+    annotation("jakarta.persistence.Embeddable")
+}
+
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -33,6 +44,18 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
     testImplementation("org.testcontainers:junit-jupiter")
+
+
+    implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+    implementation("com.querydsl:querydsl-apt")
+    implementation("com.querydsl:querydsl-core")
+
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    annotationProcessor(group = "com.querydsl", name = "querydsl-apt", classifier = "jpa")
+
+//    annotationProcessor("com.querydsl:querydsl-apt:5.0.0:jakarta", "jakarta.persistence:jakarta.persistence-api:3.1.0")
+
+    kapt("com.querydsl:querydsl-apt:5.0.0:jakarta")
 }
 
 dependencyManagement {
