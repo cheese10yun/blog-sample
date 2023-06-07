@@ -1,7 +1,11 @@
 package com.example.intellijtest
 
+import com.example.intellijtest.QOrder.order
+import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import org.springframework.data.jpa.repository.JpaRepository
 import java.time.LocalDateTime
 
@@ -35,6 +39,39 @@ class Order(
     val orderItems: String,
     @Column(name = "additional_notes", nullable = false)
     val additionalNotes: String,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_status", nullable = false)
+    val orderStatus: OrderStatus,
 ) : EntityAuditing()
 
-interface OrderRepository : JpaRepository<Order, Long>
+enum class OrderStatus(desc: String) {
+    READY("준비"),
+    BICYCLE_DELIVERY("자전거 배달중"),
+    MOTORCYCLE_DELIVERY("자전거 배달중"),
+}
+
+
+interface OrderRepository : JpaRepository<Order, Long>, OrderRepositoryCustom
+
+interface OrderRepositoryCustom {
+    // 특정 가게의 현재 배달중인 주문 조회
+    fun findBy(shopId: Long): List<Order>
+}
+
+class OrderRepositoryImpl(
+    private val query: JPAQueryFactory,
+) : OrderRepositoryCustom {
+
+    override fun findBy(shopId: Long): List<Order> = query
+        .selectFrom(order)
+        .where(
+            order.orderStatus.`in`(
+                setOf(
+                    OrderStatus.BICYCLE_DELIVERY,
+                    OrderStatus.MOTORCYCLE_DELIVERY,
+                )
+            )
+        )
+        .fetch()
+}
