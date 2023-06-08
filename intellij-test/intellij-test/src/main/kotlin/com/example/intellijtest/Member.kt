@@ -74,7 +74,7 @@ class MemberQueryService(
     private val memberRepository: MemberRepository,
 ) {
 
-    fun asd(member: Member){
+    fun asd(member: Member) {
         member.residentRegistrationNumber!!
 
     }
@@ -88,4 +88,5 @@ data class AdultMember(
     // ...
     val residentRegistrationNumber: String,
     var status: MemberStatus,
-)
+) {
+}
