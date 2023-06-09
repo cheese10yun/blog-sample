@@ -134,6 +134,23 @@ data class AdultMember(
 
 자세한 Projection 방법은 [Querydsl Projection 방법 소개 및 선호하는 패턴 정리](https://cheese10yun.github.io/querydsl-projections/)에서 포스팅한 내용이 있습니다. Projection을 사용하면 영속성 컨텍스트가 없기 때문에 JPA에서 제공해주는 다양한 기능들을 사용하지 못한다. 그 밖에 단점들도 있지만 이것은 조금더 이후에 살펴보자. 이렇게까지 하면서 해야할 가치가 있을까 라는 의문이 있다.
 
+```json
+//  Refind(환불) 객체를 JSON으로 표시
+{
+  "order": {
+    "order_number": "1110",
+    "name": "나이키 에어멕스",
+    "price": 10000
+  },
+  "payment": {
+    "payment_metohd_type": "CARD",
+    "credit_card": {
+      "number": "110-123123",
+      "card_corp": "SHINHAN"
+    },
+    "account": null
+  }
+}
+```
 
-성인 Member Projection 객체를 만들고 여기서 Notnull을 보장하자. 물론 모든 경우에 이런 패턴이 적합한것은 아니지만 Notnull 필드가 많고 그 것에 따라 의미가 크게 달라지는 구간에서는 활용성이 높다고 생각한다. 예를 들어 카드 결제, 무통장 결제 등등 관련 필드가 너무 다르기 떄문에 이렇게 구분해서 객체를 만들어서 사용하는 것도 좋은 방법이다. Projection 방법은 ![Querydsl Projection 방법 소개 및 선호하는 패턴 정리](https://cheese10yun.github.io/querydsl-projections/)에서 포스팅한 내용이 있습니다.
-
+위 데이터 구조 처럼 주문에대한 Refund(환불) 객체가있고, 신용카드 결제라면 `credit_card` 정보가 있고, 무통장 입금의 경우에는 `account` 정보가 있다고 가정해보자. `credit_card`, `account` 정보는 상호 베타적인 정보이기 떄문에 두 객체는 nullable 설정할 수 밖에 없다. Refund(환불) 엔티티 객체를 그대로 사용한다면 내가 조회한 데이터와 상관 없이 계솩 null 안정성에 대한 고민을 할 수 밖에 없고 `!!`의 불편한 동행이 계속 된다. 문제는 그것 뿐만이 아니다 환불이라는 컨텍스트의 모호함이 있다. 카드 환불인지, 무통장입금의 환불인지를 명확하게 표시하면 그 컨텍스트를 이해하는 것에 도움이 된다. 물론 변수명으로 표현이 하지만 Projection을 사용해서 `CardRefund` 타입으로 표현하는 것도 좋은 방법이라고 생각한다.
