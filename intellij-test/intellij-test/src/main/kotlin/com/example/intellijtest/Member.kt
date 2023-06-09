@@ -30,14 +30,12 @@ class Member(
 ) : EntityAuditing()
 
 enum class MemberStatus(
-    desc: String,
+    desc: String
 ) {
     NORMAL("정상"),
-    DORMANCY("휴면"),
+    UNVERIFIED("미인증"),
     LOCK("계정 일지 정지"),
     BAN("계정 영구정지");
-
-
 }
 
 interface MemberRepository : JpaRepository<Member, Long>, MemberRepositoryCustom
@@ -54,12 +52,12 @@ class MemberRepositoryImpl(
 
     override fun findBy(gender: String): List<Member> = query
         .selectFrom(member)
-        .where(member.status.`in`(MemberStatus.NORMAL, MemberStatus.DORMANCY))
+        .where(member.status.`in`(MemberStatus.NORMAL, MemberStatus.UNVERIFIED))
         .fetch()
 
     override fun findBy(age: Int): List<Member> = query
         .selectFrom(member)
-        .where(member.status.`in`(MemberStatus.NORMAL, MemberStatus.DORMANCY))
+        .where(member.status.`in`(MemberStatus.NORMAL, MemberStatus.UNVERIFIED))
         .where(member.age.gt(age))
         .fetch()
 

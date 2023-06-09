@@ -12,12 +12,27 @@
   * 생성자로 제어하기 어려운 부분
   * 그럼에도 가능한 케이스 조회 전용,
 
+# 좋은 코드 설계를 위한 답없는 고민들
 
-# None title
+좋으 코드 설계를 위한 고민들을 평소에 많이 해왔고, 그에 관련한 학습들도 진행 했었다. OOP, DDD, Clean Code, Clean Architecture 등등을 통해서 나름의 주관이 생겼으며 경력 초반에는 이런 것들을 지키기 위해 많이 노력해왔다. 현재는 이런 개념들을 선택적으로 적용하며 또 어떠한 의미에서는 이런것들을 지키는 것들에 대해서 가성비가 좋지 않다고 까지 생각한다. 해당 포스팅에서 작성한 내용은 개발하면서 코드 설계 적인 부분에 대해서 아직까지 고민을 하고 있는 부분들에 대해서 정리한 것들이다.
 
-## 파라미터의 복잡도를 어떻게 제어할 것인가?
+## 복잡도를 어디서 제어(책임)할 것인가?
 
-### 조회 코드에서 직접 지정
+당연히 요구사항이 복잡하니 코드 또한 복잡해 진다. 결국 이러한 복잡도를 어느 코드에서는 해결 해야하는데 이 부분에 대한 고민이다. 
+
+```kotlin
+enum class MemberStatus(
+    desc: String
+) {
+    NORMAL("정상"), // 이메일 받는 회원 
+    UNVERIFIED("미인증"), // 이메일 받는 회원
+    LOCK("계정 일지 정지"), // 이메일 제외 회원
+    BAN("계정 영구정지"); // 이메일 제외 회원
+}
+```
+예를 들어 특정 성별 중 현재 활성화된 회원들 전체에게 이메일을 보내는 로직에서 활성화 회원들을 조회하는 코드가 있다고 가정 해보자.
+
+### 조회 코드에서 복잡도 제어
 
 ```kotlin
 class MemberRepositoryImpl(
@@ -27,14 +42,15 @@ class MemberRepositoryImpl(
     override fun findBy(gender: String): List<Member> = query
         .selectFrom(member)
          // 정상적인 회원 상태를 직접 명시
-        .where(member.status.`in`(setOf(MemberStatus.NORMAL, MemberStatus.DORMANCY)))
+        .where(member.genter.eq(gender))
+        .where(member.status.`in`(setOf(MemberStatus.NORMAL, MemberStatus.UNVERIFIED)))
         .fetch()
 }
 ```
-장점으로는 외부에서 가져다 사용하는 경우 Member의 구체적인 상태의 상세 규칙을 몰라도 안전하게 조회할 수 있다는 점이다.  단점으로는 LOCK, BAN 상태의 조회가 필요할때 거의 유사한 코드가 중복해서 나온다는 것이다. 
+조회 코드에서 회원 상태의 복잡도를 직접 제어하면 외부 객체에서 현재 활성화 상태에 대한 복잡도에 대해서 자유로워 진다. 즉 호출하는 객체에서는 회원의 상태에 대해서 알바가 없어 진다는 장점이 있다. 하지만 단점 또한 있다. 회원 상태가 다른 조회 로직이 있다면 거의 유사한 코드가 중복해서 나온다는 것이다.
 
+### 조회를 호출하는 코드에서 복잡도 제어
 
-### 조회 파라미터로 넘겨 받기 
 ```kotlin
 class MemberRepositoryImpl(
     private val query: JPAQueryFactory,
@@ -47,12 +63,11 @@ class MemberRepositoryImpl(
         .fetch()
 }
 ```
-장점으로는 여러 상태를 조합해서 사용이 가능하기 때문에 유연하게 대처가 가능하다. 단점으로는 조회하는 코드에서 실제 엑티비한 유저에 대한 구체적인 상태를 명시 해야 한다는 것이다.  
+조회를 호출하는 코드에서 복잡도 제어를 하면 회원 상태에 대한 세부적인 규칙을 해당 객체를 호출하는 곳에 복잡도가 위임된다. 즉 호출하는 쪽에서 회원 상태에 대해서 명확하게 알고 있어야 한다. 물론 이정도 상태 정도야 복잡도가 높다고 할 수 없지만 여러 필드들의 조합을 분석해서 조회 해야하는 경우는 복잡도가 높아진다. 또 요구사항이 바뀌어서 코드를 변경했다면 호출하는 코드들을 모두 찾아가서 변경해야 한다. 그 복잡도를 외부에서 제어 했기 때문에 당연한 결과이다. 
 
 ### 정리
-위 예제 처럼 단순히 한 가지 필드를 가지고 구분할 수 있는 정도는 크게 문제가 되지 않지만 여러 필드들의 조합으로 특정 상태를 결정 짓는다면 복잡도에 대한 제어를 어떻게할 것인가에 대해서 고민이 필요하다. 정답이 있는 문제라고 생각하진 않지만 많은 사람들이 고민을 해봤으면 한다.
 
-나름의 결론이 있다면(또 어떻게 바뀔지 모르겠지만) 네이밍을 통해서 그 의도를 드러나게 하는 것이 좋다고 생각한다.
+단순 파라미터로 받을것인가 아닌가에 대한 단순한 고민이 아니라 복잡도를 어디에서 제어할것인가? 그에 따른 장단점이 있고 어떠한 근거로 어떠한 방법을 택할것인가 또 그 근거는 무엇인가에 대한 고민을 해봤으면 한다. 나름의 결론이 있다면(또 어떻게 바뀔지 모르겠지만) 네이밍을 통해서 그 의도를 드러나게 하는 것이 좋다고 생각한다.
 
 ```kotlin
 @Service
@@ -60,25 +75,25 @@ class MemberQueryService(
     private val memberRepository: MemberRepository,
 ) {
 
-    // 활성화 상태인 유저 성별로 조회, 파라미터로 상태를 직접 넘겨 받아도 무방
+    // 활성화 상태인 유저 성별로 조회, 명확하게 해당 의도 전달
     fun findActivityMemberBy(gender: String): List<Member> {
-        return memberRepository.findBy(gender)
+        return memberRepository.findBy(gender, setOf(MemberStatus.NORMAL, MemberStatus.UNVERIFIED))
     }
 }
 
 class MemberRepositoryImpl(
-  private val query: JPAQueryFactory,
+    private val query: JPAQueryFactory,
 ) : MemberRepositoryCustom {
 
-    // 도메인적 의도가 들어나지 않아도 무방  
-    override fun findBy(gender: String): List<Member> = query
-      .selectFrom(member)
-      .where(member.status.`in`(MemberStatus.NORMAL, MemberStatus.DORMANCY))
-      .fetch()
+    // 제너럴하게 파라미터로 넘겨 받음
+    override fun findBy(gender: String, memberStatuses: Set<MemberStatus>): List<Member> = query
+        .selectFrom(member)
+        .where(member.status.`in`(memberStatuses))
+        .fetch()
 }
 ```
-
-MemberQueryService 같은 서비스 계층을 두고 여기에서 네이밍으로 명확하게 그 의도를 설정하면 파라미터 상태를 받아도, 안받아도 크게 지장이 없다고 생각한다. 또 Repository는 인프라레이어에 가깝기 떄문에 비즈니스 관련 네이밍을 작성하지 않는것이 더 바람직 하다고 생각한다. MemberQueryService 처럼 조회 전용 서비스를 작성하는 것을 선호하는데 관련 포스팅은 [Spring Guide - Service 가이드](https://cheese10yun.github.io/spring-guide-service/#-2)에 정리되어 있다. 객체의 책임의 크기에 관심이 있다면 읽어봐도 좋다.
+MemberQueryService 같은 서비스 계층을 두고 해당 객체에서 네이밍으로 명확하게 그 의도를 표현하고, Repository 계층에서는 제너럴하게 파라미터로 받아 처리한다. 이렇게 하면 서비스 계층에서는 명확하게 현재 활성화 상태의 유저를 조회하게 되며, 인프라 계층에서는 제너럴하게 조회로직을 작성함으로써 중복 코드 및 유사 코드를 방지할 수 있다. 인프라스트럭처에 직접적인 의존성을 갖게하는 것보다 MemberQueryService 처럼 서비스 계층을 통해 인프라스트럭처를 간접적으로 의존하는 것이 여러모로 좋다고 생각한다. 관련 포스팅은
+[Spring Guide - Service 가이드](https://cheese10yun.github.io/spring-guide-service/#-2)에 정리되어 있다.
 
 
 ## Notnull을 보장 받고 싶은데...
