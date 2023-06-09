@@ -121,16 +121,19 @@ class MemberRepositoryImpl(
         .fetch()
 }
 ```
-성인 Member를 조회 했지만 실제 Member 객체를 리턴하기 때문에 주민등록 필드를 notnull 관련 작업을 진행할 떄는 `member.residentRegistrationNumber!!`을 사용 해야 한다.
 
-개인적으로 JPA를 사용하지만 더티 체킹을 통한 업데이트 등은 생상성과 효율성을 매우 높여주지만, 이것을 사용하지 않을 떄는 Projection을 사용해서 리턴하는 것이 좋다고 생각한다.
+성인 Member를 조회 했지만 실제 Member 객체를 리턴하기 때문에 주민등록 필드를 notnull 관련 작업을 진행할 떄는 `member.residentRegistrationNumber!!`을 사용 해야 한다. 이런 경우 Projection을 사용하면 이런 문제를 쉽게 해결할 수 있다.
 
 ```kotlin
 data class AdultMember(
-    // ...
+    // notnull을 보장
     val residentRegistrationNumber: String,
     var status: MemberStatus,
 )
 ```
+
+자세한 Projection 방법은 [Querydsl Projection 방법 소개 및 선호하는 패턴 정리](https://cheese10yun.github.io/querydsl-projections/)에서 포스팅한 내용이 있습니다. Projection을 사용하면 영속성 컨텍스트가 없기 때문에 JPA에서 제공해주는 다양한 기능들을 사용하지 못한다. 그 밖에 단점들도 있지만 이것은 조금더 이후에 살펴보자. 이렇게까지 하면서 해야할 가치가 있을까 라는 의문이 있다.
+
+
 성인 Member Projection 객체를 만들고 여기서 Notnull을 보장하자. 물론 모든 경우에 이런 패턴이 적합한것은 아니지만 Notnull 필드가 많고 그 것에 따라 의미가 크게 달라지는 구간에서는 활용성이 높다고 생각한다. 예를 들어 카드 결제, 무통장 결제 등등 관련 필드가 너무 다르기 떄문에 이렇게 구분해서 객체를 만들어서 사용하는 것도 좋은 방법이다. Projection 방법은 ![Querydsl Projection 방법 소개 및 선호하는 패턴 정리](https://cheese10yun.github.io/querydsl-projections/)에서 포스팅한 내용이 있습니다.
 
