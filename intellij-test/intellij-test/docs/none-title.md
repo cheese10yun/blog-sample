@@ -81,11 +81,62 @@ class MemberRepositoryImpl(
 MemberQueryService 같은 서비스 계층을 두고 해당 객체에서 네이밍으로 명확하게 그 의도를 표현하고, Repository 계층에서는 제너럴하게 파라미터로 받아 처리한다. 이렇게 하면 서비스 계층에서는 명확하게 현재 활성화 상태의 유저를 조회하게 되며, 인프라 계층에서는 제너럴하게 조회로직을 작성함으로써 중복 코드 및 유사 코드를 방지할 수 있다. 인프라스트럭처에 직접적인 의존성을 갖게하는 것보다 MemberQueryService 처럼 서비스 계층을 통해 인프라스트럭처를 간접적으로 의존하는 것이 여러모로 좋다고 생각한다. 관련 포스팅은
 [Spring Guide - Service 가이드](https://cheese10yun.github.io/spring-guide-service/#-2)에 정리되어 있다.
 
-## 유효성 검사는 어디 또 해야할까?, 멀티 모듈인 경우는 ?
+
+## 유효성 검사는 어디서 어떻게 해야할까?
+
+![](../images/layer-1.png)
+
+일반적으로 Presentation 계층에서 다양한 유효성 검사를 하고 문제가 없다면 서비스 계층으로 넘어가서 비즈니스 로직을 수행하는 것이 일반적이다. 간단하게 코드로 표현하면 다음과 같다.
+
+```kotlin
+// 회원가입 요청 DTO
+@MemberRegistrationForm
+data class MemberRegistrationRequest(
+  @field:NotEmpty
+  val firstName: String,
+  @field:NotEmpty
+  val lastName: String,
+  @field:NotEmpty
+  val email: String
+)
+
+@RestController
+@RequestMapping("/api/members")
+class MemberController(
+    private val memberRegistrationService: MemberRegistrationService
+) {
+
+    @PostMapping
+    fun register(
+        @RequestBody @Valid dto: MemberRegistrationRequest
+    ) {
+        // ...
+        // (1) 간단한 validation 외에 각종 검증...
+        memberRegistrationService.register(dto)
+    }
+}
+```
+
+`spring-boot-starter-validation` 의존성으로 필드에 대한 유효성 검증을 쉽게 진행할 수 있다. 하지만 상호 베타적인 값 검증, 외부 인프라를 의존하는 유효성 검사는 진행하기가 어렵다. 그래서 [ConstraintValidator을 이용해서 효과적인 검증](https://cheese10yun.github.io/ConstraintValidator/)에 대해서 포스팅한 적이 있다. 추가적인 검증을 그냥 `(1)`에서 진행해도 무방하지만 Error Response 관련해서 더 효율적으로 관리하기 위해서는 `ConstraintValidator`을 통해서 진행하는 것이 좋다. 예를 들어 요청 필드가 5개고 해당 요청 필드 5개가 모두 문제라면 Error Response을 할 때 모든 문제에 대해서 구체적으로 응답해주는것이 좋다. 개별적으로 응답을 주면 최악의 경우 5번 요청을 하고 나서야 모든 필드들에 대해서 유효성 확보가 되기 떄문이다.
+
+
+### 사전 유효성 검증의 문제
+
+![](../images/layer-2.png)
+
+사전에 검증하게 되면 문제가 있다. 위 그림 처럼 여러개의 애플리케이션, 혹은 다른 서비스에서 `MemberRegistrationService`의존할 하여 회원가입을 진행할 수 있다. 이렇게 어느 한 구간에서 유효성 검사를 하지 않거나, 유효성 검증 항목의 변경 사항이 제대로 반영되지 않거나 하는 문제가 발생할 수 있다. 결국 여러 애플리케이션, 외부 객체에서 의존하려면 유효성 검사를 모두 `MemberRegistrationService`에서 진행 시키는것이 바람직해 보일 수 있다.
+
+### 사전 유효성 검증의 문제 해결 방법
+
+이 해결 방법은 지금도 고민중이 현재의 해결 방법도 타인에게 자신이게 권할 정도로 확신이 있지는 않다. 
+
+
 
 * 표현 계층에서 벨리데이션 하는 것이 좋음
 * 그렇다면 서비스 계층에서 다른 서비스 계층을 호출하는 것은? 
 * 멀티 모듈에서는 여러 애플리케이션에서 사용하면 ?
+
+
 
 ## Notnull을 보장 받고 싶은데...
 
