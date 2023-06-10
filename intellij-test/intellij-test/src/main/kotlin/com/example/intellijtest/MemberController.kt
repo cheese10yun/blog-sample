@@ -2,6 +2,7 @@ package com.example.intellijtest
 
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
+import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -13,12 +14,13 @@ class MemberController {
 
     @PostMapping
     fun register(
-        @RequestBody dto: MemberRegistrationRequest
+        @RequestBody @Valid dto: MemberRegistrationRequest
     ) {
         // ...
     }
 }
 
+@MemberRegistrationForm
 data class MemberRegistrationRequest(
     val firstName: String,
     val lastName: String,

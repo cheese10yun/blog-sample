@@ -41,3 +41,13 @@ class AppRunner(
 
     }
 }
+
+//@Configuration
+//class Configuration {
+//
+//    @Bean
+//    fun query(entityManager: EntityManager): JPAQueryFactory {
+//        return JPAQueryFactory(entityManager)
+//    }
+//}
+

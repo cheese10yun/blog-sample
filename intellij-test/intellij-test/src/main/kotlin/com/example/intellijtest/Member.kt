@@ -38,7 +38,9 @@ enum class MemberStatus(
     BAN("계정 영구정지");
 }
 
-interface MemberRepository : JpaRepository<Member, Long>, MemberRepositoryCustom
+interface MemberRepository :
+    JpaRepository<Member, Long>,
+    MemberRepositoryCustom
 
 interface MemberRepositoryCustom {
     // 특정 성별의로 유저 조회
@@ -46,26 +48,27 @@ interface MemberRepositoryCustom {
     fun findBy(age: Int): List<Member>
 }
 
-class MemberRepositoryImpl(
-    private val query: JPAQueryFactory,
-) : MemberRepositoryCustom {
+class MemberRepositoryImpl :
+    QuerydslCustomRepositorySupport(Member::class.java),
+    MemberRepositoryCustom {
 
-    override fun findBy(gender: String): List<Member> = query
-        .selectFrom(member)
-        .where(member.status.`in`(MemberStatus.NORMAL, MemberStatus.UNVERIFIED))
-        .fetch()
+    override fun findBy(gender: String): List<Member> =
+        selectFrom(member)
+            .where(member.status.`in`(MemberStatus.NORMAL, MemberStatus.UNVERIFIED))
+            .fetch()
 
-    override fun findBy(age: Int): List<Member> = query
-        .selectFrom(member)
-        .where(member.status.`in`(MemberStatus.NORMAL, MemberStatus.UNVERIFIED))
-        .where(member.age.gt(age))
-        .fetch()
+    override fun findBy(age: Int): List<Member> =
+        selectFrom(member)
+            .where(member.status.`in`(MemberStatus.NORMAL, MemberStatus.UNVERIFIED))
+            .where(member.age.gt(age))
+            .fetch()
 
-//    override fun findBy(gender: String, memberStatuses: Set<MemberStatus>): List<Member> = query
-//        .selectFrom(member)
-//        .where(member.status.`in`(memberStatuses))
-//        .fetch()
+//    override fun findBy(gender: String, memberStatuses: Set<MemberStatus>): List<Member> =
+//        selectFrom(member)
+//            .where(member.status.`in`(memberStatuses))
+//            .fetch()
 }
+
 
 @Service
 class MemberQueryService(
