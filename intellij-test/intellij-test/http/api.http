@@ -52,9 +52,19 @@ Accept: application/json
 
 
 # 자동완성
-GET {{shop-service}}/api/
-Accept: application/json
+POST {{shop-service}}/api/members
+Content-Type: application/json
 
+{
+  "firstName": "test",
+  "lastName": "test",
+  "email": "test@test.cpm",
+  "phoneNumber": "01011111111",
+  "address": "address ...",
+  "age": 10,
+  "gender": "openingHours$-{it}",
+  "occupation": "worker"
+}
 ###
 
 

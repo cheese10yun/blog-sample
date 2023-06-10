@@ -59,12 +59,12 @@ interface OrderRepositoryCustom {
     fun findBy(shopId: Long): List<Order>
 }
 
-class OrderRepositoryImpl(
-    private val query: JPAQueryFactory,
-) : OrderRepositoryCustom {
+class OrderRepositoryImpl :
+    QuerydslCustomRepositorySupport(Order::class.java),
+    OrderRepositoryCustom {
 
-    override fun findBy(shopId: Long): List<Order> = query
-        .selectFrom(order)
+    override fun findBy(shopId: Long): List<Order> =
+        selectFrom(order)
         .where(
             order.orderStatus.`in`(
                 setOf(
