@@ -128,14 +128,85 @@ class MemberController(
 
 ### 사전 유효성 검증의 문제 해결 방법
 
-이 해결 방법은 지금도 고민중이 현재의 해결 방법도 타인에게 자신이게 권할 정도로 확신이 있지는 않다. 
+```kotlin
+// ValidatorService에서 모든 예외를 담당한다.
+@Service
+class MemberRegistrationValidatorService(
+    private val memberQueryService: MemberQueryService
+) {
+    // 내부 로직을 기반으로 오류 검사를 진행하며, 유효성 검사 실패시 Excpetion 발생
+    fun checkEmailDuplication(email: String) {
+        var inValidCount = 0
+        val errorMessage = StringBuilder()
 
+        isExistedEmail(email)
+            .also { isExistedEmail ->
+                if (isExistedEmail) {
+                    inValidCount++
+                    errorMessage.append("${email}은 이미 등록된 이메일 입니다.\n")
+                }
+            }
 
+        if (true) {
+            inValidCount++
+            errorMessage.append("${email}은 xxx 문제가 있습니다. \n")
+        }
 
-* 표현 계층에서 벨리데이션 하는 것이 좋음
-* 그렇다면 서비스 계층에서 다른 서비스 계층을 호출하는 것은? 
-* 멀티 모듈에서는 여러 애플리케이션에서 사용하면 ?
+        check(inValidCount == 0) { errorMessage.toString() }
+    }
 
+   // 실제 유효성 검사를 단순히 boolean 으로 표현 
+    fun isExistedEmail(email: String) = memberQueryService.existedEmail(email)
+}
+
+// Presentation 계층에서 유효성 검사 진행, 실제 검증에 대한 로직은 ValidatorService을 통해 진행 하며 오류 메시지 전달 역할 담당
+@Service
+class MemberRegistrationFormValidator(
+    private val memberRegistrationValidatorService: MemberRegistrationValidatorService
+) : ConstraintValidator<MemberRegistrationForm, MemberRegistrationRequest> {
+    
+    override fun isValid(dto: MemberRegistrationRequest, context: ConstraintValidatorContext): Boolean {
+        var inValidCount = 0
+        val existedEmail = memberRegistrationValidatorService.isExistedEmail(dto.email)
+
+        if (existedEmail) {
+            inValidCount++
+            addConstraintViolation(context, "${dto.email}은 이미 등록된 이메일 입니다.", "email")
+        }
+
+        // 기타 문제...
+        // 한 가지 필드를 여러 검증을 진행...
+        if (true) {
+            inValidCount++
+            addConstraintViolation(context, "${dto.email}은 xxx 문제가 있습니다.", "email")
+        }
+
+        return inValidCount == 0
+    }
+}
+```
+MemberRegistrationValidatorService를 보면 isExistedEmail는 유효성 검사에 대한 결과를 Boolean 타입으로 응답하며, checkEmailDuplication에서 isExistedEmail을 활용하여 얘외 여부를 결정한다. 또 isExistedEmail은 단순 Boolean 타입이기 때문에 여러 애플리케이션 Presentation 계층에서 해당 메서드로 유효성 검사를 진행하며 애플리케이션에 맞는 응답에 대한 핸들링을 진행한다.
+
+```kotlin
+@Service
+class MemberRegistrationService(
+    private val memberRegistrationValidatorService: MemberRegistrationValidatorService
+) {
+    /**
+     * @param isAlreadyCompletedValidation true 경우 이미 유효성 검사를 진행 한것으로 간주하고 추가적으로 유혀성 검사를 진행하지 않는다. 
+     */
+    fun register(
+        dto: MemberRegistrationRequest,
+        isAlreadyCompletedValidation: Boolean = false // 이미 유효성 검사를 진행 했다면 추가적은 검증을 진행하지 않는다..
+    ) {
+        if (isAlreadyCompletedValidation.not()){
+            memberRegistrationValidatorService.checkEmailDuplication(dto.email)
+        }
+      // ... 등록 로직
+    }
+}
+```
+MemberRegistrationService 계층에서는 isAlreadyCompletedValidation을 기준으로 추가적으로 유혀성 검사를 진행할지 여부를 결정한다. 만약 Presentation 계층에서 동일한 유효성 검사를 진행 했다면 더 이상 검증을 하지 않고 등록 로직을 수행한다. 물론 성능상의 큰 차이가 없다면 이런 플레그를 두지 않고 두번 검사해도 무방하다. 이렇게 진행하면 장점으로는 유효성 검사 로직이 한 곳에 모이게 되기 떄문에 코드의 응집력이 높아지며, 사전 검증 여부를 확인하고 검증을 진행하지 않았다면 유효성 검사를 담당하는 객체를 통해서 진행하면 된다. 물론 단점으로는 단순 플레그 처리이기 떄문에 호출하는 곳에서 이것을 무시하고 진행하지 않았음에도 진행 했다고 요청하면 되기 떄문에 단점으로 볼 수 있다. 최소한의 방어로직으로 해당 플래그 default value를 false으로 설정하자. 꼭 이렇게 사용하지 않더라도 유효성을 검증하는 코드를 한 객체에 위임하여 관리하는 것은 좋은 패턴이라고 생각한다. 
 
 
 ## Notnull을 보장 받고 싶은데...

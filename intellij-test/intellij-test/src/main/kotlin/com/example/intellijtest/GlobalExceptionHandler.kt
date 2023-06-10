@@ -1,5 +1,6 @@
 package com.example.intellijtest
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindException
@@ -14,6 +15,9 @@ import java.time.LocalDateTime
 
 @ControllerAdvice
 class GlobalExceptionHandler {
+
+    private val log = LoggerFactory.getLogger(javaClass)!!
+
     /**
      * javax.validation.Valid or @Validated 으로 binding error 발생시 발생한다.
      * HttpMessageConverter 에서 등록한 HttpMessageConverter binding 못할경우 발생
@@ -21,6 +25,7 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException::class)
     protected fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
+        log.error(e.message, e)
         val response = ErrorResponse(ErrorCode.INVALID_INPUT_VALUE, e.bindingResult)
         return ResponseEntity(response, HttpStatus.BAD_REQUEST)
     }
@@ -31,6 +36,7 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(BindException::class)
     protected fun handleBindException(e: BindException): ResponseEntity<ErrorResponse> {
+        log.error(e.message, e)
         val response = ErrorResponse(ErrorCode.INVALID_INPUT_VALUE, e.bindingResult)
         return ResponseEntity(response, HttpStatus.BAD_REQUEST)
     }
@@ -41,6 +47,7 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
     protected fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
+        log.error(e.message, e)
         val response = ErrorResponse(ErrorCode.METHOD_NOT_ALLOWED)
         return ResponseEntity(response, HttpStatus.BAD_REQUEST)
     }
@@ -49,15 +56,15 @@ class GlobalExceptionHandler {
      * 지원하지 않은 HTTP method 호출 할 경우 발생
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
-    protected fun handleHttpRequestMethodNotSupportedException(e: HttpRequestMethodNotSupportedException?): ResponseEntity<ErrorResponse> {
+    protected fun handleHttpRequestMethodNotSupportedException(e: HttpRequestMethodNotSupportedException): ResponseEntity<ErrorResponse> {
+        log.error(e.message, e)
         val response = ErrorResponse(ErrorCode.METHOD_NOT_ALLOWED)
         return ResponseEntity(response, HttpStatus.METHOD_NOT_ALLOWED)
     }
 
-
-
     @ExceptionHandler(Exception::class)
-    protected fun handleException(e: Exception?): ResponseEntity<ErrorResponse> {
+    protected fun handleException(e: Exception): ResponseEntity<ErrorResponse> {
+        log.error(e.message, e)
         val response = ErrorResponse(ErrorCode.INVALID_INPUT_VALUE)
         return ResponseEntity(response, HttpStatus.INTERNAL_SERVER_ERROR)
     }

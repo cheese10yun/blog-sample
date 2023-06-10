@@ -32,6 +32,7 @@ class MemberRegistrationFormValidator(
         }
 
         // 기타 문제...
+        // 한 가지 필드를 여러 검증을 진행...
         if (true) {
             inValidCount++
             addConstraintViolation(context, "${dto.email}은 xxx 문제가 있습니다.", "email")
