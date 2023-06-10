@@ -22,11 +22,10 @@ class Member(
     val age: Int,
     val gender: String,
     val occupation: String,
-    @Column(name = "resident_registration_number", nullable = true)
     val residentRegistrationNumber: String?,
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    var status: MemberStatus = MemberStatus.NORMAL,
+    val status: MemberStatus = MemberStatus.NORMAL
 ) : EntityAuditing()
 
 enum class MemberStatus(
@@ -46,6 +45,8 @@ interface MemberRepositoryCustom {
     // 특정 성별의로 유저 조회
     fun findBy(gender: String): List<Member>
     fun findBy(age: Int): List<Member>
+    fun existedEmail(email: String): Boolean
+    fun existedPhoneNumber(phoneNumber: String): Boolean
 }
 
 class MemberRepositoryImpl :
@@ -63,10 +64,17 @@ class MemberRepositoryImpl :
             .where(member.age.gt(age))
             .fetch()
 
-//    override fun findBy(gender: String, memberStatuses: Set<MemberStatus>): List<Member> =
-//        selectFrom(member)
-//            .where(member.status.`in`(memberStatuses))
-//            .fetch()
+    override fun existedEmail(email: String) =
+        select(member.id)
+            .from(member)
+            .where(member.email.eq(email))
+            .fetchFirst() != null
+
+    override fun existedPhoneNumber(phoneNumber: String) =
+        select(member.id)
+            .from(member)
+            .where(member.phoneNumber.eq(phoneNumber))
+            .fetchFirst() != null
 }
 
 
@@ -75,14 +83,12 @@ class MemberQueryService(
     private val memberRepository: MemberRepository,
 ) {
 
-    fun asd(member: Member) {
-        member.residentRegistrationNumber!!
+    fun findActivityMemberBy(gender: String): List<Member> =
+        memberRepository.findBy(gender)
 
-    }
+    fun existedEmail(email: String) = memberRepository.existedEmail(email)
 
-    fun findActivityMemberBy(gender: String): List<Member> {
-        return memberRepository.findBy(gender)
-    }
+    fun existedPhoneNumber(phoneNumber: String) = memberRepository.existedPhoneNumber(phoneNumber)
 }
 
 data class AdultMember(

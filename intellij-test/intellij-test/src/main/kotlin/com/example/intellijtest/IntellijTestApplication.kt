@@ -1,5 +1,8 @@
 package com.example.intellijtest
 
+import jakarta.persistence.Column
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -17,9 +20,9 @@ fun main(args: Array<String>) {
 @Configuration
 class AppRunner(
     private val shopRepository: ShopRepository,
+    private val memberRepository: MemberRepository
 ) : ApplicationRunner {
     override fun run(args: ApplicationArguments) {
-
         (1..5).map {
             Shop(
                 brn = "brn$-{it}",
@@ -38,6 +41,26 @@ class AppRunner(
         }.also {
             shopRepository.saveAll(it)
         }
+
+        (1..5).map {
+            Member(
+                firstName = "firstName",
+                lastName = "lastName",
+                email = "test-${it}@asd.com",
+                phoneNumber = "phoneNumber",
+                address = "address",
+                age = it,
+                gender = "gender",
+                occupation = "occupation",
+                residentRegistrationNumber = "residentRegistrationNumber",
+                status = MemberStatus.UNVERIFIED
+            )
+
+        }.also {
+            memberRepository.saveAll(it)
+        }
+
+
 
     }
 }

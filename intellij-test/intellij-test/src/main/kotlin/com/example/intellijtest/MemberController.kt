@@ -1,10 +1,8 @@
 package com.example.intellijtest
 
-import jakarta.validation.ConstraintValidator
-import jakarta.validation.ConstraintValidatorContext
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotEmpty
-import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -32,16 +30,6 @@ data class MemberRegistrationRequest(
     val firstName: String,
     @field:NotEmpty
     val lastName: String,
-    @field:NotEmpty
+    @field:Email
     val email: String
 )
-
-@Service
-class MemberRegistrationService(
-) {
-
-    fun register(dto: MemberRegistrationRequest) {
-
-    }
-
-}
