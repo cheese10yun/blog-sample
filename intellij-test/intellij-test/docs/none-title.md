@@ -359,7 +359,7 @@ data class AdultMember(
 자세한 Projection 방법은 [Querydsl Projection 방법 소개 및 선호하는 패턴 정리](https://cheese10yun.github.io/querydsl-projections/)에서 포스팅한 내용이 있습니다. Projection을 사용하면 영속성 컨텍스트가 없기 때문에 JPA에서 제공해주는 다양한 기능들을 사용하지 못한다. 그 밖에 단점들도 있지만 이것은 조금더 이후에 살펴보자. 이렇게까지 하면서 해야할 가치가 있을까 라는 의문이 있다.
 
 ```json
-//  Refind(환불) 객체를 JSON으로 표시
+//  Refind(환불) 객체를 JSON으로 표현
 {
   "order": {
     "order_number": "1110",
@@ -383,3 +383,6 @@ data class AdultMember(
 * [ ] DDD, rich Object 도매인이 집중됨
 * [ ] 인터페이스, 그런데 단순 함수를 사용하고 싶은 것에서 상속 구조는 올바르지 않다고 생각한다, 우선 인터페이스를 두어서 얻는 이점은 세부 구현체를 숨기고 인터페이스를 바라보게 함으로써 클래스 간의 의존관계를 줄이는 것, 다형성을 사용 하는 것 이 핵심이라고 생각합니다.
 * [ ] 상속보다 조립을
+
+
+### Projection의 결론
