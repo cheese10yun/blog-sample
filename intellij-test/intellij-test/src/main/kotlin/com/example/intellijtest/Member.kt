@@ -1,7 +1,6 @@
 package com.example.intellijtest
 
 import com.example.intellijtest.QMember.member
-import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
