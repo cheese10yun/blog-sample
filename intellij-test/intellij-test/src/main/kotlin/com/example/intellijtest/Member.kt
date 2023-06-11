@@ -14,19 +14,54 @@ import org.springframework.stereotype.Service
 @Table(name = "member")
 //@Where(clause = "status = 'NORMAL'")
 class Member(
-    val firstName: String,
-    val lastName: String,
-    val email: String,
-    val phoneNumber: String,
-    val address: String,
-    val age: Int,
-    val gender: String,
-    val occupation: String,
-    val residentRegistrationNumber: String?,
+    firstName: String,
+    lastName: String,
+    email: String,
+    phoneNumber: String,
+    address: String,
+    age: Int,
+    gender: String,
+    occupation: String,
+    residentRegistrationNumber: String?,
+    status: MemberStatus
+) : EntityAuditing() {
+
+    var firstName: String = ""
+        internal set
+    var lastName: String = ""
+        internal set
+    var email: String = ""
+        internal set
+    var phoneNumber: String = ""
+        internal set
+    var address: String = ""
+        internal set
+    var age: Int = 0
+        internal set
+    var gender: String = ""
+        internal set
+    var occupation: String = ""
+        internal set
+    var residentRegistrationNumber: String? = null
+        internal set
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    val status: MemberStatus = MemberStatus.NORMAL
-) : EntityAuditing()
+    var status: MemberStatus = MemberStatus.NORMAL
+
+
+    init {
+        this.firstName = firstName
+        this.lastName = lastName
+        this.email = email
+        this.phoneNumber = phoneNumber
+        this.address = address
+        this.age = age
+        this.gender = gender
+        this.occupation = occupation
+        this.residentRegistrationNumber = residentRegistrationNumber
+        this.status = status
+
+    }
+}
 
 enum class MemberStatus(
     desc: String
