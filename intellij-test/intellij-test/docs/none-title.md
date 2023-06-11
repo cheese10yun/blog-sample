@@ -84,7 +84,7 @@ MemberQueryService 같은 서비스 계층을 두고 해당 객체에서 네이�
 
 ## 유효성 검사는 어디서 어떻게 해야할까?
 
-![](../images/layer-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/layer-1.png)
 
 일반적으로 Presentation 계층에서 다양한 유효성 검사를 하고 문제가 없다면 서비스 계층으로 넘어가서 비즈니스 로직을 수행하는 것이 일반적이다. 간단하게 코드로 표현하면 다음과 같다.
 
@@ -143,7 +143,7 @@ class MemberController(
 
 ### 사전 유효성 검증의 문제
 
-![](../images/layer-2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/layer-2.png)
 
 사전에 검증하게 되면 문제가 있다. 위 그림처럼 여러 개의 애플리케이션, 혹은 다른 서비스에서 `MemberRegistrationService`의존 하여 회원가입을 진행할 수 있다. 이렇게 어느 한 구간에서 유효성 검사를 하지 않거나, 유효성 검증 항목의 변경 사항이 제대로 반영되지 않거나 하는 문제가 발생할 수 있다. 결국 여러 애플리케이션, 외부 객체에서 의존하려면 유효성 검사를 모두 `MemberRegistrationService`에서 진행 시키는 것이 바람직해 보일 수 있다.
 
@@ -300,7 +300,7 @@ class Member(
 
 개인적으로 단순 setter를 지양한다. 하지만 팀 내 컨벤션으로 가져가야 할 정도로 가져가야 할 컨벤션으로 가져가야 할 정도인가?라고 하면 조금은 회의적이다. 회의적인 이유는 효율성이다. setter를 지양하는 다양한 이유가 있겠지만 개인적인 생각으로는 결국 서비스가 커지고, 관련 개발자들도 많아지면 복잡도를 제어하기가 더욱더 힘들어진다는 것이다. 즉 그렇게 복잡하지 않은 서비스의 경우는 setter를 지양해야 할 필요성이 상대적으로 낮다고 본다. 물론 어느 정도가 복잡하냐는 기준 자체는 주관적인 관점이기 부분이 크기 때문에 많은 논쟁들이 발생 하긴 한다. 
 
-![](../images/layer-4.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/layer-4.png)
 
 위 구조처럼 상품, 주문, 결제, 회원, 쿠폰 등등 모든 서비스들이 단일 서비스 즉 모놀리식 으로 구성돼 있다고 가정해 보자. 서비스 초기에는 2 ~ 3명의 개발자가 모든 도메인에 대해서 거의 같은 수준으로 도메인을 이해하고 있다. 하지만 서비스가 커지고, 개발자를 채용하면 문제들이 발생한다. 초기에 있던 2 ~ 3명의 개발자들도 프로젝트가 복잡해지면 도메인의 이해 수준이 달라지게 되며 새롭게 합류한 개발자들은 더더욱 그 이해도가 차이 날 수밖에 없다.
 
@@ -311,7 +311,7 @@ class Member(
 
 그렇다면 이렇게 복잡해졌으니 단순 setter를 지양하는 방식으로 프로젝트를 리팩토링할 것인가?라는 의견에는 동의하지 않는다. 그렇게 리팩토링할 시관과 리소스로 차리를 서비스를 상품, 주문, 결제, 회원, 쿠폰 등으로 분리해서 본인의 복잡도를 본인의 애플리케이션에서 해결해야 한다.
 
-![](../images/layer-3.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/layer-3.png)
 
 위 이미지처럼 적당한 서비스의 크기로 애플리케이션을 나누는 것이 도메인적인 복잡도를 해결하기 좋은 방법이라고 생각한다. 물론 이렇게 분산 환경을 구축하면 기술적인 복잡도가 요구되게 한다. 개발의 모든 결정은 다 트레이드오프가 있으며 이런 결정은 단순히 기술적인 역량뿐만이 아니라 정무적인 역량도 함께 필요하다고 생각한다. 이러한 역량까지 없기 때문에 나의 결론은 거대한 모놀로식 구조라면 단순 setter를 지양하는 것보다는 서비스의 크기를 작게 나누는 것에 대해서 더 리소스를 투자하는 게 효율적이라고 생각한다.
 
@@ -325,15 +325,15 @@ class Member(
 
 단순 setter가 없는 경우 불편한 점은 테스트 코드 작성이 어려운 부분이다. 이 부분에 대한 국체적인 설명은 [2023 Spring Camp 실무에서 적용하는 테스트 코드 작성 방법과 노하우](https://springcamp.ksug.org/2023/)에서 다룬 적이 있다. 해당 발표 내용은 이후 유튜브에 공개되기 때문에 자세한 내용은 이후에 볼 수 있기 때문에 대략적으로 설명하면 다음과 같다
 
-![](../images/order-flow.001.jpeg)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/order-flow.001.jpeg)
 
 주문 Flow는 주문 -> 결제 확인 -> 상품 준비 -> 배송 시작 -> 배송 완료 이렇게 Flow가 존재하고 해당 Flow에는 순서가 있기 때문에 각 Step 별로 구성되며 건너뛰어서 넘어갈 수 없는 구조다. 즉 타임 테이블이 있고 그 순서대로만 진행해야 하기 때문에 상태 변경에든 다양한 유효성 체크 로직이 있다.
 
-![](../images/order-flow.003.jpeg)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/order-flow.003.jpeg)
 
 Order라는 엔티티 객체를 테스트 코드를 작성하려면 특정 Snapshot 상태로 만들어야 한다. 테스트 코드를 작성하는 구간은 상품 준비 -> 배송시작 임으로 해당 객체를 상품 준비 상태로 만들어야 한다. 하지만 단순 setter가 없기 때문에 상품 준비 중 객체로 직접 만드는 것이 어려운 부분이 있다. 
 
-![](../images/order-flow.004.jpeg)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/order-flow.004.jpeg)
 
 가장 쉬운 해결 책으로는 Order 객체를 하나 만들고 주문 -> 결제 확인 -> 상품 준비의 로직을 각각 호출해서 상품 준비 중 상태로 만들면 된다. 하지만 이 방법도 좋은 방법이 아니다. 해당 테스트 코드의 주요 관심사는 상품 준비 -> 배송 시작에 대한 테스트 코드를 작성하는 것이지 주문 상태부터 결제 확인, 상품 준비까지 객체를 만드는 것이 주요 관심사가 아니다. 이렇게 작성하면 주문 -> 결제 확인, 결제 확인 -> 상품 준비 등의 Flow가 변경이 있다면 이 테스트 코드까지 영향 범위가 확대된다. 즉 테스트 코드는 중요 관심사의 변경에만 반영하는 것이 좋다.
 
@@ -427,7 +427,7 @@ data class AdultMember(
 ```
 GeneralMember 인터페이스를 만들고 필요한 공통 로직을 작성한다. 그리고 Member 엔티티 객체, AdultMember Projection 객체에서 해당 인터페이스를 구현하면 공통 로직을 사용할 수 있다. 하지만 이렇게 인터페이스를 설계하려면 책임과 역할을 명확한 단위(작은 단위)로 구성해야 한다. 그저 엔티티와 일대일로 매핑되는 인터페이스를 두는 행위는 지양해야 한다.
 
-![](../images/projection-2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/projection-2.png)
 
 Member라는 공통 교집합에는 이름, 이메일, 주소 세 가지 필드가 있다. GeneralMember가 보호자 연락처, 보호자 동의 여부 필드를 가지고 있다면 어떻게 될까? 정상적으로 override을 할 수 없다. 즉 위 그림처럼 회원이라는 인터페이스는 세 가지 일반(공통), 성인, 미성년자 인터페이스로 구성해야 하며 단순히 인터페이스를 공통 로직으로만 보고 설계하면 안 되고 많은 것들을 고려해야 한다.
 
