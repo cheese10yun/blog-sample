@@ -14,8 +14,8 @@ class MemberRegistrationService(
         dto: MemberRegistrationRequest,
         isAlreadyCompletedValidation: Boolean = false // 이미 유효성 검사를 진행 했다면 추가적은 검증을 진행하지 않는다..
     ) {
-        if (isAlreadyCompletedValidation.not()){
-            memberRegistrationValidatorService.checkEmailDuplication(dto.email)
-        }
+//        if (isAlreadyCompletedValidation.not()){
+//            memberRegistrationValidatorService.checkEmailDuplication(dto.email)
+//        }
     }
 }

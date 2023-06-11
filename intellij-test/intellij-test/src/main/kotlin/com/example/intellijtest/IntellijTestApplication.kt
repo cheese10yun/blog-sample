@@ -42,25 +42,25 @@ class AppRunner(
             shopRepository.saveAll(it)
         }
 
-        (1..5).map {
-            Member(
-                firstName = "firstName",
-                lastName = "lastName",
-                email = "test-${it}@asd.com",
-                phoneNumber = "phoneNumber",
-                address = "address",
-                age = it,
-                gender = "gender",
-                occupation = "occupation",
-                residentRegistrationNumber = "residentRegistrationNumber",
-                status = MemberStatus.UNVERIFIED
-            )
-
-        }.also {
-            it.first().fullName()
-
-            memberRepository.saveAll(it)
-        }
+//        (1..5).map {
+//            Member(
+//                firstName = "firstName",
+//                lastName = "lastName",
+//                email = "test-${it}@asd.com",
+//                phoneNumber = "phoneNumber",
+//                address = "address",
+//                age = it,
+//                gender = "gender",
+//                occupation = "occupation",
+//                residentRegistrationNumber = "residentRegistrationNumber",
+//                status = MemberStatus.UNVERIFIED
+//            )
+//
+//        }.also {
+//            it.first().fullName()
+//
+//            memberRepository.saveAll(it)
+//        }
 
 
 

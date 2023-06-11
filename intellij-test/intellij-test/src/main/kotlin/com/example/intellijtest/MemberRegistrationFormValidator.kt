@@ -26,17 +26,17 @@ class MemberRegistrationFormValidator(
         var inValidCount = 0
         val existedEmail = memberRegistrationValidatorService.isExistedEmail(dto.email)
 
-        if (existedEmail) {
-            inValidCount++
-            addConstraintViolation(context, "${dto.email}은 이미 등록된 이메일 입니다.", "email")
-        }
-
-        // 기타 문제...
-        // 한 가지 필드를 여러 검증을 진행...
-        if (true) {
-            inValidCount++
-            addConstraintViolation(context, "${dto.email}은 xxx 문제가 있습니다.", "email")
-        }
+//        if (existedEmail) {
+//            inValidCount++
+//            addConstraintViolation(context, "${dto.email}은 이미 등록된 이메일 입니다.", "email")
+//        }
+//
+//        // 기타 문제...
+//        // 한 가지 필드를 여러 검증을 진행...
+//        if (true) {
+//            inValidCount++
+//            addConstraintViolation(context, "${dto.email}은 xxx 문제가 있습니다.", "email")
+//        }
 
         return inValidCount == 0
     }

@@ -18,14 +18,11 @@ class MemberController(
 
     @PostMapping
     fun register(
-        adultMember: AdultMember,
         @RequestBody @Valid dto: MemberRegistrationRequest
     ) {
         // ...
         // 간단한 validation 외에 각종 검증...
-        memberRegistrationService.register(dto)
-
-        adultMember.fullName()
+        memberRegistrationService.register(dto, true)
     }
 
     @GetMapping
@@ -34,7 +31,7 @@ class MemberController(
     }
 }
 
-@MemberRegistrationForm
+//@MemberRegistrationForm
 data class MemberRegistrationRequest(
     @field:NotEmpty
     val firstName: String,

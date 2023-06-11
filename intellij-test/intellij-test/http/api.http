@@ -57,8 +57,8 @@ Content-Type: application/json
 
 {
   "firstName": "test",
-  "lastName": "test",
-  "email": "test-1@asd.com",
+  "lastName": "",
+  "email": "asd",
   "phoneNumber": "01011111111",
   "address": "address ...",
   "age": 10,

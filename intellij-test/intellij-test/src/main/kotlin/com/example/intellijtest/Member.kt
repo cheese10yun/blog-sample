@@ -143,7 +143,7 @@ class MemberRepositoryImpl :
     override fun existedEmail(email: String) =
         select(member.id)
             .from(member)
-            .where(member.email.eq(email))
+            .where(member.generalMember.email.eq(email))
             .fetchFirst() != null
 
     override fun existedPhoneNumber(phoneNumber: String) =
