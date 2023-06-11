@@ -38,7 +38,6 @@ class Refund protected constructor() : EntityAuditing() {
         this.account = account
         this.creditCard = creditCard
     }
-
 }
 
 

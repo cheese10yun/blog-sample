@@ -57,7 +57,7 @@ class AppRunner(
             )
 
         }.also {
-//            it.first().age = 123
+            it.first().fullName()
 
             memberRepository.saveAll(it)
         }

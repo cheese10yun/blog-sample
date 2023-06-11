@@ -9,6 +9,18 @@ import jakarta.persistence.Table
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Service
 
+interface GeneralMember {
+
+    val firstName: String
+    val lastName: String
+
+    // ...
+    fun fullName(): String {
+        return "$firstName $lastName"
+    }
+}
+
+
 @Entity
 @Table(name = "member")
 class Member(
@@ -23,29 +35,36 @@ class Member(
     occupation: String,
     residentRegistrationNumber: String?,
     status: MemberStatus
-) : EntityAuditing() {
+) : EntityAuditing(), GeneralMember {
 
     @Column(name = "first_name", nullable = false)
-    var firstName: String = ""
+    override var firstName: String = ""
         protected set
+
     @Column(name = "last_name", nullable = false)
-    var lastName: String = ""
+    override var lastName: String = ""
         protected set
+
     @Column(name = "phone_number", nullable = false)
     var phoneNumber: String = ""
         protected set
+
     @Column(name = "address", nullable = false)
     var address: String = ""
         protected set
+
     @Column(name = "age", nullable = false)
     var age: Int = 0
         protected set
+
     @Column(name = "gender", nullable = false)
     var gender: String = ""
         protected set
+
     @Column(name = "occupation", nullable = false)
     var occupation: String = ""
         protected set
+
     @Column(name = "resident_registration_number", nullable = false)
     var residentRegistrationNumber: String? = null
         protected set
@@ -65,6 +84,7 @@ class Member(
         this.residentRegistrationNumber = residentRegistrationNumber
         this.status = status
     }
+
 }
 
 enum class MemberStatus(
@@ -133,6 +153,7 @@ class MemberQueryService(
 data class AdultMember(
     // ...
     val residentRegistrationNumber: String,
-    var status: MemberStatus,
-) {
-}
+    override val firstName: String,
+    override val lastName: String,
+    val status: MemberStatus,
+) : GeneralMember

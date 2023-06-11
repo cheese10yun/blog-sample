@@ -18,11 +18,14 @@ class MemberController(
 
     @PostMapping
     fun register(
+        adultMember: AdultMember,
         @RequestBody @Valid dto: MemberRegistrationRequest
     ) {
         // ...
         // 간단한 validation 외에 각종 검증...
         memberRegistrationService.register(dto)
+
+        adultMember.fullName()
     }
 
     @GetMapping

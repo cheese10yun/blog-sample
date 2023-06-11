@@ -381,6 +381,48 @@ data class AdultMember(
 
 ### Projection의 치명적인 단점
 
+Projection을 사용하면 영속성 컨텍스트를 사용하지 못하는 단점 말고도 다른 큰 단점이 있다. 리턴되는 타입이 엔티티 객체가 아니기 떄문에 엔티티 객체에 있는 로직을 사용할 수 없다는 것이다. 이를 해결 하기 위해서 Interface로 묶고 공통 적인 로직은 Interface에서 구현 하는 것으로 쉽게 해결이 가능해 보안다.
+
+```kotlin
+interface GeneralMember {
+    // ...
+    val email: String
+    val firstName: String
+    val lastName: String
+    
+    // 공통 로직을 작성
+    fun fullName(): String {
+        return "$firstName $lastName"
+    }
+}
+
+data class AdultMember(
+    // ...
+    override val email: String,
+    override val firstName: String,
+    override val lastName: String,
+    val status: MemberStatus,
+) : GeneralMember  // 인터페이스를 상속해서 공통 로직 사용 가능
+```
+GeneralMember 인터페이스를 만들고 필요한 공통 로직을 작성한다. 그리고 Member 엔티티 객체, AdultMember Projection 객체에서 해당 인터페이스를 구현 하면 공통 로직을 사용할 수 있다.
+
+하지만 이렇게 인터페이스를 설계하려면 책임과 역할을 명확한 단위(작은 단위)로 구성해야 한다. 그저 엔티티와 일대일로 매핑되는 인터페이스를 두는 행위는 지양해야 한다.
+
+![](../images/projection-2.png)
+
+Member라는 공통 교집합에는 이름, 이메일, 주소 세 가지 필드가 있다. GeneralMember가 보호자 연락처, 보호자 동의 여부 필드를 가지고 있다면 어떻게 될까? 정상적으로 override을 할 수 없다. 즉 위 그림 처럼 회원이라는 인터페이스는 세 가지 일반(공통), 성인, 미성년자 인터페이스로 구성 해야하며 단순히 인터페이스를 공통 로직으로만 보고 설계하면 안되고 많은 것들을 고려 해야한다.
+
+
+### 이런식의 인터페이스는 올바른가?
+
+위 문제 처럼 각 책임에 맞게 적절하게 인터페이스를 두었다고 가정해보자. 그렇다면 그것이 좋은 설계라고 볼 수 있을까? 나는 그렇지 않다고 생각한다. 결국 인터페이스를 두는 이유는 세부 구현체를 숨기기고 인터페이스를 바라보게 함으로써 클래스 간의 의존관계를 줄이는 것, 다형성을 사용 하여 역할을 대체 할 수있는 것이 중요한 핵심이라고 생각한다. 위 예제처럼 인터페이스는 그저 중복로직을 맞기 위해 억지로 끼워 맞추는것에 지나지 않는다고 생각한다. 
+
+
+
+
+
+
+
 
 * [ ] DDD, rich Object 도매인이 집중됨
 * [ ] 인터페이스, 그런데 단순 함수를 사용하고 싶은 것에서 상속 구조는 올바르지 않다고 생각한다, 우선 인터페이스를 두어서 얻는 이점은 세부 구현체를 숨기고 인터페이스를 바라보게 함으로써 클래스 간의 의존관계를 줄이는 것, 다형성을 사용 하는 것 이 핵심이라고 생각합니다.
@@ -391,4 +433,6 @@ data class AdultMember(
 
 Projection을 사용을 권장하는 구간은 다음과 같다
 
-1. 대용량 처리를 진행하는 경우, 영속성 컨텍스트, 더티 체킹, Lazy 로딩
+1. 대용량 처리를 진행하는 경우
+2. 더티 체킹, Lazy 로딩 기능 등 영속성 컨텍스트를 통한 기능이 추가적으로 필요하지 않은 케이스
+3. 
