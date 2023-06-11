@@ -2,6 +2,7 @@ package com.example.intellijtest
 
 import com.example.intellijtest.QMember.member
 import jakarta.persistence.Column
+import jakarta.persistence.Embedded
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service
 
 interface GeneralMember {
 
+    val email: String
     val firstName: String
     val lastName: String
 
@@ -21,11 +23,22 @@ interface GeneralMember {
 }
 
 
+class GeneralMemberEmbedded(
+    @Column(name = "first_name", nullable = false)
+    override var firstName: String,
+    @Column(name = "last_name", nullable = false)
+    override var lastName: String,
+    @Column(name = "email", nullable = false, updatable = false)
+    override var email: String,
+) : GeneralMember
+
+
 @Entity
 @Table(name = "member")
 class Member(
-    @Column(name = "email", nullable = false, updatable = false)
-    val email: String,
+//    @Column(name = "email", nullable = false, updatable = false)
+//    val email: String,
+    generalMember: GeneralMemberEmbedded,
     firstName: String,
     lastName: String,
     phoneNumber: String,
@@ -35,15 +48,18 @@ class Member(
     occupation: String,
     residentRegistrationNumber: String?,
     status: MemberStatus
-) : EntityAuditing(), GeneralMember {
+) : EntityAuditing(), GeneralMember by generalMember {
 
-    @Column(name = "first_name", nullable = false)
-    override var firstName: String = ""
-        protected set
+//    @Column(name = "first_name", nullable = false)
+//    override var firstName: String = ""
+//        protected set
+//
+//    @Column(name = "last_name", nullable = false)
+//    override var lastName: String = ""
+//        protected set
 
-    @Column(name = "last_name", nullable = false)
-    override var lastName: String = ""
-        protected set
+    @Embedded
+    lateinit var generalMember: GeneralMember
 
     @Column(name = "phone_number", nullable = false)
     var phoneNumber: String = ""
@@ -74,8 +90,9 @@ class Member(
 
     init {
         // 필요하다면 유효성 체크, 기타 로직 수행 등등 진행
-        this.firstName = firstName
-        this.lastName = lastName
+
+        this.generalMember = generalMember
+
         this.phoneNumber = phoneNumber
         this.address = address
         this.age = age
@@ -152,7 +169,7 @@ class MemberQueryService(
 
 data class AdultMember(
     // ...
-    val residentRegistrationNumber: String,
+    override val email: String,
     override val firstName: String,
     override val lastName: String,
     val status: MemberStatus,
