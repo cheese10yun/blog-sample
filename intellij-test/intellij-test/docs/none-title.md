@@ -146,7 +146,8 @@ class MemberRegistrationValidatorService(
                     errorMessage.append("${email}은 이미 등록된 이메일 입니다.\n")
                 }
             }
-
+        // 기타 문제...
+        // 한 가지 필드를 여러 검증을 진행...
         if (true) {
             inValidCount++
             errorMessage.append("${email}은 xxx 문제가 있습니다. \n")
@@ -193,7 +194,7 @@ class MemberRegistrationService(
     private val memberRegistrationValidatorService: MemberRegistrationValidatorService
 ) {
     /**
-     * @param isAlreadyCompletedValidation true 경우 이미 유효성 검사를 진행 한것으로 간주하고 추가적으로 유혀성 검사를 진행하지 않는다. 
+     * @param isAlreadyCompletedValidation true 경우 이미 유효성 검사를 진행 한것으로 간주하고 추가적으로 유효성 검사를 진행하지 않는다. 
      */
     fun register(
         dto: MemberRegistrationRequest,
@@ -206,7 +207,83 @@ class MemberRegistrationService(
     }
 }
 ```
-MemberRegistrationService 계층에서는 isAlreadyCompletedValidation을 기준으로 추가적으로 유혀성 검사를 진행할지 여부를 결정한다. 만약 Presentation 계층에서 동일한 유효성 검사를 진행 했다면 더 이상 검증을 하지 않고 등록 로직을 수행한다. 물론 성능상의 큰 차이가 없다면 이런 플레그를 두지 않고 두번 검사해도 무방하다. 이렇게 진행하면 장점으로는 유효성 검사 로직이 한 곳에 모이게 되기 떄문에 코드의 응집력이 높아지며, 사전 검증 여부를 확인하고 검증을 진행하지 않았다면 유효성 검사를 담당하는 객체를 통해서 진행하면 된다. 물론 단점으로는 단순 플레그 처리이기 떄문에 호출하는 곳에서 이것을 무시하고 진행하지 않았음에도 진행 했다고 요청하면 되기 떄문에 단점으로 볼 수 있다. 최소한의 방어로직으로 해당 플래그 default value를 false으로 설정하자. 꼭 이렇게 사용하지 않더라도 유효성을 검증하는 코드를 한 객체에 위임하여 관리하는 것은 좋은 패턴이라고 생각한다. 
+MemberRegistrationService 계층에서는 isAlreadyCompletedValidation을 기준으로 추가적으로 유효성 검사를 진행할지 여부를 결정한다. 만약 Presentation 계층에서 동일한 유효성 검사를 진행 했다면 더 이상 검증을 하지 않고 등록 로직을 수행한다. 물론 성능상의 큰 차이가 없다면 이런 플레그를 두지 않고 두번 검사해도 무방하다. 이렇게 진행하면 장점으로는 유효성 검사 로직이 한 곳에 모이게 되기 떄문에 코드의 응집력이 높아지며, 사전 검증 여부를 확인하고 검증을 진행하지 않았다면 유효성 검사를 담당하는 객체를 통해서 진행하면 된다. 물론 단점으로는 단순 플레그 처리이기 떄문에 호출하는 곳에서 이것을 무시하고 진행하지 않았음에도 진행 했다고 요청하면 되기 떄문에 단점으로 볼 수 있다. 최소한의 방어로직으로 해당 플래그 default value를 false으로 설정하자. 꼭 이렇게 사용하지 않더라도 유효성을 검증하는 코드를 한 객체에 위임하여 관리하는 것은 좋은 패턴이라고 생각한다.
+
+
+## Setter 없애기
+
+개인적으로 Setter 사용을 지양한다. 관련 내용은 [Spring-Jpa Best Practices Step-06 - Setter 사용하지 않기](https://cheese10yun.github.io/spring-jpa-best-06/)에서 진행한적 있다. 최근 대부분의 프로젝트는 Kotlin을 기반으로 코딩하고 있으며, JPA도 많이 사용하고 있다. OOP 설계를 지향하기 위해서는 단순 setter를 지양하는 것은 매우 동의 하지만 Kotlin + JPA 조합을 사용하는 프로젝트에서는 적용하는 것이 많이 불편하다.
+
+```kotlin
+@Entity
+@Table(name = "member")
+class Member(
+    @Column(name = "email", nullable = false, updatable = false)
+    val email: String,
+    firstName: String,
+    lastName: String,
+    phoneNumber: String,
+    address: String,
+    age: Int,
+    gender: String,
+    occupation: String,
+    residentRegistrationNumber: String?,
+    status: MemberStatus
+) : EntityAuditing() {
+
+    @Column(name = "first_name", nullable = false)
+    var firstName: String = ""
+        protected set
+    @Column(name = "last_name", nullable = false)
+    var lastName: String = ""
+        protected set
+    @Column(name = "phone_number", nullable = false)
+    var phoneNumber: String = ""
+        protected set
+    @Column(name = "address", nullable = false)
+    var address: String = ""
+        protected set
+    @Column(name = "age", nullable = false)
+    var age: Int = 0
+        protected set
+    @Column(name = "gender", nullable = false)
+    var gender: String = ""
+        protected set
+    @Column(name = "occupation", nullable = false)
+    var occupation: String = ""
+        protected set
+    @Column(name = "resident_registration_number", nullable = false)
+    var residentRegistrationNumber: String? = null
+        protected set
+
+    @Enumerated(EnumType.STRING)
+    var status: MemberStatus = MemberStatus.NORMAL
+
+    init {
+        // 필요하다면 유효성 체크, 기타 로직 수행 등등 진행
+        this.firstName = firstName
+        this.lastName = lastName
+        this.phoneNumber = phoneNumber
+        this.address = address
+        this.age = age
+        this.gender = gender
+        this.occupation = occupation
+        this.residentRegistrationNumber = residentRegistrationNumber
+        this.status = status
+    }
+}
+
+```
+단순히 생성자로 받아서 처리하는 방식 보다 코드가 간결하지 않다. 
+
+* setter를 안쓰기 위한 노력
+* 코틀린에서는 변하지 않는 값은 그냥 val 선언
+* kotlin에서 필요 이상으로 귀찮음
+* 그렇다면 setter를 업애는 것은 정말 효율적인가 ?
+  * 거대한 모노로틱 구조에서는 치명적인 단점
+  * setter를 업애는 구조로 개편하는 것보다, 서비스 단위를 작게 유지하는 것에 리소스를 쓰는 것이 더 바람직하고 가성기가 좋음
+  * 그렇다면 프로젝트의 크기를 적절하게 줄인다면 setter는 필요할까? 필요하지 않을까? 필요는 하지만 절대적으로 필요하지 않음
+  * setter가 없다는건 테스트하기의 어려움, 결국 상속보단 조립을으로 키워드 전이
 
 
 ## Notnull을 보장 받고 싶은데...
@@ -272,18 +349,3 @@ data class AdultMember(
 * [ ] DDD, rich Object 도매인이 집중됨
 * [ ] 인터페이스, 그런데 단순 함수를 사용하고 싶은 것에서 상속 구조는 올바르지 않다고 생각한다, 우선 인터페이스를 두어서 얻는 이점은 세부 구현체를 숨기고 인터페이스를 바라보게 함으로써 클래스 간의 의존관계를 줄이는 것, 다형성을 사용 하는 것 이 핵심이라고 생각합니다.
 * [ ] 상속보다 조립을
-
-## Setter 없애기
-
-개인적으로 Setter 사용을 지양한다. 관련 내용은 [Spring-Jpa Best Practices Step-06 - Setter 사용하지 않기](https://cheese10yun.github.io/spring-jpa-best-06/)에서 진행한적 있다. 최근 대부분의 프로젝트는 Kotlin을 기반으로 코딩하고 있으며, JPA도 많이 사용하고 있다. OOP 설계를 지향하기 위해서는 단순 setter를 지양하는 것은 매우 동의 하지만 Kotlin + JPA 조합을 사용하는 프로젝트에서는 적용하는 것이 많이 불편하다.  
-
-
-
-* setter를 안쓰기 위한 노력
-* 코틀린에서는 변하지 않는 값은 그냥 val 선언
-* kotlin에서 필요 이상으로 귀찮음
-* 그렇다면 setter를 업애는 것은 정말 효율적인가 ?
-  * 거대한 모노로틱 구조에서는 치명적인 단점
-  * setter를 업애는 구조로 개편하는 것보다, 서비스 단위를 작게 유지하는 것에 리소스를 쓰는 것이 더 바람직하고 가성기가 좋음
-  * 그렇다면 프로젝트의 크기를 적절하게 줄인다면 setter는 필요할까? 필요하지 않을까? 필요는 하지만 절대적으로 필요하지 않음
-  * setter가 없다는건 테스트하기의 어려움, 결국 상속보단 조립을으로 키워드 전이

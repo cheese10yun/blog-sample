@@ -8,7 +8,7 @@ class MemberRegistrationService(
 ) {
 
     /**
-     * @param isAlreadyCompletedValidation true 경우 이미 유효성 검사를 진행 한것으로 간주하고 추가적으로 유혀성 검사를 진행하지 않는다.
+     * @param isAlreadyCompletedValidation true 경우 이미 유효성 검사를 진행 한것으로 간주하고 추가적으로 유효성 검사를 진행하지 않는다.
      */
     fun register(
         dto: MemberRegistrationRequest,

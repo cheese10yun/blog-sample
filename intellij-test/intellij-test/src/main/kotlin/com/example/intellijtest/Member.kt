@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service
 
 @Entity
 @Table(name = "member")
-//@Where(clause = "status = 'NORMAL'")
 class Member(
+    @Column(name = "email", nullable = false, updatable = false)
+    val email: String,
     firstName: String,
     lastName: String,
-    email: String,
     phoneNumber: String,
     address: String,
     age: Int,
@@ -26,32 +26,38 @@ class Member(
     status: MemberStatus
 ) : EntityAuditing() {
 
+    @Column(name = "first_name", nullable = false)
     var firstName: String = ""
-        internal set
+        protected set
+    @Column(name = "last_name", nullable = false)
     var lastName: String = ""
-        internal set
-    var email: String = ""
-        internal set
+        protected set
+    @Column(name = "phone_number", nullable = false)
     var phoneNumber: String = ""
-        internal set
+        protected set
+    @Column(name = "address", nullable = false)
     var address: String = ""
-        internal set
+        protected set
+    @Column(name = "age", nullable = false)
     var age: Int = 0
-        internal set
+        protected set
+    @Column(name = "gender", nullable = false)
     var gender: String = ""
-        internal set
+        protected set
+    @Column(name = "occupation", nullable = false)
     var occupation: String = ""
-        internal set
+        protected set
+    @Column(name = "resident_registration_number", nullable = false)
     var residentRegistrationNumber: String? = null
-        internal set
+        protected set
+
     @Enumerated(EnumType.STRING)
     var status: MemberStatus = MemberStatus.NORMAL
 
-
     init {
+        // 필요하다면 유효성 체크, 기타 로직 수행 등등 진행
         this.firstName = firstName
         this.lastName = lastName
-        this.email = email
         this.phoneNumber = phoneNumber
         this.address = address
         this.age = age
@@ -59,7 +65,6 @@ class Member(
         this.occupation = occupation
         this.residentRegistrationNumber = residentRegistrationNumber
         this.status = status
-
     }
 }
 
