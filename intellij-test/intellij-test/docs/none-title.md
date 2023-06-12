@@ -252,44 +252,36 @@ class Member(
 ) : EntityAuditing() {
 
     @Column(name = "first_name", nullable = false)
-    var firstName: String = ""
+    var firstName: String = firstName
         protected set
     @Column(name = "last_name", nullable = false)
-    var lastName: String = ""
+    var lastName: String = lastName
         protected set
     @Column(name = "phone_number", nullable = false)
-    var phoneNumber: String = ""
+    var phoneNumber: String = phoneNumber
         protected set
     @Column(name = "address", nullable = false)
-    var address: String = ""
+    var address: String = address
         protected set
     @Column(name = "age", nullable = false)
-    var age: Int = 0
+    var age: Int =age
         protected set
     @Column(name = "gender", nullable = false)
-    var gender: String = ""
+    var gender: String = gender
         protected set
     @Column(name = "occupation", nullable = false)
-    var occupation: String = ""
+    var occupation: String = occupation
         protected set
     @Column(name = "resident_registration_number", nullable = false)
-    var residentRegistrationNumber: String? = null
+    var residentRegistrationNumber: String? = residentRegistrationNumber
         protected set
 
     @Enumerated(EnumType.STRING)
-    var status: MemberStatus = MemberStatus.NORMAL
+    var status: MemberStatus = status
+        protected set
 
     init {
         // 필요하다면 유효성 체크, 기타 로직 수행 등등 진행
-        this.firstName = firstName
-        this.lastName = lastName
-        this.phoneNumber = phoneNumber
-        this.address = address
-        this.age = age
-        this.gender = gender
-        this.occupation = occupation
-        this.residentRegistrationNumber = residentRegistrationNumber
-        this.status = status
     }
 }
 
