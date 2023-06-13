@@ -1,6 +1,6 @@
 # Intelli J
 
-## Presentation
+## Presentation Assistant
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-6.png)
 
