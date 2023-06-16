@@ -91,3 +91,6 @@
 * [Spring Cloud Sleuth 분산 환경 트래킹](https://github.com/cheese10yun/blog-sample/blob/master/msa-error-response/docs/sleuth.md)
 * [Exposed 추가 정리](https://github.com/cheese10yun/blog-sample/blob/master/exposed-study/docs/exposed.md)
 * [Spring Cloud Gateway Error Handling & Filter](https://github.com/cheese10yun/blog-sample/blob/master/spring-msa/docs/cloud-gateway.md)
+* [코틀린 Collection 정리](https://github.com/cheese10yun/TIL/blob/master/ETC/%EC%BD%94%ED%8B%80%EB%A6%B0-%EC%BB%AC%EB%9E%99%EC%85%98-%EA%B0%80%EA%B3%B5.md)
+* [IntelliJ 자주 사용하는 기능 정리](https://github.com/cheese10yun/blog-sample/blob/master/intellij-test/intellij-test/REAEMD.md)
+* [좋은 코드 설계를 위한 답없는 고민들](https://github.com/cheese10yun/blog-sample/blob/master/intellij-test/intellij-test/docs/none-title.md)
