@@ -262,7 +262,7 @@ HTTP Client 모듈의 main 디렉터리에 ClientConfiguration을 위치 시킴�
 
 | 방식                 | 장점                                   | 단점                                       |
 |--------------------|--------------------------------------|------------------------------------------|
-| Mock Server Test   | HTTP 통신을 실제 진행하여 서비스 환경과 가장 근접한 테스트 | HTTP 통신 Mocking을 의존하는 모든 구간에 Mocking 필요  |
+| Mock Server Test   | HTTP 통신을 실제 진행하여 서비스 환경과 가장 근접한 테스트  | HTTP 통신 Mocking을 의존하는 모든 구간에 Mocking 필요  |
 | @MockBean          | HTTP Mocking에 비해 비교적 간단하게 Mocking 가능 | Application Context를 재사용 못해 테스트 빌드 속도 저하 |
 | @TestConfiguration | Application Context 이슈 해결            | 멀티 모듈 환경에서 @TestConfiguration 사용 어려움     |
 | java-test-fixtures | 멀티 모듈에서 환경에서 사용 가능                   | 멀티 모듈이 아닌 경우 불필요                         |
@@ -278,6 +278,7 @@ Mock Test를 중심으로 얘기했지만, 제가 전달하고자 하는 메시�
 Redis를 도입하게 되어 각각의 환경을 구성했지만 테스트 환경을 구축하지 못했다고 가정해 보겠습니다. 테스트 환경의 인프라스트럭처 구성이 되어 있지 못해서 테스트 코드 작성이 불가능합니다. 이처럼 테스트 코드를 작성하기 불가능하거나 어려운 이유는 매우 다양합니다. 해당 예시처럼 Redis 테스트 환경 구축에 대한 지식이 아직 없어 못하는 경우도 있을 수 있으며, 그 밖에 다양한 이유로 테스트 코드 작성이 불가능한 이유는 필연적으로 발생하며 그것에 대처하는 방향성에 대해서 말씀드리고 싶습니다.
 
 ### Black Box 격리
+
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/images/065.jpeg)
 
 xxx 이유로 테스트 코드 작성이 어려운 영역을 Black Box 영역이라 지칭하겠습니다. 이 Black Box 영역의 가장 큰 문제점은 이 영역이 전이된다는 것입니다. Redis 테스트 환경이 없다면 그것을 직/간접적으로 의존하는 구간이 Black Box로 전이됩니다. 이렇게 전이되다 보면 모든 영역이 테스트 불가능한 Black Box가 됩니다.
@@ -286,17 +287,36 @@ xxx 이유로 테스트 코드 작성이 어려운 영역을 Black Box 영역이
 
 Black Box 영역이 전이되지 않게 격리 시켜야 합니다. 설령 그 영역 자체는 테스트를 못하는 한이 있더라도 그 Black Box가 전이되는 것을 막아야 합니다. 즉, Black Box 영역을 테스트 못하더라도 다른 객체는 여전히 테스트를 진행할 수 있는 환경을 구성해야 합니다. 비단 Mock 관련에 한정된 것은 아닙니다. 이러한 설명을 가장 매끄럽게 할 수 있는 것이 Mock이라는 상황인 것이고, 전달하고자 하는 핵심 메시지는 테스트가 어렵 가나, 불가능한 영역이 전이되는 것을 격리 시키는 것입니다. 이렇게 격리 시킴으로써 다른 영역은 테스트가 가능 해진다는 것입니다. 격리 시키는 방법은 다양하게 있으며, 해당 프로젝트에 알맞은 적절한 방법을 적용해서 사용하면 됩니다.
 
+## 넓은 테스트 대역
 
-## 넓은 테스트 대역폭
+최종적으로 지향하는 테스트 코드는 폭넓은 테스트 대역입니다. 외부 통신처럼 Mocking에 의존하는 구간이 나오면 폭넓은 테스트 코드를 작성하기가 어려워집니다. 만약 HTTP 통신의 의존성이 있다면 HTTP 통신 기반으로 Mocking 하는 것보다 객체의 행위 자체를 Mocking 하여 폭넓은 테스트 코드를 작성하는 것이 좋다고 생각합니다.  
+
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/images/012.jpeg)
+파트너 서비스의 서버를 호출하여 사업자 상태를 반영하는 Batch 애플리케이션에 대해서 테스트 코드를 작성한다고 가정해 보겠습니다.
+
+### Partner 사업자 정보
+
+| NO | 상호명   | 사업자 번호    | 사업자 상태 |
+|----|:------|-----------|--------|
+| 1  | (주)테크 | 111111111 | 오픈     |
+| 2  | (주)가구 | 111111112 | 오픈     |
+| 3  | (주)한용 | 111111113 | 휴업     |
+| 4  | (주)가족 | 111111114 | 휴업     |
+| 5  | (주)손신 | 111111115 | 폐업     |
+| 6  | (주)지구 | 111111116 | 폐업     |
+
+Shop은 모두 오픈 상태라고 가정하고, 위 사업자 번호 기준으로 상태가 업데이트를 진행해야 합니다. 
 
 ```kotlin
 @Import(
     ClientTestConfiguration::class
 )
 internal class SimpleTaskJobConfigurationTest(
+    private val simpleTaskJob: Job,
+    private val shopRepository: ShopRepository,
     private val mockPartnerClient: PartnerClient
 ) : BatchTestSupport() {
-    
+
     @Test
     internal fun `simpleTaskJob`() {
         //given
@@ -342,13 +362,13 @@ internal class SimpleTaskJobConfigurationTest(
                 closeDate = LocalDate.of(2023, 6, 14)
             )
         )
-        
+
+
         //when
         launchJob(simpleTaskJob)
 
         //then
         thenBatchCompleted()
-        
         val shops = shopRepository.findAll().toList()
         then(shops).hasSize(6)
         then(shops).allSatisfy(
@@ -363,8 +383,10 @@ internal class SimpleTaskJobConfigurationTest(
                 }
             }
         )
-
     }
 }
 ```
 
+ClientTestConfiguration에서 설정한 mockPartnerClient 객체로 Partner 사업자 정보에 대한 Mocking을 gvien 함수로 작성합니다. 이렇듯 해당 비즈니스 로직의 모든 케이스에 대해서 폭넓은 테스트 코드로 커버하는 것이 중요하며, 폭넓은 테스트를 하기 위해서는 HTTP Mocking 보다 행위 자체를 Mocking 하는 것이 훨씬 더 효율 적입니다.
+
+그렇다면 HTTP 통신 관련 Mocking 테스트는 불필요한 것일까요? 결론부터 말씀드리면 필요하다고 생각합니다. 이에 대한 포스팅은 실무에서 적용하는 테스트 코드 작성 방법과 노하우 Part 2: 테스트 코드로부터 피드백 받기에서 마저 진행하겠습니다.
