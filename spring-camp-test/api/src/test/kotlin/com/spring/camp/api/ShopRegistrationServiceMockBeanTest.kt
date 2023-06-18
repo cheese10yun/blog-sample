@@ -7,7 +7,7 @@ import org.assertj.core.api.BDDAssertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
-import org.mockito.Mockito
+import org.mockito.Mockitoimport org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 
@@ -16,6 +16,9 @@ class ShopRegistrationServiceMockBeanTest(
     private val mockPartnerClient: PartnerClient,
     private val mockPartnerClientService: PartnerClientService,
 ) : TestSupport() {
+
+//    @MockBean
+//    private lateinit var partnerClient: PartnerClient
 
     @BeforeEach
     fun resetMock() {
