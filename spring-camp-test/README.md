@@ -285,3 +285,86 @@ xxx 이유로 테스트 코드 작성이 어려운 영역을 Black Box 영역이
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/images/069.jpeg)
 
 Black Box 영역이 전이되지 않게 격리 시켜야 합니다. 설령 그 영역 자체는 테스트를 못하는 한이 있더라도 그 Black Box가 전이되는 것을 막아야 합니다. 즉, Black Box 영역을 테스트 못하더라도 다른 객체는 여전히 테스트를 진행할 수 있는 환경을 구성해야 합니다. 비단 Mock 관련에 한정된 것은 아닙니다. 이러한 설명을 가장 매끄럽게 할 수 있는 것이 Mock이라는 상황인 것이고, 전달하고자 하는 핵심 메시지는 테스트가 어렵 가나, 불가능한 영역이 전이되는 것을 격리 시키는 것입니다. 이렇게 격리 시킴으로써 다른 영역은 테스트가 가능 해진다는 것입니다. 격리 시키는 방법은 다양하게 있으며, 해당 프로젝트에 알맞은 적절한 방법을 적용해서 사용하면 됩니다.
+
+
+## 넓은 테스트 대역폭
+
+```kotlin
+@Import(
+    ClientTestConfiguration::class
+)
+internal class SimpleTaskJobConfigurationTest(
+    private val mockPartnerClient: PartnerClient
+) : BatchTestSupport() {
+    
+    @Test
+    internal fun `simpleTaskJob`() {
+        //given
+        given(mockPartnerClient.getPartnerBy("111111111")).willReturn(
+            PartnerResponse(
+                businessRegistrationNumber = "111111111",
+                status = ShopStatus.OPEN,
+                closeDate = null
+            )
+        )
+        given(mockPartnerClient.getPartnerBy("111111112")).willReturn(
+            PartnerResponse(
+                businessRegistrationNumber = "111111112",
+                status = ShopStatus.OPEN,
+                closeDate = null
+            )
+        )
+        given(mockPartnerClient.getPartnerBy("111111113")).willReturn(
+            PartnerResponse(
+                businessRegistrationNumber = "111111113",
+                status = ShopStatus.SHUTDOWN,
+                closeDate = null
+            )
+        )
+        given(mockPartnerClient.getPartnerBy("111111114")).willReturn(
+            PartnerResponse(
+                businessRegistrationNumber = "111111114",
+                status = ShopStatus.SHUTDOWN,
+                closeDate = null
+            )
+        )
+        given(mockPartnerClient.getPartnerBy("111111115")).willReturn(
+            PartnerResponse(
+                businessRegistrationNumber = "111111115",
+                status = ShopStatus.CLOSED,
+                closeDate = LocalDate.of(2023, 6, 1)
+            )
+        )
+        given(mockPartnerClient.getPartnerBy("111111116")).willReturn(
+            PartnerResponse(
+                businessRegistrationNumber = "111111116",
+                status = ShopStatus.CLOSED,
+                closeDate = LocalDate.of(2023, 6, 14)
+            )
+        )
+        
+        //when
+        launchJob(simpleTaskJob)
+
+        //then
+        thenBatchCompleted()
+        
+        val shops = shopRepository.findAll().toList()
+        then(shops).hasSize(6)
+        then(shops).allSatisfy(
+            Consumer { shop ->
+                when (shop.businessRegistrationNumber) {
+                    "111111111" -> then(shop.status).isEqualTo(ShopStatus.OPEN)
+                    "111111112" -> then(shop.status).isEqualTo(ShopStatus.OPEN)
+                    "111111113" -> then(shop.status).isEqualTo(ShopStatus.SHUTDOWN)
+                    "111111114" -> then(shop.status).isEqualTo(ShopStatus.SHUTDOWN)
+                    "111111115" -> then(shop.status).isEqualTo(ShopStatus.CLOSED)
+                    "111111116" -> then(shop.status).isEqualTo(ShopStatus.CLOSED)
+                }
+            }
+        )
+
+    }
+}
+```
+
