@@ -1,4 +1,4 @@
-# Getting Started Redis (Srping Data Redis)
+# Getting Started Redis (Spring Data Redis)
 
 Redis에 대한 내용을 최대한 간략하게 설명한 포스팅입니다.
 

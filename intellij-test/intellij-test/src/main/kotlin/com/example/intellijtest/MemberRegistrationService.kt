@@ -19,3 +19,31 @@ class MemberRegistrationService(
 //        }
     }
 }
+
+@Service
+class MemberStatusManagementService(
+    private val memberRepository: MemberRepository
+) {
+
+//    fun getUnverifiedMembers(adultMembers: List<AdultMember>): List<AdultMember> {
+//        return adultMembers.mapNotNull {
+//            // 이메일 미인증 여부를 로직 ...
+//            if (true) {
+//                it.apply { this.status = MemberStatus.UNVERIFIED }
+//            } else {
+//                null
+//            }
+//        }
+//    }
+
+    fun getUnverifiedMembers(adultMembers: List<AdultMember>): List<AdultMember> {
+        return adultMembers.mapNotNull {
+            // 이메일 미인증 여부를 로직 ...
+            if (true) {
+                it.copy(status = MemberStatus.UNVERIFIED)
+            } else {
+                null
+            }
+        }
+    }
+}

@@ -160,7 +160,7 @@ interface CsvLineAggregator<T> {
 * (3): csv 파일에 집계할 방식에 대해서 작성합니다. `CsvLineAggregator` 인터페이스를 기준으로 진행됩니다. csv 필드에 대한 구분은 `,`을 사용하며, `PaymentCsvMapper` 기반으로 필드 순서가 결정됩니다.
 * (4): csv 파일에 header 정보를 입력합니다. `PaymentCsvMapper`에 headNames를 사용해서 (3)에서 사용한 필드 순서와 동일하게 지정합니다.
 
-`CsvLineAggregator`, `PaymentCsvMapper`를 사용하지 않아도 문제는 없지만 Srping Batch에서 지원하는 `lineAggregator`, `headerCallback` 사용법을 단순화 시켰습니다. 프레임 워크에서는 상대적으로 저수준의 기능을 제공해주기 때문에 각 서비스에서 고수준으로 변경해서 사용하는 방법을 고려해서 개발하는 것도 개발자에게 중요한 스킬이라고 생각합니다.
+`CsvLineAggregator`, `PaymentCsvMapper`를 사용하지 않아도 문제는 없지만 Spring Batch에서 지원하는 `lineAggregator`, `headerCallback` 사용법을 단순화 시켰습니다. 프레임 워크에서는 상대적으로 저수준의 기능을 제공해주기 때문에 각 서비스에서 고수준으로 변경해서 사용하는 방법을 고려해서 개발하는 것도 개발자에게 중요한 스킬이라고 생각합니다.
 
 
 ## 실행 결과

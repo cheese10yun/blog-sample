@@ -434,6 +434,60 @@ Member라는 교집합에는 이름, 이메일, 주소 세 가지 필드가 있�
 
 캡슐화를 쉽게 깨트리고, 상위 클래스에 지나치게 의존하게 돼서 변화에 유연하게 대응하지 못하는 경우 상속보다는 조합(Composition)을 사용해서 이러한 문제를 해결하라고 한다. 또 Kotlin에서는 객체에 있는 모든 public 함수를 이 객체를 담고 있는 컨테이너를 통해 노출할 수 있는 기능을 by 키워드를 통해 제공해 주고 있다. 이런 것으로 해결은 가능하나 JPA와 사용했을 때 궁합이 좋지 않고 이러한 문제를 해결할 내공이 부족하여 이 방법에 대한 확신은 아직 없다.
 
+
+## val 으로 불변을 보장 받고 싶을 때
+
+val 으로 불변을 보장 받으면 코드의 예측, 유지보수 측면에서 많은 장점들이 있어 가능하면 val 으로 사용하기 위해 많은 노력들을 한다. 예를 들어 AdultMember를 조회하여 이메일 인증을 진행하지 않은 경우 상태를 UNVERIFIED("미인증")으로 변경해야 하는 경우를 생각해보자.
+
+```kotlin
+data class AdultMember(
+    // ...
+    val id: Long,
+    override val email: String,
+    override val firstName: String,
+    override val lastName: String,
+    var status: MemberStatus, // var 선언
+) : GeneralMember
+
+```
+이메일 인증여부를 검사하고 인증되지 않은 AdultMember의 status 필드를 변경 하려면 변수를 var으로 선언 해야한다. 
+
+```kotlin
+class MemberStatusManagementService {
+    fun getUnverifiedMembers(adultMembers: List<AdultMember>): List<AdultMember> {
+        return adultMembers.mapNotNull {
+            // 이메일 미인증 여부를 로직 ...
+            if (true) {
+                // 필드 변경
+                it.apply { this.status = MemberStatus.UNVERIFIED }
+            } else {
+                null
+            }
+        }
+    }
+}
+```
+var 으로 선언한 status 필드를 직접 정의해서 업데이트를 진행하고 미인증 AdultMember 객체를 리턴 해주고 있다. 이런 케이스의 경우에는 data class의 copy를 사용하는 것이 효율적이다.
+
+
+```kotlin
+class MemberStatusManagementService {
+    fun getUnverifiedMembers(adultMembers: List<AdultMember>): List<AdultMember> {
+        return adultMembers.mapNotNull {
+            // 이메일 미인증 여부를 로직 ...
+            if (true) {
+                it.copy(status = MemberStatus.UNVERIFIED)
+            } else {
+                null
+            }
+        }
+    }
+}
+```
+AdultMember 객체의 status을 val으로 변경하고 실제 데이터 변경은 copy통해 진행한다. 
+
+
+
 ## 마무리
 
 복잡도를 제어하고 유지 보수하기 좋은 코드 디자인을 갖기 위해 학습했던 것들을 실제 적용하면서 만났던 현실적인 문제들을 정리해 보았다. 이런 것들을 학습할 때는 모든 문제를 해결해 줄 것처럼 느껴지지만 은탄환은 없으며 개발이라는 것은 트레이드오프이며 무언가를 얻으면 반드시 무언가를 어느 정도는 손해 볼 수밖에 없다. 하지만 그 손해 정도를 줄이는 것이 경험이고 실력이라고 생각한다. 만약 위에 언급한 부분을 철저히 지키고 있다면 얻은 것은 무엇이며 그 선택으로 인해 필연적으로 잃어버린 것은 무엇인지, 반대로 이것들을 지키지 않고 있다면 그로 인해 얻은 것과 잃은 것은 무엇인지 많은 개발자들이 고민해 보고 토론해 봤으면 한다.

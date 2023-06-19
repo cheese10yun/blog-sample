@@ -123,6 +123,7 @@ interface MemberRepositoryCustom {
     fun findBy(age: Int): List<Member>
     fun existedEmail(email: String): Boolean
     fun existedPhoneNumber(phoneNumber: String): Boolean
+    fun updateStatusBy(ids: List<Long>, memberStatus: MemberStatus): Long
 }
 
 class MemberRepositoryImpl :
@@ -151,6 +152,14 @@ class MemberRepositoryImpl :
             .from(member)
             .where(member.phoneNumber.eq(phoneNumber))
             .fetchFirst() != null
+
+
+    override fun updateStatusBy(ids: List<Long>, memberStatus: MemberStatus) =
+        update(member)
+            .set(member.status, memberStatus)
+            .where(member.id.`in`(ids))
+            .execute()
+
 }
 
 
@@ -165,10 +174,20 @@ class MemberQueryService(
     fun existedEmail(email: String) = memberRepository.existedEmail(email)
 
     fun existedPhoneNumber(phoneNumber: String) = memberRepository.existedPhoneNumber(phoneNumber)
+
+
+    fun updateStatus(
+        ids: List<Long>,
+        status: MemberStatus
+    ) {
+
+
+    }
 }
 
 data class AdultMember(
     // ...
+    val id: Long,
     override val email: String,
     override val firstName: String,
     override val lastName: String,
