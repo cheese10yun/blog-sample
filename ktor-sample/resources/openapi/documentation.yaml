@@ -1,0 +1,8 @@
+openapi: "3.0.3"
+info:
+  title: "ktor_sample API"
+  description: "ktor_sample API"
+  version: "1.0.0"
+servers:
+- url: "https://ktor_sample"
+paths: {}
