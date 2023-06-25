@@ -330,7 +330,17 @@ Order라는 엔티티 객체를 테스트 코드를 작성하려면 특정 Snaps
 
 ### 확신 없는 결론...
 
-이러한 문제로 단순 setter를 없애는 게 다양한 부작용들이 있다. 물론 이런 부작용들은 Given 절에 데이터 셋업의 어려움이기 때문에 필요한 데이터를 sql 파일, json 파일로 데이터를 임의로 만들어서 테스트를 진행하는 방식으로 대체하고 있다. 이러한 방법이 다양한 테스트 대역폭을 확보하기 위한 좋은 전략이라고 생각은 하지만 이 또한 단점들이 있어서 이 방법을 택할 정도로 압도적인 장점이 크지 않기 때문에 확신은 없고 계속 고민하고 있는 주제이다. 이러한 이유 등등으로 프로젝트를 크기를 적절하게 분리해서 분산 환경으로 관리하고 setter는 그 해당 팀의 정책적으로 선택하는 것이 좋다고 생각한다. 
+이러한 문제로 단순 setter를 없애는 게 다양한 부작용들이 있다. 물론 이런 부작용들은 Given 절에 데이터 셋업의 어려움이기 때문에 필요한 데이터를 sql 파일, json 파일로 데이터를 임의로 만들어서 테스트를 진행하는 방식으로 대체하고 있다. sql 파일 기반으로 테스트하는 방식에 대해서 설명하면 다음과 같다.
+
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/order-flow.005.jpeg)
+
+스프링 테스트에서 지원해 주는 @Sql 어노테이션 기반으로 Given 절에 해당하는 데이터를 sql 파일 기반으로 만들어서 테스트하는 방식으로, 관련 포스팅은 [Sql을 통해서 테스트 코드를 쉽게 작성하자](https://cheese10yun.github.io/sql-test/)에 정리되어 있다.
+
+
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/order-flow.006.jpeg)
+
+sql 파일로 관리하면 비즈니스 로직에 상관없이 특정 시점으로 자유롭게 데이터를 셋업 할 수 있으며 그 결과 폭넓은 테스트 코드를 보다 쉽게 작성할 수 있게 되며, 외부 의존성 없는 순수한 POJO 엔티티 객체를 테스트하고 싶은 경우 이와 비슷하게 json 파일 기반으로 테스트할 수 있다. 이러한 방법이 다양한 테스트 대역폭을 확보하기 위한 좋은 전략이라고 생각은 하지만 이 또한 단점들이 있어서 이 방법을 택할 정도로 압도적인 장점이 크지 않기 때문에 확신은 없고 계속 고민하고 있는 주제이다. 이러한 이유 등등으로 프로젝트를 크기를 적절하게 분리해서 분산 환경으로 관리하고 setter는 그 해당 팀의 정책적으로 선택하는 것이 좋다고 생각한다.
+
 
 ## Notnull을 보장 받고 싶은데...
 
@@ -433,60 +443,6 @@ Member라는 교집합에는 이름, 이메일, 주소 세 가지 필드가 있�
 ### 상속보다는 조합(Composition)
 
 캡슐화를 쉽게 깨트리고, 상위 클래스에 지나치게 의존하게 돼서 변화에 유연하게 대응하지 못하는 경우 상속보다는 조합(Composition)을 사용해서 이러한 문제를 해결하라고 한다. 또 Kotlin에서는 객체에 있는 모든 public 함수를 이 객체를 담고 있는 컨테이너를 통해 노출할 수 있는 기능을 by 키워드를 통해 제공해 주고 있다. 이런 것으로 해결은 가능하나 JPA와 사용했을 때 궁합이 좋지 않고 이러한 문제를 해결할 내공이 부족하여 이 방법에 대한 확신은 아직 없다.
-
-
-## val 으로 불변을 보장 받고 싶을 때
-
-val 으로 불변을 보장 받으면 코드의 예측, 유지보수 측면에서 많은 장점들이 있어 가능하면 val 으로 사용하기 위해 많은 노력들을 한다. 예를 들어 AdultMember를 조회하여 이메일 인증을 진행하지 않은 경우 상태를 UNVERIFIED("미인증")으로 변경해야 하는 경우를 생각해보자.
-
-```kotlin
-data class AdultMember(
-    // ...
-    val id: Long,
-    override val email: String,
-    override val firstName: String,
-    override val lastName: String,
-    var status: MemberStatus, // var 선언
-) : GeneralMember
-
-```
-이메일 인증여부를 검사하고 인증되지 않은 AdultMember의 status 필드를 변경 하려면 변수를 var으로 선언 해야한다. 
-
-```kotlin
-class MemberStatusManagementService {
-    fun getUnverifiedMembers(adultMembers: List<AdultMember>): List<AdultMember> {
-        return adultMembers.mapNotNull {
-            // 이메일 미인증 여부를 로직 ...
-            if (true) {
-                // 필드 변경
-                it.apply { this.status = MemberStatus.UNVERIFIED }
-            } else {
-                null
-            }
-        }
-    }
-}
-```
-var 으로 선언한 status 필드를 직접 정의해서 업데이트를 진행하고 미인증 AdultMember 객체를 리턴 해주고 있다. 이런 케이스의 경우에는 data class의 copy를 사용하는 것이 효율적이다.
-
-
-```kotlin
-class MemberStatusManagementService {
-    fun getUnverifiedMembers(adultMembers: List<AdultMember>): List<AdultMember> {
-        return adultMembers.mapNotNull {
-            // 이메일 미인증 여부를 로직 ...
-            if (true) {
-                it.copy(status = MemberStatus.UNVERIFIED)
-            } else {
-                null
-            }
-        }
-    }
-}
-```
-AdultMember 객체의 status을 val으로 변경하고 실제 데이터 변경은 copy통해 진행한다. 
-
-
 
 ## 마무리
 
