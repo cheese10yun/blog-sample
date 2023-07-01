@@ -1,4 +1,4 @@
-# Exposed
+# Kotlin 기반 경량 ORM Exposed
 
 ## Exposed 란 ?
 
