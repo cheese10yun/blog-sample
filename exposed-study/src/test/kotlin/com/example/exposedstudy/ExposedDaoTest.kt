@@ -1,9 +1,11 @@
 package com.example.exposedstudy
 
+import org.assertj.core.api.BDDAssertions.then
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
 import org.junit.jupiter.api.Test
 
@@ -20,18 +22,23 @@ class ExposedDaoTest : ExposedTestSupport() {
     }
 
     @Test
-    fun `book create`() {
-        val insert = Writers.insert { writer ->
-            writer[this.name] = null
-            writer[this.email] = "email@asd.com"
+    fun `Writers name test`() {
+        //given
+        val name = "    yun kim   "
+        val email = "email@asd.com"
+
+        //when
+        val entityID = Writers.insertAndGetId { writer ->
+            writer[this.name] = name
+            writer[this.email] = email
             writer[this.createdAt] = LocalDateTime.now()
             writer[this.updatedAt] = LocalDateTime.now()
         }
 
-        val all = Writer.all().toList()
-        for (writer in all) {
-            println(writer)
-        }
+        //then
+        val writer = Writer.findById(entityID)!!
+
+        then(writer.name).isEqualTo("yun kim")
     }
 
     @Test

@@ -9,7 +9,10 @@ import org.jetbrains.exposed.sql.VarCharColumnType
 import org.jetbrains.exposed.sql.append
 
 
-class ConverterColumnType(colLength: Int) : VarCharColumnType(colLength = colLength) {
+/**
+ * TrimmingWhitespace
+ */
+class TrimmingWhitespaceConverterColumnType(length: Int) : VarCharColumnType(colLength = length) {
 
     override fun valueToDB(value: Any?): String? {
         return when (value) {

@@ -1,10 +1,6 @@
 package com.example.exposedstudy
 
-import com.example.exposedstudy.Books.clientDefault
-import com.example.exposedstudy.Orders.clientDefault
-import com.example.exposedstudy.Writers.clientDefault
 import java.math.BigDecimal
-import java.time.LocalDate
 import java.time.LocalDateTime
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
@@ -49,7 +45,7 @@ object Writers : LongIdTable("writer") {
 //    val name = varchar("name", 150).nullable()
     val name = registerColumn<String>(
         name = "name",
-        type = ConverterColumnType(150)
+        type = TrimmingWhitespaceConverterColumnType(length = 150)
     ).nullable()
 
     val email = varchar("email", 150)
