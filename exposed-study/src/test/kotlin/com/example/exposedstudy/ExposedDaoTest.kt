@@ -12,10 +12,26 @@ class ExposedDaoTest : ExposedTestSupport() {
     @Test
     fun create() {
         val writer = Writer.new {
-            this.register("asd", "asd")
+            this.register("    asd    ", "asd")
         }
 
-        println(writer)
+        writer.name
+        println(writer.name)
+    }
+
+    @Test
+    fun `book create`() {
+        val insert = Writers.insert { writer ->
+            writer[this.name] = null
+            writer[this.email] = "email@asd.com"
+            writer[this.createdAt] = LocalDateTime.now()
+            writer[this.updatedAt] = LocalDateTime.now()
+        }
+
+        val all = Writer.all().toList()
+        for (writer in all) {
+            println(writer)
+        }
     }
 
     @Test
@@ -50,7 +66,6 @@ class ExposedDaoTest : ExposedTestSupport() {
 
         Writer.all().sortedByDescending { it.id }
             .forEach { println(it) }
-
     }
 
     @Test
@@ -128,5 +143,4 @@ class ExposedDaoTest : ExposedTestSupport() {
         writer[this.createdAt] = LocalDateTime.now()
         writer[this.updatedAt] = LocalDateTime.now()
     }
-
 }
