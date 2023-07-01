@@ -78,4 +78,4 @@ fun `Writers name test`() {
 
 앞뒤 공백이 제거된 `yun kim`으로 출력되는 것을 확인할 수 있습니다.
 
-## 
+## groupConcat 

@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.junit.jupiter.api.Test
 
@@ -39,6 +40,48 @@ class ExposedDaoTest : ExposedTestSupport() {
         val writer = Writer.findById(entityID)!!
 
         then(writer.name).isEqualTo("yun kim")
+    }
+
+    @Test
+    fun `groupConcat`() {
+        //given
+        val name = "yun kim"
+        val email1 = "email@asd.com"
+        val email2 = "email@asd.com"
+
+        Writers.insertAndGetId { writer ->
+            writer[this.name] = name
+            writer[this.email] = email1
+            writer[this.createdAt] = LocalDateTime.now()
+            writer[this.updatedAt] = LocalDateTime.now()
+        }
+
+        Writers.insertAndGetId { writer ->
+            writer[this.name] = name
+            writer[this.email] = email2
+            writer[this.createdAt] = LocalDateTime.now()
+            writer[this.updatedAt] = LocalDateTime.now()
+        }
+
+        //when
+        val map = Writers
+            .slice(
+                Writers.email.groupConcat(),
+                Writers.name,
+            )
+            .select {
+                Writers.name eq name
+            }
+            .map {
+                Pair(
+                    it[Writers.email.groupConcat()], it[Writers.name]
+                )
+            }
+
+        println("")
+
+
+        //then
     }
 
     @Test
