@@ -1,8 +1,8 @@
-[![HitCount](http://hits.dwyl.io/cheese10yun/blog-sample.svg)](http://hits.dwyl.io/cheese10yun/blog-sample)
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fcheese10yun%2Fblog-sample&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
 # Yun Blog Sample Code
 
-[Yun Blog](https://cheese10yun.github.io) ***예제 코드 지속해서 해당 프로젝트를 이어 나아갈 예정이라 깃허브 Star, Watching 버튼을 누르시면 구독 신청받으실 수 있습니다.***
+[Yun Blog](https://cheese10yun.github.io)의 Sample Code 및 기타 학습에 관련된 Code 모음 Repository
 
 * [Loopback 게시판 만들기 (1)](https://github.com/cheese10yun/blog-sample/tree/master/loopback-boards)
 * [AWS S3 업로드시 이미지 최적화](https://github.com/cheese10yun/blog-sample/tree/master/AWS_S3_Image_Optimization_)
