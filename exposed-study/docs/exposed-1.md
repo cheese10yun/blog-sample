@@ -1,4 +1,6 @@
-# Kotlin 기반 경량 ORM Exposed 추가 정리 part 2
+# Kotlin 기반 경량 ORM Exposed 추가 정리 part 3
+
+## Exposed 포스팅
 
 * [Kotlin 기반 경량 ORM Exposed](https://cheese10yun.github.io/exposed/)
 * [Kotlin 기반 경량 ORM Exposed 추가 정리 part 2](https://cheese10yun.github.io/exposed-2/)
@@ -76,7 +78,7 @@ fun `Writers name test`() {
 ```
 앞뒤 공백이 있는 문자열에 대해서 실제 데이터베이스에 정상적으로 Converter 로직이 동작하는지 테스트를 진행해 보겠습니다. 실제 디버깅으로 확인해 보겠습니다.
 
-https://raw.githubusercontent.com/cheese10yun/blog-sample/master/exposed-study/docs/images/exposed-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/exposed-study/docs/images/exposed-1.png)
 
 앞뒤 공백이 제거된 `yun kim`으로 출력되는 것을 확인할 수 있습니다.
 
@@ -118,7 +120,7 @@ fun `groupConcat`() {
 ```
 email 필드는 varchar 타입이며 다음과 같은 구조이기 때문에 groupConcat을 메서드를 사용할 수 있습니다.
 
-https://raw.githubusercontent.com/cheese10yun/blog-sample/master/exposed-study/docs/images/exposed-column.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/exposed-study/docs/images/exposed-column.png)
 
 ```kotlin
 fun varchar(name: String, length: Int, collate: String? = null): Column<String> = registerColumn(name, VarCharColumnType(length, collate))
@@ -130,7 +132,7 @@ fun <T : String?> Expression<T>.groupConcat(
 ): GroupConcat<T> = GroupConcat(this, separator, distinct, orderBy = orderBy)
 ```
 
-Expression<String> 타입이기 때문에 groupConcat 확장 함수를 그대로 사용할 수 있습니다. 최종 SQL을 살펴보겠습니다. 
+Expression<String> 타입이기 때문에 groupConcat 확장 함수를 그대로 사용할 수 있습니다. 최종 SQL을 살펴보겠습니다.
 
 ```sql
 SELECT GROUP_CONCAT(DISTINCT writer.email), writer.`name`
@@ -139,9 +141,7 @@ WHERE writer.`name` = 'yun kim'
 ```
 의도한 대로 `GROUP_CONCAT(DISTINCT writer.email)` SQL Function이 정상적으로 출력되었습니다. 그러면 조회한 데이터를 확인해 보겠습니다.
 
-https://raw.githubusercontent.com/cheese10yun/blog-sample/master/exposed-study/docs/images/exposed-2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/exposed-study/docs/images/exposed-2.png)
 
 최정 결과로 문자열 `email-1@asd.com, email-2@asd.com`을 응답받은 것을 확인할 수 있습니다.
-
-
 
