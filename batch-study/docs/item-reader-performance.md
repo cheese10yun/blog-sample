@@ -316,7 +316,7 @@ limit 1000;
 HibernateCursorItemReader를 이해하기 앞서 JDBC를 이용하여 대량의 데이터를 가져오는 방에 대해서 이야기해보겠습니다. 이론적인 설명은 [Real MySQL](http://www.yes24.com/Product/Goods/6960931)을 보고 정리했습니다. MySQL를 사용 중이면 정말 추천드리는 도서입니다.
 
 ### 대용량 조회 스트리밍 방식
-JDBC 표준에서 제공하는 `Statement.setFetchSzie()`를 이용해서 MySQL 서버로부터 SELECT된 레코드를 클라이언트 애플리케이션으로 한 번에 가져올 레코드의 건수를 설정하는 역할을 합니다. **하지만 Connector/J에서 `Statement.setFetchSzie()`의 표준을 지원하지 못하고 있습니다. 즉 Statement.setFetchSzie(100)을 설정해도 100개의 레코드만 가져오게 동작하지는 않습니다.**
+JDBC 표준에서 제공하는 `Statement.setFetchSize()`를 이용해서 MySQL 서버로부터 SELECT된 레코드를 클라이언트 애플리케이션으로 한 번에 가져올 레코드의 건수를 설정하는 역할을 합니다. **하지만 Connector/J에서 `Statement.setFetchSize()`의 표준을 지원하지 못하고 있습니다. 즉 Statement.setFetchSize(100)을 설정해도 100개의 레코드만 가져오게 동작하지는 않습니다.**
 
 ![](https://github.com/cheese10yun/TIL/raw/master/assets/rea-mysql-flow-1.png)
 
@@ -469,7 +469,7 @@ class ReaderPerformanceJobConfiguration(
     }
 }
 ```
-fetchSize를 위처럼 10으로 주면 마치 `Statement.setFetchSzie(10)`이 입력되게 되며 해당 rows 별로 스트리밍 하는 거 같지만 저건 어디까지나 청크 사이즈 개념으로 해당 해당 Reader가 fetchSize 만큼 읽고 나서 Processor or Writer로 넘어가는 사이즈입니다.
+fetchSize를 위처럼 10으로 주면 마치 `Statement.setFetchSize(10)`이 입력되게 되며 해당 rows 별로 스트리밍 하는 거 같지만 저건 어디까지나 청크 사이즈 개념으로 해당 해당 Reader가 fetchSize 만큼 읽고 나서 Processor or Writer로 넘어가는 사이즈입니다.
 
 > ![](https://camo.githubusercontent.com/11d20a04aec707c42067d8d6797ffcdf55245c07d6345acf883bfec0a6674a4d/68747470733a2f2f646f63732e737072696e672e696f2f737072696e672d62617463682f646f63732f342e302e782f7265666572656e63652f68746d6c2f696d616765732f6368756e6b2d6f7269656e7465642d70726f63657373696e672e706e67)
 > 출처 [Chunk-oriented Processing](https://docs.spring.io/spring-batch/docs/4.0.x/reference/html/index-single.html#chunkOrientedProcessing)
