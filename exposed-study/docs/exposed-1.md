@@ -1,5 +1,8 @@
 # Kotlin 기반 경량 ORM Exposed 추가 정리 part 2
 
+* [Kotlin 기반 경량 ORM Exposed](https://cheese10yun.github.io/exposed/)
+* [Kotlin 기반 경량 ORM Exposed 추가 정리 part 2](https://cheese10yun.github.io/exposed-2/)
+
 ## VarCharColumnType 기반 Converter
 
 데이터 저장소에 값을 저장하는 경우, 저장된 데이터를 가져오는 경우 적절하게 컨버팅이 필요한 경우 JPA에서는 `@Converter`를 사용하면 손쉽게 제어할 수 있습니다. Exposed에서는 `VarCharColumnType`를 확장하는 방식으로 해당 기능을 사용할 수 있습니다.
