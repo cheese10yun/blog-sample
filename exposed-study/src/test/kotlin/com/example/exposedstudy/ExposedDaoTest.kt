@@ -1,9 +1,11 @@
 package com.example.exposedstudy
 
 import org.assertj.core.api.BDDAssertions.then
+import org.jetbrains.exposed.dao.id.EntityID
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import org.jetbrains.exposed.sql.batchInsert
+import org.jetbrains.exposed.sql.groupConcat
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.select
@@ -39,6 +41,8 @@ class ExposedDaoTest : ExposedTestSupport() {
         //then
         val writer = Writer.findById(entityID)!!
 
+
+
         then(writer.name).isEqualTo("yun kim")
     }
 
@@ -46,27 +50,19 @@ class ExposedDaoTest : ExposedTestSupport() {
     fun `groupConcat`() {
         //given
         val name = "yun kim"
-        val email1 = "email@asd.com"
-        val email2 = "email@asd.com"
+        Writers.batchInsert((1..2)) {
+            this[Writers.name] = name
+            this[Writers.email] = "email-${it}@asd.com"
+        }.map {
+            it[Writers.id]
 
-        Writers.insertAndGetId { writer ->
-            writer[this.name] = name
-            writer[this.email] = email1
-            writer[this.createdAt] = LocalDateTime.now()
-            writer[this.updatedAt] = LocalDateTime.now()
-        }
-
-        Writers.insertAndGetId { writer ->
-            writer[this.name] = name
-            writer[this.email] = email2
-            writer[this.createdAt] = LocalDateTime.now()
-            writer[this.updatedAt] = LocalDateTime.now()
         }
 
         //when
-        val map = Writers
+        val groupConcat = Writers.email.groupConcat(distinct = true)
+        val result = Writers
             .slice(
-                Writers.email.groupConcat(),
+                groupConcat,
                 Writers.name,
             )
             .select {
@@ -74,14 +70,35 @@ class ExposedDaoTest : ExposedTestSupport() {
             }
             .map {
                 Pair(
-                    it[Writers.email.groupConcat()], it[Writers.name]
+                    it[Writers.name], it[groupConcat]
                 )
             }
+            .first()
 
-        println("")
+        //then
+        then(result.first).isEqualTo(name)
+        then(result.second).isEqualTo("email-1@asd.com,email-2@asd.com")
+    }
+
+    @Test
+    fun `groupConcat enum`() {
+        //given
+        val entityID = insertWriter("name", "asd")[Writers.id]
+        batchInsertBook(entityID = entityID)
+
+
+        //when
+        val groupConcatEnum = Books.status.groupConcatEnum(distinct = true)
+        val result = Books
+            .slice(Books.title, groupConcatEnum)
+            .select { Books.writer.eq(entityID) }
+//            .map { Pair(it[Books.title], it[groupConcatEnum] ) }
+//            .first()
 
 
         //then
+        println("")
+
     }
 
     @Test
@@ -193,4 +210,19 @@ class ExposedDaoTest : ExposedTestSupport() {
         writer[this.createdAt] = LocalDateTime.now()
         writer[this.updatedAt] = LocalDateTime.now()
     }
+
+    private fun batchInsertBook(data: List<Int> = (1..10).map { it }, entityID: EntityID<Long>) {
+        Books.batchInsert(
+            data
+        ) {
+            this[Books.writer] = entityID
+            this[Books.title] = "$it-title"
+            this[Books.status] = if (it % 2 == 0) BookStatus.NONE else BookStatus.READY
+            this[Books.price] = it.toBigDecimal()
+            this[Books.createdAt] = LocalDateTime.now()
+            this[Books.updatedAt] = LocalDateTime.now()
+        }
+    }
+
 }
+

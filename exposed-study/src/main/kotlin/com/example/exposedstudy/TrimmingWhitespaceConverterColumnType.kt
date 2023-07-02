@@ -31,7 +31,7 @@ class TrimmingWhitespaceConverterColumnType(length: Int) : VarCharColumnType(col
 }
 
 
-fun <T : Any> ExpressionWithColumnType<T>.groupConcat(distinct: Boolean = false): CustomFunction<T> = CustomFunction("group_concat", columnType, distinct, this)
+fun <T : Enum<T>> ExpressionWithColumnType<T>.groupConcatEnum(distinct: Boolean = false): CustomFunction<T> = CustomFunction("group_concat", columnType, distinct, this)
 
 
 open class CustomFunction<T>(

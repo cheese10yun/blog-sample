@@ -11,10 +11,6 @@ import org.jetbrains.exposed.sql.javatime.datetime
 object Books : LongIdTable("book") {
     val writer = reference("writer_id", Writers)
     val title = varchar("title", 150)
-//    val title = registerColumn<String>(
-//        name = "name",
-//        type = ConverterColumnType(150)
-//    )
     val status = enumerationByName("status", 150, BookStatus::class)
     val price = decimal("price", 10, 4)
     val createdAt = datetime("created_at").clientDefault { LocalDateTime.now() }
