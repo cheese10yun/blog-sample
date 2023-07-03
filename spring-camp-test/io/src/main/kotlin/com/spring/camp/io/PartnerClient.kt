@@ -1,8 +1,11 @@
 package com.spring.camp.io
 
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.getForObject
 import java.time.LocalDate
+
 
 @AllOpen
 class PartnerClient(
@@ -34,6 +37,14 @@ class PartnerClient(
         brn: String,
     ): PartnerStatusResponse {
         return restTemplate.getForObject("/api/v1/partner/${brn}", PartnerStatusResponse::class.java)!!
+    }
+
+
+
+    fun getPartners(
+        brn: Set<String>,
+    ): List<PartnerStatusResponse> {
+        return restTemplate.getForObject("/api/v1/partner/${brn}", object : ParameterizedTypeReference<List<PartnerStatusResponse>>() {})
     }
 }
 

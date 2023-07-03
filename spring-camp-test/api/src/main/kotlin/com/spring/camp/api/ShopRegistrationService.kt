@@ -3,6 +3,7 @@ package com.spring.camp.api
 import com.spring.camp.io.PartnerClient
 import com.spring.camp.io.PartnerClientService
 import com.spring.camp.io.PartnerStatus
+import com.spring.camp.io.PartnerStatusResponse
 import org.springframework.stereotype.Service
 
 @Service
@@ -25,6 +26,10 @@ class ShopRegistrationService(
 //            )
 //        )
 //    }
+
+    fun asd(brns: Set<String>): List<PartnerStatusResponse> {
+        return partnerClient.getPartners(brns)
+    }
 
     fun register(
         brn: String,
