@@ -17,7 +17,7 @@ pluginManagement {
     val pluginVersions = mapOf(
         "org.jetbrains.kotlin" to "1.6.21",
         "org.jetbrains.kotlin.plugin" to "1.6.21",
-        "org.springframework" to "2.7.11-SNAPSHOT",
+        "org.springframework" to "2.7.11",
         "io.spring" to "1.0.15.RELEASE"
     )
 
