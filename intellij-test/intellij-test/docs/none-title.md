@@ -403,7 +403,7 @@ data class AdultMember(
 
 ### Projection의 치명적인 단점
 
-Projection을 사용하면 영속성 컨텍스트를 사용하지 못하는 단점 말고도 다른 큰 단점이 있다. 리턴되는 타입이 엔티티 객체가 아니기 때문에 엔티티 객체에 있는 로직을 사용할 수 없다는 것이다. 이를 해결하기 위해서 Interface로 묶고 공통적인 로직은 Interface에서 구현하는 것으로 쉽게 해결이 가능해 보안 다.
+Projection을 사용하면 영속성 컨텍스트를 사용하지 못하는 단점 말고도 다른 큰 단점이 있다. 리턴되는 타입이 엔티티 객체가 아니기 때문에 엔티티 객체에 있는 로직을 사용할 수 없다는 것이다. 이를 해결하기 위해서 Interface로 묶고 공통적인 로직은 Interface에서 구현하는 것으로 쉽게 해결이 가능해 보인다.
 
 ```kotlin
 interface GeneralMember {
