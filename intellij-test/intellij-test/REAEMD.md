@@ -23,15 +23,15 @@
 |--------------------------|-----------------|------------------------------------|
 | `Split Right`            | fn + ctr +  ➡️  | 현재 화면 오른 쪽으로 분활                    |
 | `Split Down`             | fn + ctr +  ⬇️  | 현재 화면 아래 쪽으로 분할                    |
-| `Goto Next Splitter`     | shfit + cmd  ➡️ | 현재 포커싱 화면애서 다음 Tab으로 이동            |
-| `Goto Previous Splitter` | shfit + cmd  ⬅️ | 현재 포커싱 화면애서 이전 다음 Tab으로 이동         |
+| `Goto Next Splitter`     | shift + cmd  ➡️ | 현재 포커싱 화면애서 다음 Tab으로 이동            |
+| `Goto Previous Splitter` | shift + cmd  ⬅️ | 현재 포커싱 화면애서 이전 다음 Tab으로 이동         |
 | `<- Back`                | cmd + [         | 현재 Tab의 이전 Tab, tab limit 1 지정시 유용 |
 | `-> Forword`             | cmd + ]         | 현재 Tab의 다음 Tab, tab limit 1 지정시 유용 |
 | `Recent Files`           | cmd + e         | 최근 Open 파일 리스트                     |
-| `Recent Locations`       | shfit + cmd + e | 최근 Open 파일 커서 위치                   |
+| `Recent Locations`       | shift + cmd + e | 최근 Open 파일 커서 위치                   |
 | `Bookmarks 지정`           | cmd + F3        | 북마크 지정                             |
 | `Bookmarks`              | F3              | 지정한 북마크 리스트                        |
-| `Go to file`             | shfit + cmd + o | 파일 열기                              |
+| `Go to file`             | shift + cmd + o | 파일 열기                              |
 
 ## 간단 팁
 
@@ -39,7 +39,7 @@
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-3.png)
 
-* 특정한 기능을 찾고 싶은 경우 단축키 `shfit + cmd + a` Find Action으로 해당 기능을 찾을 수 있음
+* 특정한 기능을 찾고 싶은 경우 단축키 `shift + cmd + a` Find Action으로 해당 기능을 찾을 수 있음
 * 대충 이런 기능이 있지 않을까 하는 기능을 검색을 통해서 해당 기능의 유무를 빠르게 파악 가능 ex) git stash
 
 ### Key map
