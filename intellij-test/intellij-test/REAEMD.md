@@ -159,6 +159,12 @@ IDE에서 마우스를 사용하면 대체 가능한 단축키를 알려주는 �
 
 [Kotlin Fill Class](https://plugins.jetbrains.com/plugin/10942-kotlin-fill-class)는 코틀린 생성자 네임드 파라미터 기반으로 생성을 도와주는 플러그인
 
+### Inspection Lens
+
+![](https://plugins.jetbrains.com/files/19678/screenshot_fdccbd0c-626e-4502-8622-71931e8b8fef)
+
+[Inspection Lens](https://plugins.jetbrains.com/plugin/19678-inspection-lens)는 오류, 경고 및 기타 검사 하이라이트를 인라인으로 표시해 주는 플러그인
+
 
 ### 플러그인 찾는 방법
 
