@@ -120,7 +120,9 @@ fun asd(): Unit {
 
 ## Plugins
 
-### [String Manipulation Plugin](https://plugins.jetbrains.com/plugin/2162-string-manipulation/)
+### String Manipulation Plugin
+
+[String Manipulation Plugin](https://plugins.jetbrains.åcom/plugin/2162-string-manipulation/) 플러그인은 문자열에 대한 다양한 기능을 제공합니다.
 
 ![](https://raw.githubusercontent.com/cheese10yun/IntelliJ/master/assets/string-manipulation-1.gif)
 
@@ -130,41 +132,44 @@ fun asd(): Unit {
 
 * Switch는 다양한 문자열 포맷으로 쉽게 변경이 가능합니다.
 
-### [Grep Console](https://plugins.jetbrains.com/plugin/7125-grep-console)
+### Grep Console
 
 > ![](https://plugins.jetbrains.com/files/7125/screenshot_16117.png)
 > ![](https://plugins.jetbrains.com/files/7125/screenshot_17407.png)
 > 출처 [Grep Console](https://plugins.jetbrains.com/plugin/7125-grep-console)
 
-Console Log를 Grep 해서 보다 쉽게 로그 확인을 도와주는 플러그인
+[Grep Console](https://plugins.jetbrains.com/plugin/7125-grep-console)를 Grep 해서 보다 쉽게 로그 확인을 도와주는 플러그인
 
 
-### [Key Promoter X](https://plugins.jetbrains.com/plugin/9792-key-promoter-x)
+### Key Promoter X
 
 > ![](https://plugins.jetbrains.com/files/9792/screenshot_17105.png)
 > 출처 [Key Promoter X](https://plugins.jetbrains.com/plugin/9792-key-promoter-x)
 
-IDE에서 마우스를 사용하면 대체 가능한 단축키를 알려주는 플러그인
+[Key Promoter X](https://plugins.jetbrains.com/plugin/9792-key-promoter-x)는 IDE에서 마우스를 사용하면 대체 가능한 단축키를 알려주는 플러그인
 
 
-### [Presentation Assistant](https://plugins.jetbrains.com/plugin/7345-presentation-assistant)
+### Presentation Assistant
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/intellij-test/intellij-test/images/tip-6.png)
 
-사용하는 단축키와 기능 명을 디스플레이 해주는 플러그인
+[Presentation Assistant](https://plugins.jetbrains.com/plugin/7345-presentation-assistant)는 사용하는 단축키와 기능 명을 디스플레이 해주는 플러그인
+
 
 ### Kotlin Fill Class
 
-![](https://user-images.githubusercontent.com/8841470/59397528-e61a4380-8dc7-11e9-9684-d82d225316fe.gif)
+> ![](https://user-images.githubusercontent.com/8841470/59397528-e61a4380-8dc7-11e9-9684-d82d225316fe.gif)
+> 출처 [Kotlin Fill Class](https://plugins.jetbrains.com/plugin/10942-kotlin-fill-class)
 
 [Kotlin Fill Class](https://plugins.jetbrains.com/plugin/10942-kotlin-fill-class)는 코틀린 생성자 네임드 파라미터 기반으로 생성을 도와주는 플러그인
 
+
 ### Inspection Lens
 
-![](https://plugins.jetbrains.com/files/19678/screenshot_fdccbd0c-626e-4502-8622-71931e8b8fef)
+> ![](https://plugins.jetbrains.com/files/19678/screenshot_fdccbd0c-626e-4502-8622-71931e8b8fef)
+> 출처 [Inspection Lens](https://plugins.jetbrains.com/plugin/19678-inspection-lens)
 
 [Inspection Lens](https://plugins.jetbrains.com/plugin/19678-inspection-lens)는 오류, 경고 및 기타 검사 하이라이트를 인라인으로 표시해 주는 플러그인
-
 
 ### 플러그인 찾는 방법
 
