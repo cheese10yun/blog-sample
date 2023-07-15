@@ -1,11 +1,13 @@
 package com.example.tobyspring;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
 //@RestController
 @RequestMapping("/hello")
+@Component
 public class HelloController {
 
     private final HelloService helloService;

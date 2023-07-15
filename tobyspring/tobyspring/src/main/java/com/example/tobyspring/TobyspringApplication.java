@@ -6,6 +6,7 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +26,7 @@ import java.io.IOException;
 
 //@SpringBootApplication
 @Configuration
+@ComponentScan
 public class TobyspringApplication {
 
     @Bean
@@ -38,8 +40,6 @@ public class TobyspringApplication {
     }
 
     public static void main(String[] args) {
-//        SpringApplication.run(TobyspringApplication.class, args);
-
         final AnnotationConfigWebApplicationContext  applicationContext =  new AnnotationConfigWebApplicationContext() {
             @Override
             protected void onRefresh() {
