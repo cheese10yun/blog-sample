@@ -26,17 +26,26 @@ public class TobyspringApplication {
     public static void main(String[] args) {
 //        SpringApplication.run(TobyspringApplication.class, args);
 
-        final GenericWebApplicationContext applicationContext = new GenericWebApplicationContext();
+        final GenericWebApplicationContext applicationContext = new GenericWebApplicationContext(){
+            @Override
+            protected void onRefresh() {
+                super.onRefresh();
+
+                final TomcatServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
+
+                final WebServer webServer = serverFactory.getWebServer(servletContext -> {
+                    servletContext.addServlet("dispatcherServlet", new DispatcherServlet(this)
+                    ).addMapping("/*");
+                });
+
+                webServer.start();
+            }
+        };
         applicationContext.registerBean(HelloController.class);
         applicationContext.registerBean(SimpleHelloService.class);
         applicationContext.refresh();
 
-        final TomcatServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
 
-        final WebServer webServer = serverFactory.getWebServer(servletContext -> {
-            servletContext.addServlet("dispatcherServlet", new DispatcherServlet(applicationContext)
-            ).addMapping("/*");
-        });
 
 
 //        final WebServer webServer = serverFactory.getWebServer(servletContext -> {
@@ -64,7 +73,5 @@ public class TobyspringApplication {
 //            }).addMapping("/hello");
 //        });
 
-
-        webServer.start();
     }
 }
