@@ -46,8 +46,6 @@ public class TobyspringApplication {
         applicationContext.refresh();
 
 
-
-
 //        final WebServer webServer = serverFactory.getWebServer(servletContext -> {
 ////            final HelloController helloController = new HelloController();
 //            servletContext.addServlet("frontcontroller", new HttpServlet() {
