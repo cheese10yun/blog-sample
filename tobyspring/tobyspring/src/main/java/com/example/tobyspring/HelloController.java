@@ -1,7 +1,11 @@
 package com.example.tobyspring;
 
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Objects;
 
+//@RestController
+@RequestMapping("/hello")
 public class HelloController {
 
     private final HelloService helloService;
@@ -11,7 +15,9 @@ public class HelloController {
     }
 
 
-    public String hello(String msg) {
+    @GetMapping
+    @ResponseBody
+    public String hello(@RequestParam("name") String msg) {
         return helloService.sayHello(Objects.requireNonNull(msg));
     }
 }
