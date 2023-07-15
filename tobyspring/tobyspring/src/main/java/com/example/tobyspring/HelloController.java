@@ -8,6 +8,7 @@ import java.util.Objects;
 //@RestController
 @RequestMapping("/hello")
 @Component
+//@MyAnnotation
 public class HelloController {
 
     private final HelloService helloService;

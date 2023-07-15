@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
+import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -29,14 +30,24 @@ import java.io.IOException;
 @ComponentScan
 public class TobyspringApplication {
 
+//    @Bean
+//    public HelloController helloController(HelloService helloService){
+//        return new HelloController(helloService);
+//    }
+//
+//    @Bean
+//    public HelloService helloService(){
+//        return new SimpleHelloService();
+//    }
+
     @Bean
-    public HelloController helloController(HelloService helloService){
-        return new HelloController(helloService);
+    public ServletWebServerFactory servletWebServerFactory(){
+        return new TomcatServletWebServerFactory();
     }
 
     @Bean
-    public HelloService helloService(){
-        return new SimpleHelloService();
+    public DispatcherServlet dispatcherServlet(){
+        return new DispatcherServlet();
     }
 
     public static void main(String[] args) {
@@ -45,9 +56,13 @@ public class TobyspringApplication {
             protected void onRefresh() {
                 super.onRefresh();
 
-                final TomcatServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
+                final ServletWebServerFactory serverFactory = this.getBean(ServletWebServerFactory.class);
+                final DispatcherServlet dispatcherServlet = this.getBean(DispatcherServlet.class);
+                dispatcherServlet.setApplicationContext(this);
+
+
                 final WebServer webServer = serverFactory.getWebServer(servletContext -> {
-                    servletContext.addServlet("dispatcherServlet", new DispatcherServlet(this)
+                    servletContext.addServlet("dispatcherServlet", dispatcherServlet
                     ).addMapping("/*");
                 });
 
