@@ -5,11 +5,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
@@ -21,18 +24,28 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 //@SpringBootApplication
+@Configuration
 public class TobyspringApplication {
+
+    @Bean
+    public HelloController helloController(HelloService helloService){
+        return new HelloController(helloService);
+    }
+
+    @Bean
+    public HelloService helloService(){
+        return new SimpleHelloService();
+    }
 
     public static void main(String[] args) {
 //        SpringApplication.run(TobyspringApplication.class, args);
 
-        final GenericWebApplicationContext applicationContext = new GenericWebApplicationContext(){
+        final AnnotationConfigWebApplicationContext  applicationContext =  new AnnotationConfigWebApplicationContext() {
             @Override
             protected void onRefresh() {
                 super.onRefresh();
 
                 final TomcatServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
-
                 final WebServer webServer = serverFactory.getWebServer(servletContext -> {
                     servletContext.addServlet("dispatcherServlet", new DispatcherServlet(this)
                     ).addMapping("/*");
@@ -41,8 +54,9 @@ public class TobyspringApplication {
                 webServer.start();
             }
         };
-        applicationContext.registerBean(HelloController.class);
-        applicationContext.registerBean(SimpleHelloService.class);
+//        applicationContext.registerBean(HelloController.class);
+//        applicationContext.registerBean(SimpleHelloService.class);
+        applicationContext.register(TobyspringApplication.class);
         applicationContext.refresh();
 
 
