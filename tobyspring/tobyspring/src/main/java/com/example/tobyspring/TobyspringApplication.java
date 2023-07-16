@@ -1,5 +1,6 @@
 package com.example.tobyspring;
 
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
@@ -27,7 +28,9 @@ public class TobyspringApplication {
     }
 
     public static void main(String[] args) {
-        extracted(TobyspringApplication.class, args);
+//        extracted(TobyspringApplication.class, args);
+
+        SpringApplication.run(TobyspringApplication.class, args);
     }
 
 }
