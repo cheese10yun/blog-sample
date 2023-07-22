@@ -6,9 +6,10 @@
 (정리 추가 1-1)
 // 통과
 @Transactional(isolation = Isolation.READ_UNCOMMITTED) // 통과 O
-@Transactional(isolation = Isolation.SERIALIZABLE)) // 통과 O 
-@Transactional(isolation = Isolation.READ_COMMITTED)) // 통과 X
-@Transactional(isolation = Isolation.REPEATABLE_READ)) // 통과 X
+@Transactional(isolation = Isolation.READ_COMMITTED) // 통과 X
+@Transactional(isolation = Isolation.REPEATABLE_READ) // 통과 X
+@Transactional(isolation = Isolation.SERIALIZABLE) // 통과 O
+
 @Synchronized
 fun decrease(stockId: Long, quantity: Long) {
     val stock = stockRepository.findByIdOrNull(stockId)!!
