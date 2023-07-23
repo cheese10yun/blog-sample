@@ -13,12 +13,11 @@ class Coroutines {
 
     @Test
     @DelicateCoroutinesApi
-    fun test() = runBlocking {
-
+    fun `코루틴 생성 테스트`() = runBlocking {
         println("${Thread.activeCount()} thread active at the start")
 
         val time = measureTimeMillis {
-            createCoroutines(100_000)
+            createCoroutines(3)
         }
 
         println("${Thread.activeCount()} thread active at the end")
@@ -31,9 +30,12 @@ class Coroutines {
         val jobs = ArrayList<Job>()
         for (i in 1..amount) {
             jobs += GlobalScope.launch {
-                delay(1000)
+                println("Started $i in ${Thread.currentThread().name}")
+                delay(1_000)
+                println("Finished $i in ${Thread.currentThread().name}")
             }
         }
         jobs.forEach { it.join() }
     }
+
 }
