@@ -4,6 +4,7 @@ import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -38,4 +39,42 @@ class Coroutines {
         jobs.forEach { it.join() }
     }
 
+    lateinit var user: UserInfo
+
+    @Test
+    fun `레디스 컨디션`() = runBlocking {
+        asyncGetUserInfo(1)
+        delay(1000)
+        println("User ${user.id} is ${user.name}")
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun asyncGetUserInfo(id: Int) = GlobalScope.async {
+        delay(11000)
+        user = UserInfo()
+    }
+
+    data class UserInfo(
+        val id: Int = 1,
+        val name: String = "Tster"
+    )
+
+    var counter = 0
+
+    @Test
+    fun `원자성 위반`() = runBlocking {
+        val workerA = asyncIncrement(2_000)
+        val workerB = asyncIncrement(100)
+
+        workerA.await()
+        workerB.await()
+        println("counter [$counter]")
+
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun asyncIncrement(by: Int) = GlobalScope.async {
+        for (i in 0 until by)
+            counter++
+    }
 }
