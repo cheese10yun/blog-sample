@@ -77,4 +77,55 @@ class Coroutines {
         for (i in 0 until by)
             counter++
     }
+
+    lateinit var jobA: Job
+    lateinit var jobB: Job
+
+    @OptIn(DelicateCoroutinesApi::class)
+    @Test
+    fun `교착 상태`() = runBlocking {
+        GlobalScope.launch {
+            delay(1_000)
+            // wait for JobB to Fish
+            jobB.join()
+        }
+
+        GlobalScope.launch {
+            // wait for JobA to Fish
+            jobA.join()
+        }
+
+        // wait for JobA to Fish
+        jobA.join()
+        println("Finished")
+    }
+
+    @Test
+    fun `명시적 선언`() = runBlocking {
+        val time = measureTimeMillis {
+            val name = async { getName() }
+            val lastName = async { getLastName() }
+            println("Hello ${name.await()} ${lastName.await()}")
+        }
+        println("Execution took $time ms")
+    }
+
+    private suspend fun getName(): String {
+        delay(1_000)
+        return "Yun"
+    }
+
+    private suspend fun getLastName(): String {
+        delay(1_000)
+        return "Kim"
+    }
+
+//    suspend fun getProfile(id: Int){
+//        val basicUserInfo = asyncGetUserInfo(id)
+//        val contactInfo = asyncGetContactInfo(id)
+//
+//        createProfile(basicUserInfo.await(), contactInfo.wait())
+//    }
+
+
 }
