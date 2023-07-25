@@ -63,7 +63,7 @@ public class JdbcTest5 {
 //                connection.commit()
 //
 //            }catch (e: Exception){
-//                // 트랜잭션 2 예외발생시 롤백, 트랜잭션 1은 try catch로 분리되어 있기 떄문에 영향 없음
+//                // 트랜잭션 2 예외발생시 롤백, 트랜잭션 1은 try catch로 분리되어 있기 때문에 영향 없음
 //                connection.rollback()
 //            }
 //            // 트랜잭션 1 종료
