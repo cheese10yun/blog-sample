@@ -40,7 +40,6 @@
 
 ### RDBMS vs MongoDB
 
-
 | RDBMS    | MongoDB    |
 | -------- | ---------- |
 | Cluster  | Cluster    |
@@ -51,11 +50,11 @@
 
 ### 기본 Database
 
-| Database | Description                                                                                                                                                                     |
-| -------- |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| admin    | * 인증과 권한 부여 역할이다.<br/> * 일부 관리 작업을 하려면 admin database 접근이 필요하다.                                                                                                                 |
+| Database | Description                                                                                                                                                                                                                    |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| admin    | * 인증과 권한 부여 역할이다.<br/> * 일부 관리 작업을 하려면 admin database 접근이 필요하다.                                                                                                                                    |
 | local    | * 모든 mongodb instance는 local database를 소유한다.<br/> * oplog와 같은 replication 절차에 필요한 정보를 저장한다. <br/> * startup_log와 같은 instance 진단 정보를 저장한다. <br/> * local database는 자체는 복제되지 않는다. |
-| config   | * shareded cluster에 각 shard 정보를 저장한다.                                                      ㅇ                                                                                    |
+| config   | * shareded cluster에 각 shard 정보를 저장한다.                                                                                                                                                                                 |
 
 ### Collection 특징
 
@@ -70,15 +69,28 @@
 * 생성시, 상위 구조인 Database나 Collection이 없다면 먼저 생성하고 Document를 생성한다.
 * Document의 최대 크기는 **16MB** 이다.
 
-
 ## MongoDB 배포 형태 소개
 
 ## Replica Set
 
+## Sharded Cluster
+
+* 장점
+  * 용량의 한계를 극복 가능
+  * 데이터 규모와 부하가 크더라도 처리량이 좋다.
+  * 고가용성을 보장한다.
+  * 하드웨어에 대한 제약을 해결할 수 있다.
+* 단점
+  * 관리가 비교적 복잡하다.
+  * Replica Set과 비교해서 쿼리가 느리다.
+
+### Architecture
+
+![](images/draw-mongodb.drawio-1.png)
+
 ## Replica Set vs Sharded Cluster 어떻게 배포할것인가?
 
 ## MogoDB Storage Engines
-
 
 | 항목             | MMAPv1                                         | WiredTiger           |
 | ---------------- | ---------------------------------------------- | -------------------- |
