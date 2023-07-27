@@ -3,10 +3,12 @@ package com.example.kotlincoroutine
 import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
@@ -128,4 +130,46 @@ class Coroutines {
 //    }
 
 
+    @OptIn(DelicateCoroutinesApi::class)
+    @Test
+    fun name() {
+        newSingleThreadContext(name = "serviceCall")
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    @Test
+    fun `async() 사용 방법`() = runBlocking {
+
+
+        val task = GlobalScope.async {
+            doSomething()
+        }
+
+//        task.join()
+        task.await()
+        println("Completed")
+    }
+
+    @OptIn(DelicateCoroutinesApi::class, InternalCoroutinesApi::class)
+    @Test
+    fun `async() 안전하게 예외 처리`() = runBlocking {
+        val task = GlobalScope.async {
+            doSomething()
+        }
+
+        task.join()
+        if (task.isCancelled) {
+            val exception = task.getCancellationException()
+            println("Error with message: ${exception.cause}")
+        } else {
+            println("Success")
+        }
+
+        println("Completed")
+    }
+
+
+    private fun doSomething() {
+        throw UnsupportedOperationException("Can`t Do")
+    }
 }
