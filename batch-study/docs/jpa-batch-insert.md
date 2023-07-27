@@ -140,7 +140,7 @@ internal class BulkInsertJobConfigurationTest(
     }
 }
 ```
-`paymentBackJpaRepository.saveAll()`를 이용해서 batch inset를 진행합니다. JPA 기반으로 Batch Insert를 진행할 때 별다른 코드가 필요 없습니다. 컬렉션 객체를 `saveAll()`으로 저장하는 것이 전부입니다. `hibernate.show_sql: true`으로 로킹 결고를 확인해보겠습니다.
+`paymentBackJpaRepository.saveAll()`를 이용해서 batch insert를 진행합니다. JPA 기반으로 Batch Insert를 진행할 때 별다른 코드가 필요 없습니다. 컬렉션 객체를 `saveAll()`으로 저장하는 것이 전부입니다. `hibernate.show_sql: true`으로 로킹 결고를 확인해보겠습니다.
 
 ![](img/sql-batch-1.png)
 
