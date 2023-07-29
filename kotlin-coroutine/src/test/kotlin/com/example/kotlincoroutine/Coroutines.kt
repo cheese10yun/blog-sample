@@ -1,6 +1,10 @@
 package com.example.kotlincoroutine
 
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.system.measureTimeMillis
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -219,7 +223,105 @@ class Coroutines {
         task.join()
     }
 
-    fun printCurrentThread(){
+    fun printCurrentThread() {
         println("Running is thread [${Thread.currentThread().name}]")
+    }
+
+    @Test
+    fun `Job 사용 방법`() = runBlocking {
+        val job = GlobalScope.launch {
+            // Do something..
+        }
+        // val job = Job() // 팩토리 함수로 사용 가능
+    }
+
+    @Test
+    fun `Job 예외 처리`() = runBlocking {
+        val job = GlobalScope.launch {
+            // Do something..
+            TODO("Not Implemented!")
+        }
+        delay(500)
+    }
+
+    @Test
+    fun `생성 CoroutineStart LAZY`() = runBlocking {
+        GlobalScope.launch(start = CoroutineStart.LAZY) {
+            TODO("Not Implemented!")
+        }
+        delay(500)
+    }
+
+    @Test
+    fun `활성 CoroutineStart LAZY start`() = runBlocking {
+        val job = GlobalScope.launch(start = CoroutineStart.LAZY) {
+            delay(3000)
+        }
+        job.start()
+    }
+
+    @Test
+    fun `활성 CoroutineStart LAZY join`() = runBlocking {
+        val job = GlobalScope.launch(start = CoroutineStart.LAZY) {
+            delay(3000)
+        }
+        job.join()
+    }
+
+    @Test
+    fun `cancel `() = runBlocking {
+        val job = GlobalScope.launch(start = CoroutineStart.LAZY) {
+            // Do some work here
+            delay(5000)
+        }
+        delay(2000)
+        job.cancel()
+    }
+
+    @Test
+    fun `cancel cause`() = runBlocking {
+        val job = GlobalScope.launch(start = CoroutineStart.LAZY) {
+            // Do some work here
+            delay(5000)
+        }
+        delay(2000)
+        job.cancel(cause = CancellationException("Timeout"))
+    }
+
+    @OptIn(InternalCoroutinesApi::class)
+    @Test
+    fun `cancel getCancellationException`() = runBlocking {
+        val job = GlobalScope.launch(start = CoroutineStart.LAZY) {
+            // Do some work here
+            delay(5000)
+        }
+        delay(2000)
+        job.cancel(cause = CancellationException("Tried of waiting"))
+
+        val cancellation = job.getCancellationException()
+        println(cancellation)
+    }
+
+    @Test
+    fun `cancel CoroutineException Handler`() = runBlocking {
+        val exceptionHandler = CoroutineExceptionHandler { _: CoroutineContext, throwable: Throwable ->
+            println("Job cancelled due to ${throwable.message}")
+        }
+        GlobalScope.launch(exceptionHandler) {
+            TODO("Not implemented yet!")
+        }
+        delay(2000)
+    }
+
+    @Test
+    fun `cancel invokeOnCompletion`() = runBlocking {
+        GlobalScope.launch {
+            TODO("Not implemented yet!")
+        }.invokeOnCompletion { cause ->
+            cause?.let {
+                println("Job canelled due to ${it.message}")
+            }
+        }
+        delay(2000)
     }
 }
