@@ -6,6 +6,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
@@ -145,8 +146,8 @@ class Coroutines {
             doSomething()
         }
 
-//        task.join()
-        task.await()
+//        task.join() // 예외가 발생해도, Completed 출력
+        task.await() // 예외가 발생하면 종료
         println("Completed")
     }
 
@@ -168,8 +169,57 @@ class Coroutines {
         println("Completed")
     }
 
+    @Test
+    fun `코루틴에서 예외가 발생하는 경우`() {
+        runBlocking { doSomethingTest() }
+    }
+
+    suspend fun doSomethingTest() = coroutineScope {
+        val async = async { doSomething() }
+        async.await()
+        println("Completed")
+    }
 
     private fun doSomething() {
         throw UnsupportedOperationException("Can`t Do")
+    }
+
+
+    @OptIn(InternalCoroutinesApi::class)
+    @Test
+    fun `launch`() = runBlocking {
+        val task = GlobalScope.launch {
+            doSomething()
+        }
+        task.join()
+        if (task.isCancelled) {
+            val exception = task.getCancellationException()
+            println("Error with message: ${exception.cause}")
+        } else {
+            println("Success")
+        }
+
+        println("Completed")
+    }
+
+    @Test
+    fun `특정 디스패처 사용하기`() = runBlocking {
+        val task = launch {
+            printCurrentThread()
+        }
+        task.join()
+    }
+
+    @Test
+    fun `특정 디스패처 사용하기2`() = runBlocking {
+        val dispatcher = newSingleThreadContext("ServiceCall")
+        val task = launch(dispatcher) {
+            printCurrentThread()
+        }
+        task.join()
+    }
+
+    fun printCurrentThread(){
+        println("Running is thread [${Thread.currentThread().name}]")
     }
 }
