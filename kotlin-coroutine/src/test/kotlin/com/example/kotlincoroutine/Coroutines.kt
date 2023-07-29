@@ -236,6 +236,15 @@ class Coroutines {
     }
 
     @Test
+    fun `Job 사용 방법 테스트`(): Unit = runBlocking {
+        val job = GlobalScope.launch {
+            TODO("Not Implemented!")
+        }
+        job.start()
+//        job.join()
+    }
+
+    @Test
     fun `Job 예외 처리`() = runBlocking {
         val job = GlobalScope.launch {
             // Do something..
@@ -323,5 +332,42 @@ class Coroutines {
             }
         }
         delay(2000)
+    }
+
+
+    @Test
+    fun `Deferred handler`() = runBlocking {
+        val headlinesTask = GlobalScope.async {
+            getHeadLines()
+        }
+        headlinesTask.await()
+    }
+
+    private fun getHeadLines() {
+        // Do some work here
+    }
+
+
+    @Test
+    fun `Deferred 예외 처리`(): Unit = runBlocking {
+        val deferred = GlobalScope.async {
+            TODO("Not implemented yet!")
+        }
+
+        // Wait for it to fail
+//        delay(2_000)
+        deferred.await()
+    }
+
+    @Test
+    fun `Deferred 예외 처리 try-catch`(): Unit = runBlocking {
+        val deferred = GlobalScope.async {
+            TODO("Not implemented yet!")
+        }
+        try {
+            deferred.await()
+        }catch (e: Throwable){
+            println(e.printStackTrace())
+        }
     }
 }
