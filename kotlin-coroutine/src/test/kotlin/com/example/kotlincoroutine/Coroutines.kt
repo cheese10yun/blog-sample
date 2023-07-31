@@ -370,4 +370,20 @@ class Coroutines {
             println(e.printStackTrace())
         }
     }
+
+    @Test
+    fun `상태는 한 방향으로만 이동`() = runBlocking {
+        val time = measureTimeMillis {
+            val job = GlobalScope.launch {
+                delay(2000)
+            }
+            job.join()
+
+            // Restart the job
+            job.start()
+            job.join()
+        }
+        println("Took $time ms")
+    }
+
 }
