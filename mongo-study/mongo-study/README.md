@@ -247,3 +247,88 @@ db.planets.find(
 ```
 </div>
 </details>
+
+## 유용한 Query 함수들
+
+### Bulk Writer
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+```js
+db.bulk.bulkWrite(
+    [
+        {insertOne: {document: {doc: 1, order: 1}}},
+        {insertOne: {document: {doc: 2, order: 2}}},
+        {insertOne: {document: {doc: 3, order: 3}}},
+        {insertOne: {document: {doc: 4, order: 4}}},
+        {insertOne: {document: {doc: 4, order: 5}}},
+        {insertOne: {document: {doc: 5, order: 6}}},
+        {
+            deleteOne: {
+                filter: {doc: 3}
+            }
+        },
+        {
+            updateOne: {
+                filter: {doc: 2},
+                update: {
+                    $set: {doc: 12}
+                }
+            }
+        }
+    ],
+    {ordered: false}
+)
+```
+* ordered 순서 여부
+
+```js
+db.bulk.countDocuments()
+db.bulk.estimatedDocumentCount()
+
+db.bulk.distinct("doc")
+
+db.bulk.find()
+
+db.bulk.findAndModify(
+    {
+        query: {doc: 5},
+        sort: {order: -1},
+        update: {$inc: {doc: 1}}
+    }
+)
+
+db.sequence.insertOne({seq: 0})
+
+db.sequence.find()
+
+db.sequence.findAndModify({
+    query: {},
+    sort: {seq: -1},
+    update: {$inc: {seq:1}}
+})
+
+db.bulk.getIndexes()
+
+db.bulk.createIndex({doc:1})
+
+db.bulk.updateOne(
+    {doc:1},
+    {$set: {_id:1}}
+)
+
+
+db.bulk.replaceOne(
+    {doc:1},
+    {doc:13},
+    )
+
+db.bulk.find()
+```
+</div>
+</details>
+
+
+
+
