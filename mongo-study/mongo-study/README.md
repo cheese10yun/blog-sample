@@ -97,4 +97,152 @@
 | Data Compression | 지원하지 않는다.                               | 지원한다.            |
 | Locl             | 버전에 따라 Database 혹인 Collection 레벨 Lock | Document 레벨의 Locl |
 
-# MongoDB Atlas 소개 및 실습 환경 셋팅
+
+# Document Query 실습
+
+## CRUD
+
+<details>
+<summary>접기/펼치기</summary>
+
+접은 내용(ex 소스 코드)
+</details>
+
+```js
+show dbs
+
+use test
+
+db.employees.insertOne({
+    name: "lake",
+    age: 21,
+    dept: "Database",
+    joinDate: new ISODate('2022-10-01'),
+    salary: 400000,
+    bonus: null
+})
+
+db.employees.find()
+
+
+db.employees.insertMany([
+    {
+        name: "ocean",
+        age: 45,
+        dept: "Network",
+        joinDate: new ISODate('1999-11-15'),
+        resignationDate: new ISODate('2002-12-23'),
+        salary: 100000,
+        bonus: null
+    },
+    {
+        name: "river",
+        age: 34,
+        dept: "Devops",
+        isNegotiating: true
+    }
+])
+
+db.employees.updateOne(
+    {"name": "river"},
+    {
+        $set: {
+            salary: 35000,
+            dept: "Database",
+            joinDate: new ISODate("2022-12-31")
+        },
+        $unset: {
+            isNegotiating: ""
+        }
+    }
+    )
+
+db.employees.find()
+
+db.employees.updateMany(
+    {
+        resignationDate: {$exists: false},
+        joinDate: {$exists: true}
+    },
+    {
+        $mul: {salary: Decimal128("1.1")}
+    }
+)
+
+db.employees.updateMany(
+    {
+        resignationDate: {$exists: false},
+        bonus: {$exists: true}
+    },
+    {
+        $set: {bonus: 200000}
+    }
+)
+
+db.employees.find()
+
+db.employees.deleteOne(
+    {
+        name: "river"
+    }
+)
+
+db.employees.find()
+
+db.employees.deleteMany({})
+
+show collections
+
+db.employees.drop()
+
+
+db.planets.findOne(
+    {
+        name: "Mars"
+    }
+)
+
+
+db.planets.find(
+    {
+        hasRings: true,
+        orderFromSun: {$lte: 6}
+    }
+)
+
+
+db.planets.find(
+    {
+        $and: [
+            {
+                hasRings: true,
+            },
+            {
+                orderFromSun: {$lte: 6}
+            }
+        ]
+    }
+)
+
+db.planets.find(
+    {
+        $or: [
+            {
+                hasRings: {$ne: false },
+            },
+            {
+                orderFromSun: {$gt: 6}
+            }
+        ]
+    }
+)
+
+db.planets.find(
+    {
+        mainAtmosphere: {$in: ['O2']}
+    }
+)
+
+```
+
+
