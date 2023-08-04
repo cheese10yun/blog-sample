@@ -102,11 +102,11 @@
 
 ## CRUD
 
+
+
 <details>
 <summary>접기/펼치기</summary>
-
-접은 내용(ex 소스 코드)
-</details>
+<div markdown="1">
 
 ```js
 show dbs
@@ -243,6 +243,7 @@ db.planets.find(
     }
 )
 
+
 ```
-
-
+</div>
+</details>
