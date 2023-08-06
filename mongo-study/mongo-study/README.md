@@ -420,3 +420,7 @@ db.movies.find(
 
 ### Aggregation 예제
 
+
+### 배포의 형태에 따른 CRUD 특징
+
+
