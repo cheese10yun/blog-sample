@@ -248,9 +248,9 @@ db.planets.find(
 </div>
 </details>
 
-## 유용한 Query 함수들
+### 유용한 Query 함수들
 
-### Bulk Writer
+#### Bulk Writer
 
 <details>
 <summary>접기/펼치기</summary>
@@ -331,29 +331,30 @@ db.bulk.find()
 </details>
 
 
-## 배열과 내장 Document를 다루는 방법 1 Read
+### 배열과 내장 Document를 다루는 방법 1 Read
 
-## 배열과 내장 Document를 다루는 방법 2 Update
+### 배열과 내장 Document를 다루는 방법 2 Update
 
-## Query 예제
+### Query 예제
 
 <details>
 <summary>접기/펼치기</summary>
 <div markdown="1">
-### sample_mflix database의 mpvies collection 전체를 조회한다.
+
+#### sample_mflix database의 mpvies collection 전체를 조회한다.
 
 ```
 db.movies.find()
 ```
 
-### mpvies collection의 Document 수를 구한다.
+#### mpvies collection의 Document 수를 구한다.
 
 ```
 db.movies.countDocuments()
 ```
 
 
-### mpvies collection의 전체를 조회하는데, title, year, genres, runtime, rated를 보여주고 _id는 보여주지 않는다.
+#### mpvies collection의 전체를 조회하는데, title, year, genres, runtime, rated를 보여주고 _id는 보여주지 않는다.
 
 ```
 db.movies.find(
@@ -369,7 +370,7 @@ db.movies.find(
     )
 ```
 
-### movies 100분 이하
+#### movies 100분 이하
 
 ```
 db.movies.find(
@@ -377,7 +378,7 @@ db.movies.find(
 )
 ```
 
-### movies 100 분이하, 장르 드라마
+#### movies 100 분이하, 장르 드라마
 
 ```
 db.movies.find(
@@ -389,7 +390,7 @@ db.movies.find(
 ```
 
 
-### movies 100 분이하, 장르 드라마, size 1개
+#### movies 100 분이하, 장르 드라마, size 1개
 
 ```
 db.movies.find(
@@ -405,3 +406,17 @@ db.movies.find(
 ```
 </div>
 </details>
+
+
+## 집계 프레임워크 Aggregation
+
+* Collection의 데이터를 변환하거나 분석하기 위해 집계 프레임워크
+* Aggregation find 함수로 처리할 수 없는, SQL의 Group By와 Join 구문 같은 복잡한 데이터 분석 기능을 제공한다.
+* Aggregation 프레임워크는 Pipelin 형태를 갖춘다.
+* MongoDB 2.2 부터 제공되었고 이전에는 Map Reduce를 사용 했다.
+
+
+### 자주 사용되는 Aggregation Stage
+
+### Aggregation 예제
+
