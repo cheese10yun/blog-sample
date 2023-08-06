@@ -337,7 +337,9 @@ db.bulk.find()
 
 ## Query 예제
 
-
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
 ### sample_mflix database의 mpvies collection 전체를 조회한다.
 
 ```
@@ -401,6 +403,5 @@ db.movies.find(
     {genres: 1}
 )
 ```
-
-
-
+</div>
+</details>
