@@ -331,5 +331,76 @@ db.bulk.find()
 </details>
 
 
+## 배열과 내장 Document를 다루는 방법 1 Read
+
+## 배열과 내장 Document를 다루는 방법 2 Update
+
+## Query 예제
+
+
+### sample_mflix database의 mpvies collection 전체를 조회한다.
+
+```
+db.movies.find()
+```
+
+### mpvies collection의 Document 수를 구한다.
+
+```
+db.movies.countDocuments()
+```
+
+
+### mpvies collection의 전체를 조회하는데, title, year, genres, runtime, rated를 보여주고 _id는 보여주지 않는다.
+
+```
+db.movies.find(
+    {},
+    {
+        title:1,
+        year:1,
+        genres: 1,
+        runtime: 1,
+        rated: 1,
+        _id:0
+    }
+    )
+```
+
+### movies 100분 이하
+
+```
+db.movies.find(
+    { runtime: {$lte: 100}}
+)
+```
+
+### movies 100 분이하, 장르 드라마
+
+```
+db.movies.find(
+    {
+        runtime: {$lte: 100},
+        genres: 'Drama'
+    }
+)
+```
+
+
+### movies 100 분이하, 장르 드라마, size 1개
+
+```
+db.movies.find(
+    {
+        $and: [
+            {runtime: {$lte: 100}},
+            {genres: 'Drama'},
+            {genres: {$size: 1}}
+        ]
+    },
+    {genres: 1}
+)
+```
+
 
 
