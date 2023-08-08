@@ -5,7 +5,9 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -366,7 +368,7 @@ class Coroutines {
         }
         try {
             deferred.await()
-        }catch (e: Throwable){
+        } catch (e: Throwable) {
             println(e.printStackTrace())
         }
     }
@@ -386,4 +388,73 @@ class Coroutines {
         println("Took $time ms")
     }
 
+    @Test
+    fun `suspend 외부`() {
+        runBlocking {
+            greetDelayed(1000)
+        }
+    }
+
+    suspend fun greetDelayed(delayMillis: Long) {
+        delay(delayMillis)
+        println("Hello, World!")
+    }
+
+    data class Profile(
+        val id: Long,
+        val name: String,
+        val age: Int
+    )
+
+//    interface ProfileServiceRepository {
+//        fun fetchByName(name:String): Profile
+//
+//        fun fetchById(id: Long): Profile
+//    }
+
+//    interface ProfileServiceRepository {
+//        fun asyncFetchByName(name:String): Deferred<Profile>
+//        fun asyncFetchById(id: Long): Deferred<Profile>
+//    }
+
+    interface ProfileServiceRepository {
+        suspend fun fetchByName(name: String): Profile
+        suspend fun fetchById(id: Long): Profile
+    }
+
+    class ProfileServiceClient : ProfileServiceRepository {
+        override suspend fun fetchByName(name: String): Profile {
+            return Profile(1, name, 28)
+        }
+
+        override suspend fun fetchById(id: Long): Profile {
+            return Profile(1, "name", 28)
+        }
+    }
+
+    @Test
+    fun `구현 테스트 코드`() = runBlocking {
+        val client = ProfileServiceClient()
+
+        val profile = client.fetchById(12)
+        println(profile)
+    }
+
+    @Test
+    fun `CommonPool test`() {
+
+        GlobalScope.launch(Dispatchers.Default) {
+
+        }
+    }
+
+    @Test
+    fun `Unconfined test`() = runBlocking {
+        GlobalScope.launch(Dispatchers.Unconfined) {
+            println("Starting in ${Thread.currentThread().name}")
+
+            delay(500)
+            println("Resuming in ${Thread.currentThread().name}")
+        }.join()
+    }
 }
