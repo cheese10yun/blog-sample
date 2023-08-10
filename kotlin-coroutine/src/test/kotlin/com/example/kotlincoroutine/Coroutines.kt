@@ -5,7 +5,6 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -14,8 +13,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newFixedThreadPoolContext
@@ -46,7 +47,7 @@ class Coroutines {
         for (i in 1..amount) {
             jobs += GlobalScope.launch {
                 println("Started $i in ${Thread.currentThread().name}")
-                delay(1_000)
+                kotlinx.coroutines.delay(1_000)
                 println("Finished $i in ${Thread.currentThread().name}")
             }
         }
@@ -58,13 +59,13 @@ class Coroutines {
     @Test
     fun `레디스 컨디션`() = runBlocking {
         asyncGetUserInfo(1)
-        delay(1000)
+        kotlinx.coroutines.delay(1000)
         println("User ${user.id} is ${user.name}")
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     fun asyncGetUserInfo(id: Int) = GlobalScope.async {
-        delay(11000)
+        kotlinx.coroutines.delay(11000)
         user = UserInfo()
     }
 
@@ -99,7 +100,7 @@ class Coroutines {
     @Test
     fun `교착 상태`() = runBlocking {
         GlobalScope.launch {
-            delay(1_000)
+            kotlinx.coroutines.delay(1_000)
             // wait for JobB to Fish
             jobB.join()
         }
@@ -125,12 +126,12 @@ class Coroutines {
     }
 
     private suspend fun getName(): String {
-        delay(1_000)
+        kotlinx.coroutines.delay(1_000)
         return "Yun"
     }
 
     private suspend fun getLastName(): String {
-        delay(1_000)
+        kotlinx.coroutines.delay(1_000)
         return "Kim"
     }
 
@@ -257,7 +258,7 @@ class Coroutines {
             // Do something..
             TODO("Not Implemented!")
         }
-        delay(500)
+        kotlinx.coroutines.delay(500)
     }
 
     @Test
@@ -265,13 +266,13 @@ class Coroutines {
         GlobalScope.launch(start = CoroutineStart.LAZY) {
             TODO("Not Implemented!")
         }
-        delay(500)
+        kotlinx.coroutines.delay(500)
     }
 
     @Test
     fun `활성 CoroutineStart LAZY start`() = runBlocking {
         val job = GlobalScope.launch(start = CoroutineStart.LAZY) {
-            delay(3000)
+            kotlinx.coroutines.delay(3000)
         }
         job.start()
     }
@@ -279,7 +280,7 @@ class Coroutines {
     @Test
     fun `활성 CoroutineStart LAZY join`() = runBlocking {
         val job = GlobalScope.launch(start = CoroutineStart.LAZY) {
-            delay(3000)
+            kotlinx.coroutines.delay(3000)
         }
         job.join()
     }
@@ -288,9 +289,9 @@ class Coroutines {
     fun `cancel `() = runBlocking {
         val job = GlobalScope.launch(start = CoroutineStart.LAZY) {
             // Do some work here
-            delay(5000)
+            kotlinx.coroutines.delay(5000)
         }
-        delay(2000)
+        kotlinx.coroutines.delay(2000)
         job.cancel()
     }
 
@@ -298,9 +299,9 @@ class Coroutines {
     fun `cancel cause`() = runBlocking {
         val job = GlobalScope.launch(start = CoroutineStart.LAZY) {
             // Do some work here
-            delay(5000)
+            kotlinx.coroutines.delay(5000)
         }
-        delay(2000)
+        kotlinx.coroutines.delay(2000)
         job.cancel(cause = CancellationException("Timeout"))
     }
 
@@ -309,9 +310,9 @@ class Coroutines {
     fun `cancel getCancellationException`() = runBlocking {
         val job = GlobalScope.launch(start = CoroutineStart.LAZY) {
             // Do some work here
-            delay(5000)
+            kotlinx.coroutines.delay(5000)
         }
-        delay(2000)
+        kotlinx.coroutines.delay(2000)
         job.cancel(cause = CancellationException("Tried of waiting"))
 
         val cancellation = job.getCancellationException()
@@ -326,7 +327,7 @@ class Coroutines {
         GlobalScope.launch(exceptionHandler) {
             TODO("Not implemented yet!")
         }
-        delay(2000)
+        kotlinx.coroutines.delay(2000)
     }
 
     @Test
@@ -338,7 +339,7 @@ class Coroutines {
                 println("Job canelled due to ${it.message}")
             }
         }
-        delay(2000)
+        kotlinx.coroutines.delay(2000)
     }
 
 
@@ -382,7 +383,7 @@ class Coroutines {
     fun `상태는 한 방향으로만 이동`() = runBlocking {
         val time = measureTimeMillis {
             val job = GlobalScope.launch {
-                delay(2000)
+                kotlinx.coroutines.delay(2000)
             }
             job.join()
 
@@ -401,7 +402,7 @@ class Coroutines {
     }
 
     suspend fun greetDelayed(delayMillis: Long) {
-        delay(delayMillis)
+        kotlinx.coroutines.delay(delayMillis)
         println("Hello, World!")
     }
 
@@ -457,7 +458,7 @@ class Coroutines {
     fun `Unconfined test`() = runBlocking {
         GlobalScope.launch(Dispatchers.Unconfined) {
             println("Starting in ${Thread.currentThread().name}")
-            delay(500)
+            kotlinx.coroutines.delay(500)
             println("Resuming in ${Thread.currentThread().name}")
         }.join()
     }
@@ -468,7 +469,7 @@ class Coroutines {
         val dispatcher = newSingleThreadContext("myThread")
         GlobalScope.launch(dispatcher) {
             println("Starting in ${Thread.currentThread().name}")
-            delay(500)
+            kotlinx.coroutines.delay(500)
             println("Resuming in ${Thread.currentThread().name}")
         }.join()
     }
@@ -478,7 +479,7 @@ class Coroutines {
         val dispatcher = newFixedThreadPoolContext(4, "myPool")
         GlobalScope.launch(dispatcher) {
             println("Starting in ${Thread.currentThread().name}")
-            delay(500)
+            kotlinx.coroutines.delay(500)
             println("Resuming in ${Thread.currentThread().name}")
         }.join()
     }
@@ -495,7 +496,7 @@ class Coroutines {
         }
 
         // wait for error to happen
-        delay(500)
+        kotlinx.coroutines.delay(500)
     }
 
     @Test
@@ -503,15 +504,15 @@ class Coroutines {
         val duration = measureTimeMillis {
             val job = launch {
                 try {
-                    while (isActive){
-                        delay(500)
+                    while (isActive) {
+                        kotlinx.coroutines.delay(500)
                         println("still running")
                     }
                 } finally {
                     println("cancelled, will end now")
                 }
             }
-            delay(1200)
+            kotlinx.coroutines.delay(1200)
             job.cancelAndJoin()
         }
         println("Took $duration ms")
@@ -522,17 +523,17 @@ class Coroutines {
         val duration = measureTimeMillis {
             val job = launch {
                 try {
-                    while (isActive){
-                        delay(500)
+                    while (isActive) {
+                        kotlinx.coroutines.delay(500)
                         println("still running")
                     }
                 } finally {
                     println("cancelled, will delay finalization now")
-                    delay(5000)
+                    kotlinx.coroutines.delay(5000)
                     println("delay completed, bye bye")
                 }
             }
-            delay(1200)
+            kotlinx.coroutines.delay(1200)
             job.cancelAndJoin()
         }
         println("Took $duration ms")
@@ -543,21 +544,187 @@ class Coroutines {
         val duration = measureTimeMillis {
             val job = launch {
                 try {
-                    while (isActive){
-                        delay(500)
+                    while (isActive) {
+                        kotlinx.coroutines.delay(500)
                         println("still running")
                     }
                 } finally {
-                    withContext(NonCancellable){
+                    withContext(NonCancellable) {
                         println("cancelled, will delay finalization now")
-                        delay(5000)
+                        kotlinx.coroutines.delay(5000)
                         println("delay completed, bye bye")
                     }
                 }
             }
-            delay(1200)
+            kotlinx.coroutines.delay(1200)
+
             job.cancelAndJoin()
         }
         println("Took $duration ms")
+    }
+
+
+    @Test
+    fun `컨텍스트 조합`(): Unit = runBlocking {
+        val dispatcher = newSingleThreadContext("MyDispatcher")
+        val handler = CoroutineExceptionHandler { context, throwable ->
+            println("Error captured")
+            println("Message: ${throwable.message}")
+        }
+
+        GlobalScope.launch(dispatcher + handler) {
+            println("Running in ${Thread.currentThread().name}")
+            TODO("Not Implements")
+        }.join()
+    }
+
+    @Test
+    fun `컨텍스트 분리`(): Unit = runBlocking {
+        val dispatcher = newSingleThreadContext("MyDispatcher")
+        val handler = CoroutineExceptionHandler { context, throwable ->
+            println("Error captured")
+            println("Message: ${throwable.message}")
+        }
+
+        // 두 컨텍스트를 결합
+        val context = dispatcher + handler
+
+        // 컨텍스트예서 하나의 요소 제거
+        val tmpCtx = context.minusKey(dispatcher.key)
+
+        GlobalScope.launch(tmpCtx) {
+            println("Running in ${Thread.currentThread().name}")
+            TODO("Not Implements")
+        }.join()
+    }
+
+    @Test
+    fun `withContext()를 사용하는 임시 컨텍스트 스위치`(): Unit = runBlocking {
+        val dispatcher = newSingleThreadContext("MyThread")
+
+        val name = GlobalScope.async(dispatcher) {
+            // 중요한 작업 수행
+            "Susan Calvin"
+        }.await()
+
+        println("User: $name")
+    }
+
+    @Test
+    fun `withContext()를 사용하는 임시 컨텍스트 스위치2`(): Unit = runBlocking {
+        val dispatcher = newSingleThreadContext("MyThread")
+        val name = withContext(dispatcher) {
+            "Susan Calvin"
+        }
+
+        println("User: $name")
+    }
+
+    @Test
+    fun `이터레이터`() {
+        val iterator = iterator {
+            yield("First")
+            yield("Second")
+            yield("Third")
+        }
+
+        println(iterator.next())
+        println(iterator.next())
+        println(iterator.next())
+    }
+
+    @Test
+    fun `시퀀스`() {
+        val sequence = sequence {
+            yield(1)
+            yield(1)
+            yield(2)
+            yield(3)
+            yield(5)
+            yield(8)
+            yield(13)
+            yield(21)
+        }
+
+        sequence.forEach { print("$it ") }
+    }
+
+
+    @Test
+    fun `test`() = runBlocking {
+        val time = measureTimeMillis {
+            val dispatcher = newSingleThreadContext("asd")
+            val job1 = launch(Dispatchers.Default) { delay(1_000) }
+            val job2 = launch(Dispatchers.Default) { delay(10) }
+
+            job1.join()
+            job2.join()
+
+
+        }
+        println("Execution took $time ms")
+    }
+
+    private suspend fun delay(delay: Long): String {
+        kotlinx.coroutines.delay(delay)
+        println("delay:${delay} Thread ${Thread.currentThread().name}")
+        return "Yun"
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    @Test
+    fun `프로듀서 만들기`() {
+        val producer = GlobalScope.produce {
+            send(1)
+        }
+
+        val context = newSingleThreadContext("myThread")
+        val producer1: ReceiveChannel<Any> = GlobalScope.produce(context) {
+            send(1)
+            send("a")
+        }
+    }
+
+    val context = newSingleThreadContext("myThread")
+    val produce = GlobalScope.produce(context) {
+        for (i in 0..9) {
+            send(i)
+        }
+    }
+    @Test
+    fun `프로듀서 모든 요소 읽기`() {
+        runBlocking {
+            produce.consumeEach {
+                println(it)
+            }
+        }
+    }
+
+    @Test
+    fun `단일 요소 받기`() {
+        val produce = GlobalScope.produce {
+            send(5)
+            send("a")
+        }
+
+        runBlocking {
+            println(produce.receive())
+            println(produce.receive())
+        }
+    }
+
+    @Test
+    fun `그룹 요소 가져 오기`() {
+        val produce = GlobalScope.produce {
+            send(5)
+            send("a")
+        }
+
+        runBlocking {
+            produce.consumeEach {
+                println(it)
+            }
+        }
+
     }
 }
