@@ -11,12 +11,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.Test
 
 class Coroutines {
@@ -452,9 +457,107 @@ class Coroutines {
     fun `Unconfined test`() = runBlocking {
         GlobalScope.launch(Dispatchers.Unconfined) {
             println("Starting in ${Thread.currentThread().name}")
-
             delay(500)
             println("Resuming in ${Thread.currentThread().name}")
         }.join()
+    }
+
+
+    @Test
+    fun `newSingleThreadContext test `() = runBlocking {
+        val dispatcher = newSingleThreadContext("myThread")
+        GlobalScope.launch(dispatcher) {
+            println("Starting in ${Thread.currentThread().name}")
+            delay(500)
+            println("Resuming in ${Thread.currentThread().name}")
+        }.join()
+    }
+
+    @Test
+    fun `newFixedThreadPoolContext test`() = runBlocking {
+        val dispatcher = newFixedThreadPoolContext(4, "myPool")
+        GlobalScope.launch(dispatcher) {
+            println("Starting in ${Thread.currentThread().name}")
+            delay(500)
+            println("Resuming in ${Thread.currentThread().name}")
+        }.join()
+    }
+
+    @Test
+    fun `CoroutineExceptionHanlder test`() = runBlocking {
+        val handler = CoroutineExceptionHandler { context, throwable ->
+            println("Error capured is $context")
+            println("Message: ${throwable.message}")
+        }
+
+        GlobalScope.launch(handler) {
+            TODO()
+        }
+
+        // wait for error to happen
+        delay(500)
+    }
+
+    @Test
+    fun `non-cancellable`() = runBlocking {
+        val duration = measureTimeMillis {
+            val job = launch {
+                try {
+                    while (isActive){
+                        delay(500)
+                        println("still running")
+                    }
+                } finally {
+                    println("cancelled, will end now")
+                }
+            }
+            delay(1200)
+            job.cancelAndJoin()
+        }
+        println("Took $duration ms")
+    }
+
+    @Test
+    fun `non-cancellable 2`() = runBlocking {
+        val duration = measureTimeMillis {
+            val job = launch {
+                try {
+                    while (isActive){
+                        delay(500)
+                        println("still running")
+                    }
+                } finally {
+                    println("cancelled, will delay finalization now")
+                    delay(5000)
+                    println("delay completed, bye bye")
+                }
+            }
+            delay(1200)
+            job.cancelAndJoin()
+        }
+        println("Took $duration ms")
+    }
+
+    @Test
+    fun `non-cancellable 3`() = runBlocking {
+        val duration = measureTimeMillis {
+            val job = launch {
+                try {
+                    while (isActive){
+                        delay(500)
+                        println("still running")
+                    }
+                } finally {
+                    withContext(NonCancellable){
+                        println("cancelled, will delay finalization now")
+                        delay(5000)
+                        println("delay completed, bye bye")
+                    }
+                }
+            }
+            delay(1200)
+            job.cancelAndJoin()
+        }
+        println("Took $duration ms")
     }
 }
