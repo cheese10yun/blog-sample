@@ -1,7 +1,6 @@
 package com.spring.camp.io
 
 import kotlin.properties.Delegates
-import org.assertj.core.api.BDDAssertions
 import org.assertj.core.api.BDDAssertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -38,7 +37,7 @@ class PartnerClientMockServerTest(
             )
             .andExpect(method(HttpMethod.GET))
             .andRespond(
-                withStatus(HttpStatus.OK)
+                withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(
                         """
@@ -55,5 +54,34 @@ class PartnerClientMockServerTest(
             partnerClient.getPartnerBy(brn)
         }
             .isInstanceOf(IllegalArgumentException::class.java)
+    }
+
+    @Test
+    fun `getPartnerBy test`() {
+        //given
+        val brn = "000-00-0000"
+        val name = "주식회사 XXX"
+        mockServer
+            .expect(
+                requestTo("http://localhost:8787/api/v1/partner/${brn}")
+            )
+            .andExpect(method(HttpMethod.GET))
+            .andRespond(
+                withStatus(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(
+                        """
+                            {
+                              "brn": "$brn",
+                              "name": "$name"
+                            }
+                        """.trimIndent()
+                    )
+            )
+
+        //when & then
+        val response = partnerClient.getPartnerBy(brn)
+        then(response.brn).isEqualTo(brn)
+        then(response.name).isEqualTo("김밥천국")
     }
 }

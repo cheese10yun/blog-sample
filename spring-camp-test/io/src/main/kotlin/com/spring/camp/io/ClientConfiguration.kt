@@ -1,12 +1,13 @@
 package com.spring.camp.io
 
+import java.io.IOException
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
-import org.springframework.context.annotation.Profile
+import org.springframework.http.client.ClientHttpResponse
+import org.springframework.web.client.ResponseErrorHandler
 import org.springframework.web.client.RestTemplate
-import org.mockito.Mockito.mock
+
 
 @Configuration
 class ClientConfiguration {
@@ -14,6 +15,7 @@ class ClientConfiguration {
     @Bean
     fun partnerClientRestTemplate(): RestTemplate = RestTemplateBuilder()
         .rootUri("http://localhost:8787")
+        .errorHandler(RestTemplateErrorHandler())
         .build()
 
     @Bean
@@ -28,4 +30,16 @@ class ClientConfiguration {
 //    fun mockPartnerClientService() =
 //        mock(PartnerClientService::class.java)!!
 
+}
+
+
+class RestTemplateErrorHandler : ResponseErrorHandler {
+    @Throws(IOException::class)
+    override fun hasError(response: ClientHttpResponse): Boolean {
+        return false
+    }
+
+    @Throws(IOException::class)
+    override fun handleError(response: ClientHttpResponse) {
+    }
 }
