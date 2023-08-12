@@ -13,10 +13,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.take
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newFixedThreadPoolContext
@@ -24,6 +27,7 @@ import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.Test
+
 
 class Coroutines {
 
@@ -654,8 +658,8 @@ class Coroutines {
     fun `test`() = runBlocking {
         val time = measureTimeMillis {
             val dispatcher = newSingleThreadContext("asd")
-            val job1 = launch(Dispatchers.Default) { delay(1_000) }
-            val job2 = launch(Dispatchers.Default) { delay(10) }
+            val job1 = launch(Dispatchers.Default) { delayLogging(1_000) }
+            val job2 = launch(Dispatchers.Default) { delayLogging(10) }
 
             job1.join()
             job2.join()
@@ -665,7 +669,7 @@ class Coroutines {
         println("Execution took $time ms")
     }
 
-    private suspend fun delay(delay: Long): String {
+    private suspend fun delayLogging(delay: Long): String {
         kotlinx.coroutines.delay(delay)
         println("delay:${delay} Thread ${Thread.currentThread().name}")
         return "Yun"
@@ -691,6 +695,7 @@ class Coroutines {
             send(i)
         }
     }
+
     @Test
     fun `프로듀서 모든 요소 읽기`() {
         runBlocking {
@@ -725,6 +730,78 @@ class Coroutines {
                 println(it)
             }
         }
+    }
 
+    @Test
+    fun `채널`(): Unit = runBlocking {
+        val time = measureTimeMillis {
+            val channel = Channel<Int>()
+
+            GlobalScope.launch {
+                repeat(10) {
+                    channel.send(it)
+                    println("Sent $it")
+                }
+            }
+
+            channel.receive()
+            channel.receive()
+        }
+
+        println("Took ${time}ms")
+    }
+
+    @Test
+    fun `버퍼드 채널 LinkedListChannel`(): Unit = runBlocking {
+        val time = measureTimeMillis {
+            val channel = Channel<Int>(Channel.UNLIMITED)
+            val sender = GlobalScope.launch {
+                repeat(10) {
+                    println("Sending $it")
+                    channel.send(it)
+                }
+            }
+            delay(500)
+        }
+        println("Took ${time}ms")
+    }
+
+    @Test
+    fun `버퍼드 채널 ArraytChannel`(): Unit = runBlocking {
+        val time = measureTimeMillis {
+            val channel = Channel<Int>(4)
+            val sender = GlobalScope.launch {
+                repeat(10) {
+                    channel.send(it)
+                    println("Sent $it")
+                }
+            }
+
+            delay(500)
+            println("Taking two")
+            channel.receive()
+            channel.receive()
+            delay(500)
+        }
+
+        println("Took ${time}ms")
+    }
+
+    @Test
+    fun `버퍼드 채널 ConflatedChannel`(): Unit = runBlocking {
+        val time = measureTimeMillis {
+            val channel = Channel<Int>(Channel.CONFLATED)
+            val sender = GlobalScope.launch {
+                repeat(5) {
+                    channel.send(it)
+                    println("Sent $it")
+                }
+            }
+
+            delay(500)
+            val element = channel.receive()
+            println("Received $element")
+        }
+        println("Took ${time}ms")
     }
 }
