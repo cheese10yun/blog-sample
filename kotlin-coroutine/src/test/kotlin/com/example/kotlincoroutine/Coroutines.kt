@@ -14,7 +14,6 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.take
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.produce
@@ -803,5 +802,27 @@ class Coroutines {
             println("Received $element")
         }
         println("Took ${time}ms")
+    }
+
+    @Test
+    fun `코루틴 단일 스레드로 한정`() : Unit = runBlocking {
+        val context = newSingleThreadContext("counter")
+        val workerA = asyncIncrement(2_000, context)
+        val workerB = asyncIncrement(100, context)
+
+        workerA.await()
+        workerB.await()
+
+        print("Counter [$counter]")
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun asyncIncrement(
+        by: Int,
+        context: CoroutineContext
+    ) = GlobalScope.async(context) {
+        for (i in 0 until by) {
+            counter++
+        }
     }
 }
