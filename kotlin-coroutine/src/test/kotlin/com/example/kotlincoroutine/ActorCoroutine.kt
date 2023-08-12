@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.junit.jupiter.api.Test
+import java.util.concurrent.atomic.AtomicInteger
 
 
 class ActorCoroutine {
@@ -99,7 +100,7 @@ class ActorCoroutine2 {
 class ActorCoroutine3 {
 
     @Test
-    fun `actor buffer`() : Unit = runBlocking {
+    fun `actor buffer`(): Unit = runBlocking {
         val bufferedPrinter = actor<String>(capacity = 10) {
             for (msg in channel)
                 println(msg)
@@ -123,8 +124,8 @@ class ActorCoroutine4 {
     }
 
     @Test
-    fun `actor buffer`() : Unit = runBlocking {
-        for (i in 1..10){
+    fun `actor buffer`(): Unit = runBlocking {
+        for (i in 1..10) {
             actor.send("a")
         }
     }
@@ -140,8 +141,8 @@ class ActorCoroutine5 {
     }
 
     @Test
-    fun `actor buffer`() : Unit = runBlocking {
-        for (i in 1..10){
+    fun `actor buffer`(): Unit = runBlocking {
+        for (i in 1..10) {
             actor.send("a")
         }
     }
@@ -175,7 +176,6 @@ class ActorCoroutine6 {
 
 class ActorCoroutine7 {
 
-
     @Test
     fun `코루틴 단일 스레드로 한정`(): Unit = runBlocking {
         val mutex = Mutex()
@@ -196,6 +196,54 @@ class ActorCoroutine7 {
         mutex.tryLock() // true
         mutex.unlock()
     }
+}
+
+class ActorCoroutine8 {
+    @Volatile
+    var shutdownRequested = false
+}
+
+class Something {
+    @Volatile
+    private var type = 0
+    private var title = ""
+
+    fun setTitle(newTitle: String) {
+        when (type) {
+            0 -> title = newTitle
+            else -> throw Exception("Invalid State")
+        }
+    }
+}
+
+class DataProcessor {
+    @Volatile
+    private var shutdownRequested = false
+
+    fun shutdown() {
+        shutdownRequested = true
+    }
+
+    fun process(){
+        while(shutdownRequested.not()){
+            // process away
+        }
+    }
+}
+
+class ActorCoroutine_9 {
+
+    var counter = AtomicInteger()
+
+    fun asyncIncrement(by: Int) = GlobalScope.async() {
+        for (i in 0 until by) {
+            counter.incrementAndGet()
+        }
+    }
+}
+
+class ActorCoroutine_ {
+
 }
 
 
