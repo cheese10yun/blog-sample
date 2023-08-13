@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.actor
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
@@ -240,6 +241,31 @@ class ActorCoroutine_9 {
             counter.incrementAndGet()
         }
     }
+}
+
+class ActorCoroutine_10 {
+
+
+
+
+    @Test
+    fun suspendTest2() :Unit = runBlocking {
+
+        suspend2()
+        suspend1()
+    }
+
+    suspend fun suspend2(){
+        println("suspend2 start")
+        delay(1000)
+        println("suspend2 end")
+    }
+
+    suspend fun suspend1(){
+        println("suspend1 start")
+        println("suspend1 end")
+    }
+
 }
 
 class ActorCoroutine_ {
