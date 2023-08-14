@@ -245,9 +245,6 @@ class ActorCoroutine_9 {
 
 class ActorCoroutine_10 {
 
-
-
-
     @Test
     fun suspendTest2() :Unit = runBlocking {
 
@@ -266,6 +263,23 @@ class ActorCoroutine_10 {
         println("suspend1 end")
     }
 
+}
+
+class ActorCoroutine_11 {
+
+//    private val log = kLogger
+
+    val threadLocal = ThreadLocal<String>()
+        .also {
+            it.set("hello")
+        }
+
+    @Test
+    fun name() {
+
+
+
+    }
 }
 
 class ActorCoroutine_ {
