@@ -10,9 +10,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
 class CoroutineStud4 {
-
     private val log = kLogger()
-
 
     @Test
     fun `flow test`(): Unit = runBlocking {
