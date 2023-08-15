@@ -294,3 +294,35 @@ Process finished with exit code 0
   * label을 변경하고 재귀 호출을 통해서 transition
 
 ## 동기, 비동기, Coroutine
+
+# Coroutine Context 이해
+
+
+```kotlin
+fun main() {
+    val getting = ThreadLocal<String>()
+
+    getting.set("Hello")
+
+
+    runBlocking {
+
+        log.info("thread: ${Thread.currentThread().name}")
+        log.info("getting: ${getting.get()}")
+
+        launch(Dispatchers.IO) {
+
+            log.info("thread: ${Thread.currentThread().name}")
+            log.info("getting: ${getting.get()}")
+
+        }
+    }
+}
+```
+
+```
+18:20:17.251 [main] INFO - thread: main
+18:20:17.253 [main] INFO - getting: Hello
+18:20:17.257 [DefaultDispatcher-worker-1] INFO - thread: DefaultDispatcher-worker-1
+18:20:17.257 [DefaultDispatcher-worker-1] INFO - getting: null
+```
