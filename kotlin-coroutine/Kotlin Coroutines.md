@@ -360,11 +360,11 @@ fun main(): Unit = runBlocking {
 * (1): runBlocking의 CoroutineContext이 사용된다.
 * (2): 새로운 CoroutineContext을 만들고 이름을 withContext 으로 지정한다.
 * (3): 새로운 CoroutineContext에서 CoroutineContext 정보를 출력한다. runBlocking의 CoroutineContext와는 다른 CoroutineContext가 할당된다.
-* (4): 새로운 CoroutineContext에서 launch를 실행하는데 딜레이를 200ms 주고 로그를 찍는다. **여기서 중요한 점은 해당 딜레이를 모두 지나야지 launch 스코프를 나오게된다. ** 
+* (4): 새로운 CoroutineContext에서 launch를 실행하는데 딜레이를 200ms 주고 로그를 찍는다. **여기서 중요한 점은 해당 딜레이를 모두 지나야지 launch 스코프를 나오게된다.** 
 * (5): runBlocking의 CoroutineContext에서 딜레이를 50ms를 주고 로그를 찍는다. runBlocking의 CoroutineContext 이기 떄문에 (6)번 로그가 먼저 찍히고 딜레이 50ms 이후 launch의 로그가 찍힌다.
 
 
-중요 포인트는 CoroutineContext안에서 새로운 CoroutineContext를 만들면 새로운 CoroutineContext에서 모든 작업이 동기식으로 동작한다는 것이다. 반면 동일 CoroutineContext안에서는 (6)의 로그가 찍히고 (5)의 딜레이 이후 로그가 찍힌다 
+**중요 포인트는 CoroutineContext안에서 새로운 CoroutineContext를 만들면 새로운 CoroutineContext에서 모든 작업이 동기식으로 동작한다는 것이다. 반면 동일 CoroutineContext안에서는 (6)의 로그가 찍히고 (5)의 딜레이 이후 로그가 찍힌다.** 
 
 ```
 [main] - start context in runBlocking: [BlockingCoroutine{Active}@157632c9, BlockingEventLoop@6ee12bac]
