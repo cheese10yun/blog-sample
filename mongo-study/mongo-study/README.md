@@ -437,15 +437,14 @@ Single Document -> Transaction -> Replica Set Member -> Sharded Cluster Shard
 | secondaryPreferred | 가능하면 Secondary에서 읽고 없으면 primary로 요청 |
 | nearest            | 평균 Ping 시간을 기반으로 지연율이 가장 낮은 멤버로 요청  |
 
- 
 ## Read/Write Concern
 
-
 ### Write Concern
+
 ![img.png](images/img-1.png)
 
-* w: majority 과반수의 secondary에서 apply를 한 경우 동기화 완료처리, 위 상황에서는 primary 1개 secondary가 2개이기 때문에 1개만 apply 완료되면 replica set에 적용이 완료됐다고 판단 
- 
+* w: majority 과반수의 secondary에서 apply를 한 경우 동기화 완료처리, 위 상황에서는 primary 1개 secondary가 2개이기 때문에 1개만 apply 완료되면 replica set에 적용이 완료됐다고 판단
+
 ### Read Concern Level
 
 | Read Concern 종류 | 설명                                     |
@@ -455,7 +454,6 @@ Single Document -> Transaction -> Replica Set Member -> Sharded Cluster Shard
 | majority        | Member 과반수가 들고 있는 동일한 데이터를 반환          |
 | lineeaizable    | 쿼리 수행 전에 모든 Majority Write가 반영된 결과를 반환 |
 | snapshot        | 특정 시점에 대한 결과를 반환(Point-In-Time Query)  |
-
 
 ![img.png](images/img-2.png)
 
@@ -467,3 +465,95 @@ Single Document -> Transaction -> Replica Set Member -> Sharded Cluster Shard
 
 # MongoDB Index 기본 구조와 효율적인 탐색
 
+## Compound index & ESR Rule
+
+```
+db.products.creaateIndex( {"item": 1, "stock": 1, "price": 1} )
+```
+
+```
+db.products.find({item: "Banana"})
+db.products.find({item: "Banana", stock: {$gt: 5})
+db.products.find({item: "Banana", stock: {$gt: 5}, price: { $gt:10000 })
+```
+
+item 으로 조회하는 경우 복합 인덱스 보다 item만을 인덱스로 생성하는게 좋다. 불필요한 인덱스를 생성하면 인덱스 때문에 용량이 증가되고 insert 성능도 크게 떨어지기 때문이다.
+
+### ESR Rule
+
+* E = Equal
+* S = Sort
+* R = Range
+
+| 명칭          | 설명                    | Query                                                    |
+|-------------|-----------------------|:---------------------------------------------------------|
+| E           | Equality First        |                                                          |
+| E -> R      | Equality Before Range | find({gamertag: "Ace", level: {$gt:50})                  |
+| E -> S      | Equality Before Sort  | find({gamertag: "Ace"}).sort({score:1})                  |
+| S -> R      | Sort Before Range     | find({level: {$gt: 50}).sort({score:1})                  |
+| E -> S -> R | Equality Sort Range   | find({gamertag: "Ace", level: {$gt: 50}).sort({score:1}) |
+
+ 
+E -> S -> R 순으로 인덱스를 태우는게 대체로 빠르다
+
+
+#### E -> R Equality Before Range
+
+```
+find({gamertag: "Ace", level: {$gt:50})
+```
+
+![img.png](images/001.png)
+
+gamertag 인덱스키로 Ace를 먼저 찾고 level을 범위로 필터링하는게 훨씬 더 효율적이다.  
+
+
+#### E -> S Equality Before Sort
+
+```
+find({gamertag: "Ace"}).sort({score:1})
+```
+
+![img.png](images/004.png)
+
+gamertag 인덱스키로 Ace를 먼저 찾고 score으로 정렬하는 것이 훨씬 더 효율적이다.
+
+
+#### S -> R Sort Before Range
+
+```
+find({level: {$gt: 50}).sort({score:1})
+```
+
+![img.png](images/002.png)
+
+대부분의 경우 Sort 비용이 Range의 비용 보다 저렴하다. 위 이미지에서는 정렬 필드인 score를 먼저 보게 되는 경우 더 많은 인덱스를 읽게 되어 level를 먼저 보는 것보다 더 비효율적으로 보인다. 하지만 인덱스 키를 읽는 것은 생각보다 더 저렴한 비용이 발생하고 정렬을 하는 것은 생각보다 더 큰 비용이 발생한다. 그러기 떄문에 score를 먼저 봐서 인덱스키를 더 많이 보는건 맞지만 그 비용이 저렴하고 추후 에 있을 정렬 비용까지 생각하면 score 부터 읽고 level을 정렬하는것이 더 효율적이다. 물론 이것은 모든 경우에 해당하는 것은 아니며 인덱스, 컬렉션 데이터양에 따라서 다르다.
+
+
+#### E -> S -> R Equality Sort Range
+
+```
+find({gamertag: "Ace", level: {$gt: 50}).sort({score:1})
+```
+
+![img.png](images/003.png)
+
+대부분의 경우 E -> S -> R 성립한다. 하지만 모든 케이스에 대해서 성립하는 것은 아니다.
+
+
+```
+find({gamertag: "Ace", date: {$gt: 2022}).sort({score:1})
+```
+
+![img.png](images/005.png)
+
+2022년도 데이터가 1개뿐이라면 E -> S -> R 으로 조회하면 불필요한 데이터를 더 많이 읽게된다. 하지만 정렬 필드를 제외하고 E -> R으로만 검색하면 1개의 인덱스 키만 탐색하게 된다.
+
+실행 계획을 보면 정렬이 포함된 쿼리의 경우 9001개의 인덱스 키를 찾아서 최종적으로 1개의 도큐먼트를 반환하지만 정렬이 없는 경우는 1개의 인덱스 키를 찾아 1개의 도큐먼트를 응답한다. 물론 인덱덱스 키에 대한 조회는 비용이 저렴하기 떄문에 9001개를 찾는 응답은 23ms 으로 빠르게 응답했다. 그래도 정렬이 없는 쿼리는 0ms으로 더 훨씬더 빠르다. 한 번의 조회는 큰 차이는 없을 수 있지만 여러번의 조회를 지속적으로하면 23ms도 유의미한 차이를 발생 시킨다.
+
+
+### 실습
+
+```
+db.zips.getIndexes()
+```
