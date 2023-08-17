@@ -554,6 +554,186 @@ find({gamertag: "Ace", date: {$gt: 2022}).sort({score:1})
 
 ### 실습
 
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
 ```
 db.zips.getIndexes()
 ```
+
+```json
+[
+  {
+    "key": {
+      "_id": 1
+    },
+    "name": "_id_",
+    "v": 2
+  }
+]
+```
+* 기본적으로 _id 필드는 인덱스 필드로 설정된다.
+
+```
+db.zips.find(
+    {
+        state: "LA",
+        pop: {
+            $gt: 40000
+        }
+    }
+).sort({city: 1}).explain('executionStats')
+```
+* 실행 계획을 확인 가능
+
+```json
+{
+  "executionStats": {
+    "executionSuccess": true,
+    "nReturned": 13,
+    "executionTimeMillis": 22,
+    "totalKeysExamined": 0,
+    "totalDocsExamined": 29470,
+    ...
+  }
+}
+```
+* nReturned: 반환된 도큐먼트
+* executionTimeMillis: 실행 시간
+* totalKeysExamined: 인덱스 키를 몇개나 탐색했는지
+* totalDocsExamined: 키를 통해서 몇개의 도큐먼트를 조회 했는지
+
+13개를 도큐먼트를 반환하는데 29470개의 도큐먼트를 조회했다고 분석이 가능하다.
+
+
+```
+# 인덱스 생성
+db.zips.createIndex({state: 1})
+
+# 인덱스 확인
+db.zips.getIndexes()
+```
+
+```
+[
+  {
+    "key": {
+      "_id": 1
+    },
+    "name": "_id_",
+    "v": 2
+  },
+  {
+    "key": {
+      "state": 1
+    },
+    "name": "state_1",
+    "v": 2
+  }
+]
+```
+* state 인덱스 키 추가된 것을 확인 
+
+
+```json
+{
+  "executionStats": {
+    "executionSuccess": true,
+    "nReturned": 13,
+    "executionTimeMillis": 2,
+    "totalKeysExamined": 469,
+    "totalDocsExamined": 469
+  },
+  ...
+  "inputStage": {
+    "stage": "IXSCAN",
+    "nReturned": 469,
+    ...
+    "keyPattern": {
+      "state": 1
+    },
+  },
+  ..
+}
+```
+* executionTimeMillis 수행된 시간이 줌
+* totalKeysExamined: 인덱스 키 탐색 확
+* totalDocsExamined: 인덱스 키를 통해서 조회한 결과 확인 
+* stage: IXSCAN = 인덱스 스켄 진행
+* keyPattern: 사용한 인덱스 키
+
+
+```
+# E -> S -> R 룰 적용
+db.zips.createIndex({state: 1, city: 1, pop: 1})
+```
+* equal = state
+* sort = city
+* range = pop 적용
+
+
+```json
+{
+  "executionStats": {
+    "executionSuccess": true,
+    "nReturned": 13,
+    "executionTimeMillis": 3,
+    "totalKeysExamined": 419,
+    "totalDocsExamined": 13,
+    ...
+    "keyPattern": {
+      "state": 1,
+      "city": 1,
+      "pop": 1
+    },
+  }
+}
+```
+* totalKeysExamined 인덱스 키를 탐색한 것은 419
+* totalDocsExamined 도큐먼트를 탐색한 것은 13, nReturned 반환된 13개와 동일 즉 인덱스를 통해 정확하게 가져옴
+* keyPattern: 인덱스 순서대로 적용 확인
+* sort하는 부분이 없음, 인덱스를 통해서 city가 정렬되어 있기 때문에 인덱스 정렬을 그대로 사용
+
+```
+db.zips.find(
+    {
+        state: "LA",
+        pop: {
+            $gt: 40000
+        }
+    },
+    {
+        _id: 0,
+        state: 1,
+        pop: 1,
+        city: 1
+    }
+)
+    .sort({city: 1})
+    .explain('executionStats')
+```
+* 인덱스 키만 프로젝션
+
+```json
+{
+  "executionStats": {
+    "executionSuccess": true,
+    "nReturned": 13,
+    "executionTimeMillis": 2,
+    "totalKeysExamined": 419,
+    "totalDocsExamined": 0,
+    "executionStages": {
+      "stage": "PROJECTION_COVERED",
+      ...
+    }
+}
+```
+* totalDocsExamined = 0, 인덱스 키만 프로젝션 조회하는 경우 도큐먼트를 다시 읽으로 가지 않아도 됨
+
+</div>
+</details>
+
+
+
+
