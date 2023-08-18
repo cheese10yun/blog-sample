@@ -493,9 +493,7 @@ item 으로 조회하는 경우 복합 인덱스 보다 item만을 인덱스로 
 | S -> R      | Sort Before Range     | find({level: {$gt: 50}).sort({score:1})                  |
 | E -> S -> R | Equality Sort Range   | find({gamertag: "Ace", level: {$gt: 50}).sort({score:1}) |
 
- 
 E -> S -> R 순으로 인덱스를 태우는게 대체로 빠르다
-
 
 #### E -> R Equality Before Range
 
@@ -505,8 +503,7 @@ find({gamertag: "Ace", level: {$gt:50})
 
 ![img.png](images/001.png)
 
-gamertag 인덱스키로 Ace를 먼저 찾고 level을 범위로 필터링하는게 훨씬 더 효율적이다.  
-
+gamertag 인덱스키로 Ace를 먼저 찾고 level을 범위로 필터링하는게 훨씬 더 효율적이다.
 
 #### E -> S Equality Before Sort
 
@@ -518,7 +515,6 @@ find({gamertag: "Ace"}).sort({score:1})
 
 gamertag 인덱스키로 Ace를 먼저 찾고 score으로 정렬하는 것이 훨씬 더 효율적이다.
 
-
 #### S -> R Sort Before Range
 
 ```
@@ -528,7 +524,6 @@ find({level: {$gt: 50}).sort({score:1})
 ![img.png](images/002.png)
 
 대부분의 경우 Sort 비용이 Range의 비용 보다 저렴하다. 위 이미지에서는 정렬 필드인 score를 먼저 보게 되는 경우 더 많은 인덱스를 읽게 되어 level를 먼저 보는 것보다 더 비효율적으로 보인다. 하지만 인덱스 키를 읽는 것은 생각보다 더 저렴한 비용이 발생하고 정렬을 하는 것은 생각보다 더 큰 비용이 발생한다. 그러기 떄문에 score를 먼저 봐서 인덱스키를 더 많이 보는건 맞지만 그 비용이 저렴하고 추후 에 있을 정렬 비용까지 생각하면 score 부터 읽고 level을 정렬하는것이 더 효율적이다. 물론 이것은 모든 경우에 해당하는 것은 아니며 인덱스, 컬렉션 데이터양에 따라서 다르다.
-
 
 #### E -> S -> R Equality Sort Range
 
@@ -540,7 +535,6 @@ find({gamertag: "Ace", level: {$gt: 50}).sort({score:1})
 
 대부분의 경우 E -> S -> R 성립한다. 하지만 모든 케이스에 대해서 성립하는 것은 아니다.
 
-
 ```
 find({gamertag: "Ace", date: {$gt: 2022}).sort({score:1})
 ```
@@ -550,7 +544,6 @@ find({gamertag: "Ace", date: {$gt: 2022}).sort({score:1})
 2022년도 데이터가 1개뿐이라면 E -> S -> R 으로 조회하면 불필요한 데이터를 더 많이 읽게된다. 하지만 정렬 필드를 제외하고 E -> R으로만 검색하면 1개의 인덱스 키만 탐색하게 된다.
 
 실행 계획을 보면 정렬이 포함된 쿼리의 경우 9001개의 인덱스 키를 찾아서 최종적으로 1개의 도큐먼트를 반환하지만 정렬이 없는 경우는 1개의 인덱스 키를 찾아 1개의 도큐먼트를 응답한다. 물론 인덱덱스 키에 대한 조회는 비용이 저렴하기 떄문에 9001개를 찾는 응답은 23ms 으로 빠르게 응답했다. 그래도 정렬이 없는 쿼리는 0ms으로 더 훨씬더 빠르다. 한 번의 조회는 큰 차이는 없을 수 있지만 여러번의 조회를 지속적으로하면 23ms도 유의미한 차이를 발생 시킨다.
-
 
 ### 실습
 
@@ -573,6 +566,7 @@ db.zips.getIndexes()
   }
 ]
 ```
+
 * 기본적으로 _id 필드는 인덱스 필드로 설정된다.
 
 ```
@@ -585,6 +579,7 @@ db.zips.find(
     }
 ).sort({city: 1}).explain('executionStats')
 ```
+
 * 실행 계획을 확인 가능
 
 ```json
@@ -599,13 +594,13 @@ db.zips.find(
   }
 }
 ```
+
 * nReturned: 반환된 도큐먼트
 * executionTimeMillis: 실행 시간
 * totalKeysExamined: 인덱스 키를 몇개나 탐색했는지
 * totalDocsExamined: 키를 통해서 몇개의 도큐먼트를 조회 했는지
 
 13개를 도큐먼트를 반환하는데 29470개의 도큐먼트를 조회했다고 분석이 가능하다.
-
 
 ```
 # 인덱스 생성
@@ -633,8 +628,8 @@ db.zips.getIndexes()
   }
 ]
 ```
-* state 인덱스 키 추가된 것을 확인 
 
+* state 인덱스 키 추가된 것을 확인
 
 ```json
 {
@@ -652,26 +647,26 @@ db.zips.getIndexes()
     ...
     "keyPattern": {
       "state": 1
-    },
+    }
   },
   ..
 }
 ```
+
 * executionTimeMillis 수행된 시간이 줌
 * totalKeysExamined: 인덱스 키 탐색 확
-* totalDocsExamined: 인덱스 키를 통해서 조회한 결과 확인 
+* totalDocsExamined: 인덱스 키를 통해서 조회한 결과 확인
 * stage: IXSCAN = 인덱스 스켄 진행
 * keyPattern: 사용한 인덱스 키
-
 
 ```
 # E -> S -> R 룰 적용
 db.zips.createIndex({state: 1, city: 1, pop: 1})
 ```
+
 * equal = state
 * sort = city
 * range = pop 적용
-
 
 ```json
 {
@@ -686,10 +681,11 @@ db.zips.createIndex({state: 1, city: 1, pop: 1})
       "state": 1,
       "city": 1,
       "pop": 1
-    },
+    }
   }
 }
 ```
+
 * totalKeysExamined 인덱스 키를 탐색한 것은 419
 * totalDocsExamined 도큐먼트를 탐색한 것은 13, nReturned 반환된 13개와 동일 즉 인덱스를 통해 정확하게 가져옴
 * keyPattern: 인덱스 순서대로 적용 확인
@@ -713,6 +709,7 @@ db.zips.find(
     .sort({city: 1})
     .explain('executionStats')
 ```
+
 * 인덱스 키만 프로젝션
 
 ```json
@@ -727,8 +724,9 @@ db.zips.find(
       "stage": "PROJECTION_COVERED",
       ...
     }
-}
+  }
 ```
+
 * totalDocsExamined = 0, 인덱스 키만 프로젝션 조회하는 경우 도큐먼트를 다시 읽으로 가지 않아도 됨, 즉 인덱스 키 필드만 프로젝을 진행하면 인덱스 키에서 찾은 값을 그대로 사용
 
 </div>
@@ -736,12 +734,11 @@ db.zips.find(
 
 ## Multikey index
 
-### Multikey index 개념 
+### Multikey index 개념
 
 ![img.png](images/005.png)
 
 배열로 2개의 도큐먼트로 표현하고, 하나는 오브젝트로 4개의 도큐먼트를 표현한 경우더라도 인덱스 키의 카운트는 동일하다. **Multikey index는 배열의 모든 요소 하나 하나가 인덱스 키가 된다.** Multikey index는 도큐먼트 하나가 바라보는 키가 여러개가 존재하기 떄문에 Multikey index 라고 한다.
-
 
 ### Multikey index 비용
 
@@ -763,7 +760,6 @@ db.collection.createIndex({ratings:1})
 
 Multikey index는 배열의 크기가 작은 경우 사용하는 경우 좋다. Document의 전체 크기도 중요하겠지만 배열 필드에 천개 요소가 넘어가는 경우 성능적인 부분을 고려해봐야함.
 
-
 ### Multikey index 실습
 
 <details>
@@ -772,13 +768,15 @@ Multikey index는 배열의 크기가 작은 경우 사용하는 경우 좋다. 
 
 ```json
 // 멀티키 인덱스키 생성
-db.data.createIndex({sections: -1})
+db.data.createIndex({
+  sections: -1
+})
 
 // 실행 계획 조회
 db.data.find(
-    {
-        sections: 'AG1'
-    }
+{
+  sections: 'AG1'
+}
 ).explain('executionStats')
 ```
 
@@ -790,9 +788,10 @@ db.data.find(
       "sections": -1
     },
     "indexName": "sections_-1",
-    "isMultiKey": true,
-}
+    "isMultiKey": true
+  }
 ```
+
 * isMultiKey: 멀티키 인덱스 사용
 
 ```
@@ -814,12 +813,12 @@ db.grades.find(
 {
   ...
   "indexName": "scores.type_1",
-  "isMultiKey": true, 
+  "isMultiKey": true
 }
 ```
+
 * indexName: 인덱스 정상 사용 확인
 * isMultiKey: 멀티키 인덱스 사용 여부 확인
-
 
 ```
 # 기존 인덱스 제거
@@ -852,10 +851,13 @@ db.grades.find(
   "isMultiKey": true,
   "multiKeyPaths": {
     "class_id": [],
-    "scores.type": ["scores"]
-  },
+    "scores.type": [
+      "scores"
+    ]
+  }
 }
 ```
+
 * keyPattern: Compound Index 사용 확인
 * isMultiKey: Compound Index를 사용 하고 Multikey index도 사용하는 것을 확인
 
@@ -864,7 +866,6 @@ db.grades.find(
 
 ## Index의 다양한 속성
 
- 
 ### TTL Index 실습
 
 <details>
@@ -942,14 +943,103 @@ db.unique.insertOne(
 </div>
 </details>
 
+### Sparse index
+
+필드가 존재하는 경우에만 인덱스에 포함 시키는 속성
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+```
+// sample data index
+db.sparse.insertOne({x:1})
+db.sparse.insertOne({x:2})
+db.sparse.insertOne({y:2})
+
+// sparse index 생성
+db.sparse.createIndex(
+    { x: 1 },
+    { sparse: true }
+)
+
+// 전체 조회시 x:1, x:2, y:2 조회 
+db.sparse.find()
+
+// 전체 조회 + hint 으로 인덱스 조회시 x:1, x:2 조회, 인덱스 걸린 데이터만 조회 
+db.sparse.find().hint({x:1})
+```
+
+</div>
+</details>
+
+### Hidden index
+
+Hidden index는 실행 계획에서 숨겨서 해당 인덱스를 사용하지 못하게 하는 기능, 운영중인 서비스에서 특정 인덱스를 드롭하고 싶은 경우 드롭시 부정적인 영향이 있는 경우 Hidden index으로 처리
+
+## Index 생성 주의사항
+
+### Background Option
+
+```
+db.collection.createIndex({a: 1}, {background: true})
+```
+
+4.2 버전 이전까지 background 옵션을 설정하지 않으면 index를 빠르게 생성할 수 있지만, Database 단위의 Lock을 걸어서 index 생성이 완료될 때 까지 Read/Write가 막힌다. 4.2 이상 버전 부터는 background가 기본 true 으로 변경됨
+
+### 구분 검사  취약
+
+```
+// 구분 검사가 취약하기 때문에 실제로 백그라운드에서 동작하지 않는다.
+db.collection.createIndex(
+  { "deleteData": 1 }, 
+  { expireAfterSeconds: 60 } ,
+  { background: true }
+)
+
+// 2번째 인자로 background 넘겨 정상동작한다.
+db.collection.createIndex(
+  { "deleteData": 1 }, 
+  { expireAfterSeconds: 60, background: true }
+)
+```
+
+### Rolling Index Builds
+
+4.4 이전 까지는 index는 내부적으로 Primary에서 생성 완료하고 Secondary에 복제한다. index 생성으로 인해서 발생하는 성능저하를 줄이기 위해 멤버 하나씩 접속해서 Rolling 형태로 index를 생성 했다.
+
+* 하지만 너무 번거롭다.
+* Unique Index는 Collection에 대해서 Write가 없다는 것을 확인하고 생성해야 한다.
+* Index 생성 시간이 Oplog Window Hour보다 작아야 한다.
 
 
+4.4 이후 부터는 Primary, Secondary를 내부적으로 동시에 인덱스를 생성하여 Rolling 방식은 더이상 사용하지 않는다.
 
 
+### Drop Index
+
+4.4 이전 까지는 Index는 내부적으로 Primary에서 생성을 완료하고 Secondary에서 복제한다. Primary에서 생성을 완료하고 Secondary로 복제되는 도중에 Index를 Drop하면, Secondary에서 복제를 멈추는 문제가 있다. 즉 Index가 큰 경우, 복제 지연이 발생할 수 있다.
+
+4.4 이후 부터는 Primary, Secondary를 내부적으로 동시에 인덱스를 생성하여 해당 문제가 없다. 
 
 
+### Resumable Index Build
+
+버전 5.0 부터 index를 생성 중에 정상적으로, process가 shutdown되면 다시 기동 되었을 때 기존의 progress에서 index가 생성된다. **비정상적으로 shutdown된 경우는 처음부터 index를 다시 생성한다.**
 
 
+### 내장된 Document Index 생성
+
+필터링에서 Document의 모든 필드의 순서도 같을 때만 Index를 사용하기 때문에 내장 Document 필드 자체에 Index를 만드는 것을 피한다.
 
 
+# Advanced Querying
 
+## lockup 이론 
+
+> Accessed Together Stays Together (접근하는 정보는 같이 저장되고 있다.)
+> Please Embed your Document`s Avoid Join`s (조인 사용하지 말고 Embemed를 사용해라.)
+
+MongoDb는 Left outer Join 형태로만 Join을 지원하고 Lockup 이라고 한다. 
+
+## lockup 실습
