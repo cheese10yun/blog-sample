@@ -560,7 +560,7 @@ find({gamertag: "Ace", date: {$gt: 2022}).sort({score:1})
 
 ```
 db.zips.getIndexes()
-```
+``` 
 
 ```json
 [
@@ -729,10 +729,226 @@ db.zips.find(
     }
 }
 ```
-* totalDocsExamined = 0, 인덱스 키만 프로젝션 조회하는 경우 도큐먼트를 다시 읽으로 가지 않아도 됨
+* totalDocsExamined = 0, 인덱스 키만 프로젝션 조회하는 경우 도큐먼트를 다시 읽으로 가지 않아도 됨, 즉 인덱스 키 필드만 프로젝을 진행하면 인덱스 키에서 찾은 값을 그대로 사용
 
 </div>
 </details>
+
+## Multikey index
+
+### Multikey index 개념 
+
+![img.png](images/005.png)
+
+배열로 2개의 도큐먼트로 표현하고, 하나는 오브젝트로 4개의 도큐먼트를 표현한 경우더라도 인덱스 키의 카운트는 동일하다. **Multikey index는 배열의 모든 요소 하나 하나가 인덱스 키가 된다.** Multikey index는 도큐먼트 하나가 바라보는 키가 여러개가 존재하기 떄문에 Multikey index 라고 한다.
+
+
+### Multikey index 비용
+
+```
+# Document 1
+{_id: 1, item: "ABC", ratings: [2, 5, 7]}
+
+# Document 2
+{_id: 1, item: "ABC", ratings: [2]}
+
+db.collection.createIndex({ratings:1})
+
+# 발생 비용 단순계산
+# _id: 1 ---> 1 + 1.5 * 3 = 5.5
+# _id: 2 ---> 1 + 1.5 * 2 = 2.5
+```
+
+실제 Collection에 Document를 지정하는 비율을 1이라고 가정하면 **index key entry를 추가하고 삭제하는 작업은 1.5정도 비용이 필요하다고 한다.**
+
+Multikey index는 배열의 크기가 작은 경우 사용하는 경우 좋다. Document의 전체 크기도 중요하겠지만 배열 필드에 천개 요소가 넘어가는 경우 성능적인 부분을 고려해봐야함.
+
+
+### Multikey index 실습
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+```json
+// 멀티키 인덱스키 생성
+db.data.createIndex({sections: -1})
+
+// 실행 계획 조회
+db.data.find(
+    {
+        sections: 'AG1'
+    }
+).explain('executionStats')
+```
+
+```json
+{
+  "inputStage": {
+    "stage": "IXSCAN",
+    "keyPattern": {
+      "sections": -1
+    },
+    "indexName": "sections_-1",
+    "isMultiKey": true,
+}
+```
+* isMultiKey: 멀티키 인덱스 사용
+
+```
+# 오브젝트 안의 배열에 인덱스 생성
+db.grades.createIndex({"scores.type": 1})
+
+# 인덱스 확인
+db.grades.getIndexes()
+
+# 실행 계획 확인
+db.grades.find(
+    {
+        "scores.type": "exam"
+    }
+).explain("executionStats") 
+```
+
+```json
+{
+  ...
+  "indexName": "scores.type_1",
+  "isMultiKey": true, 
+}
+```
+* indexName: 인덱스 정상 사용 확인
+* isMultiKey: 멀티키 인덱스 사용 여부 확인
+
+
+```
+# 기존 인덱스 제거
+db.grades.dropIndex({"scores.type": 1})
+
+# compound index 생성
+db.grades.createIndex(
+    {class_id: 1, "scores.type": 1}
+)
+
+# 실행계획 조회
+db.grades.find(
+    {
+        "scores.type": "exam",
+        class_id: {
+            $gte: 350
+        }
+    }
+    ).explain("executionStats")
+```
+
+```json
+{
+  ...
+  "keyPattern": {
+    "class_id": 1,
+    "scores.type": 1
+  },
+  "indexName": "class_id_1_scores.type_1",
+  "isMultiKey": true,
+  "multiKeyPaths": {
+    "class_id": [],
+    "scores.type": ["scores"]
+  },
+}
+```
+* keyPattern: Compound Index 사용 확인
+* isMultiKey: Compound Index를 사용 하고 Multikey index도 사용하는 것을 확인
+
+</div>
+</details>
+
+## Index의 다양한 속성
+
+ 
+### TTL Index 실습
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+```
+// sample data insert
+db.ttl.insertMany(
+    [
+        {msg: "Hello!", time: new ISODate},
+        {msg: "HelloWorld!", time: new ISODate}
+    ]
+)
+
+// TTL Index 추가
+db.ttl.createIndex(
+    {time: 1},
+    {expireAfterSeconds: 60},
+)
+
+// TTL 시간 이후 데이터 제거됨
+db.ttl.find()
+```
+
+### Unique Index 실습
+
+<details>
+<summary>접기/펼치기</summary>
+<div markdown="1">
+
+```
+// 유니크 인덱스 생성
+db.unique.createIndex(
+    {name: 1},
+    {unique: true}
+)
+
+// sample data insert
+db.unique.insertMany([
+    {"name": "tom"},
+    {"name": "john"},
+])
+
+// 중복 data insert 오류
+db.unique.insertOne({"name": "tom"},)
+
+Write operation error on server ac-rq5pfw3-shard-00-01.qhhygdz.mongodb.net:27017. Write error: WriteError{code=11000, message='E11000 duplicate key error collection: test.unique index: name_1 dup key: { name: "tom" }', details={}}.
+
+// 기존 인덱스 삭제
+db.unique.dropIndexes({name: 1})
+
+// Compound 인덱스 생성
+db.unique.createIndex(
+    {name: 1, age: 1},
+    {unique: true}
+)
+
+// sample data insert
+db.unique.insertOne(
+    {"name": "james", age:24}
+)
+
+// 중복 data insert 오류
+db.unique.insertOne(
+    {"name": "james", age:24}
+)
+
+// age 25, 다른 값 입력 가능
+db.unique.insertOne(
+    {name: "james", age: 25}
+)
+```
+
+</div>
+</details>
+
+
+
+
+
+
+
+
 
 
 
