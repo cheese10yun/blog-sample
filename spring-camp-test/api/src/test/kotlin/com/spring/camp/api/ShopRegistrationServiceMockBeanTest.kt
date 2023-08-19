@@ -46,10 +46,10 @@ class ShopRegistrationServiceMockBeanTest(
 //    }
 
     @Test
-    fun `register mock bean test`() {
+    fun `register partner client에서 파트너 정보를 가져오지 못하는 경우 test`() {
         //given
         val brn = "000-00-0000"
-        val name = "국세청에서 응답받은 가맹점명"
+        val name = "(주)한글"
         given(mockPartnerClient.getPartnerEntityBy(brn))
             .willReturn(
                 ResponseEntity(
@@ -62,8 +62,8 @@ class ShopRegistrationServiceMockBeanTest(
         val shop = shopRegistrationService.register(brn)
 
         //then
-        then(shop.name).isEqualTo(name)
         then(shop.brn).isEqualTo(brn)
+        then(shop.name).isEqualTo("국세청에서 응답받은 가맹점명...")
     }
 
     @Test

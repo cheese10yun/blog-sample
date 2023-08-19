@@ -143,5 +143,5 @@ WHERE writer.`name` = 'yun kim'
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/exposed-study/docs/images/exposed-2.png)
 
-최정 결과로 문자열 `email-1@asd.com, email-2@asd.com`을 응답받은 것을 확인할 수 있습니다.
+최종 결과로 문자열 `email-1@asd.com, email-2@asd.com`을 응답받은 것을 확인할 수 있습니다.
 

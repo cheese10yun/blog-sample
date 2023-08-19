@@ -32,10 +32,10 @@ class ShopRegistrationService(
         val partnerResponse = partnerClientService.getPartner(brn)
         val shop = when {
             partnerResponse.statusCode.is2xxSuccessful.not() -> {
-                // 조회 실패시 추가 질의 로직...
+                // 조회 실패시 국세청 서버에 추가 질의 로직...
                 Shop(
                     brn = brn,
-                    name = "국세청에서 응답받은 가맹점명"
+                    name = "국세청에서 응답받은 가맹점명..."
                 )
             }
             else -> Shop(
