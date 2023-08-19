@@ -22,7 +22,7 @@ class PartnerClientService(
     /**
      * 2xx 응답이 아닌 경우 호출하는 곳에서 제어하게 변경
      */
-    fun getPartner(brn: String): ResponseEntity<PartnerResponse> {
+    fun getPartner(brn: String): ResponseEntity<PartnerResponse?> {
         return partnerClient.getPartnerByResponse(brn)
     }
 

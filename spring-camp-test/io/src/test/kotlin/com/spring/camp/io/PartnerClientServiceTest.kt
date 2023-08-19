@@ -78,17 +78,13 @@ class PartnerClientServiceTest(
     fun `getPartner ResponseEntity 응답`() {
         //given
         val brn = "000-00-0000"
-        val name = "주식회사 XXX"
-        val partnerResponse = PartnerResponse(brn, name)
 
         given(mockPartnerClient.getPartnerByResponse(brn))
-            .willReturn(ResponseEntity(partnerResponse, HttpStatus.BAD_REQUEST))
+            .willReturn(ResponseEntity(null, HttpStatus.BAD_REQUEST))
 
         //when
         val response = partnerClientService.getPartner(brn)
 
         then(response.statusCode).isEqualTo(HttpStatus.BAD_REQUEST)
-        then(response.body!!.brn).isEqualTo(brn)
-        then(response.body!!.name).isEqualTo(name)
     }
 }
