@@ -9,7 +9,7 @@ import java.time.LocalDate
 
 @AllOpen
 class PartnerClient(
-    private val restTemplate: RestTemplate,
+    private val partnerClientRestTemplate: RestTemplate,
 ) {
 
 //    fun getPartnerBy(brn: String): PartnerResponse {
@@ -21,22 +21,22 @@ class PartnerClient(
 //    }
 
     fun getPartnerBy(brn: String): PartnerResponse {
-        val response = restTemplate.getForEntity("/api/v1/partner/${brn}", PartnerResponse::class.java)
-        if (response.statusCode.is2xxSuccessful.not()){
-            throw IllegalArgumentException("....")
-        }
+        val response = partnerClientRestTemplate.getForEntity("/api/v1/partner/${brn}", PartnerResponse::class.java)
+//        if (response.statusCode.is2xxSuccessful.not()){
+//            throw IllegalArgumentException("....")
+//        }
         return response.body!!
     }
 
     fun getPartnerByResponse(brn: String): ResponseEntity<PartnerResponse> {
-        restTemplate.getForEntity("/api/v1/partner/${brn}", PartnerResponse::class.java, mapOf("asd" to "ads"))
-        return restTemplate.getForEntity("/api/v1/partner/${brn}", PartnerResponse::class.java)
+        partnerClientRestTemplate.getForEntity("/api/v1/partner/${brn}", PartnerResponse::class.java, mapOf("asd" to "ads"))
+        return partnerClientRestTemplate.getForEntity("/api/v1/partner/${brn}", PartnerResponse::class.java)
     }
 
     fun getPartnerStatus(
         brn: String,
     ): PartnerStatusResponse {
-        return restTemplate.getForObject("/api/v1/partner/${brn}", PartnerStatusResponse::class.java)!!
+        return partnerClientRestTemplate.getForObject("/api/v1/partner/${brn}", PartnerStatusResponse::class.java)!!
     }
 
 
@@ -44,7 +44,7 @@ class PartnerClient(
     fun getPartners(
         brn: Set<String>,
     ): List<PartnerStatusResponse> {
-        return restTemplate.getForObject("/api/v1/partner/${brn}", object : ParameterizedTypeReference<List<PartnerStatusResponse>>() {})
+        return partnerClientRestTemplate.getForObject("/api/v1/partner/${brn}", object : ParameterizedTypeReference<List<PartnerStatusResponse>>() {})
     }
 }
 

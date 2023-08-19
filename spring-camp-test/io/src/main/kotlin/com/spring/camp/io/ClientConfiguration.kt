@@ -20,7 +20,7 @@ class ClientConfiguration {
 
     @Bean
     fun partnerClient(partnerClientRestTemplate: RestTemplate) = PartnerClient(
-        restTemplate = partnerClientRestTemplate
+        partnerClientRestTemplate = partnerClientRestTemplate
     )
 
 
