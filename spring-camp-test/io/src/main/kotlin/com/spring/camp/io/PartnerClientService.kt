@@ -12,7 +12,7 @@ class PartnerClientService(
      * 2xx 응답이 아닌 경우 Business Logic에 맞게 설정
      */
     fun getPartnerBy(brn: String): PartnerResponse {
-        val response = partnerClient.getPartnerByResponse(brn)
+        val response = partnerClient.getPartnerEntityBy(brn)
         if (response.statusCode.is2xxSuccessful.not()){
             throw IllegalArgumentException("....")
         }
@@ -23,7 +23,7 @@ class PartnerClientService(
      * 2xx 응답이 아닌 경우 호출하는 곳에서 제어하게 변경
      */
     fun getPartner(brn: String): ResponseEntity<PartnerResponse?> {
-        return partnerClient.getPartnerByResponse(brn)
+        return partnerClient.getPartnerEntityBy(brn)
     }
 
 //    /**

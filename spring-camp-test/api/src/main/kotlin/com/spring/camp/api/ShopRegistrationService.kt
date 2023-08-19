@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service
 @Service
 class ShopRegistrationService(
     private val shopRepository: ShopRepository,
-    private val partnerClient: PartnerClient,
     private val partnerClientService: PartnerClientService,
 ) {
 
@@ -27,10 +26,6 @@ class ShopRegistrationService(
 //        )
 //    }
 
-    fun asd(brns: Set<String>): List<PartnerStatusResponse> {
-        return partnerClient.getPartners(brns)
-    }
-
     fun register(
         brn: String,
     ): Shop {
@@ -40,7 +35,7 @@ class ShopRegistrationService(
                 // 조회 실패시 추가 질의 로직...
                 Shop(
                     brn = brn,
-                    name = "응답받은 가맹점명"
+                    name = "국세청에서 응답받은 가맹점명"
                 )
             }
             else -> Shop(

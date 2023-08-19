@@ -29,26 +29,6 @@ class ShopRegistrationServiceMockBeanTest(
 //        Mockito.reset(mockPartnerClientService)
     }
 
-    @Test
-    fun sdasdasdasd() {
-
-
-        val brn = setOf("234234")
-        val willReturn = given(mockPartnerClient.getPartners(brn)
-        ).willReturn(
-            listOf(
-                PartnerStatusResponse(
-                    status = PartnerStatus.CLOSING,
-                    closeBusinessDate = null
-                )
-            )
-        )
-
-        val asd = shopRegistrationService.asd(brn)
-
-        println("")
-    }
-
     //    @Test
 //    fun `register mock bean test`() {
 //        //given
@@ -65,26 +45,26 @@ class ShopRegistrationServiceMockBeanTest(
 //        then(shop.brn).isEqualTo(brn)
 //    }
 
-//    @Test
-//    fun `register mock bean test`() {
-//        //given
-//        val brn = "000-00-0000"
-//        val name = "주식회사 XXX"
-//        given(mockPartnerClientService.getPartner(brn))
-//            .willReturn(
-//                ResponseEntity(
-//                    PartnerResponse(brn, name),
-//                    HttpStatus.BAD_REQUEST
-//                )
-//            )
-//
-//        //when
-//        val shop = shopRegistrationService.register(brn)
-//
-//        //then
-//        then(shop.name).isEqualTo(name)
-//        then(shop.brn).isEqualTo(brn)
-//    }
+    @Test
+    fun `register mock bean test`() {
+        //given
+        val brn = "000-00-0000"
+        val name = "국세청에서 응답받은 가맹점명"
+        given(mockPartnerClient.getPartnerEntityBy(brn))
+            .willReturn(
+                ResponseEntity(
+                    PartnerResponse(brn, name),
+                    HttpStatus.BAD_REQUEST
+                )
+            )
+
+        //when
+        val shop = shopRegistrationService.register(brn)
+
+        //then
+        then(shop.name).isEqualTo(name)
+        then(shop.brn).isEqualTo(brn)
+    }
 
     @Test
     fun `Shop 등록 테스트 케이스`() {

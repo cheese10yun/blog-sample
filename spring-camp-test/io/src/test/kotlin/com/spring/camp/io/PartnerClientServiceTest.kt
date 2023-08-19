@@ -28,7 +28,7 @@ class PartnerClientServiceTest(
         val name = "주식회사 XXX"
         val response = PartnerResponse(brn, name)
 
-        given(mockPartnerClient.getPartnerByResponse(brn))
+        given(mockPartnerClient.getPartnerEntityBy(brn))
             .willReturn(ResponseEntity(response, HttpStatus.OK))
 
         //when
@@ -46,7 +46,7 @@ class PartnerClientServiceTest(
         val name = "주식회사 XXX"
         val response = PartnerResponse(brn, name)
 
-        given(mockPartnerClient.getPartnerByResponse(brn))
+        given(mockPartnerClient.getPartnerEntityBy(brn))
             .willReturn(ResponseEntity(response, HttpStatus.BAD_REQUEST))
 
         //when
@@ -64,7 +64,7 @@ class PartnerClientServiceTest(
         val name = "주식회사 XXX"
         val response = PartnerResponse(brn, name)
 
-        given(mockPartnerClient.getPartnerByResponse(brn))
+        given(mockPartnerClient.getPartnerEntityBy(brn))
             .willReturn(ResponseEntity(response, HttpStatus.OK))
 
         //when
@@ -79,7 +79,7 @@ class PartnerClientServiceTest(
         //given
         val brn = "000-00-0000"
 
-        given(mockPartnerClient.getPartnerByResponse(brn))
+        given(mockPartnerClient.getPartnerEntityBy(brn))
             .willReturn(ResponseEntity(null, HttpStatus.BAD_REQUEST))
 
         //when

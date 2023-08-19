@@ -28,8 +28,7 @@ class PartnerClient(
         return response.body!!
     }
 
-    fun getPartnerByResponse(brn: String): ResponseEntity<PartnerResponse?> {
-        partnerClientRestTemplate.getForEntity("/api/v1/partner/${brn}", PartnerResponse::class.java, mapOf("asd" to "ads"))
+    fun getPartnerEntityBy(brn: String): ResponseEntity<PartnerResponse?> {
         return partnerClientRestTemplate.getForEntity("/api/v1/partner/${brn}", PartnerResponse::class.java)
     }
 
@@ -38,8 +37,6 @@ class PartnerClient(
     ): PartnerStatusResponse {
         return partnerClientRestTemplate.getForObject("/api/v1/partner/${brn}", PartnerStatusResponse::class.java)!!
     }
-
-
 
     fun getPartners(
         brn: Set<String>,
