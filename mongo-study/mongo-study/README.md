@@ -1326,3 +1326,108 @@ db.restaurants.find(
 
 
 ## Query 성능 최적화 1: Aggregation
+
+## Query 성능 최적화 2: Index Bound
+
+```
+db.survey.find({
+    category_id: {
+        $gt:14,
+        $lt:25
+    }
+}).explain("executionStats")
+```
+* 실행 계획 확인
+
+```json
+{
+  "indexBounds": {
+    "category_id": ["(14, 25)"]
+  },
+}
+```
+* indexBounds: 범위 확인 14 ~ 15 확인
+
+
+```
+# multy key index 생성
+db.survey.createIndex({ratings:1})
+
+# 실행 계획 조회
+db.survey.find({
+    ratings: {
+        $gte:3,
+        $lte:6
+    }
+}).explain("executionStats")
+```
+
+```json
+{
+  "executionStats": {
+    "executionSuccess": true,
+    "nReturned": 98304,
+    "executionTimeMillis": 290,
+    "totalKeysExamined": 163840,
+    "totalDocsExamined": 98304,
+    "executionStages": {
+      "stage": "FETCH",
+      "filter": {
+        "ratings": {
+          "$gte": 3
+        }
+      },
+      "indexBounds": {
+        "ratings": ["[-inf.0, 6]"]
+      }
+  }
+}
+```
+* indexBounds: -inf.0
+  * 인덱스바운드의 범위를 정상적으로 찾지 못함 (inf.0 infinity 0 가장 작은 값) 
+* totalKeysExamined: 인덱스를 정확히 찾지 못하고 163840 만큼 찾아서 최종적으로 totalDocsExamined만큼 리턴함 즉 ㄹfetch는 단계에서 gte:3에 대해서 필터링( 인덱스 조회를 못함)
+* gte는 executionStages.filter.ratings.$gte 으로 필터링되어 검색됨
+
+```
+db.survey.find({
+    ratings: {
+        $elemMatch:{
+            $gte:3,
+            $lte:6
+        }
+    }
+}).explain("executionStats")
+```
+* $elemMatch를 이용하면 인덱스키를 정확하게 매칭할 수 있음
+
+```
+// 모든 요소에 대해서 3보다 크고 or 6보다 작은 경우가 하나라도 있으면 매칭
+db.survey.find({
+  ratings: {
+    $gte:3,
+    $lte:6
+  }
+})
+
+// 모든 요소에 대해서 3보다 크고 and 6보다 작은 경우가 하나라도 있으면 매칭
+db.survey.find({
+  ratings: {
+    $elemMatch:{
+      $gte:3,
+      $lte:6
+    }
+  }
+})
+
+
+# $elemMatch 으로 1차 필터링
+# $not으로 2,3 제외
+# indexBounds.ratings: ["[3, 6]"]을 정확하개 매칭
+db.survey.find({
+    $and:[
+        {ratings: {$elemMatch: {$gte: 3, $lte: 6}}},
+        {ratings: {$not: {$lt: 3}}},
+        {ratings: {$not: {$gt: 6}}},
+    ]
+}).explain("executionStats")
+```
