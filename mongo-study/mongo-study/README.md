@@ -1183,3 +1183,146 @@ db.restaurants.aggregate([
 </details>
 
 # Query 성능 분석
+
+## Query Planner Logic
+
+```
+// 응답이 느림
+1 -> db.test.find({a:1})
+query -> disk -> cache -> return 
+
+// 응답이 빠름, 동일한 쿼리 캐시 사용
+2 -> db.test.find({a:1})
+query  -> cache -> return
+```
+
+```
+Speed -> Disk < Cache
+Storage -> Disk > Cache
+
+100 GB Working Set > 80 GB Cache
+20GB Cache Eviction
+
+Server Spec -> 비용이 발생되는 해결 방법
+
+져렴한 해결 방버
+* 모델링
+* 쿼리 튜닝
+* 비즈니스 요구사항 자체를 변경
+
+몽고 디비 해결 방법
+실행 계획 -> Query Plan
+```
+
+* Cache: 
+* Query plan: 
+
+### Query Panner
+
+![](images/007.png)
+
+## Query Plan 읽는 방법
+
+
+```
+db.restaurants.find(
+    {
+        borough: "Brooklyn"
+    }
+).explain("executionStats")
+```
+
+```json
+{
+  "executionStats": {
+    "executionSuccess": true,
+    "nReturned": 6086,
+    "executionTimeMillis": 31,
+    "totalKeysExamined": 0,
+    "totalDocsExamined": 25359,
+    "executionStages": {
+      
+    }
+  }
+}
+```
+
+* nReturned: 반환된 Document의 Count
+* executionTimeMillis: 쿼리 수행 시간
+* totalKeysExamined: 인덱스 스캔 하여 읽은 수 (0 이라면 인덱스 스캔을 하지 않음)
+* totalDocsExamined: 결과 반환까지 읽은 총 Document Count
+
+totalKeysExamined가 0으로 인덱스 스캔을 하지 않고 totalDocsExamined의 25359 만큼 도큐먼트를 읽어서 최종적으로 nReturned인 6086의 도큐먼트를 응답했으며 수행 시간은 executionTimeMillis인 31ms 만큼 소요됐다 라고 해석 할 수 있다.
+
+
+```
+db.restaurants.find(
+    {borough: "Brooklyn"},
+    {name:1, borough:1}
+).explain("executionStats")
+```
+
+```json
+{
+  "executionStages": {
+    "stage": "PROJECTION_SIMPLE",
+    "nReturned": 6086,
+    "executionTimeMillisEstimate": 6,
+    "works": 25360,
+    "advanced": 6086,
+    "needTime": 19273,
+    "needYield": 0,
+    "saveState": 25,
+    "restoreState": 25,
+    "isEOF": 1,
+    "transformBy": {
+      "name": 1,
+      "borough": 1
+    },
+    "inputStage": {
+      "stage": "COLLSCAN",
+      "filter": {
+        "borough": {
+          "$eq": "Brooklyn"
+        }
+      },
+      "nReturned": 6086,
+      "executionTimeMillisEstimate": 5,
+      "works": 25360,
+      "advanced": 6086,
+      "needTime": 19273,
+      "needYield": 0,
+      "saveState": 25,
+      "restoreState": 25,
+      "isEOF": 1,
+      "direction": "forward",
+      "docsExamined": 25359
+    }
+  }
+},
+}
+```
+* executionStages 안에 inputStage들이 nested가 여러개 있을 수 있음
+* inputStage.stage: COLLSCAN 컬렉션 스캔을 진행
+* inputStage.filter: 필터링 정보
+* inputStage.nReturned: 쿼리 조건에 매칭되는 Document
+* inputStage.advanced: 부모 스테이지로 넘기는 Document Count
+* inputStage.works: 인덱스키 하나를 읽거나, 정렬 작업을 하거나, 쿼리 실행에 발생하는 작업 단위를 쪼개서 얼마나 많은 작업들을 하는지 알려주는 수치
+
+```
+# compound index 추가
+db.restaurants.createIndex(
+    {name: 1, borough: -1}
+)
+
+# allPlansExecution 실행 게획
+db.restaurants.find(
+    {borough: "Brooklyn"},
+    {name: 1, borough: 1}
+    )
+    .sort({name: 1})
+    .explain("allPlansExecution")
+```
+
+
+## Query 성능 최적화 1: Aggregation
