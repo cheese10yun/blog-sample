@@ -1431,3 +1431,43 @@ db.survey.find({
     ]
 }).explain("executionStats")
 ```
+
+
+### Index 최적화
+
+```
+# index 생성
+db.sales.createIndex({saleDate: 1})
+
+# index만 프로젝션 하여 조회
+db.sales.find(
+    {
+        saleDate: {
+            $gte: ISODate("2015-01-01T00:00:00.000Z")
+        }
+    },
+    {
+        saleDate: 1,
+        _id: 0
+    }
+).explain("executionStats")
+```
+
+```json
+{
+  "executionStats": {
+    "executionSuccess": true,
+    "nReturned": 3068,
+    "executionTimeMillis": 2,
+    "totalKeysExamined": 3068,
+    "totalDocsExamined": 0,
+    "executionStages": {
+      "stage": "PROJECTION_COVERED",
+      "nReturned": 3068,
+      "executionTimeMillisEstimate": 0
+    }
+```
+* executionStages.stage이 PROJECTION_COVERED 정확히 인덱스 필드만 프로젝션으로 커버했다는 의미
+* totalKeysExamined 인덱스 키로 찾읃 데이터가 3068 이고 실제 도큐먼트를 확인한 데이터는 totalDocsExamined:0 이다. 즉 인덱스 필드만 조회했기 떄문에 실제 도큐먼트를 조회하지 않아도 된다. 
+
+## Modeling
