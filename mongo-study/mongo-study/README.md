@@ -1471,3 +1471,9 @@ db.sales.find(
 * totalKeysExamined 인덱스 키로 찾읃 데이터가 3068 이고 실제 도큐먼트를 확인한 데이터는 totalDocsExamined:0 이다. 즉 인덱스 필드만 조회했기 떄문에 실제 도큐먼트를 조회하지 않아도 된다. 
 
 ## Modeling
+
+* ExtendedReferencePattern
+* AttributePattern
+* BucketPattern
+* SubsetPattern
+* TreePattern
