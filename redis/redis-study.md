@@ -22,7 +22,6 @@
 
 <details>
 <summary>접기/펼치기</summary>
-<div markdown="1">
 
 ```
 set key1 1
@@ -55,7 +54,6 @@ span
 
 <details>
 <summary>접기/펼치기</summary>
-<div markdown="1">
 
 ```
 LPUSH mylist apple
@@ -88,7 +86,6 @@ RPOP mylist
 
 <details>
 <summary>접기/펼치기</summary>
-<div markdown="1">
 
 ```
 SADD myset apple
@@ -100,8 +97,6 @@ SMEMBERS myset
 SISMEMBER myset apple
 SISMEMBER myset grape
 ```
-
-</div>
 </details>
 
 ## Hashes
@@ -120,7 +115,6 @@ SISMEMBER myset grape
 
 <details>
 <summary>접기/펼치기</summary>
-<div markdown="1">
 
 ```
 HSET user name bear age 10
@@ -141,7 +135,6 @@ HDEL user name age
 HKEYS user
 ```
 
-</div>
 </details>
 
 ## SortedSets
@@ -159,10 +152,8 @@ HKEYS user
 | ZREVRANK | 특정 값의 위치(순위)를 반환한다.(내림차순으로 정렬된) | ZREVRANK myrank apple          |
 | ZREM     | 한개 이상의 값을 삭제한다.                 | ZREM myrank apple              |
 
-
 <details>
 <summary>접기/펼치기</summary>
-<div markdown="1">
 
 ```
 ZADD myrank 10 apple 20 banana 30 grape
@@ -174,5 +165,5 @@ ZREVRANK myrank apple
 ZRANK myrank apple
 ```
 
-</div>
 </details>
+
