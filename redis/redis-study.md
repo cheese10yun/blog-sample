@@ -35,8 +35,7 @@ get mycount
 mset key1 hi key2 hello
 mget key1 key2
 ```
-
-span
+</details>
 
 ## Lists
 
