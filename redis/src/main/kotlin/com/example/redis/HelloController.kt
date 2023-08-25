@@ -2,6 +2,7 @@ package com.example.redis
 
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -9,7 +10,8 @@ import javax.servlet.http.HttpSession
 
 @RestController
 class HelloController(
-    private val redisTemplate: StringRedisTemplate
+    private val redisTemplate: StringRedisTemplate,
+    private val userService: UserService
 ) {
 
     @GetMapping("/hello")
@@ -44,7 +46,19 @@ class HelloController(
 
     @GetMapping("/myName")
     fun myName(session: HttpSession): String {
-
         return session.getAttribute("name").toString()
     }
+
+    @GetMapping("/users/{userId}/profile")
+    fun getUserProfile(
+        @PathVariable userId: String
+    ): UserProfile {
+
+        return userService.getUserProfile(userId)
+    }
 }
+
+data class UserProfile(
+    val name: String,
+    val age: Int,
+)

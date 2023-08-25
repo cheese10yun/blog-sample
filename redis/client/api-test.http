@@ -24,3 +24,9 @@ GET {{host}}/myName
 Content-Type: application/json
 
 ###
+
+
+GET {{host}}/users/1/profile
+Content-Type: application/json
+
+###
