@@ -1,0 +1,26 @@
+GET {{host}}/hello
+Content-Type: application/json
+
+###
+
+
+GET {{host}}/setFruit?name=banana
+Content-Type: application/json
+
+###
+
+GET {{host}}/getFruit?name=apple
+Content-Type: application/json
+
+###
+
+
+GET {{host}}/login?name=yun
+Content-Type: application/json
+
+###
+
+GET {{host}}/myName
+Content-Type: application/json
+
+###
