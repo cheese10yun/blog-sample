@@ -1,0 +1,2 @@
+GET http://localhost:8080/hello
+Content-Type: application/json
