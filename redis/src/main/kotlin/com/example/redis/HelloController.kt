@@ -11,7 +11,8 @@ import javax.servlet.http.HttpSession
 @RestController
 class HelloController(
     private val redisTemplate: StringRedisTemplate,
-    private val userService: UserService
+    private val userService: UserService,
+    private val rankService: RankService
 ) {
 
     @GetMapping("/hello")
@@ -55,6 +56,26 @@ class HelloController(
     ): UserProfile {
 
         return userService.getUserProfile(userId)
+    }
+
+    @GetMapping("/setScore")
+    fun setScore(
+        @RequestParam userId: String,
+        @RequestParam score: Int
+    ): Boolean {
+        return rankService.setUserScore(userId, score)
+    }
+
+    @GetMapping("/getRank")
+    fun getRank(
+        @RequestParam userId: String,
+    ): Long? {
+        return rankService.getUserRanking(userId)
+    }
+
+    @GetMapping("/getTopRanks")
+    fun getTopRanks(): List<String> {
+        return rankService.getTopRan(3)
     }
 }
 

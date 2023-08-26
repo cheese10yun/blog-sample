@@ -30,3 +30,21 @@ GET {{host}}/users/1/profile
 Content-Type: application/json
 
 ###
+
+
+GET {{host}}/setScore?userId=c&score=55
+Content-Type: application/json
+
+###
+
+
+GET {{host}}/getRank?userId=yun
+Content-Type: application/json
+
+###
+
+
+GET {{host}}/getTopRanks
+Content-Type: application/json
+
+###
