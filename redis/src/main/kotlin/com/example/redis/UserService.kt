@@ -1,6 +1,5 @@
 package com.example.redis
 
-import kotlinx.coroutines.delay
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
@@ -21,7 +20,6 @@ class UserService(
 
 @Service
 class UserCacheService{
-
     @Cacheable(cacheNames = ["userAgeCache"], key = "#userId")
     fun getUserAge(userId: String): Int {
         Thread.sleep(500)
