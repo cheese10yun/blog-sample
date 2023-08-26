@@ -2,32 +2,58 @@ package com.example.redis
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
+import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
-import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.redis.core.StringRedisTemplate
+import org.springframework.data.redis.listener.RedisMessageListenerContainer
 
 
 @Configuration
 class RedisConfig {
 
+//    @Bean
+//    fun redisConnectionFactory(): RedisConnectionFactory {
+//        return LettuceConnectionFactory()
+//    }
+//
     @Bean
-    @Primary
-    fun redisTemplate(redisConnectionFactory: LettuceConnectionFactory): RedisTemplate<*, *> =
-        RedisTemplate<ByteArray, ByteArray>().apply {
-            setConnectionFactory(redisConnectionFactory)
-        }
-            .apply {
-                this.hashValueSerializer
-            }
-
-    @Bean
-    fun redisTemplateWithTransaction(redisConnectionFactory: LettuceConnectionFactory): StringRedisTemplate {
-        val template = StringRedisTemplate(redisConnectionFactory)
-        // explicitly enable transaction support
-        template.setEnableTransactionSupport(true)
-        return template
+    fun redisContainer(
+        redisConnectionFactory: RedisConnectionFactory
+    ): RedisMessageListenerContainer {
+        val container = RedisMessageListenerContainer()
+        container.setConnectionFactory(redisConnectionFactory)
+        return container
     }
+
+//    @Bean
+//    fun redisConnectionFactory(): RedisConnectionFactory {
+//        return LettuceConnectionFactory()
+//    }
+
+//    @Bean
+//    fun redisContainer(): RedisMessageListenerContainer {
+//        val container = RedisMessageListenerContainer()
+//        container.setConnectionFactory(redisConnectionFactory())
+//        return container
+//    }
+
+
+//    @Bean
+//    @Primary
+//    fun redisTemplate(redisConnectionFactory: LettuceConnectionFactory): RedisTemplate<*, *> =
+//        RedisTemplate<ByteArray, ByteArray>().apply {
+//            setConnectionFactory(redisConnectionFactory)
+//        }
+//            .apply {
+//                this.hashValueSerializer
+//            }
+//
+//    @Bean
+//    fun redisTemplateWithTransaction(redisConnectionFactory: LettuceConnectionFactory): StringRedisTemplate {
+//        val template = StringRedisTemplate(redisConnectionFactory)
+//        // explicitly enable transaction support
+//        template.setEnableTransactionSupport(true)
+//        return template
+//    }
 
 
 //    @Bean

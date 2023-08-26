@@ -1,4 +1,7 @@
 spring:
+    main:
+        web-application-type: none
+
     cache:
         type: redis
     session:
