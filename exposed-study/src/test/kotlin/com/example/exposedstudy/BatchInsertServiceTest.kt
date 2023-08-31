@@ -2,16 +2,19 @@ package com.example.exposedstudy
 
 import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.statements.BatchUpdateStatement
 import org.jetbrains.exposed.sql.transactions.TransactionManager
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import org.junit.jupiter.api.Test
 import org.springframework.util.StopWatch
 
 class BatchInsertServiceTest(
     private val batchInsertService: BatchInsertService,
-    private val dataSource: HikariDataSource
+    private val dataSource: HikariDataSource,
 ) : ExposedTestSupport() {
 
     @Test
@@ -42,13 +45,18 @@ class BatchInsertServiceTest(
         // 데이터 셋업, 속도 측정 포함 X
         val stopWatch = StopWatch()
         stopWatch.start()
-        for (writerId in ids) {
-            Writers
-                .update({ Writers.id eq writerId })
-                {
-                    it[email] = "update"
-                }
-        }
+//        for (writerId in ids) {
+//            Writers
+//                .update({ Writers.id eq writerId })
+//                {
+//                    it[email] = "update"
+//                }
+//        }
+
+        batchInsertService.update(ids)
+
+
+
         stopWatch.stop()
         println("${ids.size} update, ${stopWatch.lastTaskTimeMillis}")
     }
@@ -72,31 +80,41 @@ class BatchInsertServiceTest(
         // 업데이트 속도 측정
         val stopWatch = StopWatch()
         stopWatch.start()
-        BatchUpdateStatement(Writers).apply {
-            ids.forEach {
-                addBatch(EntityID(it, Writers))
-                this[Writers.email] = "update"
-            }
-        }
-            .execute(TransactionManager.current())
+//        BatchUpdateStatement(Writers).apply {
+//            ids.forEach {
+//                addBatch(EntityID(it, Writers))
+//                this[Writers.email] = "update"
+//            }
+//        }
+//            .execute(TransactionManager.current())
+
+        batchInsertService.batchUpdate2(ids)
 
         stopWatch.stop()
         println("${ids.size} update, ${stopWatch.lastTaskTimeMillis}")
     }
 
     private fun setup(ids: List<Long>) {
-        ids
-            .chunked(50_000)
-            .forEach {
-                Writers.batchInsert(
-                    data = it,
-                    ignore = false,
-                    shouldReturnGeneratedValues = false
-                ) {
-                    this[Writers.email] = "old"
-                    this[Writers.name] = "old"
+
+        transaction(Database.connect(dataSource)) {
+            SchemaUtils.drop(Books)
+            SchemaUtils.drop(Writers)
+            SchemaUtils.create(Writers)
+
+            ids
+                .chunked(50_000)
+                .forEach {
+                    Writers.batchInsert(
+                        data = it,
+                        ignore = false,
+                        shouldReturnGeneratedValues = false
+                    ) {
+                        this[Writers.email] = "old"
+                        this[Writers.name] = "old"
+                    }
                 }
-            }
+
+        }
     }
 
 }
