@@ -1,6 +1,7 @@
 package com.example.exposedstudy
 
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Transaction
 import java.time.LocalDateTime
 import org.jetbrains.exposed.sql.batchInsert
@@ -8,6 +9,8 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.statements.BatchUpdateStatement
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.transactions.TransactionManager
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -41,6 +44,32 @@ class BatchInsertService {
             writer[this.email] = email
             writer[this.createdAt] = LocalDateTime.now()
             writer[this.updatedAt] = LocalDateTime.now()
+        }
+    }
+
+//    @Transactional
+    fun update(ids: List<Long>) {
+        transaction {
+            for (id in ids) {
+                Writers
+                    .update({ Writers.id eq id })
+                    {
+                        it[email] = "update"
+                    }
+            }
+        }
+    }
+
+//    @Transactional
+    fun batchUpdate2(ids: List<Long>){
+        transaction {
+            BatchUpdateStatement(Writers).apply {
+                ids.forEach {
+                    addBatch(EntityID(it, Writers))
+                    this[Writers.email] = "update"
+                }
+            }
+                .execute(this)
         }
     }
 
