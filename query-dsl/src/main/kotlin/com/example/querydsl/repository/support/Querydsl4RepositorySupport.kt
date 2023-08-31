@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport
 import org.springframework.data.jpa.repository.support.Querydsl
 import org.springframework.data.querydsl.SimpleEntityPathResolver
-import org.springframework.data.repository.support.PageableExecutionUtils
+import org.springframework.data.support.PageableExecutionUtils
 import org.springframework.stereotype.Repository
 import java.util.function.Function
 import javax.persistence.EntityManager

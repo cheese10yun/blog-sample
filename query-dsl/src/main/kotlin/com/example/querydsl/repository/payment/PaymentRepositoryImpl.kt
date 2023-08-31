@@ -15,10 +15,10 @@ import com.example.querydsl.domain.QPayment.payment as qPayment
 class PaymentRepositoryImpl : Querydsl4RepositorySupport(Payment::class.java) {
 
     fun findBy(amount: BigDecimal, pageable: Pageable): Page<Payment> {
-        return applyPagination(pageable, Function {
+        return applyPagination(pageable) {
             selectFrom(qPayment)
                 .where(qPayment.amount.gt(amount))
-        })
+        }
     }
 
     fun findByLimit(limit: Long): List<Payment> {

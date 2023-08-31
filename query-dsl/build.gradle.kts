@@ -43,6 +43,7 @@ dependencies {
     implementation("com.querydsl:querydsl-apt")
     implementation("com.querydsl:querydsl-core")
 //    implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.8")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
 
 //    runtimeOnly("com.h2database:h2")
     runtimeOnly("mysql:mysql-connector-java")
