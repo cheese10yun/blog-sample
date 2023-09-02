@@ -1,14 +1,7 @@
-GET http://localhost:8080/api/writers
+
+###
+GET {{host}}/api/users
+Content-Type: application/json
 
 
 ###
-
-
-50, 115
-100, 206
-500, 718
-1000, 1388
-5000, 6204
-10000, 12151
-50000, 65309
-100000, 120906

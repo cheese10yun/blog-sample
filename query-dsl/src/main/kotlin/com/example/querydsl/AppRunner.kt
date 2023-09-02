@@ -1,6 +1,7 @@
 package com.example.querydsl
 
 import com.example.querydsl.domain.Team
+import com.example.querydsl.repository.user.User
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Profile
@@ -33,6 +34,17 @@ class AppRunner(
 
         for (team in teams) {
             em.persist(team)
+        }
+
+        val users = (1..10).map {
+            User(
+                username = "name${it}",
+                age = it,
+            )
+        }
+
+        users.forEach {
+            em.persist(it)
         }
 
     }
