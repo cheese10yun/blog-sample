@@ -73,6 +73,6 @@ class OrderApi(
     fun getOrder(
         @PageableDefault pageable: Pageable
     ): Page<Order> {
-        return orderRepository.find(pageable)
+        return orderRepository.find2(pageable)
     }
 }
