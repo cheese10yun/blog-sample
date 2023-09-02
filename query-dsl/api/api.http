@@ -1,6 +1,8 @@
 
 ###
-GET {{host}}/api/users
+GET {{host}}/api/users?
+    page=0&
+    size=2
 Content-Type: application/json
 
 

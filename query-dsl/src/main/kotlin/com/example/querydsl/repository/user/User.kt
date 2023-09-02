@@ -1,6 +1,9 @@
 package com.example.querydsl.repository.user
 
 import com.example.querydsl.domain.EntityAuditing
+import com.example.querydsl.repository.user.QUser.user
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -34,13 +37,15 @@ interface UserCustomRepository {
 
 class UserCustomRepositoryImpl : QuerydslRepositorySupport(User::class.java), UserCustomRepository {
 
-    override fun find(pageable: Pageable): Page<User> {
-        val query = from(QUser.user)
-            .select(QUser.user)
+    override fun find(
+        pageable: Pageable
+    ) =  runBlocking {
+        val contentQuery = from(user).select(user).where(user.username.isNotNull)
+        val countQuery = from(user).select(user.count()).where(user.username.isNotNull)
+        val content = async { contentQuery.fetch() }
+        val count = async { countQuery.fetchFirst() }
 
-        return PageImpl(querydsl!!.applyPagination(pageable, query).fetch(), pageable, query.fetchCount())
-
-
+        PageImpl(content.await(), pageable, count.await())
     }
 }
 
