@@ -1,9 +1,6 @@
 package com.example.querydsl.api
 
-import com.example.querydsl.domain.Order
-import com.example.querydsl.domain.Orderer
 import com.example.querydsl.domain.Payment
-import com.example.querydsl.repository.order.OrderRepository
 import com.example.querydsl.repository.payment.PaymentRepository
 import com.example.querydsl.service.Coupon
 import com.example.querydsl.service.CouponRepository
@@ -39,7 +36,7 @@ class TransactionApi(
 class SimpleService(
     private val couponRepository: CouponRepository,
     private val paymentRepository: PaymentRepository,
-    private val orderRepository: OrderRepository,
+//    private val orderRepository: OrderRepository,
     private val paymentSaveService: PaymentSaveService,
     private val couponSaveService: CouponSaveService
 ) {
@@ -47,10 +44,10 @@ class SimpleService(
     @Transactional
     fun saveOrder() {
         println("saveOrder CurrentTransactionName: ${TransactionSynchronizationManager.getCurrentTransactionName()}")
-        orderRepository.save(Order(
-            amount = 10.toBigDecimal(),
-            orderer = Orderer(1L, "test@test.com")
-        ))
+//        orderRepository.save(Order(
+//            amount = 10.toBigDecimal(),
+//            orderer = Orderer(1L, "test@test.com")
+//        ))
 //        this.savePayment()
 //        this.saveCoupon()
         paymentSaveService.savePayment()

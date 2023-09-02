@@ -28,7 +28,6 @@ class User(
     var age: Int = 0
 ) : EntityAuditing()
 
-
 interface UserRepository : JpaRepository<User, Long>, UserCustomRepository
 
 interface UserCustomRepository {
