@@ -1,7 +1,8 @@
 package com.example.querydsl.repository.user
 
 import com.example.querydsl.domain.EntityAuditing
-import com.example.querydsl.domain.MemberStatus
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
@@ -11,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
 import javax.persistence.Table
 
 
@@ -30,15 +29,18 @@ class User(
 interface UserRepository : JpaRepository<User, Long>, UserCustomRepository
 
 interface UserCustomRepository {
-    fun find(): List<User>
+    fun find(pageable: Pageable): Page<User>
 }
 
 class UserCustomRepositoryImpl : QuerydslRepositorySupport(User::class.java), UserCustomRepository {
 
-    override fun find(): List<User> {
-        return from(QUser.user)
+    override fun find(pageable: Pageable): Page<User> {
+        val query = from(QUser.user)
             .select(QUser.user)
-            .fetch()
+
+        return PageImpl(querydsl!!.applyPagination(pageable, query).fetch(), pageable, query.fetchCount())
+
+
     }
 }
 
@@ -51,7 +53,7 @@ class UserApi(
     @GetMapping
     fun getUser(
         @PageableDefault pageable: Pageable
-    ): List<User> {
-        return userRepository.find()
+    ): Page<User> {
+        return userRepository.find(pageable)
     }
 }
