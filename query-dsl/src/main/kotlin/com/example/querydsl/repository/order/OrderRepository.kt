@@ -3,6 +3,8 @@ package com.example.querydsl.repository.order
 
 import com.example.querydsl.domain.EntityAuditing
 import com.example.querydsl.repository.order.QOrder.order
+import com.example.querydsl.repository.user.QUser
+import com.example.querydsl.repository.user.User
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.springframework.data.domain.Page
@@ -37,19 +39,27 @@ interface OrderRepository : JpaRepository<Order, Long>, OrderCustomRepository
 
 interface OrderCustomRepository {
     fun find(pageable: Pageable): Page<Order>
+    fun find2(pageable: Pageable): Page<Order>
 }
 
 class OrderCustomRepositoryImpl : QuerydslRepositorySupport(Order::class.java), OrderCustomRepository {
 
     override fun find(
         pageable: Pageable
-    ) =  runBlocking {
+    ) = runBlocking {
         val contentQuery = from(order).select(order).where(order.userId.isNotNull)
         val countQuery = from(order).select(order.count()).where(order.userId.isNotNull)
         val content = async { contentQuery.fetch() }
         val count = async { countQuery.fetchFirst() }
 
         PageImpl(content.await(), pageable, count.await())
+    }
+
+     override fun find2(pageable: Pageable): Page<Order> {
+        val query = from(order)
+            .select(order)
+
+        return PageImpl(querydsl!!.applyPagination(pageable, query).fetch(), pageable, query.fetchCount())
     }
 }
 
