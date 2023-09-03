@@ -34,7 +34,7 @@ class OrderApi(
         @RequestParam(name = "address") address: String
     ): Slice<Order> {
         log.info("thread api : ${Thread.currentThread()}")
-//        return orderRepository.findSliceBy(pageable, address)
-        return orderRepository.findSliceBy2(pageable, address)
+        return orderRepository.findSliceBy(pageable, address)
+//        return orderRepository.findSliceBy2(pageable, address)
     }
 }
