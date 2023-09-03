@@ -4,10 +4,15 @@ import com.example.querydsl.logger
 import com.querydsl.core.types.EntityPath
 import com.querydsl.core.types.Expression
 import com.querydsl.core.types.dsl.PathBuilder
+import com.querydsl.jpa.JPQLQuery
 import com.querydsl.jpa.impl.JPAQuery
 import com.querydsl.jpa.impl.JPAQueryFactory
+import kotlin.properties.Delegates.notNull
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport
 import org.springframework.data.jpa.repository.support.Querydsl
@@ -16,10 +21,6 @@ import org.springframework.data.support.PageableExecutionUtils
 import org.springframework.stereotype.Repository
 import java.util.function.Function
 import javax.persistence.EntityManager
-import kotlin.properties.Delegates.notNull
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
-import org.springframework.data.domain.PageImpl
 
 @Repository
 abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
@@ -47,6 +48,10 @@ abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
 
     protected fun <T> selectFrom(from: EntityPath<T>): JPAQuery<T> {
         return queryFactory.selectFrom(from)
+    }
+
+    protected fun from(path: EntityPath<*>): JPAQuery<*> {
+        return queryFactory.from(path)
     }
 
     protected fun <T> applyPagination(

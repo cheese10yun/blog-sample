@@ -1,6 +1,7 @@
 package com.example.querydsl
 
 import com.example.querydsl.domain.Team
+import com.example.querydsl.repository.order.Order
 import com.example.querydsl.repository.user.User
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
@@ -36,16 +37,21 @@ class AppRunner(
             em.persist(team)
         }
 
-        val users = (1..10).map {
-            User(
-                username = "name${it}",
-                age = it,
+        (1..10).map {
+            em.persist(User(username = "name${it}", age = it))
+        }
+
+        (1..22).map {
+            em.persist(
+                Order(
+                    orderNumber = "${it}-orderNumber",
+                    userId = it.toLong(),
+                    address = "address",
+                    couponId = null
+                )
             )
         }
 
-        users.forEach {
-            em.persist(it)
-        }
 
     }
 }

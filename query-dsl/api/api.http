@@ -15,3 +15,13 @@ GET {{host}}/api/orders?
 Content-Type: application/json
 
 
+###
+
+# Slice
+GET {{host}}/api/orders/slice?
+    address=address&
+    page=0&
+    size=10
+Content-Type: application/json
+
+

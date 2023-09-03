@@ -5,18 +5,18 @@ import com.example.querydsl.domain.EntityAuditing
 import com.example.querydsl.logger
 import com.example.querydsl.repository.order.QOrder.order
 import com.example.querydsl.repository.support.Querydsl4RepositorySupport
-import com.example.querydsl.repository.user.QUser
-import com.example.querydsl.repository.user.User
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Slice
+import org.springframework.data.domain.SliceImpl
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -32,7 +32,10 @@ class Order(
     @Column(name = "user_id", nullable = false)
     val userId: Long,
 
-    @Column(name = "coupon_id", nullable = false)
+    @Column(name = "address", nullable = false)
+    val address: String,
+
+    @Column(name = "coupon_id", nullable = true)
     val couponId: Long?
 
 ) : EntityAuditing()
@@ -41,10 +44,11 @@ interface OrderRepository : JpaRepository<Order, Long>, OrderCustomRepository
 
 interface OrderCustomRepository {
     fun find(pageable: Pageable): Page<Order>
-    fun find2(pageable: Pageable): Page<Order>
-    fun find3(
-        pageable: Pageable
-    ): Page<Order>
+    fun findPaging(pageable: Pageable, address: String): Page<Order>
+    fun findPaging1(pageable: Pageable, address: String): Page<Order>
+
+    fun findSlice(pageable: Pageable, address: String): Slice<Order>
+    fun findPaging2(pageable: Pageable, address: String): Page<Order>
 }
 
 class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java), OrderCustomRepository {
@@ -62,8 +66,9 @@ class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java),
     }
 
 
-    override fun find3(
-        pageable: Pageable
+    override fun findPaging1(
+        pageable: Pageable,
+        address: String
     ): Page<Order> {
         log.info("thread find3 : ${Thread.currentThread()}")
         return applyPagination(
@@ -73,10 +78,27 @@ class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java),
         )
     }
 
-    override fun find2(pageable: Pageable): Page<Order> {
+    override fun findPaging(pageable: Pageable, address: String): Page<Order> {
         val query = selectFrom(order)
         return PageImpl(querydsl.applyPagination(pageable, query).fetch(), pageable, query.fetchCount())
     }
+
+    override fun findPaging2(pageable: Pageable, address: String): Page<Order> {
+        val query = from(order).select(order).where(order.address.eq(address))
+        return PageImpl(querydsl.applyPagination(pageable, query).fetch(), pageable, query.fetchCount())
+    }
+
+    override fun findSlice(pageable: Pageable, address: String): Slice<Order> {
+        val query = from(order).select(order)
+        val fetch = querydsl.applyPagination(pageable, query).fetch().toList().filterNotNull()
+
+        val sliceImpl = SliceImpl(fetch, pageable, fetch.isNotEmpty())
+        return sliceImpl
+    }
+
+//    private fun SliceImpl(fetch: List<Order>, pageable: Pageable): Slice<Order> {
+//        TODO("Not yet implemented")
+//    }
 }
 
 @RestController
@@ -88,9 +110,21 @@ class OrderApi(
 
     @GetMapping
     fun getOrder(
-        @PageableDefault pageable: Pageable
+        @PageableDefault pageable: Pageable,
+        @RequestParam(name = "address") address: String
+
     ): Page<Order> {
         log.info("thread api : ${Thread.currentThread()}")
-        return orderRepository.find3(pageable)
+//        return orderRepository.findPaging1(pageable)
+        return orderRepository.findPaging2(pageable, address)
+    }
+
+    @GetMapping("/slice")
+    fun getOrderSlice(
+        @PageableDefault pageable: Pageable,
+        @RequestParam(name = "address") address: String
+    ): Slice<Order> {
+        log.info("thread api : ${Thread.currentThread()}")
+        return orderRepository.findSlice(pageable, address)
     }
 }
