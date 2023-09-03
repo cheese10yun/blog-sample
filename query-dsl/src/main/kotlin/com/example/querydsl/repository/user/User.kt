@@ -46,6 +46,12 @@ class UserCustomRepositoryImpl : QuerydslRepositorySupport(User::class.java), Us
 
         PageImpl(content.await(), pageable, count.await())
     }
+
+//    override fun find(pageable: Pageable): Page<User> {
+//        val query = from(QUser.user)
+//            .select(QUser.user)
+//        return PageImpl(querydsl!!.applyPagination(pageable, query).fetch(), pageable, query.fetchCount())
+//    }
 }
 
 @RestController

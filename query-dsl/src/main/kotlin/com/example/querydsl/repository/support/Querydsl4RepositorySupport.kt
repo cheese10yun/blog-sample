@@ -1,5 +1,6 @@
 package com.example.querydsl.repository.support
 
+import com.example.querydsl.logger
 import com.querydsl.core.types.EntityPath
 import com.querydsl.core.types.Expression
 import com.querydsl.core.types.dsl.PathBuilder
@@ -16,11 +17,16 @@ import org.springframework.stereotype.Repository
 import java.util.function.Function
 import javax.persistence.EntityManager
 import kotlin.properties.Delegates.notNull
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
+import org.springframework.data.domain.PageImpl
 
 @Repository
 abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
 
-    private var querydsl: Querydsl by notNull()
+    private val log by logger()
+
+    protected var querydsl: Querydsl by notNull()
 
     private var queryFactory: JPAQueryFactory by notNull()
 
@@ -43,16 +49,32 @@ abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
         return queryFactory.selectFrom(from)
     }
 
-    protected fun <T> applyPagination(pageable: Pageable, contentQuery: Function<JPAQueryFactory, JPAQuery<*>>): Page<T> {
+    protected fun <T> applyPagination(
+        pageable: Pageable,
+        contentQuery: Function<JPAQueryFactory, JPAQuery<*>>
+    ): Page<T> {
         val jpaQuery = contentQuery.apply(queryFactory)
         val content: List<T> = querydsl.applyPagination(pageable, jpaQuery).fetch() as List<T>
         return PageableExecutionUtils.getPage(content, pageable) { jpaQuery.fetchCount() }
     }
 
-    protected fun applyPagination(pageable: Pageable, contentQuery: Function<JPAQueryFactory, JPAQuery<*>>, countQuery: Function<JPAQueryFactory, JPAQuery<*>>): Page<Any> {
+    protected fun <T> applyPagination(
+        pageable: Pageable,
+        contentQuery: Function<JPAQueryFactory, JPAQuery<*>>,
+        countQuery: Function<JPAQueryFactory, JPAQuery<Long>>
+    ): Page<T> = runBlocking {
+        log.info("thread applyPagination start: : ${Thread.currentThread()}")
         val jpaContentQuery = contentQuery.apply(queryFactory)
-        val content = querydsl.applyPagination(pageable, jpaContentQuery).fetch()
-        val countQuery = countQuery.apply(queryFactory)
-        return PageableExecutionUtils.getPage(content, pageable) { countQuery.fetchCount() }
+        val content = async {
+            log.info("thread content: ${Thread.currentThread()}")
+            querydsl.applyPagination(pageable, jpaContentQuery).fetch() as List<T>
+        }
+        val count = async {
+            log.info("thread count: : ${Thread.currentThread()}")
+            countQuery.apply(queryFactory).fetchFirst()
+        }
+        log.info("thread applyPagination end: : ${Thread.currentThread()}")
+
+        PageImpl(content.await(), pageable, count.await())
     }
 }

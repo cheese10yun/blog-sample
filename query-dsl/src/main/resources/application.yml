@@ -7,7 +7,7 @@ spring:
         hibernate:
             ddl-auto: create
 
-        show-sql: true
+#        show-sql: true
         #    database-platform: com.example.querydsl.config.MysqlCustomDialect
         properties:
             hibernate:
@@ -28,4 +28,6 @@ spring:
 logging:
     level:
         ROOT: info
+#    pattern:
+#        console:
 #    org.hibernate.type.descriptor.sql.BasicBinder: trace

@@ -2,7 +2,9 @@ package com.example.querydsl.repository.order
 
 
 import com.example.querydsl.domain.EntityAuditing
+import com.example.querydsl.logger
 import com.example.querydsl.repository.order.QOrder.order
+import com.example.querydsl.repository.support.Querydsl4RepositorySupport
 import com.example.querydsl.repository.user.QUser
 import com.example.querydsl.repository.user.User
 import kotlinx.coroutines.async
@@ -40,26 +42,40 @@ interface OrderRepository : JpaRepository<Order, Long>, OrderCustomRepository
 interface OrderCustomRepository {
     fun find(pageable: Pageable): Page<Order>
     fun find2(pageable: Pageable): Page<Order>
+    fun find3(
+        pageable: Pageable
+    ): Page<Order>
 }
 
-class OrderCustomRepositoryImpl : QuerydslRepositorySupport(Order::class.java), OrderCustomRepository {
+class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java), OrderCustomRepository {
+    private val log by logger()
 
     override fun find(
         pageable: Pageable
     ) = runBlocking {
-        val contentQuery = from(order).select(order).where(order.userId.isNotNull)
-        val countQuery = from(order).select(order.count()).where(order.userId.isNotNull)
+        val contentQuery = selectFrom(order).where(order.userId.isNotNull)
+        val countQuery = select(order.count()).from(order).where(order.userId.isNotNull)
         val content = async { contentQuery.fetch() }
         val count = async { countQuery.fetchFirst() }
 
         PageImpl(content.await(), pageable, count.await())
     }
 
-     override fun find2(pageable: Pageable): Page<Order> {
-        val query = from(order)
-            .select(order)
 
-        return PageImpl(querydsl!!.applyPagination(pageable, query).fetch(), pageable, query.fetchCount())
+    override fun find3(
+        pageable: Pageable
+    ): Page<Order> {
+        log.info("thread find3 : ${Thread.currentThread()}")
+        return applyPagination(
+            pageable = pageable,
+            contentQuery = { selectFrom(order).where(order.userId.isNotNull) },
+            countQuery = { select(order.count()).from(order).where(order.userId.isNotNull) },
+        )
+    }
+
+    override fun find2(pageable: Pageable): Page<Order> {
+        val query = selectFrom(order)
+        return PageImpl(querydsl.applyPagination(pageable, query).fetch(), pageable, query.fetchCount())
     }
 }
 
@@ -68,11 +84,13 @@ class OrderCustomRepositoryImpl : QuerydslRepositorySupport(Order::class.java), 
 class OrderApi(
     private val orderRepository: OrderRepository
 ) {
+    private val log by logger()
 
     @GetMapping
     fun getOrder(
         @PageableDefault pageable: Pageable
     ): Page<Order> {
-        return orderRepository.find2(pageable)
+        log.info("thread api : ${Thread.currentThread()}")
+        return orderRepository.find3(pageable)
     }
 }
