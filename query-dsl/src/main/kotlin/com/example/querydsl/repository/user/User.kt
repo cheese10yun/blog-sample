@@ -2,6 +2,7 @@ package com.example.querydsl.repository.user
 
 import com.example.querydsl.domain.EntityAuditing
 import com.example.querydsl.repository.user.QUser.user
+import com.querydsl.jpa.JPQLQuery
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.springframework.data.domain.Page
@@ -49,8 +50,10 @@ class UserCustomRepositoryImpl : QuerydslRepositorySupport(User::class.java), Us
     }
 
     override fun find2(pageable: Pageable): Page<User> {
-        val query = from(user).select(user)
-        return PageImpl(querydsl!!.applyPagination(pageable, query).fetch(), pageable, query.fetchCount())
+        val query: JPQLQuery<User> = from(user).select(user)
+        val content: List<User> = querydsl!!.applyPagination(pageable, query).fetch()
+        val totalCount: Long = query.fetchCount()
+        return PageImpl(content, pageable, totalCount)
     }
 }
 

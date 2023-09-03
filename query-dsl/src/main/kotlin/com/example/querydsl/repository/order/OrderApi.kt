@@ -25,7 +25,7 @@ class OrderApi(
     ): Page<Order> {
         log.info("thread api : ${Thread.currentThread()}")
 //        return orderRepository.findPaging1(pageable)
-        return orderRepository.findPaging2(pageable, address)
+        return orderRepository.findPaging2By(pageable, address)
     }
 
     @GetMapping("/slice")
@@ -34,6 +34,7 @@ class OrderApi(
         @RequestParam(name = "address") address: String
     ): Slice<Order> {
         log.info("thread api : ${Thread.currentThread()}")
-        return orderRepository.findSlice(pageable, address)
+//        return orderRepository.findSliceBy(pageable, address)
+        return orderRepository.findSliceBy2(pageable, address)
     }
 }

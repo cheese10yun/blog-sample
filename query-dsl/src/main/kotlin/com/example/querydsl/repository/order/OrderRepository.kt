@@ -5,6 +5,7 @@ import com.example.querydsl.domain.EntityAuditing
 import com.example.querydsl.logger
 import com.example.querydsl.repository.order.QOrder.order
 import com.example.querydsl.repository.support.Querydsl4RepositorySupport
+import com.querydsl.jpa.impl.JPAQuery
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.springframework.data.domain.Page
@@ -39,11 +40,12 @@ interface OrderRepository : JpaRepository<Order, Long>, OrderCustomRepository
 
 interface OrderCustomRepository {
     fun find(pageable: Pageable): Page<Order>
-    fun findPaging(pageable: Pageable, address: String): Page<Order>
+    fun findPagingBy(pageable: Pageable, address: String): Page<Order>
     fun findPaging1(pageable: Pageable, address: String): Page<Order>
 
-    fun findSlice(pageable: Pageable, address: String): Slice<Order>
-    fun findPaging2(pageable: Pageable, address: String): Page<Order>
+    fun findSliceBy(pageable: Pageable, address: String): Slice<Order>
+    fun findPaging2By(pageable: Pageable, address: String): Page<Order>
+    fun findSliceBy2(pageable: Pageable, address: String): Slice<Order>
 }
 
 class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java), OrderCustomRepository {
@@ -73,25 +75,31 @@ class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java),
         )
     }
 
-    override fun findPaging(pageable: Pageable, address: String): Page<Order> {
-        val query = selectFrom(order)
+    override fun findPagingBy(pageable: Pageable, address: String): Page<Order> {
+        val query = selectFrom(order).where(order.address.eq(address))
         return PageImpl(querydsl.applyPagination(pageable, query).fetch(), pageable, query.fetchCount())
     }
 
-    override fun findPaging2(pageable: Pageable, address: String): Page<Order> {
-        val query = from(order).select(order).where(order.address.eq(address))
-        return PageImpl(querydsl.applyPagination(pageable, query).fetch(), pageable, query.fetchCount())
+    override fun findPaging2By(pageable: Pageable, address: String): Page<Order> {
+        val query: JPAQuery<Order> = from(order).select(order).where(order.address.eq(address))
+        val content: List<Order> = querydsl.applyPagination(pageable, query).fetch()
+        val totalCount: Long = query.fetchCount()
+        return PageImpl(content, pageable, totalCount)
     }
 
-    override fun findSlice(pageable: Pageable, address: String): Slice<Order> {
-        val query = from(order).select(order)
-        val fetch = querydsl.applyPagination(pageable, query).fetch().toList().filterNotNull()
-
-        val sliceImpl = SliceImpl(fetch, pageable, fetch.isNotEmpty())
-        return sliceImpl
+    override fun findSliceBy(pageable: Pageable, address: String): Slice<Order> {
+        val query: JPAQuery<Order> = from(order).select(order).where(order.address.eq(address))
+        val content: List<Order> = querydsl.applyPagination(pageable, query).fetch().toList().filterNotNull()
+        val hasNext: Boolean = content.size >= pageable.pageSize
+        return SliceImpl(content, pageable, hasNext)
     }
 
-//    private fun SliceImpl(fetch: List<Order>, pageable: Pageable): Slice<Order> {
-//        TODO("Not yet implemented")
-//    }
+    override fun findSliceBy2(pageable: Pageable, address: String): Slice<Order> {
+        return applySlicePagination(
+            pageable = pageable,
+            query = {
+                selectFrom(order).where(order.address.eq(address))
+            }
+        )
+    }
 }

@@ -10,8 +10,9 @@ Content-Type: application/json
 
 
 GET {{host}}/api/orders?
+    address=address&
     page=0&
-    size=2
+    size=22
 Content-Type: application/json
 
 
@@ -21,7 +22,5 @@ Content-Type: application/json
 GET {{host}}/api/orders/slice?
     address=address&
     page=0&
-    size=10
+    size=22
 Content-Type: application/json
-
-

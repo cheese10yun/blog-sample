@@ -4,7 +4,6 @@ import com.example.querydsl.logger
 import com.querydsl.core.types.EntityPath
 import com.querydsl.core.types.Expression
 import com.querydsl.core.types.dsl.PathBuilder
-import com.querydsl.jpa.JPQLQuery
 import com.querydsl.jpa.impl.JPAQuery
 import com.querydsl.jpa.impl.JPAQueryFactory
 import kotlin.properties.Delegates.notNull
@@ -14,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Slice
+import org.springframework.data.domain.SliceImpl
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport
 import org.springframework.data.jpa.repository.support.Querydsl
 import org.springframework.data.querydsl.SimpleEntityPathResolver
@@ -56,7 +57,7 @@ abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
 
     protected fun <T> applyPagination(
         pageable: Pageable,
-        contentQuery: Function<JPAQueryFactory, JPAQuery<*>>
+        contentQuery: Function<JPAQueryFactory, JPAQuery<T>>
     ): Page<T> {
         val jpaQuery = contentQuery.apply(queryFactory)
         val content: List<T> = querydsl.applyPagination(pageable, jpaQuery).fetch() as List<T>
@@ -65,7 +66,7 @@ abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
 
     protected fun <T> applyPagination(
         pageable: Pageable,
-        contentQuery: Function<JPAQueryFactory, JPAQuery<*>>,
+        contentQuery: Function<JPAQueryFactory, JPAQuery<T>>,
         countQuery: Function<JPAQueryFactory, JPAQuery<Long>>
     ): Page<T> = runBlocking {
         log.info("thread applyPagination start: : ${Thread.currentThread()}")
@@ -81,5 +82,15 @@ abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
         log.info("thread applyPagination end: : ${Thread.currentThread()}")
 
         PageImpl(content.await(), pageable, count.await())
+    }
+
+    protected fun <T> applySlicePagination(
+        pageable: Pageable,
+        query: Function<JPAQueryFactory, JPAQuery<T>>
+    ): Slice<T>  {
+        val jpaContentQuery = query.apply(queryFactory)
+        val content = querydsl.applyPagination(pageable, jpaContentQuery).fetch()
+        val hasNext = content.size >= pageable.pageSize
+        return SliceImpl(content, pageable, hasNext)
     }
 }
