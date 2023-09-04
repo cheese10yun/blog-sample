@@ -313,7 +313,7 @@ abstract class QuerydslCustomRepositorySupport(domainClass: Class<*>) : Querydsl
     }
 }
 ```
-* `queryFactory`에서 제공하는 `selectFrom` 및 `select` 기능도 통합하여 DSL 표현을 보다 다양하게 활용할 수 있도록 합니다.
+* `queryFactory`에서 제공하는 `selectFrom` 및 `select` 기능도 제공하여 DSL 표현을 보다 다양하게 활용할 수 있도록 합니다.
 * `applyPagination` 메서드는 페이징 처리를 위해 `Pageable` 객체와, Content 쿼리를 위한 `contentQuery`, Count 쿼리를 위한 `countQuery` 객체를 입력으로 받아서 코루틴을 활용하여 병렬 처리를 수행합니다.
 * `applySlicePagination` 메서드는 Content 쿼리만을 수행하기 때문에 `query` 객체만을 입력으로 받고, content 조회와 `hasNext` 로직을 작성합니다.
 
