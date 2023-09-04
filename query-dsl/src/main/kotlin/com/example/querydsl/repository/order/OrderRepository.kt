@@ -102,7 +102,9 @@ class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java),
     }
 
     override fun findPaging3By(pageable: Pageable, address: String): Page<Order> = runBlocking {
-        val content: Deferred<MutableList<Order>> = async {
+        log.info("findPagingBy thread : ${Thread.currentThread()}")
+        val content: Deferred<List<Order>> = async {
+            log.info("content thread : ${Thread.currentThread()}")
             from(order)
                 .select(order)
                 .innerJoin(user).on(order.userId.eq(user.id))
@@ -113,6 +115,7 @@ class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java),
                 }
         }
         val totalCount: Deferred<Long> = async {
+            log.info("count thread : ${Thread.currentThread()}")
             from(order)
                 .select(order.count())
                 .where(order.address.eq(address))
