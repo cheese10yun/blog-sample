@@ -231,10 +231,10 @@ class OrderCustomRepositoryImpl : QuerydslRepositorySupport(Order::class.java), 
 코루틴의 `async`와 `await`를 활용하여 Content 쿼리와 Count 쿼리를 병렬로 처리하였습니다. 이 과정에서 스레드 정보를 확인하기 위해 `Thread.currentThread()`를 사용하여 현재 스레드 정보를 출력합니다.
 
 ```
-INFO [nio-8080-exec-1] c.e.querydsl.repository.order.OrderApi   : thread api : Thread[http-nio-8080-exec-1,5,main]
-INFO [-1 @coroutine#1] c.e.q.r.order.OrderCustomRepositoryImpl  : findPagingBy thread : Thread[http-nio-8080-exec-1 @coroutine#1,5,main]
-INFO [-1 @coroutine#2] c.e.q.r.order.OrderCustomRepositoryImpl  : content thread : Thread[http-nio-8080-exec-1 @coroutine#2,5,main]
-INFO [-1 @coroutine#3] c.e.q.r.order.OrderCustomRepositoryImpl  : count thread : Thread[http-nio-8080-exec-1 @coroutine#3,5,main]
+INFO [nio-8080-exec-1] repository.order.OrderApi  : thread api : Thread[http-nio-8080-exec-1,5,main]
+INFO [-1 @coroutine#1] OrderCustomRepositoryImpl  : findPagingBy thread : Thread[http-nio-8080-exec-1 @coroutine#1,5,main]
+INFO [-1 @coroutine#2] OrderCustomRepositoryImpl  : content thread : Thread[http-nio-8080-exec-1 @coroutine#2,5,main]
+INFO [-1 @coroutine#3] OrderCustomRepositoryImpl  : count thread : Thread[http-nio-8080-exec-1 @coroutine#3,5,main]
 ```
 
 OrderApi의 `exec-1` 요청 스레드를 기준으로 `findPagingBy`, `content`, `count` 스레드가 동일한 스레드를 사용하는 것을 확인할 수 있습니다. 이것은 `@coroutine#` 주석에서 볼 수 있듯이 한 스레드 내에서 여러 코루틴을 실행할 수 있는 구조를 의미합니다.
@@ -260,10 +260,10 @@ fun `count 1,000ms, content 500ms delay test`() = runBlocking {
     println("${time}ms") // 1037ms
 }
 ```
-소요 시간은 1037ms으로 정상적으로 병렬 처리가 되는 것을 확인할 수 있습니다. 
+소요 시간은 1037ms으로 정상적으로 병렬 처리가 되는 것을 확인할 수 있습니다.
 
 
-## Support 객체를 통한 Querydsl 페이징 로직 개선 
+## Support 객체를 통한 Querydsl 페이징 로직 개선
 
 Slice, Page 등과 같은 페이징 처리를 위한 중복 로직을 피하고 편리하게 사용하기 위해 해당 기능을 Support 객체에 관련 로직을 위임 시키겠습니다. [Querydsl Repository Support 활용](https://cheese10yun.github.io/querydsl-support/)에서 소개한 QuerydslRepositorySupport를 기반으로 해당 기능을 한 번 더 감싸는 QuerydslCustomRepositorySupport 클래스에서 페이징 로직을 작성하겠습니다.
 
@@ -376,7 +376,7 @@ class OrderCustomRepositoryImpl : QuerydslCustomRepositorySupport(Order::class.j
             countQuery = { select(order.count()).from(order).where(order.userId.isNotNull) },
         )
     }
-    
+
 }
 ```
 `QuerydslCustomRepositorySupport` 객체를 상속받아 `applyPagination`과 `applySlicePagination` 로직을 작성합니다. 페이징 로직에 대한 처리는 모두 `QuerydslCustomRepositorySupport`로 위임되며, 각 Repository에서는 해당하는 쿼리만 작성하면 되는 구조로 코드가 훨씬 더 간결해졌습니다.
