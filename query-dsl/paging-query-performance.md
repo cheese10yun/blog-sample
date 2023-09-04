@@ -1,4 +1,4 @@
-# JPA Paging Query
+# JPA Paging Performance 향상 방법
 
 일반적으로 어드민 페이지와 같이 데이터를 테이블 뷰 형식으로 제공할 때, Paging 기법을 사용하여 현재 페이지의 내용과 페이지 정보를 표시합니다. JPA를 활용하면 이러한 반복적인 코드 작성을 보다 쉽게 처리할 수 있습니다.
 
@@ -251,14 +251,14 @@ Count 쿼리에는 `delay(1_000)`이 주어서 1초 동안 대기하며, Content
 ```kotlin
 @Test
 fun `count 1,000ms, content 500ms delay test`() = runBlocking {
-    val time = measureTimeMillis {
-        orderRepository.findPagingBy(
-            pageable = PageRequest.of(0, 10),
-            address = "address"
-        )
+        val time = measureTimeMillis {
+            orderRepository.findPagingBy(
+                pageable = PageRequest.of(0, 10),
+                address = "address"
+            )
+        }
+        println("${time}ms") // 1037ms
     }
-    println("${time}ms") // 1037ms
-}
 ```
 소요 시간은 1037ms으로 정상적으로 병렬 처리가 되는 것을 확인할 수 있습니다.
 
@@ -331,7 +331,11 @@ class OrderCustomRepositoryImpl : QuerydslCustomRepositorySupport(Order::class.j
         return SliceImpl(content, pageable, hasNext)
     }
 
-    override fun findSliceBy2(pageable: Pageable, address: String): Slice<Order> {
+    // Slice 로직 TO-BE
+    override fun findSliceBy(
+        pageable: Pageable,
+        address: String
+    ): Slice<Order> {
         return applySlicePagination(
             pageable = pageable,
             query = {
