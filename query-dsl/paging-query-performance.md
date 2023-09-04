@@ -265,13 +265,120 @@ fun `count 1,000ms, content 500ms delay test`() = runBlocking {
 소요 시간은 1037ms으로 정상적으로 병렬 처리가 되는 것을 확인할 수 있습니다. 
 
 
+## Support 객체를 통한 Querydsl 페이징 로직 개선 
 
-## TODO
+Slice, Page 등과 같은 페이징 처리를 위한 중복 로직을 피하고 편리하게 사용하기 위해 해당 기능을 Support 객체에 관련 로직을 위임 시키겠습니다. [Querydsl Repository Support 활용](https://cheese10yun.github.io/querydsl-support/)에서 소개한 QuerydslRepositorySupport를 기반으로 해당 기능을 한 번 더 감싸는 QuerydslCustomRepositorySupport 클래스에서 페이징 로직을 작성하겠습니다.
 
-* [x] 기존 페이징 쿼리 방식
-* [x] paging 사용 하지 않고 slice 사용 하기
-* [x] 페이징 쿼리가 느린 이유
-* [x] 페이징 쿼리를 따로 둬야하는 이유
-* [ ] 페이징 쿼리 개선
-* [ ] 서포트 객체 만들기
- 
+```kotlin
+abstract class QuerydslCustomRepositorySupport(domainClass: Class<*>) : QuerydslRepositorySupport(domainClass) {
+
+    protected var queryFactory: JPAQueryFactory by Delegates.notNull()
+
+    @PersistenceContext
+    override fun setEntityManager(entityManager: EntityManager) {
+        super.setEntityManager(entityManager)
+        this.queryFactory = JPAQueryFactory(entityManager)
+    }
+
+    protected fun <T> select(expr: Expression<T>): JPAQuery<T> {
+        return queryFactory.select(expr)
+    }
+
+    protected fun <T> selectFrom(from: EntityPath<T>): JPAQuery<T> {
+        return queryFactory.selectFrom(from)
+    }
+
+    protected fun from(path: EntityPath<*>): JPAQuery<*> {
+        return queryFactory.from(path)
+    }
+
+    protected fun <T> applyPagination(
+        pageable: Pageable,
+        contentQuery: Function<JPAQueryFactory, JPAQuery<T>>,
+        countQuery: Function<JPAQueryFactory, JPAQuery<Long>>
+    ): Page<T> = runBlocking {
+        val jpaContentQuery = contentQuery.apply(queryFactory)
+        val content = async { querydsl!!.applyPagination(pageable, jpaContentQuery).fetch() as List<T> }
+        val count = async { countQuery.apply(queryFactory).fetchFirst() }
+
+        PageImpl(content.await(), pageable, count.await())
+    }
+
+    protected fun <T> applySlicePagination(
+        pageable: Pageable,
+        query: Function<JPAQueryFactory, JPAQuery<T>>
+    ): Slice<T> {
+        val jpaContentQuery = query.apply(queryFactory)
+        val content = querydsl!!.applyPagination(pageable, jpaContentQuery).fetch()
+        val hasNext = content.size >= pageable.pageSize
+        return SliceImpl(content, pageable, hasNext)
+    }
+}
+```
+* `queryFactory`에서 제공하는 `selectFrom` 및 `select` 기능도 통합하여 DSL 표현을 보다 다양하게 활용할 수 있도록 합니다.
+* `applyPagination` 메서드는 페이징 처리를 위해 `Pageable` 객체와, Content 쿼리를 위한 `contentQuery`, Count 쿼리를 위한 `countQuery` 객체를 입력으로 받아서 코루틴을 활용하여 병렬 처리를 수행합니다.
+* `applySlicePagination` 메서드는 Content 쿼리만을 수행하기 때문에 `query` 객체만을 입력으로 받고, content 조회와 `hasNext` 로직을 작성합니다.
+
+```kotlin
+
+class OrderCustomRepositoryImpl : QuerydslCustomRepositorySupport(Order::class.java), OrderCustomRepository {
+    // Slice 로직 AS-IS
+    override fun findSliceBy(
+        pageable: Pageable,
+        address: String
+    ): Slice<Order> {
+        val query: JPAQuery<Order> = from(order).select(order).where(order.address.eq(address))
+        val content: List<Order> = querydsl!!.applyPagination(pageable, query).fetch()
+        val hasNext: Boolean = content.size >= pageable.pageSize
+        return SliceImpl(content, pageable, hasNext)
+    }
+
+    override fun findSliceBy2(pageable: Pageable, address: String): Slice<Order> {
+        return applySlicePagination(
+            pageable = pageable,
+            query = {
+                selectFrom(order).where(order.address.eq(address))
+            }
+        )
+    }
+
+    // Page 로직 AS-IS
+    override fun findPagingBy(
+        pageable: Pageable,
+        address: String
+    ): Page<Order> = runBlocking {
+        val content: Deferred<List<Order>> = async {
+            from(order)
+                .select(order)
+                .innerJoin(user).on(order.userId.eq(user.id))
+                .leftJoin(coupon).on(order.couponId.eq(coupon.id))
+                .where(order.address.eq(address))
+                .run {
+                    querydsl!!.applyPagination(pageable, this).fetch()
+                }
+        }
+        val totalCount: Deferred<Long> = async {
+            from(order)
+                .select(order.count())
+                .where(order.address.eq(address))
+                .fetchFirst()
+        }
+
+        PageImpl(content.await(), pageable, totalCount.await())
+    }
+
+    // Page 로직 TO-BE
+    override fun findPaging(
+        pageable: Pageable,
+        address: String
+    ): Page<Order> {
+        return applyPagination(
+            pageable = pageable,
+            contentQuery = { selectFrom(order).where(order.userId.isNotNull) },
+            countQuery = { select(order.count()).from(order).where(order.userId.isNotNull) },
+        )
+    }
+    
+}
+```
+`QuerydslCustomRepositorySupport` 객체를 상속받아 `applyPagination`과 `applySlicePagination` 로직을 작성합니다. 페이징 로직에 대한 처리는 모두 `QuerydslCustomRepositorySupport`로 위임되며, 각 Repository에서는 해당하는 쿼리만 작성하면 되는 구조로 코드가 훨씬 더 간결해졌습니다.

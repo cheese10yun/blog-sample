@@ -5,6 +5,7 @@ import com.example.querydsl.domain.EntityAuditing
 import com.example.querydsl.logger
 import com.example.querydsl.repository.order.QOrder.order
 import com.example.querydsl.repository.support.Querydsl4RepositorySupport
+import com.example.querydsl.repository.support.QuerydslCustomRepositorySupport
 import com.example.querydsl.repository.user.QUser.user
 import com.example.querydsl.service.QCoupon.coupon
 import com.querydsl.jpa.impl.JPAQuery
@@ -53,7 +54,7 @@ interface OrderCustomRepository {
     fun findPaging3By(pageable: Pageable, address: String): Page<Order>
 }
 
-class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java), OrderCustomRepository {
+class OrderCustomRepositoryImpl : QuerydslCustomRepositorySupport(Order::class.java), OrderCustomRepository {
     private val log by logger()
 
     override fun find(
@@ -72,7 +73,6 @@ class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java),
         pageable: Pageable,
         address: String
     ): Page<Order> {
-        log.info("thread find3 : ${Thread.currentThread()}")
         return applyPagination(
             pageable = pageable,
             contentQuery = { selectFrom(order).where(order.userId.isNotNull) },
@@ -82,7 +82,7 @@ class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java),
 
     override fun findPagingBy(pageable: Pageable, address: String): Page<Order> {
         val query = selectFrom(order).where(order.address.eq(address))
-        return PageImpl(querydsl.applyPagination(pageable, query).fetch(), pageable, query.fetchCount())
+        return PageImpl(querydsl!!.applyPagination(pageable, query).fetch(), pageable, query.fetchCount())
     }
 
     override fun findPaging2By(pageable: Pageable, address: String): Page<Order> {
@@ -92,7 +92,7 @@ class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java),
             .leftJoin(coupon).on(order.couponId.eq(coupon.id))
             .where(order.address.eq(address))
             .run {
-                querydsl.applyPagination(pageable, this).fetch()
+                querydsl!!.applyPagination(pageable, this).fetch()
             }
         val totalCount: Long = from(order)
             .select(order.count())
@@ -113,7 +113,7 @@ class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java),
                 .leftJoin(coupon).on(order.couponId.eq(coupon.id))
                 .where(order.address.eq(address))
                 .run {
-                    querydsl.applyPagination(pageable, this).fetch()
+                    querydsl!!.applyPagination(pageable, this).fetch()
                 }
         }
         val totalCount: Deferred<Long> = async {
@@ -131,7 +131,7 @@ class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java),
 
     override fun findSliceBy(pageable: Pageable, address: String): Slice<Order> {
         val query: JPAQuery<Order> = from(order).select(order).where(order.address.eq(address))
-        val content: List<Order> = querydsl.applyPagination(pageable, query).fetch()
+        val content: List<Order> = querydsl!!.applyPagination(pageable, query).fetch()
         val hasNext: Boolean = content.size >= pageable.pageSize
         return SliceImpl(content, pageable, hasNext)
     }

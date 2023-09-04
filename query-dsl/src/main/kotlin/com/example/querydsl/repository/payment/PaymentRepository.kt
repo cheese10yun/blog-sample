@@ -19,6 +19,7 @@ class PaymentCustomRepositoryImpl : QuerydslCustomRepositorySupport(Payment::cla
 
     override fun findUseFrom(targetAmount: BigDecimal): List<Payment> {
         return from(qPayment)
+            .select(qPayment)
             .where(qPayment.amount.gt(targetAmount))
             .fetch()
     }
