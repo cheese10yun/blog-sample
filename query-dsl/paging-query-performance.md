@@ -246,6 +246,26 @@ OrderApi의 `exec-1` 요청 스레드를 기준으로 `findPagingBy`, `content`,
 VM Option에 `-Dkotlinx.coroutines.debug`을 추가하면 실행 중인 코루틴이 어떤 스레드에서 실행되는지를 확인할 수 있습니다.
 
 
+#### 코루틴을 이용한 Count 쿼리와 Content 쿼리 병렬 처리 테스트
+
+Count 쿼리에는 `delay(1_000)`이 주어서 1초 동안 대기하며, Content 쿼리에는 `delay(500)`이 주어서 0.5초 동안 대기하면서 테스트를 진행합니다.
+
+```kotlin
+@Test
+fun `count 1,000ms, content 500ms delay test`() = runBlocking {
+    val time = measureTimeMillis {
+        orderRepository.findPagingBy(
+            pageable = PageRequest.of(0, 10),
+            address = "address"
+        )
+    }
+    println("${time}ms") // 1037ms
+}
+```
+소요 시간은 1037ms으로 정상적으로 병렬 처리가 되는 것을 확인할 수 있습니다. 
+
+
+
 ## TODO
 
 * [x] 기존 페이징 쿼리 방식

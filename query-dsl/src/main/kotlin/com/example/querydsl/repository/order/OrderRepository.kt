@@ -10,6 +10,7 @@ import com.example.querydsl.service.QCoupon.coupon
 import com.querydsl.jpa.impl.JPAQuery
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -105,6 +106,7 @@ class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java),
         log.info("findPagingBy thread : ${Thread.currentThread()}")
         val content: Deferred<List<Order>> = async {
             log.info("content thread : ${Thread.currentThread()}")
+            delay(1_000)
             from(order)
                 .select(order)
                 .innerJoin(user).on(order.userId.eq(user.id))
@@ -116,6 +118,7 @@ class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java),
         }
         val totalCount: Deferred<Long> = async {
             log.info("count thread : ${Thread.currentThread()}")
+            delay(500)
             from(order)
                 .select(order.count())
                 .where(order.address.eq(address))
