@@ -56,7 +56,7 @@ Count 쿼리는 특정 조건에 해당하는 전체 레코드 수를 조회하�
 
 이러한 문제 외에도 다른 문제가 있습니다. JPAQuery를 사용하여 Content 조회 쿼리와 레코드 Count 조회 쿼리를 동일하게 처리하면 성능적인 손해가 발생할 수 있습니다. 특히 여러 테이블을 조인하여 데이터를 조회하는 경우에 이 문제가 더 두드러집니다.
 
-![](docs/images/001.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/query-dsl/docs/images/001.png)
 
 주문 조회 시에 사용자 및 쿠폰 정보와 함께 내려줘야 하는 경우, 조회 필터에 주문 정보만 있는 상황에서 Count 쿼리를 실행할 때, 다른 테이블의 조인 없이 주문에 대한 Count 쿼리를 작성하는 것이 효율적입니다.
 
@@ -191,11 +191,11 @@ Content 쿼리는 Content에 필요한 정보를 여러 테이블의 조인을 �
 
 ### Count 쿼리와 Content 쿼리 병렬 처리하여 개선 방법
 
-![](docs/images/002.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/query-dsl/docs/images/002.png)
 
 Count 쿼리가 1,000ms가 소요되고, 이후 Content 쿼리가 500ms 소요된다고 가정하면 총 1,500ms가 소요됩니다. 이 작업을 전체 데이터를 읽을 때마다 반복하면 성능상 문제가 발생할 수 있습니다. 그러나 이 두 작업은 서로 의존성이 없기 때문에 병렬로 처리할 수 있습니다.
 
-![](docs/images/003.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/query-dsl/docs/images/003.png)
 
 Count 쿼리와 Content 쿼리를 병렬로 처리하면 Count 쿼리가 소요 시간이 더 길어도 1,000ms에 작업을 완료할 수 있습니다. 병렬 처리를 코루틴을 활용하여 구현해 보겠습니다.
 
@@ -239,7 +239,7 @@ INFO [-1 @coroutine#3] c.e.q.r.order.OrderCustomRepositoryImpl  : count thread :
 
 OrderApi의 `exec-1` 요청 스레드를 기준으로 `findPagingBy`, `content`, `count` 스레드가 동일한 스레드를 사용하는 것을 확인할 수 있습니다. 이것은 `@coroutine#` 주석에서 볼 수 있듯이 한 스레드 내에서 여러 코루틴을 실행할 수 있는 구조를 의미합니다.
 
-![](docs/images/004.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/query-dsl/docs/images/004.png)
 
 VM Option에 `-Dkotlinx.coroutines.debug`을 추가하면 실행 중인 코루틴이 어떤 스레드에서 실행되는지를 확인할 수 있습니다.
 
