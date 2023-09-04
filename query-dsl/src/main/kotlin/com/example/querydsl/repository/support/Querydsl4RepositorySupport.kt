@@ -69,17 +69,9 @@ abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
         contentQuery: Function<JPAQueryFactory, JPAQuery<T>>,
         countQuery: Function<JPAQueryFactory, JPAQuery<Long>>
     ): Page<T> = runBlocking {
-        log.info("thread applyPagination start: : ${Thread.currentThread()}")
         val jpaContentQuery = contentQuery.apply(queryFactory)
-        val content = async {
-            log.info("thread content: ${Thread.currentThread()}")
-            querydsl.applyPagination(pageable, jpaContentQuery).fetch() as List<T>
-        }
-        val count = async {
-            log.info("thread count: : ${Thread.currentThread()}")
-            countQuery.apply(queryFactory).fetchFirst()
-        }
-        log.info("thread applyPagination end: : ${Thread.currentThread()}")
+        val content = async { querydsl.applyPagination(pageable, jpaContentQuery).fetch() as List<T> }
+        val count = async { countQuery.apply(queryFactory).fetchFirst() }
 
         PageImpl(content.await(), pageable, count.await())
     }
