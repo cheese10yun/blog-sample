@@ -44,7 +44,7 @@ where order0_.address = ?
 
 Content 조회에 필요하 조회 쿼리와, 전체 레코드 조회에 필요한 쿼리를 JPAQuery를 통해 동일하게 사용이 가능하며, Querydsl의 applyPagination 메서드를 활용하여 offset 및 limit 관련 페이징 로직을 간단하게 구현할 수 있다는 큰 장점이 있습니다.
 
-Querydsl의 applyPagination을 활용하면 페이징 조회 관련 로직을 간단하게 구현할 수 있어서 개발 생산성 측면에서 큰 이점이 있습니다. 그러나 모든 개발 결정 과정에서는 트레이드오프가 발생합니다. 모든 개발 결정 과정에서 편리한 기능을 즉시 활용할 수 있지만, 나중에는 추가 비용을 지불해야 하며 이 비용은 이자를 포함하여 청구될 수 있습니다.
+Querydsl의 applyPagination을 활용하면 페이징 조회 관련 로직을 간단하게 구현할 수 있어서 개발 생산성 측면에서 큰 이점이 있습니다. 그러나 모든 개발 결정 과정에서는 트레이드오프가 발생합니다. 편리한 기능을 즉시 활용할 수 있지만, 나중에는 추가 비용을 지불해야 하며 이 비용은 이자를 포함하여 청구될 수 있습니다.
 
 어떤 문제가 발생하는지 살펴보겠습니다.
 
@@ -197,7 +197,7 @@ Count 쿼리가 1,000ms가 소요되고, 이후 Content 쿼리가 500ms 소요�
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/query-dsl/docs/images/003.png)
 
-Count 쿼리와 Content 쿼리를 병렬로 처리하면 Count 쿼리가 소요 시간이 더 길어도 1,000ms에 작업을 완료할 수 있습니다. 병렬 처리를 코루틴을 활용하여 구현해 보겠습니다.
+Count 쿼리와 Content 쿼리를 병렬로 처리하면 Count 쿼리가 소요 시간이 더 길더라도 1,000ms에 작업을 완료할 수 있습니다. 병렬 처리를 코루틴을 활용하여 구현해 보겠습니다.
 
 #### 코루틴을 이용한 Count 쿼리와 Content 쿼리 병렬 처리
 
@@ -257,10 +257,10 @@ fun `count 1,000ms, content 500ms delay test`() = runBlocking {
                 address = "address"
             )
         }
-        println("${time}ms") // 1037ms
+        println("${time}ms") // 1,037ms
     }
 ```
-소요 시간은 1037ms으로 정상적으로 병렬 처리가 되는 것을 확인할 수 있습니다.
+소요 시간은 1,037ms으로 정상적으로 병렬 처리가 되는 것을 확인할 수 있습니다.
 
 
 ## Support 객체를 통한 Querydsl 페이징 로직 개선
