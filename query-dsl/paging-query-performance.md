@@ -246,7 +246,7 @@ VM Option에 `-Dkotlinx.coroutines.debug`을 추가하면 실행 중인 코루�
 
 #### 코루틴을 이용한 Count 쿼리와 Content 쿼리 병렬 처리 테스트
 
-Count 쿼리에는 `delay(1_000)`이 주어서 1초 동안 대기하며, Content 쿼리에는 `delay(500)`이 주어서 0.5초 동안 대기하면서 테스트를 진행합니다.
+Count 쿼리에는 `delay(1_000)`을 지정하여 1초 동안 대기하고, Content 쿼리에는 `delay(500)`을 지정하여 0.5초 동안 대기하며 테스트를 진행합니다.
 
 ```kotlin
 @Test
