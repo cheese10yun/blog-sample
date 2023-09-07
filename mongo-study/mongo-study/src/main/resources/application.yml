@@ -1,1 +1,20 @@
+spring:
+    data:
+        mongodb:
+            uri: mongodb+srv://service:service@cluster0.qhhygdz.mongodb.net/test
+            username: service
+            password: service
 
+
+logging:
+    level:
+        org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+
+management:
+    endpoint:
+        health:
+            show-details: always
+    endpoints:
+        web:
+            exposure:
+                include: "*"

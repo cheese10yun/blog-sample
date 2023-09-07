@@ -1,0 +1,13 @@
+GET {{host}}/persons?
+    page=0&
+    size=2
+Content-Type: application/json
+
+###
+
+
+GET {{host}}/persons/64f9f54d72b9d23fb676ef26
+Content-Type: application/json
+
+###
+
