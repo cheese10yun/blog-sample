@@ -81,7 +81,12 @@ class OrderCustomRepositoryImpl : QuerydslCustomRepositorySupport(Order::class.j
     }
 
     override fun findPagingBy(pageable: Pageable, address: String): Page<Order> {
-        val query = selectFrom(order).where(order.address.eq(address))
+        val query = from(order)
+            .select(order)
+            .innerJoin(user).on(order.userId.eq(user.id))
+            .leftJoin(coupon).on(order.couponId.eq(coupon.id))
+            .where(order.address.eq(address))
+
         return PageImpl(querydsl!!.applyPagination(pageable, query).fetch(), pageable, query.fetchCount())
     }
 

@@ -26,7 +26,7 @@ class OrderApi(
         log.info("thread api : ${Thread.currentThread()}")
 //        return orderRepository.findPaging1(pageable)
 //        return orderRepository.findPaging2By(pageable, address)
-        return orderRepository.findPaging3By(pageable, address)
+        return orderRepository.findPagingBy(pageable, address)
     }
 
     @GetMapping("/slice")
