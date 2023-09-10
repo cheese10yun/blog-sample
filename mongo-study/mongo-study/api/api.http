@@ -11,3 +11,10 @@ Content-Type: application/json
 
 ###
 
+
+GET {{host}}/persons/query?
+    firstName=test
+Content-Type: application/json
+
+###
+
