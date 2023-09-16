@@ -15,14 +15,14 @@ class RedisConfig {
 //        return LettuceConnectionFactory()
 //    }
 //
-    @Bean
-    fun redisContainer(
-        redisConnectionFactory: RedisConnectionFactory
-    ): RedisMessageListenerContainer {
-        val container = RedisMessageListenerContainer()
-        container.setConnectionFactory(redisConnectionFactory)
-        return container
-    }
+//    @Bean
+//    fun redisContainer(
+//        redisConnectionFactory: RedisConnectionFactory
+//    ): RedisMessageListenerContainer {
+//        val container = RedisMessageListenerContainer()
+//        container.setConnectionFactory(redisConnectionFactory)
+//        return container
+//    }
 
 //    @Bean
 //    fun redisConnectionFactory(): RedisConnectionFactory {
