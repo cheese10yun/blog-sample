@@ -419,6 +419,410 @@ db.movies.find(
 
 ### Aggregation 예제
 
+
+<details>
+<summary>접기/펼치기</summary>
+
+```
+db.orders.aggregate(
+    [
+        {
+            $match: {
+                size: "medium"
+            }
+        },
+        {
+            $group: {
+                _id: {$getField: "name"},
+                totalQuantity: {
+                    $sum: {$getField: "quantity"}
+                }
+            }
+        }
+    ]
+    )
+
+db.orders.aggregate(
+    [
+        {
+            $match: {
+                size: "medium"
+            }
+        },
+        {
+            $group: {
+                _id: "$name",
+                totalQuantity: {
+                    $sum: "$quantity"
+                }
+            }
+        }
+    ]
+    )
+db.orders.aggregate([
+    {
+        $match: {
+            date: {
+                $gte: new ISODate("2020-01-30"),
+                $lt: new ISODate("2022-01-30")
+            }
+        }
+    },
+    {
+        $group: {
+            _id: {
+                $dateToString: {
+                    format: "%Y-%m-%d", date: "$date"
+                }
+            },
+            totalOrderVaule: {
+                $sum: {
+                    $multiply: ["$price", "$quantity"]
+                }
+            },
+            averageOrderQuantity: {
+                $avg: "$quantity"
+            }
+        }
+    },
+    {
+        $sort: {
+            totalOrderVaule: -1
+        }
+    }
+])
+
+
+db.books.insertMany([
+    {"_id": 8751, "title": "The Banquet", "author": "Dante", "copies": 2},
+    {"_id": 8752, "title": "Divine Comedy", "author": "Dante", "copies": 1},
+    {"_id": 8645, "title": "Eclogues", "author": "Dante", "copies": 2},
+    {"_id": 7000, "title": "The Odyssey", "author": "Homer", "copies": 10},
+    {"_id": 7020, "title": "Iliad", "author": "Homer", "copies": 10}
+])
+
+db.books.find()
+
+
+db.books.aggregate([
+    {
+        $group: {
+            _id: "$author",
+            books: {
+                $push: "$$ROOT"
+            },
+            totalCopies: {
+                $sum: "$copies"
+            }
+        }
+    }
+])
+
+
+db.books.aggregate([
+    {
+        $group: {
+            _id: "$author",
+            books: {
+                $push: "$$ROOT"
+            },
+            totalCopies: {
+                $sum: "$copies"
+            }
+        }
+    }
+])
+
+
+db.books.aggregate([
+    {
+        $group: {
+            _id: "$author",
+            books: {
+                $push: "$$ROOT"
+            }
+        }
+    },
+    {
+        $addFields: {
+            totalCopies: {
+                $sum: "$books.copies"
+            }
+        }
+    }
+])
+
+
+db.orders.drop()
+
+db.orders.insertMany([
+    {"productId": 1, "price": 12,},
+    {"productId": 2, "price": 20,},
+    {"productId": 3, "price": 80,}
+])
+
+
+db.products.insertMany([
+    {"id": 1, "instock": 120},
+    {"id": 2, "instock": 80},
+    {"id": 3, "instock": 60},
+    {"id": 4, "instock": 70}
+])
+
+
+db.orders.find()
+db.products.find()
+
+db.orders.aggregate([
+    {
+        $lookup: {
+            from: 'products',
+            localField: 'productId',
+            foreignField: 'id',
+            as: 'data'
+        }
+    },
+    {
+        $unwind: '$data'
+    }
+])
+
+db.books.aggregate([
+    {
+        $group: {
+            _id: "$author",
+            books: {
+                $push: "$$ROOT"
+            }
+        }
+    },
+    {
+        $addFields: {
+            totalCopies: {
+                $sum: "$books.copies"
+            }
+        }
+    },
+    {
+        $unwind: '$books'
+    }
+])
+
+
+db.books.aggregate([
+    {
+        $group: {
+            _id: "$author",
+            books: {
+                $push: "$$ROOT"
+            }
+        }
+    },
+    {
+        $addFields: {
+            totalCopies: {
+                $sum: "$books.copies"
+            }
+        }
+    }
+])
+
+
+use sample_airbnb
+
+show collections
+
+
+db.listingsAndReviews.aggregate(
+    [
+        {
+            $sample: {size: 3}
+        },
+        {
+            $project: {
+                name: 1,
+                summary: 1
+            }
+        }
+    ]
+    )
+
+
+db.listingsAndReviews.aggregate(
+    [
+        {
+            $match: {
+                property_type: "Apartment"
+            }
+        },
+        {
+            $sort: {
+                number_of_reviews: -1
+            }
+        },
+        {
+            $skip: 5
+        },
+        {
+            $limit: 5
+        },
+        {
+            $project: {
+                name: 1,
+                number_of_reviews: 1
+            }
+        }
+    ]
+    )
+
+
+db.books.aggregate(
+    [
+        {
+            $group: {
+                _id: "$author",
+                books: {$push: "$title"}
+            }
+        },
+        {
+            $out: "authors"
+        }
+    ]
+    )
+
+show collections
+
+use sample_training
+db.grades.find()
+
+db.grades.aggregate(
+    [
+        {
+            $unwind: "$scores"
+        },
+        {
+            $match: {
+                "scores.type": {
+                    $in: ['exam', 'quiz']
+                }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    class_id: "$class_id",
+                    type: "$scores.type"
+                },
+                avg_score: {
+                    $avg: "$scores.score"
+                }
+            }
+        },
+        {
+            $group: {
+                _id: "$_id.class_id",
+                scores: {
+                    $push: {
+                        type: "$_id.type",
+                        avg_score: "$avg_score"
+                    }
+                }
+            }
+        },
+        {
+            $sort: {
+                _id: -1
+            }
+        },
+        {
+            $limit: 5
+        }
+    ]
+    )
+
+
+db.grades.aggregate(
+    [
+        {
+            $addFields: {
+                tmp_scores: {
+                    $filter: {
+                        input: "$scores",
+                        as: "scores_var",
+                        cond: {
+                            $or: [
+                                {$eq: ["$$scores_var.type", 'exam']},
+                                {$eq: ["$$scores_var.type", 'quiz']},
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
+            $unset: ["scores", "student_id"]
+        },
+        {
+            $unwind: "$tmp_scores"
+        },
+        {
+            $group: {
+                _id: "$class_id",
+                exam_scores: {
+                    $push: {
+                        $cond: {
+                            if: {
+                                $eq: ["$tmp_scores.type", 'exam']
+                            },
+                            then: "$tmp_scores.score",
+                            else: "$$REMOVE"
+                        }
+                    }
+                },
+                quiz_scores: {
+                    $push: {
+                        $cond: {
+                            if: {
+                                $eq: ["$tmp_scores.type", 'quiz']
+                            },
+                            then: "$tmp_scores.score",
+                            else: "$$REMOVE"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                scores: {
+                    $objectToArray: {
+                        exam: {
+                            $avg: "$exam_scores"
+                        },
+                        quiz: {
+                            $avg: "$quiz_scores"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            $sort: {
+                _id: -1
+            }
+        },
+        {
+            $limit: 5
+        }
+    ]
+)
+```
+
+</details>
+
+
+
 ### 배포의 형태에 따른 CRUD 특징
 
 # MongoDB의 일관성 제어 소개

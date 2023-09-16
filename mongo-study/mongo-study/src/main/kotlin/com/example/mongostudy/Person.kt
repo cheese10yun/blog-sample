@@ -2,6 +2,8 @@ package com.example.mongostudy
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.aggregation.Aggregation
+import org.springframework.data.mongodb.core.aggregation.Aggregation.*
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
@@ -29,4 +31,28 @@ class PersonQueryService(
         val query = Query.query(Criteria.where("firstName").isEqualTo(firstName))
         return mongoTemplate.find(query, Person::class.java)
     }
+
+
+    fun groupByLastName(): List<LastNameGroup> {
+
+        val aggregation = newAggregation(
+            group("lastName"),
+            project(LastNameGroup::class.java)
+                .and(previousOperation()).`as`("lastName"),
+
+        )
+
+        val results =
+            mongoTemplate.aggregate(
+                aggregation,
+                "persons",
+                LastNameGroup::class.java
+            )
+
+        return results.mappedResults
+    }
 }
+
+data class LastNameGroup(
+    val lastName: String
+)

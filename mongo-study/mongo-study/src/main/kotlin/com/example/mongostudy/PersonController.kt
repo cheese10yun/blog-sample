@@ -27,6 +27,10 @@ class PersonController(
         return personQueryService.findBy(firstName)
     }
 
+    @GetMapping("/sample")
+    fun sample(
+    ) = personQueryService.groupByLastName()
+
     @PostMapping("/")
     fun createPerson(@RequestBody person: Person): Person {
         return personRepository.save(person)
