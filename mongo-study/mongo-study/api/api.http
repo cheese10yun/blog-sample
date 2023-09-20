@@ -24,3 +24,9 @@ Content-Type: application/json
 
 ###
 
+
+GET {{host}}/persons/sample/test?name=test
+Content-Type: application/json
+
+###
+

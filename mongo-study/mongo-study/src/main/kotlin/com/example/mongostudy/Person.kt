@@ -2,8 +2,10 @@ package com.example.mongostudy
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.data.mongodb.core.aggregation.Aggregation
-import org.springframework.data.mongodb.core.aggregation.Aggregation.*
+import org.springframework.data.mongodb.core.aggregation.Aggregation.group
+import org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation
+import org.springframework.data.mongodb.core.aggregation.Aggregation.previousOperation
+import org.springframework.data.mongodb.core.aggregation.Aggregation.project
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
@@ -11,9 +13,7 @@ import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.querydsl.QuerydslPredicateExecutor
 import org.springframework.stereotype.Service
-//import javax.persistence.Entity
 
-//@Entity
 @Document(collection = "persons")
 class Person(
     @Id
@@ -53,7 +53,11 @@ class PersonQueryService(
         return results.mappedResults
     }
 
-    fun asd() {
+    fun asd(name: String): List<Person> {
+
+        val person = QPerson.person
+
+        return personRepository.findAll(person.firstName.eq(name)).toList()
 
     }
 }

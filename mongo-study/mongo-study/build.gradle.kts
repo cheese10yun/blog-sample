@@ -29,7 +29,11 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    implementation("com.querydsl:querydsl-mongodb:5.0.0")
+    implementation("com.querydsl:querydsl-mongodb:5.0.0"){
+        exclude(group = "org.mongodb", module = "mongo-java-driver")
+    }
+
+
     kapt("com.querydsl:querydsl-apt:5.0.0")
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")

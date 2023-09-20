@@ -40,4 +40,9 @@ class PersonController(
     fun getPersonById(@PathVariable id: String): Person? {
         return personRepository.findById(id).orElse(null)
     }
+
+    @GetMapping("/sample/test")
+    fun sampleTest(@RequestParam name: String): List<Person> {
+        return personQueryService.asd(name)
+    }
 }
