@@ -11,9 +11,11 @@ import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.querydsl.QuerydslPredicateExecutor
 import org.springframework.stereotype.Service
+//import javax.persistence.Entity
 
+//@Entity
 @Document(collection = "persons")
-data class Person(
+class Person(
     @Id
     val id: String? = null,
     val firstName: String,
@@ -39,7 +41,7 @@ class PersonQueryService(
             group("lastName"),
             project(LastNameGroup::class.java)
                 .and(previousOperation()).`as`("lastName"),
-            )
+        )
 
         val results =
             mongoTemplate.aggregate(
@@ -51,7 +53,7 @@ class PersonQueryService(
         return results.mappedResults
     }
 
-    fun asd(){
+    fun asd() {
 
     }
 }
