@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.data.mongodb.repository.MongoRepository
+import org.springframework.data.querydsl.QuerydslPredicateExecutor
 import org.springframework.stereotype.Service
 
 @Document(collection = "persons")
@@ -19,7 +20,7 @@ data class Person(
     val lastName: String
 )
 
-interface PersonRepository : MongoRepository<Person, String>
+interface PersonRepository : MongoRepository<Person, String>, QuerydslPredicateExecutor<Person>
 
 @Service
 class PersonQueryService(
@@ -32,15 +33,13 @@ class PersonQueryService(
         return mongoTemplate.find(query, Person::class.java)
     }
 
-
     fun groupByLastName(): List<LastNameGroup> {
 
         val aggregation = newAggregation(
             group("lastName"),
             project(LastNameGroup::class.java)
                 .and(previousOperation()).`as`("lastName"),
-
-        )
+            )
 
         val results =
             mongoTemplate.aggregate(
@@ -50,6 +49,10 @@ class PersonQueryService(
             )
 
         return results.mappedResults
+    }
+
+    fun asd(){
+
     }
 }
 

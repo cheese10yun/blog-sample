@@ -1,10 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 
 plugins {
     id("org.springframework.boot") version "2.7.14"
     id("io.spring.dependency-management") version "1.0.15.RELEASE"
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.6.21"
+    kotlin("kapt") version "1.6.21"
 }
 
 group = "com.example"
@@ -26,7 +28,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    implementation("com.querydsl:querydsl-mongodb:5.0.0")
+
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
     testImplementation("org.testcontainers:junit-jupiter")
@@ -49,3 +57,5 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+ㅋㅋ
