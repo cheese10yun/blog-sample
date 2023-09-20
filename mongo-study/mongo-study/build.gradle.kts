@@ -30,6 +30,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     implementation("com.querydsl:querydsl-mongodb:5.0.0")
+    kapt("com.querydsl:querydsl-apt:5.0.0")
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
@@ -45,6 +46,10 @@ dependencyManagement {
     imports {
         mavenBom("org.testcontainers:testcontainers-bom:${property("testcontainersVersion")}")
     }
+}
+
+kapt {
+    annotationProcessor("org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor")
 }
 
 tasks.withType<KotlinCompile> {
