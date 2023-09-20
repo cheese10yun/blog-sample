@@ -612,3 +612,26 @@ XREADGROUP GROUP [group name] [consumer name] COUNT [count] STREAMS [key] [id]
 # user-notifications에서 group1 그룹으로 2개의 컨슈머가 각각 1개씩 조회
 XREADGROUP GROUP group1 consumer2 COUNT 1 STREAMS user-notifications
 ```
+
+
+## 특수 명령어
+
+### Pipeline
+
+Pipelining 다수의 command를 한 번에 요청하여 네트워크 성능을 향상 시키는 기술 Round-Trip Times 최소화, 대부분 클라이언트 라이브러리에서 지원한다.
+
+Round-Trip Times은 Request / Response 모델에서 발생하는 네트워크 지연 시간을 의미
+
+
+### 트랜잭션
+
+Transcation 다수의 명령을 하나의 트랜잭션으로 처리, 원자성을 보장, 중간에 에러가 발생하는 모든 Rollback 처리, 하나의 트랜잭션이 처리되는 동안 다른 클라이언트의 요청이 중간에 끼어들 수 없음
+
+명령어
+
+```redis
+MULTI -- transcation begin
+INCR foo
+DISCARD -- rollback
+EXEC
+```
