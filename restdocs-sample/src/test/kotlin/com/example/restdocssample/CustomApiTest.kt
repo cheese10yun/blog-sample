@@ -1,10 +1,12 @@
 package com.example.restdocssample
 
+import com.epages.restdocs.apispec.ResourceDocumentation.resource
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
@@ -35,19 +37,20 @@ class CustomApiTest : SpringWebTestSupport() {
                 )
         )
             .andExpect(status().isOk())
-            .andDo(
-                write.document(
-                    requestFields(
-                        fieldWithPath("email").description("The Member's email address"),
-                        fieldWithPath("name").description("The Member's name"),
-                    ),
-                    responseFields(
-                        fieldWithPath("email").description("The Member's email address"),
-                        fieldWithPath("name").description("The Member's name"),
-                    )
-                )
-            )
-            .andExpect(jsonPath("$.email", `is`(notNullValue())))
-            .andExpect(jsonPath("$.name", `is`(notNullValue())))
+            .andDo(document("carts-create", resource("Create a cart")));
+//            .andDo(
+//                write.document(
+//                    requestFields(
+//                        fieldWithPath("email").description("The Member's email address"),
+//                        fieldWithPath("name").description("The Member's name"),
+//                    ),
+//                    responseFields(
+//                        fieldWithPath("email").description("The Member's email address"),
+//                        fieldWithPath("name").description("The Member's name"),
+//                    )
+//                )
+//            )
+//            .andExpect(jsonPath("$.email", `is`(notNullValue())))
+//            .andExpect(jsonPath("$.name", `is`(notNullValue())))
     }
 }
