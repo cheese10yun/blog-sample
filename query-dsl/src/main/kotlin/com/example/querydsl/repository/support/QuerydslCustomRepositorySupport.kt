@@ -4,9 +4,6 @@ import com.querydsl.core.types.EntityPath
 import com.querydsl.core.types.Expression
 import com.querydsl.jpa.impl.JPAQuery
 import com.querydsl.jpa.impl.JPAQueryFactory
-import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
-import javax.persistence.EntityManager
-import javax.persistence.PersistenceContext
 import kotlin.properties.Delegates
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -15,7 +12,10 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
+import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import java.util.function.Function
+import javax.persistence.EntityManager
+import javax.persistence.PersistenceContext
 
 abstract class QuerydslCustomRepositorySupport(domainClass: Class<*>) : QuerydslRepositorySupport(domainClass) {
 
