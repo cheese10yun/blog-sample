@@ -1,65 +1,53 @@
 package com.example.restdocssample
 
-import org.junit.jupiter.api.BeforeEach
+import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.notNullValue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
-import org.springframework.restdocs.RestDocumentationContextProvider
-import org.springframework.restdocs.RestDocumentationExtension
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*
-import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.TestConstructor
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers
-import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.web.context.WebApplicationContext
-import org.springframework.web.filter.CharacterEncodingFilter
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post
+import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
+import org.springframework.restdocs.payload.PayloadDocumentation.requestFields
+import org.springframework.restdocs.payload.PayloadDocumentation.responseFields
+import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
+import org.springframework.restdocs.request.RequestDocumentation.pathParameters
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@SpringBootTest
-@ActiveProfiles("test")
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-@AutoConfigureMockMvc
-@ExtendWith(RestDocumentationExtension::class)
-@Import(RestDocsConfiguration::class)
-internal class CustomApiTest {
 
-    @Autowired
-    protected lateinit var restdocs: RestDocsConfiguration
-
-    @Autowired
-    protected lateinit var mockMvc: MockMvc
-
-    @Autowired
-    protected lateinit var write: RestDocumentationResultHandler
-
-    @BeforeEach
-    fun setUp(context: WebApplicationContext, provider: RestDocumentationContextProvider) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
-            .addFilters<DefaultMockMvcBuilder>(CharacterEncodingFilter("UTF-8", true))
-            .apply<DefaultMockMvcBuilder>(
-                MockMvcRestDocumentation.documentationConfiguration(
-                    provider
-                )
-            )
-            .alwaysDo<DefaultMockMvcBuilder>(MockMvcResultHandlers.print())
-            .alwaysDo<DefaultMockMvcBuilder>(restdocs.write())
-            .build()
-    }
+class CustomApiTest : SpringWebTestSupport() {
 
     @Test
-    fun name() {
+    fun asdasdsa() {
+
+
         mockMvc.perform(
-            post("/custom").contentType(MediaType.APPLICATION_JSON)
-                .content()
+            post("/custom")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                        {
+                          "name": "name",
+                          "email": "email"
+                        }
+                    """.trimIndent()
+                )
         )
-            .andDo(write.document()
+            .andExpect(status().isOk())
+            .andDo(
+                write.document(
+                    requestFields(
+                        fieldWithPath("email").description("The Member's email address"),
+                        fieldWithPath("name").description("The Member's name"),
+                    ),
+                    responseFields(
+                        fieldWithPath("email").description("The Member's email address"),
+                        fieldWithPath("name").description("The Member's name"),
+                    )
+                )
+            )
+            .andExpect(jsonPath("$.email", `is`(notNullValue())))
+            .andExpect(jsonPath("$.name", `is`(notNullValue())))
     }
 }

@@ -1,0 +1,7 @@
+[[custom]]
+== Custom API
+
+[[custom-create]]
+=== custom 생성
+
+operation::custom-api-test/asdasdsa[snippets='request-fields,http-request,response-fields,http-response']

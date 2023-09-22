@@ -1,11 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "2.5.5"
-    id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("org.asciidoctor.jvm.convert") version "3.1.0"
-    kotlin("jvm") version "1.5.31"
-    kotlin("plugin.spring") version "1.5.31"
+    id("org.springframework.boot") version "2.7.14"
+    id("io.spring.dependency-management") version "1.0.15.RELEASE"
+    id ("org.asciidoctor.jvm.convert") version "3.3.2"
+    kotlin("jvm") version "1.6.21"
+    kotlin("plugin.spring") version "1.6.21"
+    kotlin("kapt") version "1.6.21"
 }
 
 group = "com.example"
@@ -17,7 +18,7 @@ repositories {
 }
 
 lateinit var asciidoctorExt: Configuration
-val snippetsDir = file("build/generated-snippets")
+val snippetsDir by extra { file("build/generated-snippets") }
 
 asciidoctorj {
     asciidoctorExt = configurations.create("asciidoctorExt")

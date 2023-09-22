@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController
 class CustomApi {
 
     @PostMapping
-    fun custom(@RequestBody dto: CustomRequest) {
-
+    fun custom(@RequestBody dto: CustomRequest): CustomRequest {
+        return dto
     }
 
 

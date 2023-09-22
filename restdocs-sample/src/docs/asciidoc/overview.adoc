@@ -1,0 +1,39 @@
+[[overview]]
+== Overview
+
+[[overview-host]]
+=== Host
+
+|===
+| 환경 | Host
+
+| Sandbox
+| `https://sandbox-xxx-service.com`
+
+| Beta
+| `https://beta-xxx-service.com`
+
+| Production
+| `https://xxx-service.com`
+|===
+
+[[overview-http-status-codes]]
+=== HTTP status codes
+
+|===
+| Status code | Usage
+
+| `200 OK`
+| successfully
+
+| `400 Bad Request`
+| Bad Request
+
+| `500 Internal Server Error`
+| Server Error
+|===
+
+[[overview-error-response]]
+=== HTTP Error Response
+
+operation::rest-document/sample-request[snippets='http-response,response-fields']
