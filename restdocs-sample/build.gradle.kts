@@ -28,6 +28,7 @@ asciidoctorj {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -71,12 +72,9 @@ openapi { //2.3
 }
 
 openapi3 {
-//    servers = listOf(
-//        Server(uri("asdasd"), null)
-//    )
     title = "My API"
     description = "My API description"
-//    tagDescriptionsPropertiesFile = "src/docs/tag-descriptions.yaml"
+//    tagDescriptionsPropertiesFile = "src/test/resources/tags.yaml"
     version = "0.1.0"
     format = "yaml"
 }
