@@ -1,5 +1,7 @@
 package com.example.restdocssample.member
 
+import kotlin.math.min
+import org.hibernate.validator.constraints.Length
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -22,6 +24,8 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.Table
 import javax.validation.constraints.Email
+import javax.validation.constraints.Max
+import javax.validation.constraints.Min
 import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
 
@@ -54,15 +58,24 @@ class MemberApi(
 
 
 class MemberResponse(member: Member) {
+
     @field:NotNull
+    @field:NotEmpty
+    @field:Length(min = 1, max = 2)
     val id = member.id!!
-    @field:Email
+
     @field:NotEmpty
     @field:NotNull
     val email = member.email
+
     @field:NotEmpty
     @field:NotNull
+    @field:Min(value = 2L)
+    @field:Max(value = 2222L)
     val name = member.name
+
+
+    val status = member.status
 }
 
 
@@ -94,13 +107,13 @@ class Member(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private var status: MemberStatus
+    var status: MemberStatus
 
     @Column(name = "created_at", nullable = false)
-    private var createdAt: LocalDateTime
+    var createdAt: LocalDateTime
 
     @Column(name = "updated_at", nullable = false)
-    private var updatedAt: LocalDateTime
+    var updatedAt: LocalDateTime
 
     init {
         this.status = status
