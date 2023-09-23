@@ -1,0 +1,17 @@
+[[Member-API]]
+== Member API
+
+[[Member-단일-조회]]
+=== Member 단일 조회
+
+operation::member-api-test/member_get[snippets='http-request,path-parameters,http-response,response-fields']
+
+[[Member-페이징-조회]]
+=== Member 페이징 조회
+
+operation::member-api-test/member_page_test[snippets='http-request,request-parameters,http-response']
+
+[[Member-생성]]
+=== Member 생성
+
+operation::member-api-test/member_create[snippets='request-fields,http-request,http-response']

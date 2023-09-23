@@ -6,9 +6,9 @@ plugins {
     id("io.spring.dependency-management") version "1.0.15.RELEASE"
     id("org.asciidoctor.jvm.convert") version "3.3.2"
     id("com.epages.restdocs-api-spec") version "0.16.4"
-    kotlin("jvm") version "1.6.21"
-    kotlin("plugin.spring") version "1.6.21"
-    kotlin("kapt") version "1.6.21"
+    kotlin("jvm") version "1.8.20"
+    kotlin("plugin.spring") version "1.8.20"
+    kotlin("plugin.jpa") version "1.8.20"
 }
 
 group = "com.example"
@@ -28,6 +28,7 @@ asciidoctorj {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -35,7 +36,7 @@ dependencies {
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
     testImplementation("com.epages:restdocs-api-spec-mockmvc:0.16.4")
 
-
+    runtimeOnly("com.h2database:h2")
     asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
 }
 

@@ -9,4 +9,4 @@ Andy Wilkinson;
 
 include::overview.adoc[]
 
-include::custom.adoc[]
+include::member.adoc[]

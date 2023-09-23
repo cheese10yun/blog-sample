@@ -1,15 +1,21 @@
 package com.example.restdocssample
 
+import com.epages.restdocs.apispec.ResourceDocumentation
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.core.io.ClassPathResource
 import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler
+import org.springframework.restdocs.operation.preprocess.Preprocessors
+import org.springframework.restdocs.snippet.Attributes
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.servlet.MockMvc
@@ -50,12 +56,29 @@ class SpringWebTestSupport {
             .build()
     }
 
-//    @Test
-//    fun name() {
-//        mockMvc.perform(
-//            post("/custom").contentType(MediaType.APPLICATION_JSON)
-//                .content()
-//        )
-//            .andDo(write.document()
-//    }
+
+    protected fun readJson(path: String): String {
+        return String(ClassPathResource(path).inputStream.readBytes())
+    }
+}
+
+@TestConfiguration
+class RestDocsConfiguration {
+
+    @Bean
+    fun write(): RestDocumentationResultHandler {
+        return MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            ResourceDocumentation.resource("{method-name}"),
+        )
+    }
+}
+
+fun field(
+    key: String,
+    value: String
+): Attributes.Attribute {
+    return Attributes.Attribute(key, value)
 }

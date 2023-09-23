@@ -1,0 +1,18 @@
+{
+  "message": " Invalid Input Value",
+  "status": 400,
+  "errors": [
+    {
+      "field": "name",
+      "value": "zoozoozoozoozoozoozoozoozoozoozoozoozoozoozoozoo",
+      "reason": "size must be between 0 and 10"
+    },
+    {
+      "field": "email",
+      "value": "zoozoozoozoozoozoozoozoozoozoozoozoozoozoozoozoozoo@bbb.com",
+      "reason": "size must be between 0 and 30"
+    }
+  ],
+  "code": "C001",
+  "timestamp": "2021-09-12T13:09:23.604016"
+}
