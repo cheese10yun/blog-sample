@@ -45,7 +45,7 @@ class SpringWebTestSupport {
     @BeforeEach
     fun setUp(context: WebApplicationContext, provider: RestDocumentationContextProvider) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
-            .addFilters<DefaultMockMvcBuilder>(CharacterEncodingFilter("UTF-8", true))
+//            .addFilters<DefaultMockMvcBuilder>(CharacterEncodingFilter("UTF-8", true))
             .apply<DefaultMockMvcBuilder>(
                 MockMvcRestDocumentation.documentationConfiguration(
                     provider

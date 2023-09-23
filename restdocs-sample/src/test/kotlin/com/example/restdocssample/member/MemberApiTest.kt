@@ -9,6 +9,7 @@ import org.springframework.http.MediaType
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.payload.PayloadDocumentation.*
 import org.springframework.restdocs.request.RequestDocumentation
@@ -20,7 +21,7 @@ class MemberApiTest: SpringWebTestSupport(){
     @Test
     fun member_page_test() {
         mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/api/members")
+            get("/api/members")
                 .param("size", "10")
                 .param("page", "0")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -41,7 +42,7 @@ class MemberApiTest: SpringWebTestSupport(){
         // 조회 API -> 대상의 데이터가 있어야 합니다.
         val resource = ResourceDocumentation.resource("member find")
         mockMvc.perform(
-            RestDocumentationRequestBuilders.get("/api/members/{id}", 1L)
+            get("/api/members/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
@@ -63,7 +64,7 @@ class MemberApiTest: SpringWebTestSupport(){
     @Test
     fun member_create() {
         mockMvc.perform(
-            RestDocumentationRequestBuilders.post("/api/members")
+            post("/api/members")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(readJson("/json/member-api/member-create.json"))
         )

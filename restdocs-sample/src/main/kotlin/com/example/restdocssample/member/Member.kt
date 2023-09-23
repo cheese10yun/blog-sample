@@ -44,7 +44,7 @@ class MemberApi(
 
     @GetMapping
     fun getMembers(
-        @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable?
+        @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable
     ): Page<MemberResponse> {
         return memberRepository.findAll(pageable).map { MemberResponse(it!!) }
     }
