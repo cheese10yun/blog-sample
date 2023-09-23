@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
+import java.lang.IllegalStateException
 import java.time.LocalDateTime
 
 @ControllerAdvice
@@ -59,6 +60,19 @@ class GlobalExceptionHandler {
         log.error(e.message, e)
         val response = ErrorResponse(ErrorCode.METHOD_NOT_ALLOWED)
         return ResponseEntity(response, HttpStatus.METHOD_NOT_ALLOWED)
+    }
+
+
+    @ExceptionHandler(
+        value = [
+            IllegalArgumentException::class,
+            IllegalStateException::class
+        ]
+    )
+    protected fun handleInnerException(e: Exception): ResponseEntity<ErrorResponse> {
+        log.error(e.message, e)
+        val response = ErrorResponse(ErrorCode.INVALID_INPUT_VALUE)
+        return ResponseEntity(response, HttpStatus.BAD_REQUEST)
     }
 
     @ExceptionHandler(Exception::class)

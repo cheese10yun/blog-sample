@@ -26,6 +26,9 @@ class MemberApi(
 
     @GetMapping("/{id}")
     fun getMember(@PathVariable id: Long): MemberResponse {
+        if (id == 5L) {
+            throw IllegalArgumentException("$id not fond")
+        }
         return MemberResponse(memberRepository.findByIdOrNull(id) ?: throw IllegalArgumentException("$id not fond"))
     }
 
