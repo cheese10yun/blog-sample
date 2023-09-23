@@ -1,6 +1,5 @@
 package com.example.restdocssample.member
 
-import com.epages.restdocs.apispec.ConstrainedFields
 import com.epages.restdocs.apispec.ResourceSnippetParameters
 import com.epages.restdocs.apispec.Schema.Companion.schema
 import com.example.restdocssample.SpringWebTestSupport
@@ -47,6 +46,32 @@ class MemberApiYunTest : SpringWebTestSupport() {
                             fieldWithPath("name").description("asd").type(JsonFieldType.STRING).required().length(2, 10),
                             fieldWithPath("email").description("email").type(JsonFieldType.STRING).required().length(2, 10),
                             fieldWithPath("status").description("status").type("enum").enumValues(MemberStatus::class).required()
+                        )
+                        .build()
+                )
+            )
+    }
+
+    @Test
+    fun member_get_bad_request() {
+        // 잘못된 요청 시뮬레이션 -> 예를 들어, 잘못된 ID나 누락된 필수 정보 등을 전달
+        mockMvc.perform(
+            get("/api/members/{id}", "wrongId")
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(MockMvcResultMatchers.status().isBadRequest())
+            .andDo(
+                writeOpenApi(
+                    ResourceSnippetParameters
+                        .builder()
+                        .tag("Member")
+                        .summary("Member 조회 - 잘못된 요청")
+                        .description("잘못된 ID 또는 필요한 정보가 누락된 경우에 대한 응답 예시.")
+                        .responseSchema(schema("Error"))  // 여기에 오류 응답의 스키마를 지정
+                        .responseFields(
+                            fieldWithPath("errorCode").description("에러 코드").type(JsonFieldType.STRING),
+                            fieldWithPath("errorMessage").description("에러 메시지").type(JsonFieldType.STRING)
+                            // 오류 응답에 따라 추가 필드를 지정할 수 있습니다.
                         )
                         .build()
                 )
