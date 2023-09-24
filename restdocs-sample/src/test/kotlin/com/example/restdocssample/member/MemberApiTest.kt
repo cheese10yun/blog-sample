@@ -15,7 +15,7 @@ import org.springframework.restdocs.request.RequestDocumentation.parameterWithNa
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
 //@Disabled
-class MemberApiTest: SpringWebTestSupport(){
+class MemberApiTest : SpringWebTestSupport() {
 
 //    @Test
 //    fun member_page_test() {
@@ -122,12 +122,11 @@ class MemberApiTest: SpringWebTestSupport(){
                             * 블라
                             """.trimIndent()
                         )
-//                        .responseSchema(Schema.schema(MemberResponse::class.java.simpleName)) // 문서에 표시될 응답객체 정보
-                        .requestSchema(Schema.schema(MemberSignUpRequest::class.java.simpleName)) // 문서에 표시될 응답객체 정보
+                        .requestSchema(Schema.schema(MemberSignUpRequest::class.java.simpleName))
                         .requestFields(
-                            fieldWithPath("name").description("asd").type(JsonFieldType.STRING).required().length(2, 10),
-                            fieldWithPath("email").description("email").type(JsonFieldType.STRING).required().length(2, 10),
-                            fieldWithPath("status").description("status").type("enum").enumValues(MemberStatus::class).required()
+                            fieldWithPath("name").description("asd").type(JsonFieldType.STRING).fieldValidation(MemberSignUpRequest::name),
+                            fieldWithPath("email").description("email").type(JsonFieldType.STRING).fieldValidation(MemberSignUpRequest::email),
+                            fieldWithPath("status").description("status").type("enum").fieldValidation(MemberSignUpRequest::status),
                         )
                         .build()
                 )
