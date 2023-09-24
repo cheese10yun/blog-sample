@@ -55,10 +55,12 @@ class MemberResponse(member: Member) {
 
     @field:NotEmpty
     @field:NotNull
+    @field:Length(min = 1, max = 50)
     val email = member.email
 
     @field:NotEmpty
     @field:NotNull
+    @field:Length(min = 1, max = 50)
     val name = member.name
 
     val status = member.status
