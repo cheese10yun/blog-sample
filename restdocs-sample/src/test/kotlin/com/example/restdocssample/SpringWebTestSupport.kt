@@ -111,12 +111,6 @@ class SpringWebTestSupport {
         return this // 변경된 또는 추가된 FieldDescriptor 반환
     }
 
-    fun isEnumProperty(property: KProperty<*>): Boolean {
-        return property.returnType.classifier?.let {
-            it is KClass<*> && it.isSubclassOf(Enum::class)
-        } ?: false
-    }
-
     fun FieldDescriptor.required(): FieldDescriptor {
         val newConstraints = mutableListOf(
             Constraint("javax.validation.constraints.NotNull", emptyMap()),
@@ -139,20 +133,6 @@ class SpringWebTestSupport {
         return this.addConstraints(newConstraints)
     }
 
-    fun FieldDescriptor.minimum(value: Int): FieldDescriptor {
-        val newConstraints = mutableListOf(
-            Constraint("javax.validation.constraints.Min", mapOf("value" to value))
-        )
-        return this.addConstraints(newConstraints)
-    }
-
-    fun FieldDescriptor.maximum(value: Int): FieldDescriptor {
-        val newConstraints = mutableListOf(
-            Constraint("javax.validation.constraints.Max", mapOf("value" to value))
-        )
-        return this.addConstraints(newConstraints)
-    }
-
     fun FieldDescriptor.length(min: Int, max: Int): FieldDescriptor {
         val newConstraints = mutableListOf(
             Constraint("org.hibernate.validator.constraints.Length", mapOf("min" to min, "max" to max))
@@ -165,7 +145,6 @@ class SpringWebTestSupport {
         val enumConstants = (enumClass.java as Class<Enum<*>>).enumConstants
         return this.attributes(Attributes.key("enumValues").value(enumConstants.map { it.name }))
     }
-
 
     fun fieldWithPageResponse(): Array<FieldDescriptor> {
         return listOf(
@@ -181,11 +160,18 @@ class SpringWebTestSupport {
         ).toTypedArray()
     }
 
+
     private fun FieldDescriptor.addConstraints(newConstraints: List<Constraint>): FieldDescriptor {
         val constraints = this.attributes["validationConstraints"] as? MutableList<Constraint> ?: mutableListOf()
 
         constraints.addAll(newConstraints)
         return this.attributes(Attributes.key("validationConstraints").value(constraints))
+    }
+
+    private fun isEnumProperty(property: KProperty<*>): Boolean {
+        return property.returnType.classifier?.let {
+            it is KClass<*> && it.isSubclassOf(Enum::class)
+        } ?: false
     }
 }
 
