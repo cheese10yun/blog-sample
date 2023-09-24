@@ -56,7 +56,7 @@ class MemberApiTest: SpringWebTestSupport(){
                             * 블라
                             """.trimIndent()
                         )
-                        .responseSchema(Schema.schema(MemberResponse::class.java.simpleName)) // 문서에 표시될 응답객체 정보
+                        .responseSchema(Schema.schema(MemberResponse::class.java.simpleName))
                         .pathParameters(
                             parameterWithName("id").description("Member ID")
                         )
