@@ -4,11 +4,10 @@ const YAML = require('yamljs');
 const path = require('path');
 const fs = require('fs');
 const { createProxyMiddleware } = require('http-proxy-middleware');
-
-const app = express();
+const { spawn } = require('child_process');
 const openapiDir = path.join(__dirname, 'openapi');
 const files = fs.readdirSync(openapiDir);
-
+const app = express();
 const openapiFiles = files.filter(file => file.startsWith('openapi3') && file.endsWith('.yaml'));
 
 openapiFiles.forEach(file => {
@@ -61,6 +60,21 @@ app.use((req, res, next) => {
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(null, options));
 app.use('/openapi', express.static(openapiDir));
+
+// openapi 파일이 변경돼었을 경우 리스타트를 위한 서버
+app.get('/restart', (req, res) => {
+    res.contentType('application/json');
+    res.json({ message: "Restarting server..." });
+
+    process.on('exit', function() {
+        spawn(process.argv.shift(), process.argv, {
+            cwd: process.cwd(),
+            detached : true,
+            stdio: "inherit"
+        });
+    });
+    process.exit();
+});
 
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');
