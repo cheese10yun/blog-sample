@@ -5,7 +5,7 @@ info:
   version: 0.1.0
 servers:
   -
-    url: 'http://localhost:8080'
+    url: 'http://localhost:3000'
     description: 'Sandbox server'
   -
     url: 'http://localhost:2222'

@@ -3,13 +3,12 @@ const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const path = require('path');
 const fs = require('fs');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
-
 const openapiDir = path.join(__dirname, 'openapi');
 const files = fs.readdirSync(openapiDir);
 
-// 'openapi3'로 시작하는 yaml 파일만 필터링
 const openapiFiles = files.filter(file => file.startsWith('openapi3') && file.endsWith('.yaml'));
 
 openapiFiles.forEach(file => {
@@ -18,7 +17,6 @@ openapiFiles.forEach(file => {
 
     document.components = document.components || {};
 
-    // securitySchemes에 ApiKeyAuth가 없는 경우에만 추가
     if (!document.components.securitySchemes || !document.components.securitySchemes.ApiKeyAuth) {
         document.components.securitySchemes = {
             ApiKeyAuth: {
@@ -31,7 +29,6 @@ openapiFiles.forEach(file => {
     fs.writeFileSync(filePath, YAML.stringify(document, 8, 2));
 });
 
-// 파일 이름을 가공하여 options에 추가
 const swaggerOptions = {
     urls: openapiFiles.map(file => {
         const name = file.replace('openapi3-', '').replace('.yaml', '');
@@ -43,6 +40,22 @@ const options = {
     explorer: true,
     swaggerOptions: swaggerOptions
 };
+
+// 프록시 설정
+const serviceProxy = createProxyMiddleware({
+    target: 'http://localhost:8080', // 실제 API 서버 주소 입력
+    changeOrigin: true,
+    context: (pathname) => pathname.includes('/api/')// 'member'가 포함되어 있는 경우만 프록시
+});
+
+app.use((req, res, next) => {
+    if (req.path.includes('/api/')) {
+        serviceProxy(req, res, next);
+    } else {
+        next();
+    }
+});
+
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(null, options));
 app.use('/openapi', express.static(openapiDir));
