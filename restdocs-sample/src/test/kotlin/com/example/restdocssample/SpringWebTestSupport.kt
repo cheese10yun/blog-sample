@@ -167,13 +167,6 @@ class SpringWebTestSupport {
     }
 
 
-    fun FieldDescriptor.addConstraints(newConstraints: List<Constraint>): FieldDescriptor {
-        val constraints = this.attributes["validationConstraints"] as? MutableList<Constraint> ?: mutableListOf()
-
-        constraints.addAll(newConstraints)
-        return this.attributes(Attributes.key("validationConstraints").value(constraints))
-    }
-
     fun fieldWithPageResponse(): Array<FieldDescriptor> {
         return listOf(
             fieldWithPath("total_elements").description("total_elements").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::totalElements),
@@ -186,6 +179,13 @@ class SpringWebTestSupport {
             fieldWithPath("empty").description("empty").type(JsonFieldType.BOOLEAN).fieldValidation(OpenApiPageResponse::empty),
             fieldWithPath("content[0]").description("content").type(JsonFieldType.ARRAY).fieldValidation(OpenApiPageResponse::content)
         ).toTypedArray()
+    }
+
+    private fun FieldDescriptor.addConstraints(newConstraints: List<Constraint>): FieldDescriptor {
+        val constraints = this.attributes["validationConstraints"] as? MutableList<Constraint> ?: mutableListOf()
+
+        constraints.addAll(newConstraints)
+        return this.attributes(Attributes.key("validationConstraints").value(constraints))
     }
 }
 
