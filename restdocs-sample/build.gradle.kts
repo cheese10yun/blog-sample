@@ -58,11 +58,12 @@ openapi3 {
             }
         )
     )
-    title = "My API"
+    title = "Member API"
     description = "My API description"
     tagDescriptionsPropertiesFile = "src/test/resources/tags-descriptions.yaml"
     version = "0.1.0"
     format = "yaml"
+    outputFileNamePrefix = "member-api"
 }
 
 postman {
