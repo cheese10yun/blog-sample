@@ -3,8 +3,8 @@ package com.example.restdocssample.member
 import com.epages.restdocs.apispec.ResourceSnippetParameters
 import com.epages.restdocs.apispec.Schema
 import com.example.restdocssample.ErrorResponse
+import com.example.restdocssample.FieldError
 import com.example.restdocssample.SpringWebTestSupport
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get
@@ -151,14 +151,14 @@ class MemberApiTest : SpringWebTestSupport() {
                         .description("유효성 검사에서 실패하는 경우")
                         .responseSchema(Schema.schema(ErrorResponse::class.java.simpleName))  // 여기에 오류 응답의 스키마를 지정
                         .responseFields(
-                            fieldWithPath("message").description("Error Message").type(JsonFieldType.STRING),
-                            fieldWithPath("status").description("HTTP Status Code").type(JsonFieldType.NUMBER),
-                            fieldWithPath("code").description("Error Code").type(JsonFieldType.STRING),
-                            fieldWithPath("errors").description("Error").type(JsonFieldType.ARRAY),
-                            fieldWithPath("errors[0].field").description("Error field").type(JsonFieldType.STRING),
-                            fieldWithPath("errors[0].value").description("Error value").type(JsonFieldType.STRING),
-                            fieldWithPath("errors[0].reason").description("Error reason").type(JsonFieldType.STRING),
-                            fieldWithPath("timestamp").description("Error Timestamp").type(JsonFieldType.STRING),
+                            fieldWithPath("message").description("Error Message").type(JsonFieldType.STRING).fieldValidation(ErrorResponse::message),
+                            fieldWithPath("status").description("HTTP Status Code").type(JsonFieldType.NUMBER).fieldValidation(ErrorResponse::status),
+                            fieldWithPath("code").description("Error Code").type(JsonFieldType.STRING).fieldValidation(ErrorResponse::code),
+                            fieldWithPath("errors").description("Error Array").type(JsonFieldType.ARRAY).fieldValidation(ErrorResponse::errors),
+                            fieldWithPath("errors[0].field").description("Error field").type(JsonFieldType.STRING).fieldValidation(FieldError::field),
+                            fieldWithPath("errors[0].value").description("Error value").type(JsonFieldType.STRING).fieldValidation(FieldError::value),
+                            fieldWithPath("errors[0].reason").description("Error reason").type(JsonFieldType.STRING).fieldValidation(FieldError::reason),
+                            fieldWithPath("timestamp").description("Error Timestamp").type(JsonFieldType.STRING).fieldValidation(ErrorResponse::timestamp),
                         )
                         .build()
                 )
