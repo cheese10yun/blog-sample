@@ -18,21 +18,44 @@ class MemberApiTest : SpringWebTestSupport() {
 
     @Test
     fun member_page_test() {
+
+
+
         mockMvc.perform(
             get("/api/members")
-                .param("size", "10")
+                .param("size", "1")
                 .param("page", "0")
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(MockMvcResultMatchers.status().isOk())
-//            .andDo(
-//                write.document(
-//                    requestParameters(
-//                        parameterWithName("size").optional().description("size"),
-//                        parameterWithName("page").optional().description("page")
-//                    )
-//                )
-//            )
+            .andDo(
+                writeOpenApi(
+                    ResourceSnippetParameters
+                        .builder()
+                        .tag("members")
+                        .summary("Member 페이지 조회")
+                        .description(
+                            """
+                            * 블라블라
+                            * 블라
+                            """.trimIndent()
+                        )
+                        .responseSchema(Schema.schema("PageResponse<MemberResponse>"))
+                        .requestParameters(
+                            parameterWithName("size").optional().description("size"),
+                            parameterWithName("page").optional().description("page")
+                        )
+                        .responseFields(
+                            *fieldWithPageResponse(),
+                            fieldWithPath("content[0].id").description("ID").type(JsonFieldType.NUMBER).fieldValidation(MemberResponse::id),
+                            fieldWithPath("content[0].name").description("asd").type(JsonFieldType.STRING).fieldValidation(MemberResponse::name),
+                            fieldWithPath("content[0].email").description("email").type(JsonFieldType.STRING).fieldValidation(MemberResponse::email),
+                            fieldWithPath("content[0].address").description("address").type(JsonFieldType.STRING).fieldValidation(MemberResponse::address),
+                            fieldWithPath("content[0].status").description("status").type("enum").fieldValidation(MemberResponse::status),
+                        )
+                        .build()
+                )
+            )
     }
 
     @Test

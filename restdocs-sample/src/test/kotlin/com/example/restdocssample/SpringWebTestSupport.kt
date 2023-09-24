@@ -5,7 +5,6 @@ import com.epages.restdocs.apispec.ResourceDocumentation.resource
 import com.epages.restdocs.apispec.ResourceSnippetParameters
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
-import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.jvm.javaField
 import org.hibernate.validator.constraints.Length
@@ -22,6 +21,8 @@ import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler
 import org.springframework.restdocs.operation.preprocess.Preprocessors.*
 import org.springframework.restdocs.payload.FieldDescriptor
+import org.springframework.restdocs.payload.JsonFieldType
+import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.snippet.Attributes
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
@@ -46,12 +47,10 @@ class SpringWebTestSupport {
     @BeforeEach
     fun setUp(context: WebApplicationContext, provider: RestDocumentationContextProvider) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
-//            .addFilters<DefaultMockMvcBuilder>(CharacterEncodingFilter("UTF-8", true))
             .apply<DefaultMockMvcBuilder>(MockMvcRestDocumentation.documentationConfiguration(provider))
             .alwaysDo<DefaultMockMvcBuilder>(MockMvcResultHandlers.print())
             .build()
     }
-
 
     protected fun readJson(path: String): String {
         return String(ClassPathResource(path).inputStream.readBytes())
@@ -159,16 +158,11 @@ class SpringWebTestSupport {
         return this.addConstraints(newConstraints)
     }
 
-//    fun <T : Enum<T>> FieldDescriptor.enumValues(enumClass: KClass<T>): FieldDescriptor {
-//        return this.attributes(Attributes.key("enumValues").value(enumClass.java.enumConstants.map { it.name }))
-//    }
-
     fun FieldDescriptor.enumValues(enumClass: KClass<*>): FieldDescriptor {
         @Suppress("UNCHECKED_CAST")
         val enumConstants = (enumClass.java as Class<Enum<*>>).enumConstants
         return this.attributes(Attributes.key("enumValues").value(enumConstants.map { it.name }))
     }
-
 
 
     fun FieldDescriptor.addConstraints(newConstraints: List<Constraint>): FieldDescriptor {
@@ -177,4 +171,30 @@ class SpringWebTestSupport {
         constraints.addAll(newConstraints)
         return this.attributes(Attributes.key("validationConstraints").value(constraints))
     }
+
+    fun fieldWithPageResponse(): Array<FieldDescriptor> {
+        return listOf(
+            PayloadDocumentation.fieldWithPath("total_elements").description("total_elements").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::totalElements),
+            PayloadDocumentation.fieldWithPath("total_pages").description("total_pages").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::totalPages),
+            PayloadDocumentation.fieldWithPath("size").description("size").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::size),
+            PayloadDocumentation.fieldWithPath("number").description("number").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::number),
+            PayloadDocumentation.fieldWithPath("number_of_elements").description("number_of_elements").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::numberOfElements),
+            PayloadDocumentation.fieldWithPath("last").description("last").type(JsonFieldType.BOOLEAN).fieldValidation(OpenApiPageResponse::last),
+            PayloadDocumentation.fieldWithPath("first").description("first").type(JsonFieldType.BOOLEAN).fieldValidation(OpenApiPageResponse::first),
+            PayloadDocumentation.fieldWithPath("empty").description("empty").type(JsonFieldType.BOOLEAN).fieldValidation(OpenApiPageResponse::empty),
+            PayloadDocumentation.fieldWithPath("content[0]").description("content").type(JsonFieldType.ARRAY).fieldValidation(OpenApiPageResponse::content)
+        ).toTypedArray()
+    }
 }
+
+data class OpenApiPageResponse(
+    val totalElements: Int,
+    val totalPages: Int,
+    val size: Int,
+    val number: Int,
+    val numberOfElements: Int,
+    val last: Boolean,
+    val first: Boolean,
+    val empty: Boolean,
+    val content: List<*> = emptyList<Any>()
+)

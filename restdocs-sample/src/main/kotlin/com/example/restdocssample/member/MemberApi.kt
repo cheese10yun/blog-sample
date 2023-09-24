@@ -23,7 +23,6 @@ class MemberApi(
     private val memberRepository: MemberRepository
 ) {
 
-
     @GetMapping("/{id}")
     fun getMember(@PathVariable id: Long): MemberResponse {
         if (id == 5L) {
@@ -41,8 +40,10 @@ class MemberApi(
     @GetMapping
     fun getMembers(
         @PageableDefault(sort = ["id"], direction = Sort.Direction.DESC) pageable: Pageable
-    ): Page<MemberResponse> {
-        return memberRepository.findAll(pageable).map { MemberResponse(it!!) }
+    ): PageResponse<MemberResponse> {
+        return PageResponse(
+            memberRepository.findAll(pageable).map { MemberResponse(it) }
+        )
     }
 }
 
@@ -85,4 +86,16 @@ data class MemberSignUpRequest(
     fun toEntity(): Member {
         return Member(email, name, status)
     }
+}
+
+class PageResponse<T>(page: Page<T>) {
+    val totalElements = page.totalElements
+    val totalPages = page.totalPages
+    val size = page.size
+    val number = page.number
+    val numberOfElements = page.numberOfElements
+    val last = page.isLast
+    val first = page.isFirst
+    val empty = page.isEmpty
+    val content: List<T> = page.content
 }
