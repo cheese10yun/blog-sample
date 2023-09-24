@@ -1,5 +1,5 @@
+import groovy.lang.Closure
 import io.swagger.v3.oas.models.servers.Server
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("org.springframework.boot") version "2.7.14"
@@ -41,40 +41,26 @@ dependencies {
     asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
 }
 
-//restdocsApiSpec {
-//    openapi3 {
-//        // OpenAPI 3 문서의 제목 및 버전
-//        title = "My API"
-//        version = "v1"
-//
-//        // 문서가 저장될 경로 (예: build/generated-restdocs/openapi3/api-spec.yml)
-//        outputDir = file("build/generated-restdocs/openapi3")
-//
-//        // Spring REST Docs에서 생성된 .adoc 파일들이 있는 경로
-//        snippetsDir = file("build/generated-snippets")
-//
-//        // 선택적: 서버 정보, 태그, 라이선스 등을 설정합니다.
-//        servers = listOf(Server(url = "https://api.example.com", description = "My API Server"))
-//        tags = listOf(Tag(name = "users", description = "Operations about users"))
-//        // ... 기타 설정 ...
-//    }
-//}
-
-
-openapi { //2.3
-    host = "localhost:8080"
-    basePath = "/api"
-    title = "My API"
-    description = "My API description"
-//    tagDescriptionsPropertiesFile = "src/docs/tag-descriptions.yaml"
-    version = "1.0.0"
-    format = "json"
-}
-
 openapi3 {
+    setServers(
+        listOf(
+            object : Closure<Server>(this) {
+                fun doCall(server: Server) {
+                    server.url = "http://localhost:8080"
+                    server.description = "Sandbox server"
+                }
+            },
+            object : Closure<Server>(this) {
+                fun doCall(server: Server) {
+                    server.url = "http://localhost:2222"
+                    server.description = "Dev server"
+                }
+            }
+        )
+    )
     title = "My API"
     description = "My API description"
-//    tagDescriptionsPropertiesFile = "src/test/resources/tags.yaml"
+    tagDescriptionsPropertiesFile = "src/test/resources/tags-descriptions.yaml"
     version = "0.1.0"
     format = "yaml"
 }
