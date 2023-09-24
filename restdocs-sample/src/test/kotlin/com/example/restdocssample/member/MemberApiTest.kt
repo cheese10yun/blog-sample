@@ -61,10 +61,10 @@ class MemberApiTest: SpringWebTestSupport(){
                             parameterWithName("id").description("Member ID")
                         )
                         .responseFields(
-                            fieldWithPath("id").description("ID").type(JsonFieldType.NUMBER).required().minimum(3).maximum(3222),
-                            fieldWithPath("name").description("asd").type(JsonFieldType.STRING).required().length(2, 10),
-                            fieldWithPath("email").description("email").type(JsonFieldType.STRING).required().length(2, 10),
-                            fieldWithPath("status").description("status").type("enum").enumValues(MemberStatus::class).required()
+                            fieldWithPath("id").description("ID").type(JsonFieldType.NUMBER).fieldValidation(MemberResponse::id),
+                            fieldWithPath("name").description("asd").type(JsonFieldType.STRING).fieldValidation(MemberResponse::name),
+                            fieldWithPath("email").description("email").type(JsonFieldType.STRING).fieldValidation(MemberResponse::email),
+                            fieldWithPath("status").description("status").type("enum").fieldValidation(MemberResponse::status)
                         )
                         .build()
                 )

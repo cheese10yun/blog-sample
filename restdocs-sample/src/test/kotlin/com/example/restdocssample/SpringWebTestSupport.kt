@@ -1,10 +1,14 @@
 package com.example.restdocssample
 
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper
-import com.epages.restdocs.apispec.ResourceDocumentation
 import com.epages.restdocs.apispec.ResourceDocumentation.resource
 import com.epages.restdocs.apispec.ResourceSnippetParameters
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.jvm.javaField
+import org.hibernate.validator.constraints.Length
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,6 +30,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import javax.validation.constraints.NotEmpty
+import javax.validation.constraints.NotNull
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -68,9 +74,65 @@ class SpringWebTestSupport {
         )
     }
 
+
+    fun FieldDescriptor.fieldValidation(property: KProperty<*>): FieldDescriptor {
+        // 해당 클래스에서 fieldName으로 필드를 찾습니다.
+        val field = property.javaField
+
+        field?.getAnnotation(NotEmpty::class.java)?.let {
+            this.notEmpty()
+        }
+
+        field?.getAnnotation(NotNull::class.java)?.let {
+            // NotNull 어노테이션 처리
+            this.notNull()
+        }
+
+        property.findAnnotation<Length>()?.let { length ->
+            // Length 어노테이션 처리
+            val min = length.min
+            val max = length.max
+        }
+
+        field?.getAnnotation(Length::class.java)?.let { length ->
+            this.length(length.min, length.max)
+        }
+
+        // 해당 필드가 enum인지 확인
+        if (isEnumProperty(property)) {
+            // Enum 타입 캐스팅 후 enumValues 메소드 호출
+            @Suppress("UNCHECKED_CAST")
+            val enumClass = property.returnType.classifier as KClass<*>
+            this.enumValues(enumClass)
+        }
+
+
+        return this // 변경된 또는 추가된 FieldDescriptor 반환
+    }
+
+    fun isEnumProperty(property: KProperty<*>): Boolean {
+        return property.returnType.classifier?.let {
+            it is KClass<*> && it.isSubclassOf(Enum::class)
+        } ?: false
+    }
+
     fun FieldDescriptor.required(): FieldDescriptor {
         val newConstraints = mutableListOf(
             Constraint("javax.validation.constraints.NotNull", emptyMap()),
+            Constraint("javax.validation.constraints.NotEmpty", emptyMap())
+        )
+        return this.addConstraints(newConstraints)
+    }
+
+    fun FieldDescriptor.notNull(): FieldDescriptor {
+        val newConstraints = mutableListOf(
+            Constraint("javax.validation.constraints.NotEmpty", emptyMap())
+        )
+        return this.addConstraints(newConstraints)
+    }
+
+    fun FieldDescriptor.notEmpty(): FieldDescriptor {
+        val newConstraints = mutableListOf(
             Constraint("javax.validation.constraints.NotEmpty", emptyMap())
         )
         return this.addConstraints(newConstraints)
@@ -97,9 +159,17 @@ class SpringWebTestSupport {
         return this.addConstraints(newConstraints)
     }
 
-    fun <T : Enum<T>> FieldDescriptor.enumValues(enumClass: KClass<T>): FieldDescriptor {
-        return this.attributes(Attributes.key("enumValues").value(enumClass.java.enumConstants.map { it.name }))
+//    fun <T : Enum<T>> FieldDescriptor.enumValues(enumClass: KClass<T>): FieldDescriptor {
+//        return this.attributes(Attributes.key("enumValues").value(enumClass.java.enumConstants.map { it.name }))
+//    }
+
+    fun FieldDescriptor.enumValues(enumClass: KClass<*>): FieldDescriptor {
+        @Suppress("UNCHECKED_CAST")
+        val enumConstants = (enumClass.java as Class<Enum<*>>).enumConstants
+        return this.attributes(Attributes.key("enumValues").value(enumConstants.map { it.name }))
     }
+
+
 
     fun FieldDescriptor.addConstraints(newConstraints: List<Constraint>): FieldDescriptor {
         val constraints = this.attributes["validationConstraints"] as? MutableList<Constraint> ?: mutableListOf()
