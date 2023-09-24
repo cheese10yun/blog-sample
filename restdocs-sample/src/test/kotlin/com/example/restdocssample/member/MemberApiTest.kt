@@ -88,11 +88,14 @@ class MemberApiTest: SpringWebTestSupport(){
                         .description("잘못된 ID 또는 필요한 정보가 누락된 경우에 대한 응답 예시.")
                         .responseSchema(Schema.schema(ErrorResponse::class.java.simpleName))  // 여기에 오류 응답의 스키마를 지정
                         .responseFields(
-                            fieldWithPath("message").description("에러 코드").type(JsonFieldType.STRING),
-                            fieldWithPath("status").description("에러 메시지").type(JsonFieldType.NUMBER),
-                            fieldWithPath("code").description("에러 메시지").type(JsonFieldType.STRING),
-                            fieldWithPath("errors").description("에러 메시지").type(JsonFieldType.ARRAY),
-                            fieldWithPath("timestamp").description("에러 메시지").type(JsonFieldType.STRING),
+                            fieldWithPath("message").description("Error Message").type(JsonFieldType.STRING),
+                            fieldWithPath("status").description("HTTP Status Code").type(JsonFieldType.NUMBER),
+                            fieldWithPath("code").description("Error Code").type(JsonFieldType.STRING),
+                            fieldWithPath("errors").description("Error").type(JsonFieldType.ARRAY),
+//                            fieldWithPath("errors.field").description("Error field").type(JsonFieldType.STRING),
+//                            fieldWithPath("errors.value").description("Error value").type(JsonFieldType.STRING),
+//                            fieldWithPath("errors.reason").description("Error reason").type(JsonFieldType.STRING),
+                            fieldWithPath("timestamp").description("Error Timestamp").type(JsonFieldType.STRING),
                         )
                         .build()
                 )
