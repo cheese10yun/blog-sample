@@ -134,6 +134,38 @@ class MemberApiTest : SpringWebTestSupport() {
             )
     }
 
+    @Test
+    fun member_create_글자_length_실패() {
+        mockMvc.perform(
+            post("/api/members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(readJson("/json/member-api/member-create-invalid.json"))
+        )
+            .andExpect(MockMvcResultMatchers.status().isBadRequest())
+            .andDo(
+                writeOpenApi(
+                    ResourceSnippetParameters
+                        .builder()
+                        .tag("members")
+                        .summary("Member 등록 - 잘못된 요청")
+                        .description("유효성 검사에서 실패하는 경우")
+                        .responseSchema(Schema.schema(ErrorResponse::class.java.simpleName))  // 여기에 오류 응답의 스키마를 지정
+                        .responseFields(
+                            fieldWithPath("message").description("Error Message").type(JsonFieldType.STRING),
+                            fieldWithPath("status").description("HTTP Status Code").type(JsonFieldType.NUMBER),
+                            fieldWithPath("code").description("Error Code").type(JsonFieldType.STRING),
+                            fieldWithPath("errors").description("Error").type(JsonFieldType.ARRAY),
+                            fieldWithPath("errors[0].field").description("Error field").type(JsonFieldType.STRING),
+                            fieldWithPath("errors[0].value").description("Error value").type(JsonFieldType.STRING),
+                            fieldWithPath("errors[0].reason").description("Error reason").type(JsonFieldType.STRING),
+                            fieldWithPath("timestamp").description("Error Timestamp").type(JsonFieldType.STRING),
+                        )
+                        .build()
+                )
+            )
+    }
+
+
 //    @Test
 //    fun member_modify() {
 //        mockMvc.perform(
@@ -155,15 +187,7 @@ class MemberApiTest : SpringWebTestSupport() {
 //    }
 //
 //
-//    @Test
-//    fun member_create_글자_length_실패() {
-//        mockMvc.perform(
-//            RestDocumentationRequestBuilders.post("/api/members")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(readJson("/json/member-api/member-create-invalid.json"))
-//        )
-//            .andExpect(MockMvcResultMatchers.status().isBadRequest())
-//    }
+
 //
 //    @Test
 //    fun member_modify_글자_length_실패() {

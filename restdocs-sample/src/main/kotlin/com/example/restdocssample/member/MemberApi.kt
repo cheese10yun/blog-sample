@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
-import javax.validation.constraints.Max
-import javax.validation.constraints.Min
+import javax.validation.constraints.Email
 import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
 
@@ -72,9 +71,10 @@ class MemberResponse(member: Member) {
 data class MemberSignUpRequest(
     @field:Length(min = 1, max = 50)
     @field:NotEmpty
+    @field:Email
     val email: String,
 
-    @field:Length(min = 1, max = 22)
+    @field:Length(min = 1, max = 50)
     @field:NotEmpty
     val name: String,
 
