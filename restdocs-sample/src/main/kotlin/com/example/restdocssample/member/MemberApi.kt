@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.validation.Valid
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotEmpty
@@ -33,7 +34,7 @@ class MemberApi(
     }
 
     @PostMapping
-    fun createMember(@RequestBody dto: MemberSignUpRequest) {
+    fun createMember(@RequestBody @Valid dto: MemberSignUpRequest) {
         memberRepository.save(dto.toEntity())
     }
 
@@ -47,7 +48,6 @@ class MemberApi(
 }
 
 class MemberResponse(member: Member) {
-
     @field:NotNull
     @field:NotEmpty
     @field:Length(min = 1, max = 2)
@@ -59,21 +59,23 @@ class MemberResponse(member: Member) {
 
     @field:NotEmpty
     @field:NotNull
-    @field:Min(value = 2L)
-    @field:Max(value = 2222L)
     val name = member.name
-
 
     val status = member.status
 }
 
-
 data class MemberSignUpRequest(
+    @field:Length(min = 1, max = 50)
+    @field:NotEmpty
     val email: String,
+
+    @field:Length(min = 1, max = 22)
+    @field:NotEmpty
     val name: String,
+
+    @field:NotNull
     val status: MemberStatus
 ) {
-
 
     fun toEntity(): Member {
         return Member(email, name, status)

@@ -4,6 +4,7 @@ import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper
 import com.epages.restdocs.apispec.ResourceDocumentation
 import com.epages.restdocs.apispec.ResourceDocumentation.resource
 import com.epages.restdocs.apispec.ResourceSnippetParameters
+import kotlin.reflect.KClass
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,9 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.ClassPathResource
 import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
+import org.springframework.restdocs.constraints.Constraint
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler
 import org.springframework.restdocs.operation.preprocess.Preprocessors.*
+import org.springframework.restdocs.payload.FieldDescriptor
 import org.springframework.restdocs.snippet.Attributes
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
@@ -63,5 +66,45 @@ class SpringWebTestSupport {
             preprocessResponse(prettyPrint()),
             resource(resourceSnippetParameters)
         )
+    }
+
+    fun FieldDescriptor.required(): FieldDescriptor {
+        val newConstraints = mutableListOf(
+            Constraint("javax.validation.constraints.NotNull", emptyMap()),
+            Constraint("javax.validation.constraints.NotEmpty", emptyMap())
+        )
+        return this.addConstraints(newConstraints)
+    }
+
+    fun FieldDescriptor.minimum(value: Int): FieldDescriptor {
+        val newConstraints = mutableListOf(
+            Constraint("javax.validation.constraints.Min", mapOf("value" to value))
+        )
+        return this.addConstraints(newConstraints)
+    }
+
+    fun FieldDescriptor.maximum(value: Int): FieldDescriptor {
+        val newConstraints = mutableListOf(
+            Constraint("javax.validation.constraints.Max", mapOf("value" to value))
+        )
+        return this.addConstraints(newConstraints)
+    }
+
+    fun FieldDescriptor.length(min: Int, max: Int): FieldDescriptor {
+        val newConstraints = mutableListOf(
+            Constraint("org.hibernate.validator.constraints.Length", mapOf("min" to min, "max" to max))
+        )
+        return this.addConstraints(newConstraints)
+    }
+
+    fun <T : Enum<T>> FieldDescriptor.enumValues(enumClass: KClass<T>): FieldDescriptor {
+        return this.attributes(Attributes.key("enumValues").value(enumClass.java.enumConstants.map { it.name }))
+    }
+
+    fun FieldDescriptor.addConstraints(newConstraints: List<Constraint>): FieldDescriptor {
+        val constraints = this.attributes["validationConstraints"] as? MutableList<Constraint> ?: mutableListOf()
+
+        constraints.addAll(newConstraints)
+        return this.attributes(Attributes.key("validationConstraints").value(constraints))
     }
 }
