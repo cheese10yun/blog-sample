@@ -18,9 +18,6 @@ class MemberApiTest : SpringWebTestSupport() {
 
     @Test
     fun member_page_test() {
-
-
-
         mockMvc.perform(
             get("/api/members")
                 .param("size", "1")

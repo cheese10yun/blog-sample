@@ -62,7 +62,6 @@ class GlobalExceptionHandler {
         return ResponseEntity(response, HttpStatus.METHOD_NOT_ALLOWED)
     }
 
-
     @ExceptionHandler(
         value = [
             IllegalArgumentException::class,

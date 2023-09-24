@@ -31,8 +31,10 @@ openapiFiles.forEach(file => {
 
 const swaggerOptions = {
     urls: openapiFiles.map(file => {
-        const name = file.replace('openapi3-', '').replace('.yaml', '');
-        return { url: `/openapi/${file}`, name: name }
+        return {
+            url: `/openapi/${file}`,
+            name: file.replace('openapi3-', '').replace('.yaml', '')
+        }
     })
 };
 

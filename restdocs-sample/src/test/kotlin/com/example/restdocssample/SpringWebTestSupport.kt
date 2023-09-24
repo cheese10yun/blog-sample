@@ -19,10 +19,12 @@ import org.springframework.restdocs.RestDocumentationExtension
 import org.springframework.restdocs.constraints.Constraint
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler
-import org.springframework.restdocs.operation.preprocess.Preprocessors.*
+import org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest
+import org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse
+import org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint
 import org.springframework.restdocs.payload.FieldDescriptor
 import org.springframework.restdocs.payload.JsonFieldType
-import org.springframework.restdocs.payload.PayloadDocumentation
+import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.snippet.Attributes
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestConstructor
@@ -174,15 +176,15 @@ class SpringWebTestSupport {
 
     fun fieldWithPageResponse(): Array<FieldDescriptor> {
         return listOf(
-            PayloadDocumentation.fieldWithPath("total_elements").description("total_elements").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::totalElements),
-            PayloadDocumentation.fieldWithPath("total_pages").description("total_pages").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::totalPages),
-            PayloadDocumentation.fieldWithPath("size").description("size").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::size),
-            PayloadDocumentation.fieldWithPath("number").description("number").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::number),
-            PayloadDocumentation.fieldWithPath("number_of_elements").description("number_of_elements").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::numberOfElements),
-            PayloadDocumentation.fieldWithPath("last").description("last").type(JsonFieldType.BOOLEAN).fieldValidation(OpenApiPageResponse::last),
-            PayloadDocumentation.fieldWithPath("first").description("first").type(JsonFieldType.BOOLEAN).fieldValidation(OpenApiPageResponse::first),
-            PayloadDocumentation.fieldWithPath("empty").description("empty").type(JsonFieldType.BOOLEAN).fieldValidation(OpenApiPageResponse::empty),
-            PayloadDocumentation.fieldWithPath("content[0]").description("content").type(JsonFieldType.ARRAY).fieldValidation(OpenApiPageResponse::content)
+            fieldWithPath("total_elements").description("total_elements").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::totalElements),
+            fieldWithPath("total_pages").description("total_pages").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::totalPages),
+            fieldWithPath("size").description("size").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::size),
+            fieldWithPath("number").description("number").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::number),
+            fieldWithPath("number_of_elements").description("number_of_elements").type(JsonFieldType.NUMBER).fieldValidation(OpenApiPageResponse::numberOfElements),
+            fieldWithPath("last").description("last").type(JsonFieldType.BOOLEAN).fieldValidation(OpenApiPageResponse::last),
+            fieldWithPath("first").description("first").type(JsonFieldType.BOOLEAN).fieldValidation(OpenApiPageResponse::first),
+            fieldWithPath("empty").description("empty").type(JsonFieldType.BOOLEAN).fieldValidation(OpenApiPageResponse::empty),
+            fieldWithPath("content[0]").description("content").type(JsonFieldType.ARRAY).fieldValidation(OpenApiPageResponse::content)
         ).toTypedArray()
     }
 }
