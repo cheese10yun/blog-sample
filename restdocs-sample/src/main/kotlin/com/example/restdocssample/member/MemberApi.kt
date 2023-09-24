@@ -63,6 +63,7 @@ class MemberResponse(member: Member) {
     @field:Length(min = 1, max = 50)
     val name = member.name
 
+    @field:NotNull
     val status = member.status
 }
 
