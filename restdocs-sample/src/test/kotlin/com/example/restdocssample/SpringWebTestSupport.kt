@@ -79,6 +79,12 @@ class SpringWebTestSupport {
         // 해당 클래스에서 fieldName으로 필드를 찾습니다.
         val field = property.javaField
 
+        // nullable 판단
+        when {
+            property.returnType.isMarkedNullable -> this.optional()
+            else -> this.required()
+        }
+
         field?.getAnnotation(NotEmpty::class.java)?.let {
             this.notEmpty()
         }
@@ -86,12 +92,6 @@ class SpringWebTestSupport {
         field?.getAnnotation(NotNull::class.java)?.let {
             // NotNull 어노테이션 처리
             this.notNull()
-        }
-
-        property.findAnnotation<Length>()?.let { length ->
-            // Length 어노테이션 처리
-            val min = length.min
-            val max = length.max
         }
 
         field?.getAnnotation(Length::class.java)?.let { length ->

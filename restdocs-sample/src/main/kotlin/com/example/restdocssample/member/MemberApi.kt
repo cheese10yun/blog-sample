@@ -65,6 +65,8 @@ class MemberResponse(member: Member) {
 
     @field:NotNull
     val status = member.status
+
+    val address: String? = null
 }
 
 data class MemberSignUpRequest(
