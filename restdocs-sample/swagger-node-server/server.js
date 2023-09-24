@@ -42,7 +42,11 @@ const options = {
     swaggerOptions: swaggerOptions
 };
 
-// 프록시 설정
+/**
+ * 프록시 설정
+ * Swagger UI는 XHR 기반으로 HTTP 통신을 진행하기 때문에 CORS 문제가 발생한다.
+ * CORS를 우회하기 위해서 Service API 호출은 Node 서버를 기반으로 Proxy를 기반으로 통신하여 CORS를 우회한다.
+ */
 const serviceProxy = createProxyMiddleware({
     target: 'http://localhost:8080', // 실제 API 서버 주소 입력
     changeOrigin: true,
