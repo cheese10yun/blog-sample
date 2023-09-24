@@ -1,5 +1,7 @@
 import groovy.lang.Closure
 import io.swagger.v3.oas.models.servers.Server
+import org.yaml.snakeyaml.Yaml
+import java.io.InputStream
 
 plugins {
     id("org.springframework.boot") version "2.7.14"
@@ -22,6 +24,14 @@ repositories {
 lateinit var asciidoctorExt: Configuration
 val snippetsDir by extra { file("build/generated-snippets") }
 
+fun getSpringAppName(): String? {
+    val inputStream: InputStream = File("src/main/resources/application.yml").inputStream()
+    val yaml = Yaml().load<Map<String, Any>>(inputStream)
+
+    val springMap = yaml["spring"] as Map<*, *>
+    val applicationMap = springMap["application"] as Map<*, *>
+    return applicationMap["name"] as String?
+}
 asciidoctorj {
     asciidoctorExt = configurations.create("asciidoctorExt")
 }
@@ -63,7 +73,7 @@ openapi3 {
     tagDescriptionsPropertiesFile = "src/test/resources/tags-descriptions.yaml"
     version = "0.1.0"
     format = "yaml"
-    outputFileNamePrefix = "member-api"
+    outputFileNamePrefix = "openapi-${getSpringAppName().orEmpty()}"
 }
 
 postman {

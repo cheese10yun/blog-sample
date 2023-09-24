@@ -1,3 +1,5 @@
 spring:
-  jackson:
+    application:
+        name: member-api
+    jackson:
       property-naming-strategy: SNAKE_CASE

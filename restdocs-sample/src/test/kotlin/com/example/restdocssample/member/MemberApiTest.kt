@@ -48,7 +48,7 @@ class MemberApiTest : SpringWebTestSupport() {
                             fieldWithPath("content[0].name").description("asd").type(JsonFieldType.STRING).fieldValidation(MemberResponse::name),
                             fieldWithPath("content[0].email").description("email").type(JsonFieldType.STRING).fieldValidation(MemberResponse::email),
                             fieldWithPath("content[0].address").description("address").type(JsonFieldType.STRING).fieldValidation(MemberResponse::address),
-                            fieldWithPath("content[0].status").description("status").type("enum").fieldValidation(MemberResponse::status),
+                            fieldWithPath("content[0].status").description("status").type(JsonFieldType.STRING).fieldValidation(MemberResponse::status),
                         )
                         .build()
                 )
