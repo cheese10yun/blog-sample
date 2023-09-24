@@ -14,18 +14,17 @@ import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
-//@Disabled
 class MemberApiTest : SpringWebTestSupport() {
 
-//    @Test
-//    fun member_page_test() {
-//        mockMvc.perform(
-//            get("/api/members")
-//                .param("size", "10")
-//                .param("page", "0")
-//                .contentType(MediaType.APPLICATION_JSON)
-//        )
-//            .andExpect(MockMvcResultMatchers.status().isOk())
+    @Test
+    fun member_page_test() {
+        mockMvc.perform(
+            get("/api/members")
+                .param("size", "10")
+                .param("page", "0")
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(MockMvcResultMatchers.status().isOk())
 //            .andDo(
 //                write.document(
 //                    requestParameters(
@@ -34,7 +33,7 @@ class MemberApiTest : SpringWebTestSupport() {
 //                    )
 //                )
 //            )
-//    }
+    }
 
     @Test
     fun member_get() {
