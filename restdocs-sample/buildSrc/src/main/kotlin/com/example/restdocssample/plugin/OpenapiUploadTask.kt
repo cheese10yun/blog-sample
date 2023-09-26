@@ -19,12 +19,16 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.utils.io.core.buildPacket
 import io.ktor.utils.io.core.writeFully
 import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.InputStream
 
+val <T : Any> T.logger: org.slf4j.Logger get() = LoggerFactory.getLogger(javaClass)
+
 class OpenapiUploadTask : Plugin<Project> {
+
     override fun apply(project: Project) {
-        project.task("yun") {
+        project.task("openapi-upload") {
             doLast {
                 // 여기에 doLast 로직을 넣습니다.
                 runBlocking {
@@ -38,25 +42,29 @@ class OpenapiUploadTask : Plugin<Project> {
                         }
                     }
 
-                    val openApiFileName = "openapi3-test-api.yaml"
-                    val openApiFile = File("build/api-spec/$openApiFileName")
+                    val openApiDirectory = File("build/api-spec/")
+                    val openApiFiles = openApiDirectory.listFiles { _, name -> name.endsWith(".yaml") } ?: emptyArray()
 
-                    val uploadResponse = client.post("http://localhost:3000/upload") {
-                        this.setBody(
-                            MultiPartFormDataContent(
-                                parts = formData {
-                                    appendInput(
-                                        key = "file",
-                                        headers = Headers.build { append(HttpHeaders.ContentDisposition, "filename=${openApiFile.name}") },
-                                        block = { buildPacket { writeFully(openApiFile.readBytes()) } }
-                                    )
-                                }
+                    for (openApiFile in openApiFiles) {
+                        val uploadResponse = client.post("http://localhost:3000/upload") {
+                            this.setBody(
+                                MultiPartFormDataContent(
+                                    parts = formData {
+                                        appendInput(
+                                            key = "file",
+                                            headers = Headers.build { append(HttpHeaders.ContentDisposition, "filename=${openApiFile.name}") },
+                                            block = { buildPacket { writeFully(openApiFile.readBytes()) } }
+                                        )
+                                    }
+                                )
                             )
-                        )
+                        }
+
+                        logger.info("${openApiFile.name} upload response: ${uploadResponse.status}")
                     }
-                    println(uploadResponse.status)
+
                     val restartResponse = client.get("http://localhost:3000/restart")
-                    println(restartResponse.status)
+                    logger.info("Restart response: ${restartResponse.status}")
                     client.close()
                 }
             }

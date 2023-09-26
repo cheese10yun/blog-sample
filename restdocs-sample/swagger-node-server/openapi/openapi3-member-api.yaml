@@ -1,11 +1,11 @@
 openapi: 3.0.1
 info:
-  title: 'My API'
+  title: 'Member API'
   description: 'My API description'
   version: 0.1.0
 servers:
   -
-    url: 'http://localhost:3000'
+    url: 'http://localhost:8080'
     description: 'Sandbox server'
   -
     url: 'http://localhost:2222'
@@ -66,7 +66,7 @@ paths:
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ErrorResponse'}
-              examples: {member-api-test/member_create_글자_length_실패: {value: "{\n  \"message\" : \" Invalid Input Value\",\n  \"status\" : 400,\n  \"code\" : \"C001\",\n  \"errors\" : [ {\n    \"field\" : \"email\",\n    \"value\" : \"asd\",\n    \"reason\" : \"must be a well-formed email address\"\n  } ],\n  \"timestamp\" : \"2023-09-24T16:22:41.329162\"\n}"}}
+              examples: {member-api-test/member_create_글자_length_실패: {value: "{\n  \"message\" : \" Invalid Input Value\",\n  \"status\" : 400,\n  \"code\" : \"C001\",\n  \"errors\" : [ {\n    \"field\" : \"email\",\n    \"value\" : \"asd\",\n    \"reason\" : \"must be a well-formed email address\"\n  } ],\n  \"timestamp\" : \"2023-09-26T22:16:57.180511\"\n}"}}
   '/api/members/{id}':
     get:
       tags:
@@ -94,9 +94,47 @@ paths:
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ErrorResponse'}
-              examples: {member-api-test/member_get_bad_request: {value: "{\n  \"message\" : \" Invalid Input Value\",\n  \"status\" : 400,\n  \"code\" : \"C001\",\n  \"errors\" : [ ],\n  \"timestamp\" : \"2023-09-24T16:22:41.478692\"\n}"}}
+              examples: {member-api-test/member_get_bad_request: {value: "{\n  \"message\" : \" Invalid Input Value\",\n  \"status\" : 400,\n  \"code\" : \"C001\",\n  \"errors\" : [ ],\n  \"timestamp\" : \"2023-09-26T22:16:57.342294\"\n}"}}
 components:
   schemas:
+    ErrorResponse:
+      title: ErrorResponse
+      required:
+        - code
+        - errors
+        - message
+        - status
+        - timestamp
+      type: object
+      properties:
+        code:
+          minLength: 1
+          type: string
+          description: 'Error Code'
+        message:
+          minLength: 1
+          type: string
+          description: 'Error Message'
+        errors:
+          type: array
+          description: 'Error Array'
+          items:
+            required:
+              - field
+              - reason
+              - value
+            type: object
+            properties:
+              reason: {minLength: 1, type: string, description: 'Error reason'}
+              field: {minLength: 1, type: string, description: 'Error field'}
+              value: {minLength: 1, type: string, description: 'Error value'}
+        timestamp:
+          minLength: 1
+          type: string
+          description: 'Error Timestamp'
+        status:
+          type: number
+          description: 'HTTP Status Code'
     PageResponse<MemberResponse>:
       title: PageResponse<MemberResponse>
       required:
@@ -144,51 +182,13 @@ components:
               name: {maxLength: 50, minLength: 1, type: string, description: asd}
               id: {type: number, description: ID}
               email: {maxLength: 50, minLength: 1, type: string, description: email}
-              status: {type: string, description: status, enum: [LOCK, NORMAL, BAN]}
+              status: {minLength: 1, type: string, description: status}
         first:
           type: boolean
           description: first
         empty:
           type: boolean
           description: empty
-    ErrorResponse:
-      title: ErrorResponse
-      required:
-        - code
-        - errors
-        - message
-        - status
-        - timestamp
-      type: object
-      properties:
-        code:
-          minLength: 1
-          type: string
-          description: 'Error Code'
-        message:
-          minLength: 1
-          type: string
-          description: 'Error Message'
-        errors:
-          type: array
-          description: 'Error Array'
-          items:
-            required:
-              - field
-              - reason
-              - value
-            type: object
-            properties:
-              reason: {minLength: 1, type: string, description: 'Error reason'}
-              field: {minLength: 1, type: string, description: 'Error field'}
-              value: {minLength: 1, type: string, description: 'Error value'}
-        timestamp:
-          minLength: 1
-          type: string
-          description: 'Error Timestamp'
-        status:
-          type: number
-          description: 'HTTP Status Code'
     MemberResponse:
       title: MemberResponse
       required:
