@@ -143,6 +143,7 @@ class SpringWebTestSupport {
     fun FieldDescriptor.enumValues(enumClass: KClass<*>): FieldDescriptor {
         @Suppress("UNCHECKED_CAST")
         val enumConstants = (enumClass.java as Class<Enum<*>>).enumConstants
+        this.type("enum")
         return this.attributes(Attributes.key("enumValues").value(enumConstants.map { it.name }))
     }
 

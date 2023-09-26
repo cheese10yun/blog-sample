@@ -84,7 +84,7 @@ class MemberApiTest : SpringWebTestSupport() {
                             fieldWithPath("name").description("asd").type(JsonFieldType.STRING).fieldValidation(MemberResponse::name),
                             fieldWithPath("email").description("email").type(JsonFieldType.STRING).fieldValidation(MemberResponse::email),
                             fieldWithPath("address").description("address").type(JsonFieldType.STRING).fieldValidation(MemberResponse::address),
-                            fieldWithPath("status").description("status").type("enum").fieldValidation(MemberResponse::status),
+                            fieldWithPath("status").description("status").type(JsonFieldType.STRING).fieldValidation(MemberResponse::status),
                         )
                         .build()
                 )
@@ -146,7 +146,7 @@ class MemberApiTest : SpringWebTestSupport() {
                         .requestFields(
                             fieldWithPath("name").description("asd").type(JsonFieldType.STRING).fieldValidation(MemberSignUpRequest::name),
                             fieldWithPath("email").description("email").type(JsonFieldType.STRING).fieldValidation(MemberSignUpRequest::email),
-                            fieldWithPath("status").description("status").type("enum").fieldValidation(MemberSignUpRequest::status),
+                            fieldWithPath("status").description("status").type(JsonFieldType.STRING).fieldValidation(MemberSignUpRequest::status),
                         )
                         .build()
                 )
@@ -217,6 +217,4 @@ class MemberApiTest : SpringWebTestSupport() {
 //        )
 //            .andExpect(MockMvcResultMatchers.status().isBadRequest())
 //    }
-
-
 }
