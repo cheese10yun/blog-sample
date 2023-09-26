@@ -44,8 +44,11 @@ class Member(
     fun modify(name: String) {
         this.name = name
     }
-}
 
+    override fun toString(): String {
+        return "Member(email='$email', name='$name', id=$id, status=$status, createdAt=$createdAt, updatedAt=$updatedAt)"
+    }
+}
 
 interface MemberRepository : JpaRepository<Member, Long>
 
