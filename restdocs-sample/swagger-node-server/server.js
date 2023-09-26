@@ -9,6 +9,7 @@ const openapiDir = path.join(__dirname, 'openapi');
 const files = fs.readdirSync(openapiDir);
 const app = express();
 const openapiFiles = files.filter(file => file.startsWith('openapi3') && file.endsWith('.yaml'));
+const multer = require('multer');
 
 openapiFiles.forEach(file => {
     const filePath = path.join(openapiDir, file);
@@ -77,7 +78,36 @@ app.get('/restart', (req, res) => {
             stdio: "inherit"
         });
     });
+    console.log('Server Restarting')
     process.exit();
+});
+
+// multer 설정: 저장 위치와 파일 이름 지정
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, openapiDir);
+    },
+    filename: function(req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+
+const upload = multer({ storage: storage });
+
+// 파일 업로드 API 엔드포인트
+app.post('/upload', upload.single('file'), (req, res) => {
+
+    // console.log(req.file())
+
+    if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded.' });
+    }
+
+    const uploadedFilePath = path.join(openapiDir, req.file.filename);
+    console.log(`File uploaded to: ${uploadedFilePath}`);
+
+
+    res.json({ message: 'File uploaded successfully.', path: uploadedFilePath });
 });
 
 app.listen(3000, () => {
