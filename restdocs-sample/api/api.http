@@ -1,0 +1,15 @@
+####
+
+
+# curl -X POST -F "file=@/Users/yun/yun/blog-sample/restdocs-sample/build/api-spec/openapi3-aaaa-api.yaml" http://localhost:3000/upload
+POST http://localhost:3000/upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="openapi3-aaaa-api.yaml"
+
+< /Users/yun/yun/blog-sample/restdocs-sample/build/api-spec/openapi3-aaaa-api.yaml
+--WebAppBoundary--
+
+###
+
