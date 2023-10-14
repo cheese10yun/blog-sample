@@ -1,8 +1,5 @@
 import groovy.lang.Closure
 import io.swagger.v3.oas.models.servers.Server
-import kotlin.collections.Map
-import kotlin.collections.get
-import kotlin.collections.listOf
 import kotlin.collections.set
 import org.yaml.snakeyaml.Yaml
 import java.io.InputStream
@@ -18,6 +15,7 @@ plugins {
 }
 
 apply(plugin = "openapi-upload")
+apply(plugin = "open.api.build.plugin")
 
 group = "com.example"
 version = "0.0.1-SNAPSHOT"
