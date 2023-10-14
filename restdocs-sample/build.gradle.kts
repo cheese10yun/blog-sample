@@ -1,5 +1,5 @@
 import groovy.lang.Closure
-import io.swagger.v3.oas.models.servers.Server
+//import io.swagger.v3.oas.models.servers.Server
 import kotlin.collections.set
 import org.yaml.snakeyaml.Yaml
 import java.io.InputStream
@@ -23,6 +23,8 @@ java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
+
 }
 
 val openApiFileName = "openapi-${getSpringAppName().orEmpty()}.yaml"
@@ -67,36 +69,36 @@ dependencies {
     implementation("org.apache.httpcomponents:httpclient:4.5.13")
 }
 
-openapi3 {
-    setServers(
-        listOf(
-            object : Closure<Server>(this) {
-                fun doCall(server: Server) {
-                    server.url = "http://localhost:8080"
-                    server.description = "Sandbox server"
-                }
-            },
-            object : Closure<Server>(this) {
-                fun doCall(server: Server) {
-                    server.url = "http://localhost:2222"
-                    server.description = "Dev server"
-                }
-            }
-        )
-    )
-    title = "Member API"
-    description = "My API description"
-    tagDescriptionsPropertiesFile = "src/test/resources/tags-descriptions.yaml"
-    version = "0.1.0"
-    format = "yaml"
-    outputFileNamePrefix = "openapi3-${getSpringAppName().orEmpty()}"
-}
+//openapi3 {
+//    setServers(
+//        listOf(
+//            object : Closure<Server>(this) {
+//                fun doCall(server: Server) {
+//                    server.url = "http://localhost:8080"
+//                    server.description = "Sandbox server"
+//                }
+//            },
+//            object : Closure<Server>(this) {
+//                fun doCall(server: Server) {
+//                    server.url = "http://localhost:2222"
+//                    server.description = "Dev server"
+//                }
+//            }
+//        )
+//    )
+//    title = "Member API"
+//    description = "My API description"
+//    tagDescriptionsPropertiesFile = "src/test/resources/tags-descriptions.yaml"
+//    version = "0.1.0"
+//    format = "yaml"
+//    outputFileNamePrefix = "openapi3-${getSpringAppName().orEmpty()}"
+//}
 
-postman {
-    title = "My API"
-    version = "0.1.0"
-    baseUrl = "https://localhost:8080"
-}
+//postman {
+//    title = "My API"
+//    version = "0.1.0"
+//    baseUrl = "https://localhost:8080"
+//}
 
 tasks.withType<Test> {
     useJUnitPlatform()
@@ -122,3 +124,5 @@ tasks.bootJar {
         into("static/docs")
     }
 }
+
+
