@@ -19,7 +19,7 @@ class MemberTest{
             .plugin(KotlinPlugin())
             .build()
 
-        val actual = sut.giveMeBuilder<Member>()
+        sut.giveMeBuilder<Member>()
             .setExp(Member::id, 1L)
             .setExp(Member::email, "Line Sally")
             .setExp(Member::name, "Line Sally")
