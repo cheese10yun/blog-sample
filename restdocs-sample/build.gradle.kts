@@ -1,3 +1,5 @@
+//import com.epages.restdocs.apispec.gradle.OpenApiExtension
+import com.example.restdocssample.plugin.OpenApiExtension
 import groovy.lang.Closure
 import io.swagger.v3.oas.models.servers.Server
 import kotlin.collections.set
@@ -28,19 +30,9 @@ repositories {
 
 }
 
-val openApiFileName = "openapi-${getSpringAppName().orEmpty()}.yaml"
-
 lateinit var asciidoctorExt: Configuration
 val snippetsDir by extra { file("build/generated-snippets") }
 
-fun getSpringAppName(): String? {
-    val inputStream: InputStream = File("src/main/resources/application.yml").inputStream()
-    val yaml = Yaml().load<Map<String, Any>>(inputStream)
-
-    val springMap = yaml["spring"] as Map<*, *>
-    val applicationMap = springMap["application"] as Map<*, *>
-    return applicationMap["name"] as String?
-}
 asciidoctorj {
     asciidoctorExt = configurations.create("asciidoctorExt")
 }
@@ -70,44 +62,24 @@ dependencies {
     implementation("org.apache.httpcomponents:httpclient:4.5.13")
 }
 
-
-fun getProperty(propertyName: String): String {
-    val properties = Properties()
-    val inputStream = project.rootProject.file("gradle.properties").inputStream()
-    properties.load(inputStream)
-    return properties.getProperty(propertyName)
-}
-
-
-// 현재 Git branch 이름을 가져오는 함수
-fun getCurrentGitBranch(): String {
-    val process = Runtime.getRuntime().exec("git rev-parse --abbrev-ref HEAD")
-    return process.inputStream.reader().readText().trim()
-}
-
 openapi3 {
+    val openApiExtension = extensions.getByType(OpenApiExtension::class.java)
     setServers(
         listOf(
             object : Closure<Server>(this) {
                 fun doCall(server: Server) {
-                    server.url = "http://localhost:8080"
-                    server.description = "Sandbox server"
+                    server.url = openApiExtension.serverUrl
+                    server.description = openApiExtension.serverDescription
                 }
             },
-            object : Closure<Server>(this) {
-                fun doCall(server: Server) {
-                    server.url = "http://localhost:2222"
-                    server.description = "Dev server"
-                }
-            }
         )
     )
-    title = "Member API"
+    title = openApiExtension.title
     description = "My API description"
+    version = openApiExtension.version
     tagDescriptionsPropertiesFile = "src/test/resources/tags-descriptions.yaml"
-    version = "${getCurrentGitBranch()}-${getProperty("spring-boot")}"
-    format = "yaml"
-    outputFileNamePrefix = "openapi3-${getSpringAppName().orEmpty()}"
+    format = openApiExtension.format
+    outputFileNamePrefix = openApiExtension.outputFileNamePrefix
 }
 
 //postman {
