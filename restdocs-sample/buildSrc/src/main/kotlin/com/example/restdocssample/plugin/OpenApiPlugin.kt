@@ -18,3 +18,6 @@ class OpenApiPlugin : Plugin<Project> {
         }
     }
 }
+sealed class AA{
+
+}
