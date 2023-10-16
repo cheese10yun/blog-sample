@@ -40,30 +40,5 @@ dependencies {
     implementation("io.ktor:ktor-client-logging:2.1.1")
     implementation("io.ktor:ktor-client-content-negotiation:2.1.1")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.1")
-    compileOnly("com.epages:restdocs-api-spec-gradle-plugin:0.9.5")
+    compileOnlyApi("com.epages:restdocs-api-spec-gradle-plugin:0.9.5")
 }
-
-//openapi3 {
-//    setServers(
-//        listOf(
-//            object : Closure<Server>(this) {
-//                fun doCall(server: Server) {
-//                    server.url = "http://localhost:8080"
-//                    server.description = "Sandbox server"
-//                }
-//            },
-//            object : Closure<Server>(this) {
-//                fun doCall(server: Server) {
-//                    server.url = "http://localhost:2222"
-//                    server.description = "Dev server"
-//                }
-//            }
-//        )
-//    )
-//    title = "Member API 2"
-//    description = "My API description 2"
-////    tagDescriptionsPropertiesFile = "src/test/resources/tags-descriptions.yaml"
-//    version = "0.1.0 2"
-//    format = "yaml"
-////    outputFileNamePrefix = "openapi3-${getSpringAppName().orEmpty()}"
-//}

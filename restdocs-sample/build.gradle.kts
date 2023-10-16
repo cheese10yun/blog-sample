@@ -1,11 +1,7 @@
-//import com.epages.restdocs.apispec.gradle.OpenApiExtension
-import com.example.restdocssample.plugin.OpenApiExtension
+import com.example.restdocssample.plugin.OpenApiCustomExtension
 import groovy.lang.Closure
 import io.swagger.v3.oas.models.servers.Server
 import kotlin.collections.set
-import org.jetbrains.kotlin.konan.properties.Properties
-import org.yaml.snakeyaml.Yaml
-import java.io.InputStream
 
 plugins {
     id("org.springframework.boot")
@@ -63,7 +59,7 @@ dependencies {
 }
 
 openapi3 {
-    val openApiExtension = extensions.getByType(OpenApiExtension::class.java)
+    val openApiExtension = extensions.getByType(OpenApiCustomExtension::class.java)
     setServers(
         listOf(
             object : Closure<Server>(this) {

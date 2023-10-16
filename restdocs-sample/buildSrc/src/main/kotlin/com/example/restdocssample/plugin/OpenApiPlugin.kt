@@ -10,19 +10,18 @@ import java.io.InputStream
 class OpenApiPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         // Extension을 만들어서 더 많은 설정을 할 수 있습니다.
-        project.extensions.create(OpenApiExtension.taskName, OpenApiExtension::class.java, project)
+        project.extensions.create(OpenApiCustomExtension.taskName, OpenApiCustomExtension::class.java, project)
 
     }
 }
 
-open class OpenApiExtension(project: Project) {
+open class OpenApiCustomExtension(project: Project) {
     companion object {
-        const val taskName = "OpenApiPlugin"
+        const val taskName = "openApiPlugin"
     }
 
     val serverUrl = "http://localhost:2222"
     val serverDescription = "Sandbox server"
-
     val format = "yml"
 
     val version: String by lazy {
@@ -57,6 +56,4 @@ open class OpenApiExtension(project: Project) {
         val applicationMap = springMap["application"] as Map<*, *>
         return applicationMap["name"] as String
     }
-
-
 }
