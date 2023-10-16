@@ -1,6 +1,7 @@
 import groovy.lang.Closure
 import io.swagger.v3.oas.models.servers.Server
 import kotlin.collections.set
+import org.jetbrains.kotlin.konan.properties.Properties
 import org.yaml.snakeyaml.Yaml
 import java.io.InputStream
 
@@ -69,6 +70,21 @@ dependencies {
     implementation("org.apache.httpcomponents:httpclient:4.5.13")
 }
 
+
+fun getProperty(propertyName: String): String {
+    val properties = Properties()
+    val inputStream = project.rootProject.file("gradle.properties").inputStream()
+    properties.load(inputStream)
+    return properties.getProperty(propertyName)
+}
+
+
+// 현재 Git branch 이름을 가져오는 함수
+fun getCurrentGitBranch(): String {
+    val process = Runtime.getRuntime().exec("git rev-parse --abbrev-ref HEAD")
+    return process.inputStream.reader().readText().trim()
+}
+
 openapi3 {
     setServers(
         listOf(
@@ -89,7 +105,7 @@ openapi3 {
     title = "Member API"
     description = "My API description"
     tagDescriptionsPropertiesFile = "src/test/resources/tags-descriptions.yaml"
-    version = "0.1.0"
+    version = "${getCurrentGitBranch()}-${getProperty("spring-boot")}"
     format = "yaml"
     outputFileNamePrefix = "openapi3-${getSpringAppName().orEmpty()}"
 }
