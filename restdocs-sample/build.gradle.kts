@@ -5,13 +5,13 @@ import org.yaml.snakeyaml.Yaml
 import java.io.InputStream
 
 plugins {
-    id("org.springframework.boot") version "2.7.14"
-    id("io.spring.dependency-management") version "1.0.15.RELEASE"
-    id("org.asciidoctor.jvm.convert") version "3.3.2"
-    id("com.epages.restdocs-api-spec") version "0.16.4"
-    kotlin("jvm") version "1.8.20"
-    kotlin("plugin.spring") version "1.8.20"
-    kotlin("plugin.jpa") version "1.8.20"
+    id("org.springframework.boot")
+    id("io.spring.dependency-management")
+    id("org.asciidoctor.jvm.convert")
+    id("com.epages.restdocs-api-spec")
+    kotlin("jvm")
+    kotlin("plugin.spring")
+    kotlin("plugin.jpa")
 }
 
 apply(plugin = "openapi-upload")
