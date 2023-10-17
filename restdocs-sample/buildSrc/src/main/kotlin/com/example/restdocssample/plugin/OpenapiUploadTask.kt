@@ -43,20 +43,20 @@ class OpenapiUploadTask : Plugin<Project> {
                     }
 
                     val openApiDirectory = File("build/api-spec/")
-                    val openApiFiles = openApiDirectory.listFiles { _, name -> name.endsWith(".yaml") } ?: emptyArray()
+                    val openApiFiles = openApiDirectory.listFiles { _, name -> name.endsWith(".yaml") || name.endsWith(".yml") } ?: emptyArray()
 
                     for (openApiFile in openApiFiles) {
                         val uploadResponse = client.post("http://localhost:3000/upload") {
                             this.setBody(
-                                MultiPartFormDataContent(
-                                    parts = formData {
-                                        appendInput(
-                                            key = "file",
-                                            headers = Headers.build { append(HttpHeaders.ContentDisposition, "filename=${openApiFile.name}") },
-                                            block = { buildPacket { writeFully(openApiFile.readBytes()) } }
-                                        )
-                                    }
-                                )
+                                    MultiPartFormDataContent(
+                                            parts = formData {
+                                                appendInput(
+                                                        key = "file",
+                                                        headers = Headers.build { append(HttpHeaders.ContentDisposition, "filename=${openApiFile.name}") },
+                                                        block = { buildPacket { writeFully(openApiFile.readBytes()) } }
+                                                )
+                                            }
+                                    )
                             )
                         }
 

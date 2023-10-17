@@ -37,8 +37,8 @@ class Member(
 
     init {
         this.status = status
-        createdAt = LocalDateTime.now()
-        updatedAt = LocalDateTime.now()
+        this.createdAt = LocalDateTime.now()
+        this.updatedAt = LocalDateTime.now()
     }
 
     fun modify(name: String) {
