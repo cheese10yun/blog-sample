@@ -30,3 +30,11 @@ Content-Type: application/json
 
 ###
 
+GET {{host}}/persons/test?
+    page=0&
+    size=10&
+    lastName=test
+Content-Type: application/json
+
+###
+

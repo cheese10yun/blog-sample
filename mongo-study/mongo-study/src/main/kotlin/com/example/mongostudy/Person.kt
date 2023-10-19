@@ -1,6 +1,8 @@
 package com.example.mongostudy
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.aggregation.Aggregation.group
 import org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation
@@ -22,7 +24,41 @@ class Person(
     val lastName: String
 )
 
-interface PersonRepository : MongoRepository<Person, String>, QuerydslPredicateExecutor<Person>
+interface PersonRepository : MongoRepository<Person, String>, QuerydslPredicateExecutor<Person>, PersonCustomRepository
+
+interface PersonCustomRepository {
+    fun findPage(
+        lastName: String,
+        pageable: Pageable
+    ): Page<Person>
+}
+
+class PersonCustomRepositoryImpl(
+    mongoTemplate: MongoTemplate
+) : PersonCustomRepository,
+    MongoCustomRepositorySupport<Person>(
+        Person::class.java,
+        mongoTemplate
+    ) {
+
+    override fun findPage(
+        lastName: String,
+        pageable: Pageable
+    ): Page<Person> {
+        val criteria = Criteria.where("lastName").`is`(lastName)
+
+        return applyPagination(
+            pageable = pageable,
+            contentQuery = { query: Query ->
+                mongoTemplate.find(query.addCriteria(criteria), domainClass)
+            },
+            countQuery = { query: Query ->
+                mongoTemplate.count(query.addCriteria(criteria), domainClass)
+            }
+        )
+    }
+}
+
 
 @Service
 class PersonQueryService(

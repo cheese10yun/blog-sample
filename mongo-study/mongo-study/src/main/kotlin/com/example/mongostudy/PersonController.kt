@@ -1,5 +1,8 @@
 package com.example.mongostudy
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -25,6 +28,18 @@ class PersonController(
         @RequestParam("firstName") firstName: String
     ): List<Person> {
         return personQueryService.findBy(firstName)
+    }
+
+
+    @GetMapping("/test")
+    fun getQuery2(
+        @RequestParam("lastName") lastName: String,
+        @PageableDefault pageable: Pageable
+    ): Page<Person> {
+        return personRepository.findPage(
+            lastName = lastName,
+            pageable = pageable
+        )
     }
 
     @GetMapping("/sample")

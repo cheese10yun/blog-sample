@@ -57,5 +57,4 @@ enum class MemberStatus(description: String) {
     LOCK("일시 정지"),
     NORMAL("정상"),
     BAN("영구 정지");
-
 }
