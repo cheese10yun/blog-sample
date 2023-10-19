@@ -1,5 +1,6 @@
 package com.example.mongostudy
 
+import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -11,6 +12,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation.project
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.querydsl.QuerydslPredicateExecutor
@@ -50,13 +52,31 @@ class PersonCustomRepositoryImpl(
         return applyPagination(
             pageable = pageable,
             contentQuery = { query: Query ->
-                mongoTemplate.find(query.addCriteria(criteria), domainClass)
+                mongoTemplate.find(query.addCriteria(criteria), documentClass)
             },
             countQuery = { query: Query ->
-                mongoTemplate.count(query.addCriteria(criteria), domainClass)
+                mongoTemplate.count(query.addCriteria(criteria), documentClass)
             }
         )
     }
+
+    fun updateById(personId: ObjectId, newAddress: String) {
+        val criteria = Criteria.where("id").`is`(personId)
+        val update = Update().set("address", newAddress)
+        val partialUpdate = updateSingleDocument(criteria, update)
+    }
+
+    fun updatePersonsAddress(lastName: String, newAddress: String): Long {
+        val criteria = Criteria.where("lastName").`is`(lastName)
+        val update = Update().set("address", newAddress)
+
+        return updateMany(criteria, update)
+    }
+
+    fun insertMultiplePersons(persons: List<Person>) {
+        insertMany(persons)
+    }
+
 }
 
 
