@@ -1,5 +1,7 @@
-package com.example.mongostudy
+package com.example.mongostudy.person
 
+import com.example.mongostudy.MongoCustomRepositorySupport
+import com.example.mongostudy.QPerson
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.domain.Page

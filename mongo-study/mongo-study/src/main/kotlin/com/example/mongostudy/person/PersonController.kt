@@ -1,5 +1,8 @@
-package com.example.mongostudy
+package com.example.mongostudy.person
 
+import com.example.mongostudy.person.Person
+import com.example.mongostudy.person.PersonQueryService
+import com.example.mongostudy.person.PersonRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
