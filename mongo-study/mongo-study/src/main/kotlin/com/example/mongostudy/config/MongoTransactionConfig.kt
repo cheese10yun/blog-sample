@@ -10,7 +10,7 @@ const val MONGO_TRANSACTION_MANAGER = "mongoTransactionManager"
 
 @Configuration
 @EnableMongoAuditing
-class MongoConfig {
+class MongoTransactionConfig {
 
     @Bean(MONGO_TRANSACTION_MANAGER)
     fun mongoTransactionManager(factory: MongoDatabaseFactory) =
