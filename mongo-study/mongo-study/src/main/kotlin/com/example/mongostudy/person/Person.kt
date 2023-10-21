@@ -1,6 +1,6 @@
 package com.example.mongostudy.person
 
-import com.example.mongostudy.MongoCustomRepositorySupport
+import com.example.mongostudy.mongo.MongoCustomRepositorySupport
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.domain.Page

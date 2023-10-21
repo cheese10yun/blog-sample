@@ -1,5 +1,6 @@
-package com.example.mongostudy
+package com.example.mongostudy.mongo
 
+import com.example.mongostudy.logger
 import com.mongodb.client.result.UpdateResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
