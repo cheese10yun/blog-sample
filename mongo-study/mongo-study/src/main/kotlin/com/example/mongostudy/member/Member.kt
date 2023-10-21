@@ -20,15 +20,15 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @CompoundIndexes(
-    CompoundIndex(name = "memberName_email", def = "{'memberName' : 1, 'email': 1}", unique = true)
+    CompoundIndex(name = "email_status", def = "{'email' : 1, 'status': 1}", unique = true)
 )
 @Document(collection = "members")
 class Member(
     @Field(name = "member_id")
     val memberId: String,
 
-    @Field(name = "member_name")
-    val memberName: String,
+    @Field(name = "name")
+    val name: String,
 
     @Field(name = "email")
     val email: String,
@@ -45,8 +45,8 @@ class Member(
     @Field(name = "address")
     val address: String,
 
-    @Field(name = "membership_status")
-    val membershipStatus: MembershipStatus,
+    @Field(name = "status")
+    val status: MemberStatus,
 
     @Field(name = "points_accumulated")
     val pointsAccumulated: BigDecimal,
@@ -55,7 +55,7 @@ class Member(
     val lastPurchaseDate: LocalDateTime
 ) : Auditable()
 
-enum class MembershipStatus {
+enum class MemberStatus {
     ACTIVE, INACTIVE, SUSPENDED
 }
 
@@ -72,7 +72,7 @@ interface MemberCustomRepository {
         email: String?,
         dateJoinedFrom: LocalDateTime?,
         dateJoinedTo: LocalDateTime?,
-        membershipStatus: MembershipStatus?
+        memberStatus: MemberStatus?
     ): Page<Member>
 }
 
@@ -81,22 +81,22 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
     mongoTemplate
 ) {
     override fun findByMemberName(name: String): List<Member> {
-        val query = Query(Criteria.where("member_name").`is`(name))
+        val query = Query(Criteria.where(Member::name.fieldName()).`is`(name))
         return mongoTemplate.find(query, Member::class.java)
     }
 
     override fun findByEmail(email: String): List<Member> {
-        val query = Query(Criteria.where("email").`is`(email))
+        val query = Query(Criteria.where(Member::email.fieldName()).`is`(email))
         return mongoTemplate.find(query, Member::class.java)
     }
 
     override fun findActiveMembers(): List<Member> {
-        val query = Query(Criteria.where("membership_status").`is`(MembershipStatus.ACTIVE))
+        val query = Query(Criteria.where(Member::status.fieldName()).`is`(MemberStatus.ACTIVE))
         return mongoTemplate.find(query, Member::class.java)
     }
 
     override fun findMembersWithPointsOver(points: BigDecimal): List<Member> {
-        val query = Query(Criteria.where("points_accumulated").gt(points))
+        val query = Query(Criteria.where(Member::pointsAccumulated.fieldName()).gt(points))
         return mongoTemplate.find(query, Member::class.java)
     }
 
@@ -106,16 +106,16 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         email: String?,
         dateJoinedFrom: LocalDateTime?,
         dateJoinedTo: LocalDateTime?,
-        membershipStatus: MembershipStatus?
+        memberStatus: MemberStatus?
     ): Page<Member> {
         // 필터링을 위한 조건들을 추가하는 QueryBuilder
         val queryBuilder: (Query) -> Query = { query ->
             // option i =  대소문자 구분 없는 이메일 검색
-            name?.let { query.addCriteria(Criteria.where(Member::memberName.fieldName()).regex(it, "i")) }
-            email?.let { query.addCriteria(Criteria.where("email").regex(it, "i")) }
-            dateJoinedFrom?.let { query.addCriteria(Criteria.where("date_joined").gte(it)) }
-            dateJoinedTo?.let { query.addCriteria(Criteria.where("date_joined").lte(it)) }
-            membershipStatus?.let { query.addCriteria(Criteria.where("membership_status").`is`(it)) }
+            name?.let { query.addCriteria(Criteria.where(Member::name.fieldName()).regex(it, "i")) }
+            email?.let { query.addCriteria(Criteria.where(Member::email.fieldName()).regex(it, "i")) }
+            dateJoinedFrom?.let { query.addCriteria(Criteria.where(Member::dateJoined.fieldName()).gte(it)) }
+            dateJoinedTo?.let { query.addCriteria(Criteria.where(Member::dateJoined.fieldName()).lte(it)) }
+            memberStatus?.let { query.addCriteria(Criteria.where(Member::status.fieldName()).`is`(it)) }
             query
         }
 

@@ -5,7 +5,7 @@ import com.example.mongostudy.coupon.CouponRepository
 import com.example.mongostudy.coupon.CouponStatus
 import com.example.mongostudy.member.Member
 import com.example.mongostudy.member.MemberRepository
-import com.example.mongostudy.member.MembershipStatus
+import com.example.mongostudy.member.MemberStatus
 import com.example.mongostudy.order.Order
 import com.example.mongostudy.order.OrderRepository
 import com.example.mongostudy.order.OrderStatus
@@ -47,13 +47,13 @@ class MnogoDataSetUp(
         val members = (1..50).map {
             Member(
                 memberId = UUID.randomUUID().toString(),
-                memberName = "Member $it",
+                name = "Member $it",
                 email = "member$it@example.com",
                 dateJoined = LocalDateTime.now(),
                 dateOfBirth = LocalDate.of(1990 + random.nextInt(20), 1 + random.nextInt(11), 1 + random.nextInt(28)),
                 phoneNumber = "123-456-$it",
                 address = "Address $it",
-                membershipStatus = MembershipStatus.values()[random.nextInt(MembershipStatus.values().size)],
+                status = MemberStatus.values()[random.nextInt(MemberStatus.values().size)],
                 pointsAccumulated = BigDecimal(random.nextInt(1000)),
                 lastPurchaseDate = LocalDateTime.now().minusDays(random.nextLong(30))
             )

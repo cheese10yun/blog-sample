@@ -22,7 +22,7 @@ class MemberController(
         @RequestParam(name = "email", required = false) email: String?,
         @RequestParam(name = "dateJoinedFrom", required = false) dateJoinedFrom: LocalDateTime?,
         @RequestParam(name = "dateJoinedTo", required = false) dateJoinedTo: LocalDateTime?,
-        @RequestParam(name = "membershipStatus", required = false) membershipStatus: MembershipStatus?
+        @RequestParam(name = "memberStatus", required = false) memberStatus: MemberStatus?
     ): Page<Member> {
         return memberQueryService.findPageBy(
             pageable = pageable,
@@ -30,7 +30,7 @@ class MemberController(
             email = email,
             dateJoinedFrom = dateJoinedFrom,
             dateJoinedTo = dateJoinedTo,
-            membershipStatus = membershipStatus,
+            memberStatus = memberStatus,
         )
     }
 }

@@ -16,7 +16,7 @@ class MemberQueryService(
         email: String?,
         dateJoinedFrom: LocalDateTime?,
         dateJoinedTo: LocalDateTime?,
-        membershipStatus: MembershipStatus?
+        memberStatus: MemberStatus?
     ): Page<Member> {
         return memberRepository.findPageBy(
             pageable = pageable,
@@ -24,7 +24,7 @@ class MemberQueryService(
             email = email,
             dateJoinedFrom = dateJoinedFrom,
             dateJoinedTo = dateJoinedTo,
-            membershipStatus = membershipStatus
+            memberStatus = memberStatus
         )
     }
 }
