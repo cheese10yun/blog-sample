@@ -50,11 +50,11 @@ enum class CouponStatus {
     ACTIVE, EXPIRED, USED
 }
 
-interface CouponRepository: MongoRepository<Coupon, ObjectId>, CouponCustomRepository
+interface CouponRepository : MongoRepository<Coupon, ObjectId>, CouponCustomRepository
 
 interface CouponCustomRepository
 
-class CouponCustomRepositoryIml(mongoTemplate: MongoTemplate): MongoCustomRepositorySupport<Coupon>(
+class CouponCustomRepositoryIml(mongoTemplate: MongoTemplate) : CouponCustomRepository, MongoCustomRepositorySupport<Coupon>(
     Coupon::class.java,
     mongoTemplate
 )

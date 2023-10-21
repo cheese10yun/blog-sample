@@ -50,11 +50,11 @@ enum class OrderStatus {
     PENDING, SHIPPED, DELIVERED, CANCELLED
 }
 
-interface OrderRepository: MongoRepository<Order, ObjectId>, OrderCustomRepository
+interface OrderRepository : MongoRepository<Order, ObjectId>, OrderCustomRepository
 
 interface OrderCustomRepository
 
-class OrderCustomRepositoryImpl(mongoTemplate: MongoTemplate): MongoCustomRepositorySupport<Order>(
+class OrderCustomRepositoryImpl(mongoTemplate: MongoTemplate) : OrderCustomRepository, MongoCustomRepositorySupport<Order>(
     Order::class.java,
     mongoTemplate
 )

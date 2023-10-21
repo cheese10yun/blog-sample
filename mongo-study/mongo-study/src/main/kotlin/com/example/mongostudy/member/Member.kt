@@ -58,7 +58,7 @@ interface MemberRepository : MongoRepository<Member, ObjectId>, MemberCustomRepo
 
 interface MemberCustomRepository
 
-class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MongoCustomRepositorySupport<Member>(
+class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRepository, MongoCustomRepositorySupport<Member>(
     Member::class.java,
     mongoTemplate
 )
