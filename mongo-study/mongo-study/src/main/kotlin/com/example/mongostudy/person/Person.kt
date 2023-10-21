@@ -1,7 +1,6 @@
 package com.example.mongostudy.person
 
 import com.example.mongostudy.MongoCustomRepositorySupport
-import com.example.mongostudy.QPerson
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.domain.Page
@@ -12,6 +11,8 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregat
 import org.springframework.data.mongodb.core.aggregation.Aggregation.previousOperation
 import org.springframework.data.mongodb.core.aggregation.Aggregation.project
 import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.mongodb.core.mapping.Field
+import org.springframework.data.mongodb.core.mapping.FieldType
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service
 class Person(
     @Id
     val id: String? = null,
+    @Field(name = "", targetType = FieldType.DATE_TIME)
     val firstName: String,
     val lastName: String
 )
