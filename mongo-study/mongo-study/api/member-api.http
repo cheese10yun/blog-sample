@@ -2,7 +2,8 @@
 
 GET {{host}}{{v1}}/members?
     page=0&
-    size=10
+    size=10&
+    membershipStatus=SUSPENDED
 Content-Type: application/json
 
 ###

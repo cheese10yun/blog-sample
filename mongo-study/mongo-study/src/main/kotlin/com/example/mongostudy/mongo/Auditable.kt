@@ -15,12 +15,12 @@ abstract class Auditable {
 
     @Field(name = "created_at")
     @CreatedDate
-    lateinit var createdAt: LocalDateTime
+    open lateinit var createdAt: LocalDateTime
         internal set
 
     @Field(name = "updated_at")
     @LastModifiedDate
-    lateinit var updatedAt: LocalDateTime
+    open lateinit var updatedAt: LocalDateTime
         internal set
 }
 
