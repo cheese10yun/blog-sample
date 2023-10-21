@@ -2,6 +2,7 @@ package com.example.mongostudy.member
 
 import com.example.mongostudy.mongo.Auditable
 import com.example.mongostudy.mongo.MongoCustomRepositorySupport
+import com.example.mongostudy.mongo.fieldName
 import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -65,6 +66,14 @@ interface MemberCustomRepository {
     fun findByEmail(email: String): List<Member>
     fun findActiveMembers(): List<Member>
     fun findMembersWithPointsOver(points: BigDecimal): List<Member>
+    fun findPageBy(
+        pageable: Pageable,
+        name: String?,
+        email: String?,
+        dateJoinedFrom: LocalDateTime?,
+        dateJoinedTo: LocalDateTime?,
+        membershipStatus: MembershipStatus?
+    ): Page<Member>
 }
 
 class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRepository, MongoCustomRepositorySupport<Member>(
@@ -91,18 +100,18 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         return mongoTemplate.find(query, Member::class.java)
     }
 
-    fun findPageBy(
+    override fun findPageBy(
         pageable: Pageable,
-        name: String? = null,
-        email: String? = null,
-        dateJoinedFrom: LocalDateTime? = null,
-        dateJoinedTo: LocalDateTime? = null,
-        membershipStatus: MembershipStatus? = null
+        name: String?,
+        email: String?,
+        dateJoinedFrom: LocalDateTime?,
+        dateJoinedTo: LocalDateTime?,
+        membershipStatus: MembershipStatus?
     ): Page<Member> {
         // 필터링을 위한 조건들을 추가하는 QueryBuilder
         val queryBuilder: (Query) -> Query = { query ->
             // option i =  대소문자 구분 없는 이메일 검색
-            name?.let { query.addCriteria(Criteria.where("member_name").regex(it, "i")) }
+            name?.let { query.addCriteria(Criteria.where(Member::memberName.fieldName()).regex(it, "i")) }
             email?.let { query.addCriteria(Criteria.where("email").regex(it, "i")) }
             dateJoinedFrom?.let { query.addCriteria(Criteria.where("date_joined").gte(it)) }
             dateJoinedTo?.let { query.addCriteria(Criteria.where("date_joined").lte(it)) }

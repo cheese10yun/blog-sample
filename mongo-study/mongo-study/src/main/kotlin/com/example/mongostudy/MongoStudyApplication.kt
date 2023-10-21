@@ -58,7 +58,7 @@ class MnogoDataSetUp(
                 lastPurchaseDate = LocalDateTime.now().minusDays(random.nextLong(30))
             )
         }
-        memberRepository.saveAll(members)
+//        memberRepository.saveAll(members)
 
         val coupons = (1..50).map {
             Coupon(
@@ -74,7 +74,7 @@ class MnogoDataSetUp(
                 minimumOrderValue = BigDecimal(50 + random.nextInt(50))
             )
         }
-        couponRepository.saveAll(coupons)
+//        couponRepository.saveAll(coupons)
 
         val orders = (1..50).map {
             Order(
@@ -90,6 +90,6 @@ class MnogoDataSetUp(
                 quantity = random.nextInt(5) + 1
             )
         }
-        orderRepository.saveAll(orders)
+//        orderRepository.saveAll(orders)
     }
 }
