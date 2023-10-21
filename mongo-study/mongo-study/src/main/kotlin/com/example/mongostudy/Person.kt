@@ -63,7 +63,7 @@ class PersonCustomRepositoryImpl(
     fun updateById(personId: ObjectId, newAddress: String) {
         val criteria = Criteria.where("id").`is`(personId)
         val update = Update().set("address", newAddress)
-        val partialUpdate = updateSingleDocument(criteria, update)
+        val partialUpdate = updateOne(criteria, update)
     }
 
     fun updatePersonsAddress(lastName: String, newAddress: String): Long {

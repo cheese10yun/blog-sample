@@ -3,7 +3,6 @@ package com.example.mongostudy
 import com.mongodb.client.result.UpdateResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -46,9 +45,23 @@ abstract class MongoCustomRepositorySupport<T>(
         return SliceImpl(content.take(pageable.pageSize), pageable, hasNext)
     }
 
-    protected fun updateSingleDocument(criteria: Criteria, update: Update): UpdateResult {
+    protected fun updateOne(criteria: Criteria, update: Update): UpdateResult {
         val query = Query(criteria)
         return mongoTemplate.updateFirst(query, update, documentClass)
+    }
+
+    protected fun updateOne(
+        queryProvider: (Query) -> Query,
+        updateProvider: (Update) -> Update
+    ): UpdateResult {
+        val queryProvider1 = queryProvider(Query())
+        val updateProvider1 = updateProvider(Update())
+        return mongoTemplate.updateFirst(queryProvider1, updateProvider1, documentClass)
+    }
+
+    fun findFirst(queryBuilder: (Query) -> Query): T? {
+        val query = queryBuilder(Query())
+        return mongoTemplate.findOne(query.limit(1), documentClass)
     }
 
     /**
@@ -63,6 +76,8 @@ abstract class MongoCustomRepositorySupport<T>(
         val result = mongoTemplate.updateMulti(query, update, documentClass)
         return result.modifiedCount
     }
+
+
 
     /**
      * 여러 도메인 객체를 한 번에 MongoDB에 삽입합니다.
