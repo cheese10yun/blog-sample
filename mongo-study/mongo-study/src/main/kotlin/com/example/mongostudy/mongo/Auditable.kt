@@ -1,5 +1,6 @@
 package com.example.mongostudy.mongo
 
+import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
@@ -9,7 +10,8 @@ import java.time.LocalDateTime
 // 오디터 클래스
 abstract class Auditable {
     @Id
-    var id: String? = null
+    var id: ObjectId? = null
+        internal set
 
     @Field(name = "created_at")
     @CreatedDate
@@ -21,7 +23,4 @@ abstract class Auditable {
     lateinit var updatedAt: LocalDateTime
         internal set
 }
-
-
-
 

@@ -1,10 +1,15 @@
 package com.example.mongostudy.member
 
 import com.example.mongostudy.mongo.Auditable
+import com.example.mongostudy.mongo.MongoCustomRepositorySupport
+import com.example.mongostudy.order.Order
+import org.bson.types.ObjectId
+import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
+import org.springframework.data.mongodb.repository.MongoRepository
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -13,7 +18,7 @@ import java.time.LocalDateTime
     CompoundIndex(name = "memberName_email", def = "{'memberName' : 1, 'email': 1}", unique = true)
 )
 @Document(collection = "members")
-private data class Member(
+class Member(
     @Field(name = "member_id")
     val memberId: String,
 
@@ -48,3 +53,12 @@ private data class Member(
 enum class MembershipStatus {
     ACTIVE, INACTIVE, SUSPENDED
 }
+
+interface MemberRepository : MongoRepository<Member, ObjectId>, MemberCustomRepository
+
+interface MemberCustomRepository
+
+class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MongoCustomRepositorySupport<Member>(
+    Member::class.java,
+    mongoTemplate
+)
