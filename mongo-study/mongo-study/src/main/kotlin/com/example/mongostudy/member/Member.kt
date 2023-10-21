@@ -108,26 +108,25 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         dateJoinedTo: LocalDateTime?,
         memberStatus: MemberStatus?
     ): Page<Member> {
-        // 필터링을 위한 조건들을 추가하는 QueryBuilder
+
         val queryBuilder: (Query) -> Query = { query ->
-            // option i =  대소문자 구분 없는 이메일 검색
-            name?.let { query.addCriteria(Criteria.where(Member::name.fieldName()).regex(it, "i")) }
-            email?.let { query.addCriteria(Criteria.where(Member::email.fieldName()).regex(it, "i")) }
-            dateJoinedFrom?.let { query.addCriteria(Criteria.where(Member::dateJoined.fieldName()).gte(it)) }
-            dateJoinedTo?.let { query.addCriteria(Criteria.where(Member::dateJoined.fieldName()).lte(it)) }
-            memberStatus?.let { query.addCriteria(Criteria.where(Member::status.fieldName()).`is`(it)) }
-            query
+            val criteria = Criteria().apply {
+                name?.let { and(Member::name.fieldName()).regex(it, "i") }
+                email?.let { and(Member::email.fieldName()).regex(it, "i") }
+                dateJoinedFrom?.let { and(Member::dateJoined.fieldName()).gte(it) }
+                dateJoinedTo?.let { and(Member::dateJoined.fieldName()).lte(it) }
+                memberStatus?.let { and(Member::status.fieldName()).`is`(it) }
+            }
+            query.addCriteria(criteria)
         }
 
         return applyPagination(
             pageable = pageable,
             contentQuery = { query ->
-                val finalQuery = queryBuilder(query).with(pageable)
-                mongoTemplate.find(finalQuery, documentClass)
+                mongoTemplate.find(queryBuilder(query), documentClass)
             },
             countQuery = { query ->
-                val finalQuery = queryBuilder(query)
-                mongoTemplate.count(finalQuery, documentClass)
+                mongoTemplate.count(queryBuilder(query), documentClass)
             }
         )
     }
