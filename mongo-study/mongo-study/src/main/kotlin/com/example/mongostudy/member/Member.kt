@@ -111,14 +111,15 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
 
         val queryBuilder: (Query) -> Query = { query ->
             val criteria = Criteria().apply {
-                name?.let { and(Member::name.fieldName()).regex(it, "i") }
-                email?.let { and(Member::email.fieldName()).regex(it, "i") }
+                name?.let { and(Member::name.fieldName()).regex(".*$it.*", "i") }
+                email?.let { and(Member::email.fieldName()).regex(".*$it.*", "i") }
                 dateJoinedFrom?.let { and(Member::dateJoined.fieldName()).gte(it) }
                 dateJoinedTo?.let { and(Member::dateJoined.fieldName()).lte(it) }
                 memberStatus?.let { and(Member::status.fieldName()).`is`(it) }
             }
             query.addCriteria(criteria)
         }
+
 
         return applyPagination(
             pageable = pageable,

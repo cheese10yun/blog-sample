@@ -3,7 +3,7 @@
 GET {{host}}{{v1}}/members?
     page=0&
     size=10&
-    membershipStatus=SUSPENDED
+    email=member3
 Content-Type: application/json
 
 ###
