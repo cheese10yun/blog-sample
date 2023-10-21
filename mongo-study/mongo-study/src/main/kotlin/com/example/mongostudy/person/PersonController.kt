@@ -1,8 +1,5 @@
 package com.example.mongostudy.person
 
-import com.example.mongostudy.person.Person
-import com.example.mongostudy.person.PersonQueryService
-import com.example.mongostudy.person.PersonRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -61,6 +58,6 @@ class PersonController(
 
     @GetMapping("/sample/test")
     fun sampleTest(@RequestParam name: String): List<Person> {
-        return personQueryService.asd(name)
+        return personQueryService.findByName(name)
     }
 }

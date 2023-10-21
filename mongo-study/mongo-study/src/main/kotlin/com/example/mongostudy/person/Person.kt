@@ -113,12 +113,12 @@ class PersonQueryService(
         return results.mappedResults
     }
 
-    fun asd(name: String): List<Person> {
-
+    fun findByName(name: String): List<Person> {
         val person = QPerson.person
+        val eq = person.firstName.eq(name)
 
-        return personRepository.findAll(person.firstName.eq(name)).toList()
 
+        return personRepository.findAll(eq).toList()
     }
 }
 
