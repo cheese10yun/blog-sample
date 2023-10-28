@@ -99,11 +99,9 @@ abstract class MongoCustomRepositorySupport<T>(
         pageable: Pageable,
         contentQuery: (Query) -> List<S>
     ): Slice<S> {
-        val queryForContent = Query().with(pageable)
-        val content = contentQuery(queryForContent)
-        val hasNext = content.size > pageable.pageSize
-
-        return SliceImpl(content.take(pageable.pageSize), pageable, hasNext)
+        val content = contentQuery(Query().with(pageable))
+        val hasNext = content.size >= pageable.pageSize
+        return SliceImpl(content, pageable, hasNext)
     }
 }
 ```
@@ -153,6 +151,7 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
             }
         )
     }
+    
 }
 ```
 
