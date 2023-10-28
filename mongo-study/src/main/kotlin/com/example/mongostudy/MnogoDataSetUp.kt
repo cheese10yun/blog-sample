@@ -3,6 +3,7 @@ package com.example.mongostudy
 import com.example.mongostudy.coupon.Coupon
 import com.example.mongostudy.coupon.CouponRepository
 import com.example.mongostudy.coupon.CouponStatus
+import com.example.mongostudy.member.Address
 import com.example.mongostudy.member.Member
 import com.example.mongostudy.member.MemberRepository
 import com.example.mongostudy.member.MemberStatus
@@ -37,7 +38,11 @@ class MnogoDataSetUp(
                 dateJoined = LocalDateTime.now(),
                 dateOfBirth = LocalDate.of(1990 + Random.nextInt(20), 1 + Random.nextInt(11), 1 + Random.nextInt(28)),
                 phoneNumber = "123-456-$it",
-                address = "Address $it",
+                address = Address(
+                    address = "address $it",
+                    addressDetail = "address detail $it",
+                    zipCode = "zip code - $it"
+                ),
                 status = MemberStatus.values()[Random.nextInt(MemberStatus.values().size)],
                 pointsAccumulated = BigDecimal(Random.nextInt(1000)),
                 lastPurchaseDate = LocalDateTime.now().minusDays(Random.nextLong(30))
