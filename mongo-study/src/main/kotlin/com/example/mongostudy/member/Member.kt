@@ -62,7 +62,7 @@ enum class MemberStatus {
 interface MemberRepository : MongoRepository<Member, ObjectId>, MemberCustomRepository, QuerydslPredicateExecutor<Member>
 
 interface MemberCustomRepository {
-    fun findByMemberName(name: String): List<Member>
+    fun findByName(name: String): List<Member>
     fun findByEmail(email: String): List<Member>
     fun findActiveMembers(): List<Member>
     fun findMembersWithPointsOver(points: BigDecimal): List<Member>
@@ -80,13 +80,13 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
     Member::class.java,
     mongoTemplate
 ) {
-    override fun findByMemberName(name: String): List<Member> {
-        val query = Query(Criteria.where(Member::name.fieldName()).`is`(name))
+    override fun findByName(name: String): List<Member> {
+        val query = Query(Criteria.where("name").`is`(name))
         return mongoTemplate.find(query, Member::class.java)
     }
 
     override fun findByEmail(email: String): List<Member> {
-        val query = Query(Criteria.where(Member::email.fieldName()).`is`(email))
+        val query = Query(Criteria.where("email").`is`(email))
         return mongoTemplate.find(query, Member::class.java)
     }
 

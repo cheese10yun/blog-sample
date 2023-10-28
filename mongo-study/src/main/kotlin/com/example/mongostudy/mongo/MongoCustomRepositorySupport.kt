@@ -19,9 +19,12 @@ abstract class MongoCustomRepositorySupport<T>(
 ) {
     private val logger by logger()
 
-    protected fun logQuery(query: Query) {
+    protected fun logQuery(
+        query: Query,
+        name: String?= null,
+    ) {
         if (logger.isDebugEnabled) {
-            logger.debug("Executing MongoDB Query: $query")
+            logger.debug("Executing MongoDB $name Query: $query")
         }
     }
 
@@ -77,7 +80,6 @@ abstract class MongoCustomRepositorySupport<T>(
         val result = mongoTemplate.updateMulti(query, update, documentClass)
         return result.modifiedCount
     }
-
 
 
     /**
