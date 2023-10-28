@@ -22,27 +22,34 @@ fun KProperty<*>.fieldName(): String {
         ?: throw IllegalStateException("Property ${this.name} must be annotated with @Field and have a name attribute.")
 }
 
-fun Criteria.eqIfNotNull(property: KProperty<*>, value: Any?): Criteria = when {
-    value != null -> Criteria.where(property.fieldName()).`is`(value)
-    else -> this
+fun <T> Criteria.eqIfNotNull(property: KProperty<T>, value: T?): Criteria {
+    return value?.let { this.and(property).`is`(value) } ?: this
 }
 
-fun Criteria.gtIfNotNull(property: KProperty<*>, value: Any?): Criteria = when {
-    value != null -> Criteria.where(property.fieldName()).gt(value)
-    else -> this
+fun <T> Criteria.neIfNotNull(property: KProperty<T>, value: T?): Criteria {
+    return value?.let { this.and(property).ne(value) } ?: this
 }
 
-fun Criteria.ltIfNotNull(property: KProperty<*>, value: Any?): Criteria = when {
-    value != null -> Criteria.where(property.fieldName()).lt(value)
-    else -> this
+fun <T> Criteria.gtIfNotNull(property: KProperty<T>, value: T?): Criteria {
+    return value?.let { this.and(property).gt(value) } ?: this
 }
 
-fun Criteria.gteIfNotNull(property: KProperty<*>, value: Any?): Criteria = when {
-    value != null -> Criteria.where(property.fieldName()).gte(value)
-    else -> this
+fun <T> Criteria.gteIfNotNull(property: KProperty<T>, value: T?): Criteria {
+    return value?.let { this.and(property).gte(value) } ?: this
 }
 
-fun Criteria.lteIfNotNull(property: KProperty<*>, value: Any?): Criteria = when {
-    value != null -> Criteria.where(property.fieldName()).lte(value)
-    else -> this
+fun <T> Criteria.ltIfNotNull(property: KProperty<T>, value: T?): Criteria {
+    return value?.let { this.and(property).lt(value) } ?: this
+}
+
+fun <T> Criteria.lteIfNotNull(property: KProperty<T>, value: T?): Criteria {
+    return value?.let { this.and(property).lte(value) } ?: this
+}
+
+fun <T> Criteria.inIfNotNull(property: KProperty<T>, values: Collection<T>?): Criteria {
+    return values?.let { this.and(property).`in`(values) } ?: this
+}
+
+fun <T> Criteria.ninIfNotNull(property: KProperty<T>, values: Collection<T>?): Criteria {
+    return values?.let { this.and(property).nin(values) } ?: this
 }
