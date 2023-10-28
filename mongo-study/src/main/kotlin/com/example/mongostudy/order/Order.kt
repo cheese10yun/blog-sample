@@ -54,7 +54,4 @@ interface OrderRepository : MongoRepository<Order, ObjectId>, OrderCustomReposit
 
 interface OrderCustomRepository
 
-class OrderCustomRepositoryImpl(mongoTemplate: MongoTemplate) : OrderCustomRepository, MongoCustomRepositorySupport<Order>(
-    Order::class.java,
-    mongoTemplate
-)
+class OrderCustomRepositoryImpl(private val mongoTemplate: MongoTemplate) : OrderCustomRepository
