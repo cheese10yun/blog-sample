@@ -31,28 +31,11 @@ fun <T> Criteria.eqIfNotNull(property: KProperty<T>, param: T?): Criteria {
  *
  * @param ignoreCase 대소문자 구분 여부, true 경우 대소문자 구분을 무시하고 조회한다.
  */
-fun Criteria.regexIgnoreCase(property: KProperty<*>, regex: String, ignoreCase: Boolean = true): Criteria {
+fun Criteria.regexIfNotNull(property: KProperty<*>, regex: String, ignoreCase: Boolean = true): Criteria {
     return when {
         ignoreCase -> this.and(property.name).regex(regex, "i")
         else -> this.and(property.name).regex(regex, null)
     }
-}
-
-
-/**
- * regex 검색, 대부분 like 검색을 진행한다.
- *
- * @param ignoreCase 대소문자 구분 여부, true 경우 대소문자 구분을 무시하고 조회한다.
- */
-fun <T> Criteria.regexIfNotNull(property: KProperty<T>, pattern: String?, ignoreCase: Boolean = true): Criteria {
-    pattern?.let {
-        when (ignoreCase) {
-            true -> this.and(property.name).regex(pattern, "i")
-            else -> this.and(property.name).regex(pattern, null)
-        }
-        this.and(property.name).regex(pattern, "i")
-    }
-    return this
 }
 
 

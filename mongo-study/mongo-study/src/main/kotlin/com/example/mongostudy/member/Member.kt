@@ -132,3 +132,12 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         )
     }
 }
+
+class A(
+    val email: String?,
+    val name: String
+) : B(name)
+
+open class B(
+    name: String
+)

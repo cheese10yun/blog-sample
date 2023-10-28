@@ -185,5 +185,18 @@ enum class ErrorCode(
     EMAIL_DUPLICATION(400, "M001", "Email is Duplication"),
     LOGIN_INPUT_INVALID(400, "M002", "Login input is invalid"),
 
+    SERVER_ERROR(400, "M002", "Login input is invalid"),
+
     ;
 }
+
+fun Int.isSuccessful(): Boolean = this in (200 until 300)
+
+fun Int.isClientError(): Boolean = this in (400 until 500)
+
+fun Int.isServerError(): Boolean = this in (400 until 500)
+
+class ServiceException(
+    errorResponse: ErrorResponse,
+    code: ErrorCode
+): RuntimeException()
