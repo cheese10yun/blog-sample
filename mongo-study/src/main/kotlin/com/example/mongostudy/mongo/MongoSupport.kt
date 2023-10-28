@@ -19,42 +19,27 @@ fun <T> KProperty<T>.fieldName(): String {
     return annotation.name
 }
 
-fun <T> Criteria.eqIfNotNull(property: KProperty<T>, param: T?): Criteria {
-    param?.let {
-        this.and(property).`is`(param)
-    }
-    return this
+fun Criteria.eqIfNotNull(property: KProperty<*>, value: Any?): Criteria = when {
+    value != null -> Criteria.where(property.name).`is`(value)
+    else -> this
 }
 
-fun Criteria.regexIfNotNull(property: KProperty<*>, regex: String, ignoreCase: Boolean = true): Criteria {
-    return when {
-        ignoreCase -> this.and(property.name).regex(regex, "i")
-        else -> this.and(property.name).regex(regex, null)
-    }
+fun Criteria.gtIfNotNull(property: KProperty<*>, value: Any?): Criteria = when {
+    value != null -> Criteria.where(property.name).gt(value)
+    else -> this
 }
 
-
-fun <T> Criteria.inIfNotNull(property: KProperty<T>, param: List<T>?): Criteria {
-    param?.let {
-        this.and(property).`in`(param)
-    }
-    return this
+fun Criteria.ltIfNotNull(property: KProperty<*>, value: Any?): Criteria = when {
+    value != null -> Criteria.where(property.name).lt(value)
+    else -> this
 }
 
-fun <T> Criteria.inIfNotEmpty(property: KProperty<T>, param: List<T>?): Criteria {
-    if (!param.isNullOrEmpty()) {
-        this.and(property).`in`(param)
-    }
-    return this
+fun Criteria.gteIfNotNull(property: KProperty<*>, value: Any?): Criteria = when {
+    value != null -> Criteria.where(property.name).gte(value)
+    else -> this
 }
 
-fun <T> Criteria.between(property: KProperty<T>, param: List<LocalDate>): Criteria {
-    return this.and(property).gte(param[0]).lt(param[1].plusDays(1))
-}
-
-fun <T> Criteria.betweenIfNotNull(property: KProperty<T>, param: List<LocalDate>?): Criteria {
-    param?.let {
-        this.and(property).gte(it[0]).lt(it[1].plusDays(1))
-    }
-    return this
+fun Criteria.lteIfNotNull(property: KProperty<*>, value: Any?): Criteria = when {
+    value != null -> Criteria.where(property.name).lte(value)
+    else -> this
 }

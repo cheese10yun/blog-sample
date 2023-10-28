@@ -2,6 +2,7 @@ package com.example.mongostudy.member
 
 import com.example.mongostudy.mongo.Auditable
 import com.example.mongostudy.mongo.MongoCustomRepositorySupport
+import com.example.mongostudy.mongo.eqIfNotNull
 import com.example.mongostudy.mongo.fieldName
 import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
@@ -88,7 +89,7 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
     mongoTemplate
 ) {
     override fun findByName(name: String): List<Member> {
-        val query = Query(Criteria.where("name").`is`(name))
+        val query = Query(Criteria().eqIfNotNull(Member::email, name))
         return mongoTemplate.find(query, Member::class.java)
     }
 

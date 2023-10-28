@@ -8,3 +8,12 @@ Content-Type: application/json
 
 ###
 
+
+###
+
+GET {{host}}{{v1}}/members/name?
+    name=Member 33
+Content-Type: application/json
+
+###
+

@@ -12,7 +12,8 @@ import java.time.LocalDateTime
 @RestController
 @RequestMapping("/api/v1/members")
 class MemberController(
-    private val memberQueryService: MemberQueryService
+    private val memberQueryService: MemberQueryService,
+    private val memberRepository: MemberRepository
 ) {
 
     @GetMapping
@@ -32,5 +33,12 @@ class MemberController(
             dateJoinedTo = dateJoinedTo,
             memberStatus = memberStatus,
         )
+    }
+
+    @GetMapping("/name")
+    fun findByName(
+        @RequestParam(name = "name") name:String
+    ): List<Member> {
+        return memberRepository.findByName(name)
     }
 }
