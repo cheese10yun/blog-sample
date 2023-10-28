@@ -26,11 +26,6 @@ fun <T> Criteria.eqIfNotNull(property: KProperty<T>, param: T?): Criteria {
     return this
 }
 
-/**
- * regex 검색, 대부분 like 검색을 진행한다.
- *
- * @param ignoreCase 대소문자 구분 여부, true 경우 대소문자 구분을 무시하고 조회한다.
- */
 fun Criteria.regexIfNotNull(property: KProperty<*>, regex: String, ignoreCase: Boolean = true): Criteria {
     return when {
         ignoreCase -> this.and(property.name).regex(regex, "i")
@@ -57,9 +52,6 @@ fun <T> Criteria.between(property: KProperty<T>, param: List<LocalDate>): Criter
     return this.and(property).gte(param[0]).lt(param[1].plusDays(1))
 }
 
-/**
- * D[0] <= x < D[1] + 1(day)
- */
 fun <T> Criteria.betweenIfNotNull(property: KProperty<T>, param: List<LocalDate>?): Criteria {
     param?.let {
         this.and(property).gte(it[0]).lt(it[1].plusDays(1))
