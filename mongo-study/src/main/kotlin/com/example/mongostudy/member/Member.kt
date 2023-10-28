@@ -89,7 +89,7 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
     mongoTemplate
 ) {
     override fun findByName(name: String): List<Member> {
-        val query = Query(Criteria().eqIfNotNull(Member::email, name))
+        val query = Query(Criteria().eqIfNotNull(Member::name, name))
         return mongoTemplate.find(query, Member::class.java)
     }
 
