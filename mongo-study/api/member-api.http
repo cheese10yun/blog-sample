@@ -12,7 +12,7 @@ Content-Type: application/json
 ###
 
 GET {{host}}{{v1}}/members/name?
-    name=member37@example.com
+    name=address detail 38
 Content-Type: application/json
 
 ###
