@@ -58,7 +58,7 @@ class MemberCustomRepositoryImpl(private val mongoTemplate: MongoTemplate) : Mem
 
 `MemberCustomRepositoryImpl` 클래스에서는 `MemberCustomRepository` 인터페이스에 선언된 메소드의 구체적인 구현이 이루어집니다. 처음에는 `override` 키워드 없이 구현을 시작할 수 있습니다. 구현을 완료한 후, IntelliJ의 `Refactoring` 메뉴에서 `Pull Members Up...` 옵션을 선택함으로써 해당 메소드를 상위 인터페이스로 이동시킬 수 있습니다.
 
-![](images/custom-01.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/custom-01.png)
 
 인터페이스의 메서드 시그니처를 처음부터 명확히 정의하지 않고, 구현 클래스에서 메서드의 세부 구현을 확정한 후에 이를 상위 인터페이스로 옮기는 방식을 개인적으로 선호합니다.
 
