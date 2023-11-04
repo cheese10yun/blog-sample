@@ -1,4 +1,4 @@
-# Spring Data MongoDB Custom Repository
+# Spring Data MongoDB Repository 확장
 
 Spring Data JPA에서 흔히 사용하는 Repository 확장 패턴을 Spring Data MongoDB에도 적용할 수 있습니다. 이 패턴은 'CustomRepository'와 'CustomRepositoryImpl'의 조합으로 구성되며, [Spring-JPA Best Practices step-15](https://cheese10yun.github.io/spring-jpa-best-15/)에서 이전에 포스팅한적 있습니다. 이 방법을 사용하면 복잡한 조회 작업을 'CustomRepositoryImpl'에서 처리할 수 있게 됩니다. 이 구조를 사용하면, 사용자는 Repository 인터페이스만을 이용하여 데이터를 조회할 수 있게 되어 코드의 간결성과 유지보수성이 향상됩니다. 예를 들어, CustomRepositoryImpl에서 복잡한 쿼리 로직을 구현하면, 상위 레벨에서는 이러한 구현 디테일을 신경 쓰지 않고 데이터 접근 로직을 단순화할 수 있습니다. Spring Data MongoDB에서 동일하게 적용하는 방법을 살펴보겠습니다.
 
