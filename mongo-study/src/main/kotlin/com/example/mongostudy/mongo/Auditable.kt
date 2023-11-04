@@ -23,4 +23,3 @@ abstract class Auditable {
     open lateinit var updatedAt: LocalDateTime
         internal set
 }
-
