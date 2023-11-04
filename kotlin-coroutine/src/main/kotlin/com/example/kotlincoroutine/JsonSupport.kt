@@ -22,7 +22,7 @@ object JsonSupport {
      * {"name":"xxx","address":{"address":"address","address_detail":"address_detail_1","zip_code":"111"}}
      * ```
      *
-     * @sample com.kakaopay.aloha.core.io.support.JsonSupportTest.minifyJson
+     * @sample com.example.kotlincoroutine.JsonSupportTest.minifyJson
      */
     fun minifyJson(json: String): String {
         val result = StringBuilder()
