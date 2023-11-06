@@ -102,3 +102,4 @@
 * [좋은 코드 설계를 위한 답없는 고민들](https://github.com/cheese10yun/blog-sample/blob/master/intellij-test/intellij-test/docs/none-title.md)
 * [Kotlin 기반 경량 ORM Exposed 추가 정리 part 3](https://github.com/cheese10yun/blog-sample/blob/master/exposed-study/docs/exposed-1.md)
 * [JPA 페이징 Performance 향상 방법](https://github.com/cheese10yun/blog-sample/blob/master/query-dsl/paging-query-performance.md)
+* [Spring Data MongoDB Repository 확장](https://cheese10yun.github.io/spring-data-mongo-repository/)
