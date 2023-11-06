@@ -25,13 +25,10 @@ class MemberCustomRepositoryImpl(private val mongoTemplate: MongoTemplate) : Mem
 
 코드의 각 부분은 MongoDB를 사용하는 스프링 애플리케이션에서 도메인 객체를 정의하고, 저장소를 구성하는 데 필요한 요소들을 포함하고 있습니다. 아래는 코드 구조를 기반으로 한 정리입니다:
 
-1. **`Member` 클래스** - MongoDB의 'members' 컬렉션에 매핑되는 도메인 객체입니다. 'name'과 'email' 필드를 가지고 있으며, 각 필드는 MongoDB의 문서 필드에 맞추어 `@Field` 애노테이션을 사용하여 지정되어 있습니다. 또한, `Auditable`을 상속받아 생성 및 수정 시간에 대한 감사(audit) 정보를 자동으로 관리할 수 있습니다.
-
-2. **`MemberRepository` 인터페이스** - MongoDB의 기본 CRUD 작업을 위한 `MongoRepository`와 사용자 정의 쿼리를 위한 `MemberCustomRepository`, Querydsl 지원을 위한 `QuerydslPredicateExecutor`를 확장하는 저장소 인터페이스입니다. 이로 인해 `Member` 객체에 대한 표준 데이터 접근 패턴과 함께 복잡한 쿼리 기능을 제공합니다.
-
-3. **`MemberCustomRepository` 인터페이스** - 사용자 정의 쿼리를 위한 인터페이스로, 실제 사용자 정의 로직을 위한 메소드의 시그니처를 포함할 수 있습니다.
-
-4. **`MemberCustomRepositoryImpl` 클래스** - `MemberCustomRepository`의 구현체로, 실제 사용자 정의 쿼리 로직을 실행하는 메소드를 포함합니다. `MongoTemplate`을 주입받아 MongoDB의 복잡한 작업을 처리하는 데 사용됩니다.
+1. **`Member`** - MongoDB의 'members' 컬렉션에 매핑되는 도메인 객체입니다. 'name'과 'email' 필드를 가지고 있으며, 각 필드는 MongoDB의 문서 필드에 맞추어 `@Field` 애노테이션을 사용하여 지정되어 있습니다.
+2. **`MemberRepository`** - MongoDB의 기본 CRUD 작업을 위한 `MongoRepository`와 사용자 정의 쿼리를 위한 `MemberCustomRepository`, Querydsl 지원을 위한 `QuerydslPredicateExecutor`를 확장하는 저장소 인터페이스입니다. 이로 인해 `Member` 객체에 대한 표준 데이터 접근 패턴과 함께 복잡한 쿼리 기능을 제공합니다.
+3. **`MemberCustomRepository`** - 사용자 정의 쿼리를 위한 인터페이스로, 실제 사용자 정의 로직을 위한 메소드의 시그니처를 포함할 수 있습니다.
+4. **`MemberCustomRepositoryImpl`** - `MemberCustomRepository`의 구현체로, 실제 사용자 정의 쿼리 로직을 실행하는 메소드를 포함합니다. `MongoTemplate`을 주입받아 MongoDB의 복잡한 작업을 처리하는 데 사용됩니다.
 
 이 구성을 통해, 애플리케이션은 MongoDB에 대한 데이터 액세스를 추상화하고 효율적으로 관리할 수 있으며, 사용자 정의 저장소를 통해 비즈니스 로직에 맞는 복잡한 데이터 접근 패턴을 구현할 수 있어 애플리케이션의 유연성을 증가시키고 코드의 관리를 간소화합니다.
 
@@ -58,7 +55,7 @@ class MemberCustomRepositoryImpl(private val mongoTemplate: MongoTemplate) : Mem
 
 `MemberCustomRepositoryImpl` 클래스에서는 `MemberCustomRepository` 인터페이스에 선언된 메소드의 구체적인 구현이 이루어집니다. 처음에는 `override` 키워드 없이 구현을 시작할 수 있습니다. 구현을 완료한 후, IntelliJ의 `Refactoring` 메뉴에서 `Pull Members Up...` 옵션을 선택함으로써 해당 메소드를 상위 인터페이스로 이동시킬 수 있습니다.
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/query-result.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/custom-01.png)
 
 인터페이스의 메서드 시그니처를 처음부터 명확히 정의하지 않고, 구현 클래스에서 메서드의 세부 구현을 확정한 후에 이를 상위 인터페이스로 옮기는 방식을 개인적으로 선호합니다.
 
@@ -105,7 +102,7 @@ abstract class MongoCustomRepositorySupport<T>(
 }
 ```
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/query-dsl/docs/images/003.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/query-result.png)
 
 JPA 페이징 성능을 향상시키는 방법으로, 내용을 담은 콘텐츠 쿼리와 개수를 세는 카운트 쿼리를 분리하여 구현하는 것이 유익하다는 내용을 [JPA 페이징 Performance 향상 방법](https://cheese10yun.github.io/page-performance/)에서 다루었습니다. 이 두 쿼리는 상호 의존적이지 않아 병렬 처리를 함으로써 성능을 높일 수 있습니다. 또한, 슬라이스 쿼리의 경우, '다음 페이지가 있는지'를 확인하는 `hasNext` 메서드를 포함한 공통된 로직을 사용함으로써 코드 중복을 방지하고 재사용성을 극대화합니다. `MongoCustomRepositorySupport` 클래스는 이러한 공통 기능을 제공하여 효율적인 데이터 조회와 페이지 처리를 가능하게 합니다."
 
