@@ -1,5 +1,6 @@
 package com.example.mongostudy.member
 
+import com.example.mongostudy.MongoStudyApplicationTests
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
@@ -13,18 +14,17 @@ class MemberQueryServiceTest() {
 
 }
 
-@Transactional
-@SpringBootTest
+
 class MemberRepositoryTest(
     private val memberRepository: MemberRepository
-){
-
+) : MongoStudyApplicationTests() {
 
     @Test
     fun `findByEmail asd`() {
         //given
         memberRepository.findByEmail("sample@test.com")
-
         //when
     }
+
+
 }

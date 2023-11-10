@@ -1,6 +1,7 @@
 package com.example.mongostudy.mongo
 
 import com.example.mongostudy.logger
+import com.mongodb.bulk.BulkWriteResult
 import com.mongodb.client.result.UpdateResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -8,6 +9,7 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
+import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
@@ -21,7 +23,7 @@ abstract class MongoCustomRepositorySupport<T>(
 
     protected fun logQuery(
         query: Query,
-        name: String?= null,
+        name: String? = null,
     ) {
         if (logger.isDebugEnabled) {
             logger.debug("Executing MongoDB $name Query: $query")
@@ -56,9 +58,22 @@ abstract class MongoCustomRepositorySupport<T>(
         queryProvider: (Query) -> Query,
         updateProvider: (Update) -> Update
     ): UpdateResult {
-        val queryProvider1 = queryProvider(Query())
-        val updateProvider1 = updateProvider(Update())
-        return mongoTemplate.updateFirst(queryProvider1, updateProvider1, documentClass)
+        return mongoTemplate.updateFirst(queryProvider(Query()), updateProvider(Update()), documentClass)
+    }
+
+    protected fun updateInBulk(
+        operations: List<Pair<() -> Query, () -> Update>> // Query와 Update 생성자를 위한 람다 리스트
+    ): BulkWriteResult {
+        // BulkOperations 객체를 생성합니다.
+        val bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, documentClass)
+
+        // 제공된 리스트를 반복하면서 bulk 연산에 각 update를 추가합니다.
+        operations.forEach { (queryCreator, updateCreator) ->
+            bulkOps.updateOne(queryCreator.invoke(), updateCreator.invoke())
+        }
+
+        // 모든 업데이트를 실행합니다.
+        return bulkOps.execute()
     }
 
     fun findFirst(queryBuilder: (Query) -> Query): T? {

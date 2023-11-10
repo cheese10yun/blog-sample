@@ -13,14 +13,14 @@ import java.time.LocalDate
 
 object MongoSupport
 
-fun KProperty<*>.fieldName(): String {
-    // 필드에 직접 적용된 어노테이션을 가져오기
-    val fieldAnnotation = this.javaField?.getAnnotation(Field::class.java)
-
-    // 어노테이션이 존재하면 name 속성 값을 반환, 그렇지 않으면 예외 발생
-    return fieldAnnotation?.name
-        ?: throw IllegalStateException("Property ${this.name} must be annotated with @Field and have a name attribute.")
-}
+//fun KProperty<*>.fieldName(): String {
+//    // 필드에 직접 적용된 어노테이션을 가져오기
+//    val fieldAnnotation = this.javaField?.getAnnotation(Field::class.java)
+//
+//    // 어노테이션이 존재하면 name 속성 값을 반환, 그렇지 않으면 예외 발생
+//    return fieldAnnotation?.name
+//        ?: throw IllegalStateException("Property ${this.name} must be annotated with @Field and have a name attribute.")
+//}
 
 fun <T> Criteria.eqIfNotNull(property: KProperty<T>, value: T?): Criteria {
     return value?.let { this.and(property).`is`(value) } ?: this
