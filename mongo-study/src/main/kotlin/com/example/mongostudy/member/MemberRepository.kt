@@ -2,7 +2,6 @@ package com.example.mongostudy.member
 
 import com.example.mongostudy.mongo.MongoCustomRepositorySupport
 import com.example.mongostudy.mongo.eqIfNotNull
-import com.example.mongostudy.mongo.fieldName
 import com.example.mongostudy.mongo.gtIfNotNull
 import com.example.mongostudy.mongo.gteIfNotNull
 import com.example.mongostudy.mongo.lteIfNotNull
@@ -42,6 +41,8 @@ interface MemberCustomRepository {
         name: String?,
         email: String?
     ): Slice<Member>
+
+    fun updateInBulk()
 }
 
 class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRepository, MongoCustomRepositorySupport<Member>(
@@ -119,7 +120,7 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         )
     }
 
-    fun updateInBulk() {
+    override fun updateInBulk() {
         val listOf = listOf(
             { Query(where("_id").`is`(1)) } to { Update().set("rule_id", 24) },
             { Query(where("_id").`is`(4)) } to { Update().set("rule_id", 21) },
