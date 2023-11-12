@@ -5,7 +5,6 @@ import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.findAll
 import org.springframework.data.mongodb.core.mapping.Document
@@ -15,10 +14,9 @@ import java.util.function.Consumer
 
 
 @MongoTestSupport
-@SpringBootTest
 class MongoDataSetupExecutionListenerTest(
     private val mongoTemplate: MongoTemplate
-) {
+) : MongoStudyApplicationTests() {
 
     @AfterAll
     fun `테스트가 끝난 시점에 모든 데이터는 초기화 되야 한다`() {

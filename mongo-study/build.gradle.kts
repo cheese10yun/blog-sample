@@ -43,9 +43,9 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
+//    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
     testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:mongodb")
+//    testImplementation("org.testcontainers:mongodb")
 }
 
 dependencyManagement {
