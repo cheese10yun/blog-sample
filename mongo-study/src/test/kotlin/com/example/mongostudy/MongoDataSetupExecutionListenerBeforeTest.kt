@@ -1,31 +1,25 @@
 package com.example.mongostudy
 
-import com.example.mongostudy.mongo.Auditable
 import org.assertj.core.api.BDDAssertions.then
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.findAll
-import org.springframework.data.mongodb.core.mapping.Document
-import org.springframework.data.mongodb.core.mapping.Field
-import java.time.LocalDateTime
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestConstructor
 import java.util.function.Consumer
 
-
 @MongoTestSupport
-class MongoDataSetupExecutionListenerTest(
+@SpringBootTest
+@ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+class MongoDataSetupExecutionListenerBeforeTest(
     private val mongoTemplate: MongoTemplate
-) : MongoStudyApplicationTests() {
+) {
 
-    @AfterAll
-    fun `테스트가 끝난 시점에 모든 데이터는 초기화 되야 한다`() {
-        val fooDocuments = mongoTemplate.findAll<Foo>()
-        val barDocuments = mongoTemplate.findAll<Bar>()
-
-        then(fooDocuments).hasSize(0)
-        then(barDocuments).hasSize(0)
-    }
 
     @MongoDataSetup(
         jsonPath = "/mongo-document-foo.json",
@@ -123,24 +117,3 @@ class MongoDataSetupExecutionListenerTest(
         )
     }
 }
-
-@Document(collection = "foo")
-data class Foo(
-    @Field("address_detail")
-    var addressDetail: String
-) : Auditable()
-
-data class FooProjection(
-    @Field("address_detail")
-    var addressDetail: String,
-    @Field("created_at")
-    val createdAt: LocalDateTime,
-    @Field("updated_at")
-    val updatedAt: LocalDateTime
-)
-
-@Document(collection = "bar")
-data class Bar(
-    @Field("email")
-    var email: String
-) : Auditable()
