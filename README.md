@@ -190,8 +190,9 @@
 * 01-29  [HTTP Client 책임 분리하기](https://cheese10yun.github.io/http-client/)
 * 01-23  [MSA 환경에서 Error Response 서버로 전달하기](https://cheese10yun.github.io/error-response-2/)
 
-## 2023[](https://)
+## 2023
 
+* 11-12 [MongoDB 다양한 테스트 케이스를 커버할 수 있는 테스트 데이터 셋업 방법](https://cheese10yun.github.io/spring-data-mongo-test-setup/)
 * 11-04  [Spring Data MongoDB Repository 확장](https://cheese10yun.github.io/spring-data-mongo-repository/)
 * 09-05  [JPA 페이징 Performance 향상 방법](https://cheese10yun.github.io/page-performance/)
 * 07-02  [Kotlin 기반 경량 ORM Exposed 추가 정리 part 3](https://cheese10yun.github.io/exposed-3/)
