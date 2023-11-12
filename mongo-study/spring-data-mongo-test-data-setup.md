@@ -131,7 +131,7 @@ class MongoDataSetupExecutionListenerBeforeTest(
 * (3): `jsonPath`은 `test/resources/` 디렉토리에 위치한 JSON 파일의 경로를 지정합니다. 마지막으로,
 * (4): MongoDB에 삽입할 문서의 클래스를 명시합니다.
 
-![](images/mongo-test-1.png)
+![](https://github.com/cheese10yun/blog-sample/blob/391a198fecd66e4f972e8b5cab31e4ce906acadb/mongo-study/images/mongo-test-1.png?raw=true)
 
 `@MongoDataSetup` 어노테이션을 사용하면, JSON 파일을 통해 MongoDB 테스트 데이터를 간편하게 설정할 수 있으며, 테스트 실행 시 Foo Document 객체가 성공적으로 저장되고 조회되는 것을 확인할 수 있습니다.
 
