@@ -12,8 +12,6 @@ import org.springframework.data.mongodb.core.mapping.Field
 import java.time.LocalDateTime
 import java.util.function.Consumer
 
-
-@MongoTestSupport
 class MongoDataSetupExecutionListenerTest(
     private val mongoTemplate: MongoTemplate
 ) : MongoStudyApplicationTests() {

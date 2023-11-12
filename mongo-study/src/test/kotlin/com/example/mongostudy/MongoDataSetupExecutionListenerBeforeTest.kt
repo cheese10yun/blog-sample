@@ -14,7 +14,6 @@ import java.util.function.Consumer
 @MongoTestSupport
 @SpringBootTest
 @ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class MongoDataSetupExecutionListenerBeforeTest(
     private val mongoTemplate: MongoTemplate

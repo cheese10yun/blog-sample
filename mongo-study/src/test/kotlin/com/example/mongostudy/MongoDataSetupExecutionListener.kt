@@ -14,6 +14,29 @@ import org.springframework.test.context.TestExecutionListener
 import org.springframework.test.context.TestExecutionListeners
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener
 
+
+/**
+ * Mongo Data Setup에 필요한 어노테이션을 Combined 하여 제공하는 어노테이션
+ * ~~~kotlin
+ * @MongoTestSupport
+ * class xxxTest() {
+ *    ...
+ * }
+ * ~~~
+ * 테스트 클래스 상단에 `@MongoTestSupport` 추가하여 사용
+ *
+ * @see com.example.mongostudy.MongoDataSetupExecutionListenerTest
+ */
+@TestExecutionListeners(
+    listeners = [
+        MongoDataSetupExecutionListener::class,
+        DependencyInjectionTestExecutionListener::class
+    ]
+)
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS)
+annotation class MongoTestSupport
+
 /**
  * MongoDB Test DataSetup을 Support
  * [MongoDataSetup.jsonPath]의 JSON 파일을 MongoDB Document에 저장을 진행한다. 자세한 사용법은 아래 참조
@@ -22,6 +45,9 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  */
 class MongoDataSetupExecutionListener : TestExecutionListener {
 
+    /**
+     * 테스트 이전에 [MongoDataSetup]기반으로 Document를 생성한다.
+     */
     override fun beforeTestMethod(testContext: TestContext) {
         val currentTestMethod = testContext.testMethod
         val mongoDataSetup = currentTestMethod.getAnnotation(MongoDataSetup::class.java)
@@ -61,6 +87,9 @@ class MongoDataSetupExecutionListener : TestExecutionListener {
         }
     }
 
+    /**
+     *
+     */
     private fun insertDocuments(mongoDataSetup: MongoDataSetup, testContext: TestContext) {
         val mongoTemplate = mongoTemplate(testContext)
         val documents = objectMapper.readValue<List<Any>>(
@@ -88,6 +117,10 @@ class MongoDataSetupExecutionListener : TestExecutionListener {
         return testContext.applicationContext.getBean(MongoTemplate::class.java)
     }
 
+    /**
+     * [path]의 경로에 있는 파일을 읽어서 String으로 응답한다.
+     * JSON 파일을 읽어 String으로 리턴
+     */
     private fun readFile(path: String): String {
         return String(ClassPathResource(path).inputStream.readBytes())
     }
@@ -124,25 +157,3 @@ annotation class MongoDataSetup(
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.ANNOTATION_CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class MongoDataSetups(vararg val mongoDataSetup: MongoDataSetup)
-
-/**
- * Mongo Data Setup에 필요한 어노테이션을 Combined 하여 제공하는 어노테이션
- * ~~~kotlin
- * @MongoTestSupport
- * class xxxTest() {
- *    ...
- * }
- * ~~~
- * 테스트 클래스 상단에 `@MongoTestSupport` 추가하여 사용
- *
- * @see com.example.mongostudy.MongoDataSetupExecutionListenerTest
- */
-@TestExecutionListeners(
-    listeners = [
-        MongoDataSetupExecutionListener::class,
-        DependencyInjectionTestExecutionListener::class
-    ]
-)
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.CLASS)
-annotation class MongoTestSupport

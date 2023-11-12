@@ -9,4 +9,5 @@ import org.springframework.test.context.TestConstructor
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@MongoTestSupport
 abstract class MongoStudyApplicationTests
