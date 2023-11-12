@@ -1,8 +1,8 @@
 [
   {
-    "email": "aaa@asd.com"
+    "address_detail": "1동, xxxx"
   },
   {
-    "email": "bbb@asd.com"
+    "address_detail": "2동, xxxx"
   }
 ]

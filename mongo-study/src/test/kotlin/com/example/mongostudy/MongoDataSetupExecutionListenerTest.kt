@@ -82,12 +82,12 @@ class MongoDataSetupExecutionListenerTest(
 
     @MongoDataSetups(
         MongoDataSetup(
-            jsonPath = "/mongo-document-foo.json",
-            clazz = Foo::class,
-        ),
-        MongoDataSetup(
             jsonPath = "/mongo-document-bar.json",
             clazz = Bar::class,
+        ),
+        MongoDataSetup(
+            jsonPath = "/mongo-document-foo.json",
+            clazz = Foo::class,
         ),
     )
     @Test
