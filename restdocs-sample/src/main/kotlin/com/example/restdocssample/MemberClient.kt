@@ -1,8 +1,18 @@
 package com.example.restdocssample
 
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.DEFAULT
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.get
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.runBlocking
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import java.lang.IllegalStateException
 
 @Service
 class MemberClient(
@@ -22,6 +32,31 @@ class MemberClient(
     }
 }
 
+class MemberKtorClient() {
+
+    val client = HttpClient {
+        install(Logging) {
+            logger = Logger.DEFAULT
+            level = LogLevel.ALL
+        }
+        install(ContentNegotiation) {
+            json()
+        }
+    }
+
+
+    fun getMember(memberId: Long): ResponseResult<Member> {
+        return runBlocking {
+            client
+                .get("http://example.com/api/members/$memberId")
+                .responseResult<Member>()
+        }
+    }
+
+
+
+}
+
 fun xxx() {
     val memberClient = MemberClient(RestTemplate())
     val response = memberClient.getMember(1L) // 1번 회원 조회를 가정
@@ -35,7 +70,7 @@ fun xxx() {
 
     val success = Result.success("asd")
 
-    Result.failure<String>(exception = )
+    Result.failure<String>(IllegalStateException())
 
 }
 
