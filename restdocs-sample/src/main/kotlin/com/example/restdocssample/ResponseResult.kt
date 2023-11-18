@@ -53,7 +53,7 @@ sealed class ResponseResult<out T> {
     val isFailure: Boolean
         get() = this is Failure
 
-    /**
+    /**ㅊ
      * [Success] 경우 콜백
      */
     inline fun onSuccess(action: (T) -> Unit): ResponseResult<T> {

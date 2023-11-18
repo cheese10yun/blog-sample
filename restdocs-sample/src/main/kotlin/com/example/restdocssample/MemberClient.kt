@@ -54,6 +54,17 @@ class MemberKtorClient() {
     }
 
 
+    fun xxx() {
+        val memberClient = MemberClient(RestTemplate())
+        val response = memberClient.getMember(1L) // 1번 회원 조회를 가정
+
+        if (response.statusCode.is2xxSuccessful) {
+            // 비즈니스 로직 진행
+        } else {
+            // 2xx가 아닌 경우의 처리 로직
+            throw IllegalArgumentException("...")
+        }
+    }
 
 }
 
