@@ -2,10 +2,9 @@
 
 본 포스팅에서는 애플리케이션의 로직 처리 과정에서 발생하는 여러 서버들 간의 협력이라는 중요한 주제를 다루려고 합니다. 현대의 애플리케이션 아키텍처에서는 하나의 서비스가 독립적으로 모든 기능을 처리하기보다는, 여러 서버들이 상호작용하며 각각의 역할을 수행하곤 합니다. 이러한 상호작용 과정에서 HTTP 통신은 서버 간의 협력을 위한 주요한 수단으로 자주 사용됩니다. 이때, 효율적이고 안정적인 HTTP 클라이언트 코드의 작성은 매우 중요한 고려사항이 됩니다. 따라서, 본 포스팅에서는 이러한 컨텍스트 하에 HTTP 클라이언트 코드를 설계하는 방법에 대해 자세히 살펴보고자 합니다. 특히 HTTP 통신의 경우 실패 케이스를 항상 염두에 두어야 합니다. 어떻게 코드를 설계해야 통신 실패 및 다양한 경우의 수에 따른 제어가 쉽고 직관적으로 진행할 수 있는 방법에 대해서도 다루어보겠습니다.
 
-
 ## HTTP Client Sample Code
 
-Spring 프레임워크를 사용한다면 가장 대중적으로 사용하는 라이브러리인 `RestTemplate`를 이용하여 HTTP 통신으로 Member를 조회하는 코드를 작성하면 아래와 같습니다.   
+Spring 프레임워크를 사용한다면 가장 대중적으로 사용하는 라이브러리인 `RestTemplate`를 이용하여 HTTP 통신으로 Member를 조회하는 코드를 작성하면 아래와 같습니다.
 
 ```kotlin
 data class Member(
@@ -16,7 +15,7 @@ data class Member(
 
 @Service
 class MemberClient(
-    private val restTemplate: RestTemplate 
+    private val restTemplate: RestTemplate
 ) {
 
     fun getMember(memberId: Long): Member {
@@ -26,8 +25,7 @@ class MemberClient(
 }
 ```
 
-이 코드 예제는 Spring 프레임워크를 사용하여 `RestTemplate`을 활용해 HTTP 통신을 통한 Member 조회 기능을 구현한 것입니다. `getMember` 함수는 회원의 ID를 매개변수로 받아 해당 회원의 정보를 조회합니다. 이 함수는 `RestTemplate`의 `getForObject` 메소드를 사용하여 주어진 URL로부터 회원 정보를 가져옵니다. 여기서 URL은 회원의 ID를 포함하여 동적으로 구성됩니다. `getForObject` 메소드는 지정된 URL에서 JSON 형태의 데이터를 가져와 `Member` 클래스의 인스턴스로 자동 변환합니다. 
-
+이 코드 예제는 Spring 프레임워크를 사용하여 `RestTemplate`을 활용해 HTTP 통신을 통한 Member 조회 기능을 구현한 것입니다. `getMember` 함수는 회원의 ID를 매개변수로 받아 해당 회원의 정보를 조회합니다. 이 함수는 `RestTemplate`의 `getForObject` 메소드를 사용하여 주어진 URL로부터 회원 정보를 가져옵니다. 여기서 URL은 회원의 ID를 포함하여 동적으로 구성됩니다. `getForObject` 메소드는 지정된 URL에서 JSON 형태의 데이터를 가져와 `Member` 클래스의 인스턴스로 자동 변환합니다.
 
 이 코드는 간단하고 직관적으로 보이지만, HTTP 통신 실패와 같은 예외 상황에 대한 처리가 필요할 때는 호출하는 측에서 직접적인 예외 핸들링을 해야 합니다. 예를 들어, 아래와 같은 함수에서 HTTP 응답이 `2xx` 성공 코드가 아닌 경우에 대한 후속 조치가 필요합니다.
 
@@ -48,7 +46,9 @@ fun getMember(memberId: Long): ResponseEntity<Member> {
 }
 ```
 
-이러한 방식으로 처리하면, 호출하는 측에서 HTTP 응답 코드에 따라 적절한 로직을 구현할 수 있습니다. 그러나 이 방법은 몇 가지 단점이 있을 수 있습니다. 어떤 문제점이 있는지 살펴 보겠습니다.
+이러한 방식으로 처리하면, 호출하는 측에서 HTTP 응답 코드에 따라 적절한 로직을 구현할 수 있습니다. 그러나 이 방법은 몇 가지 단점이 있을 수 있습니다. 어떤 문제점이 있는지 살펴 보겠습니다.번
+
+### HTTP Client Sample Code 문제점
 
 이 텍스트는 `ResponseEntity<T>` 리턴 타입의 문제점에 대해 설명하고 있습니다. 첫 번째 주요 문제는 이 타입이 특정 라이브러리에 지나치게 의존적이라는 점입니다. HTTP 클라이언트 라이브러리는 대체 가능성이 높아야 하는데, 특정 라이브러리에 과도하게 의존적인 리턴 타입을 사용하면 라이브러리를 교체할 때 비용이 크게 들게 됩니다. 이는 특히 멀티 모듈 프로젝트에서 HTTP 통신을 담당하는 모듈을 분리하여 관리할 경우 더욱 중요한 고려사항이 됩니다. 특정 라이브러리의 리턴 타입을 사용하면 라이브러리 변경 시 해당 모듈을 사용하는 다른 모듈에도 직접적인 영향을 미치게 됩니다.
 
@@ -73,7 +73,6 @@ fun xxx() {
 ```
 
 이 코드에서는 HTTP 응답이 2xx 범위에 속하지 않을 경우 예외 처리가 필요합니다. 이때, 어떤 예외를 발생시킬지 사용자가 결정해야 합니다. 또한, 예외 처리 시 `MemberClient`로부터 받은 오류 응답을 그대로 사용할지, 수정할지 결정해야 합니다.
-
 
 이미지 추가
 
@@ -124,9 +123,7 @@ result.onFailure { error ->
 
 이 예시에서 fetchProfile 함수는 Result 타입을 반환합니다. onSuccess 블록은 결과가 성공적일 때 실행되고, onFailure 블록은 오류가 발생했을 때 실행됩니다. 이러한 특징을 이용하면 HTTP Client 응답을 효율적으로 처리할 있어 HTTP Response에 전목 시켜보겠습니다.
 
-
 ### 코틀린 Result 개념을 활용한 ResponseResult
-
 
 코틀린에서 Result 타입은 함수가 성공적으로 결과를 반환했는지, 아니면 예외가 발생했는지를 포장하는 데 사용됩니다. 이는 함수가 예외를 던지는 대신, 성공적인 결과나 실패를 나타내는 객체를 반환하게 만들어, 오류 처리를 더 간결하고 안전하게 할 수 있게 도와줍니다.
 
@@ -183,7 +180,7 @@ sealed class ResponseResult<out T> {
             is Success -> return action(body)
             is Failure -> {
                 when {
-                    errorResponse.status.isClientError() -> throw ServiceException(errorResponse = errorResponse, code = ErrorCode.INVALID_INPUT_VALUE )
+                    errorResponse.status.isClientError() -> throw ServiceException(errorResponse = errorResponse, code = ErrorCode.INVALID_INPUT_VALUE)
                     else -> throw ServiceException(errorResponse = errorResponse, code = ErrorCode.SERVER_ERROR)
                 }
             }
@@ -195,14 +192,14 @@ data class ErrorResponse(
     val message: String,
     val code: String,
     val status: Int
-){
+) {
+    val timestamp: LocalDateTime = LocalDateTime.now()
     ...
 }
-    
+
 ```
 
-`ResponseResult`라는 `sealed class`를 정의하고 있습니다, 이는 제네릭 타입 `T`를 사용하는 결과 처리 클래스입니다. `ResponseResult` 클래스는 HTTP 통신 이후 작업의 결과를 나타내는 데 사용됩니다. HTTP 통신 이후 성공 응답을 주는 `Success<T>` 서브 클래스와, 2xx가 아닌 실패의 경우 `ErrorResponse`을 전달받는 `Failure` 서브 클래스의 두 가지 클래스를 가지고 있으며, 여러 메소드들을 제공하고 있습니다. 각 요소를에 대해서 더 설명드리겠습니다. 
-
+`ResponseResult`라는 `sealed class`를 정의하고 있습니다, 이는 제네릭 타입 `T`를 사용하는 결과 처리 클래스입니다. `ResponseResult` 클래스는 HTTP 통신 이후 작업의 결과를 나타내는 데 사용됩니다. HTTP 통신 이후 성공 응답을 주는 `Success<T>` 서브 클래스와, 2xx가 아닌 실패의 경우 `ErrorResponse`을 전달받는 `Failure` 서브 클래스의 두 가지 클래스를 가지고 있으며, 여러 메소드들을 제공하고 있습니다. 각 요소를에 대해서 더 설명드리겠습니다.
 
 #### 서브 클래스
 
@@ -225,13 +222,11 @@ data class ErrorResponse(
 
 `Failure`의 경우, `ErrorResponse`에 따라 예외 발생 여부를 결정합니다. `getOrThrow` 메소드에서는 `ErrorResponse`의 상태(`status`)를 확인하여 적절한 `ServiceException`을 던집니다. 이 예외는 사용자 정의 예외로 보이며, 오류 코드를 포함하고 있습니다.
 
-
 #### 정리
 
 이 `ResponseResult` 클래스는 HTTP 호출과 같은 작업의 결과를 더 유연하고 안전하게 처리할 수 있도록 설계되었습니다. 성공과 실패 케이스를 명확하게 구분하고, 각 상황에 맞는 로직을 실행할 수 있도록 메소드를 제공합니다. 또한, 예외 처리를 위한 메커니즘이 포함되어 있어, 오류 상황에 대한 세밀한 제어가 가능합니다.
 
-
-### ResponseResult HTTP Client 라이브러리에 적용
+## ResponseResult HTTP Client 라이브러리에 적용
 
 RestTemplate의 사용은 직관성이 떨어지고, 불필요한 의존성 문제와 테스트 시 Application Context가 필요한 문제 등을 야기할 수 있습니다. 따라서 코틀린을 사용할 경우, HTTP 클라이언트 라이브러리로 [Fuel](https://github.com/kittinunf/fuel) 또는 [Ktor](https://github.com/ktorio/ktor)를 추천합니다. 단순하고 소규모의 HTTP 클라이언트 작업을 할 때는 Fuel이 적합하며, 보다 복잡하고 다양한 HTTP 통신이 필요한 상황에서는 Ktor를 사용하는 것이 좋습니다. **또한, `ResponseResult`는 특정 HTTP 클라이언트 라이브러리에 종속적이지 않게 구현되어 있어, 필요에 따라 RestTemplate를 계속 사용하는 것도 가능합니다.**
 
@@ -244,7 +239,7 @@ suspend inline fun <reified T> HttpResponse.responseResult(): ResponseResult<T> 
             val responseBody = bodyAsText()
             ResponseResult.Failure(
                 when {
-                    isServiceErrorResponseSerializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
+                    isErrorResponseSerializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
                     else -> defaultErrorResponse
                 }
             )
@@ -255,47 +250,87 @@ suspend inline fun <reified T> HttpResponse.responseResult(): ResponseResult<T> 
 // RestTemplate 확장 함수
 inline fun <reified T> ResponseEntity<String>.responseResult(): ResponseResult<T> {
     return when (this.statusCode.is2xxSuccessful) {
-        true -> {
-            ResponseResult.Success(defaultObjectMapper.readValue<T>(body!!))
-        }
+        true -> ResponseResult.Success(defaultObjectMapper.readValue<T>(body!!))
         else -> {
             val responseBody = this.body.toString()
             ResponseResult.Failure(
                 when {
-                    isServiceErrorResponseSerializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
+                    isErrorResponseSerializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
                     else -> defaultErrorResponse
                 }
             )
         }
     }
 }
+```
 
+RestTemplate 경우 기본 설정이 2xx가 아닌 경우 예외를 발생 시키기 때문에 `ResponseErrorHandler`을 통해서 Custom 설정으로 변경이 필요하며, ResponseEntity 객체에서 2xx 경우에만 시리얼라이즈가 성공적으로 진행하 가능하기 때문에 `ResponseEntity<String>`으로 String 타입을 받고, 2xx 경우에 시리얼라이즈를 진행합니다. 이후 `responseResult<Member>()`으로 `<T>` 타입을 명시적으로 받아서 처리합니다.
 
-/**
- *  표준 [ErrorResponse]를 Serialize 가능 여부
- */
-fun isServiceErrorResponseSerializeAble(responseBody: String): Boolean {
+### 내부 Error Response 통일 하여 얻는 장점
+
+외부나 다른 팀의 서버와 달리, 동일한 팀 내에서 운영되는 서버들의 오류 응답(Error Response)을 통일하는 것이 바람직합니다. 만약 팀 내에서도 서버별로 오류 메시지가 서로 다르면, 4xx 및 5xx 오류에 대한 처리가 더 복잡해집니다. 또한, 이러한 서버들과 연동하는 다른 팀도 4xx 및 5xx 오류에 대해 처리하는 복잡도가 높아질 수 있습니다. 따라서 같은 팀 내에서 서비스하는 서버들은 오류 응답을 통일하여 관리하는 것이 좋습니다. 이렇게 하면 오류 처리가 간소화되고, 다른 팀과의 협업도 원활해질 수 있습니다.
+
+### 통일화된 Error Response
+
+팀 내에서 서비스되는 서버들의 오류 응답을 통일화하는 것은 오류 처리를 간소화하고 코드 비용을 줄이는 데 도움이 됩니다. 예를 들어, 아래의 JSON 구조로 오류 응답이 통일되었다고 가정해 봅시다.
+
+```json
+{
+  "message": "Invalid Input Value",
+  "status": 400,
+  "code": "C001",
+  "errors": [],
+  "timestamp": "2023-11-19T21:15:38.122448"
+}
+```
+
+이 경우 아래와 같이, 팀 내 서비스 간의 호출에서 오류가 발생했을 때
+
+```
+# 요청
+A -> B -> C
+
+# 응답
+A <- B <- C
+```
+
+이 오류 메시지는 최초 호출지인 서비스 A까지 전달될 수 있어야 합니다. 오류 메시지가 통일되면 이러한 전달이 용이해지고, 관련 코드 비용도 감소합니다.
+
+```kotlin
+// 표준 ErrorResponse 직렬화 가능 여부 확인
+fun isErrorResponseSerializeAble(responseBody: String): Boolean {
     return when (val rootNode = defaultObjectMapper.readTree(responseBody)) {
         null -> false
         else -> rootNode.path("message").isTextual && rootNode.path("status").isNumber && rootNode.path("code").isTextual
     }
 }
 
+// 기본 ErrorResponse 객체
 val defaultErrorResponse = ErrorResponse(
     code = ErrorCode.INVALID_INPUT_VALUE
 )
 ```
 
+`responseResult` 함수에서 2xx가 아닌 경우, 응답받은 오류 응답이 팀 내 표준 오류 메시지인지 확인하고, 맞다면 `ErrorResponse` 객체로 직렬화합니다. 그렇지 않은 경우 기본 `ErrorResponse`를 사용합니다. 예를 들어, 서버가 다운되어 표준 오류 응답을 제공할 수 없는 상황에서 기본 응답을 사용합니다. 이외에도 다양한 상황에 대비한 방어적 로직이 필요합니다.
 
+`ErrorResponse` 객체를 사용하면, 오류 발생 시 상세한 예외 처리가 가능해집니다. 예를 들어, `memberClient.getMember` 호출로부터 `ErrorResponse` 객체를 받게 되면, 오류가 발생했을 때 이 객체를 기반으로 추가적인 핸들링을 할 수 있습니다. 아래의 코드 예시는 이러한 상황을 보여줍니다.
 
+```kotlin
+fun xxx() {
+    val member = memberClient.getMember(1L)
 
-## ResponseResult 기반 HTTP Response 핸들링
+    member
+        .onFailure { errorResponse: ErrorResponse ->
+            // 오류 발생시 넘겨 받은 errorResponse 객체로 추가 핸들링 가능
+        }
+}
+```
 
-
-
+이 코드에서 `onFailure` 블록 내부에서 `ErrorResponse` 객체에 대한 추가 처리를 할 수 있습니다. 이렇게 오류에 대한 응답을 구체적으로 다룰 수 있게 되므로, 예외 상황에 대한 대응이 보다 정교하고 세밀하게 이루어질 수 있습니다.
 
 
 -----
+
 * [ ] onSuccess 콜백
 * [ ] onFailure 콜백
 * [ ] getOrNull null 처리 위임

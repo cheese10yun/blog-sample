@@ -11,10 +11,6 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
-import org.springframework.boot.web.client.RestTemplateBuilder
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
@@ -49,14 +45,12 @@ class MemberClient(
 
 inline fun <reified T> ResponseEntity<String>.responseResult(): ResponseResult<T> {
     return when (this.statusCode.is2xxSuccessful) {
-        true -> {
-            ResponseResult.Success(defaultObjectMapper.readValue<T>(body!!))
-        }
+        true -> ResponseResult.Success(defaultObjectMapper.readValue<T>(body!!))
         else -> {
             val responseBody = this.body.toString()
             ResponseResult.Failure(
                 when {
-                    isServiceErrorResponseSerializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
+                    isErrorResponseSerializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
                     else -> defaultErrorResponse
                 }
             )
@@ -96,7 +90,7 @@ class MemberKtorClient() {
     fun getMember(memberId: Long): ResponseResult<Member> {
         return runBlocking {
             client
-                .get("http://example.com/api/members/$memberId")
+                .get("http://localhost:8787/api/members/$memberId")
                 .responseResult<Member>()
         }
     }

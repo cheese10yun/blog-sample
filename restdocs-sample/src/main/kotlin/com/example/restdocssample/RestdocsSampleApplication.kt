@@ -18,7 +18,6 @@ import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.stereotype.Component
-import org.springframework.web.client.RestTemplate
 
 @SpringBootApplication
 class RestdocsSampleApplication
@@ -54,7 +53,7 @@ suspend inline fun <reified T> HttpResponse.responseResult(): ResponseResult<T> 
             val responseBody = bodyAsText()
             ResponseResult.Failure(
                 when {
-                    isServiceErrorResponseSerializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
+                    isErrorResponseSerializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
                     else -> defaultErrorResponse
                 }
             )
@@ -65,7 +64,7 @@ suspend inline fun <reified T> HttpResponse.responseResult(): ResponseResult<T> 
 /**
  *  표준 [ErrorResponse]를 Serialize 가능 여부
  */
-fun isServiceErrorResponseSerializeAble(responseBody: String): Boolean {
+fun isErrorResponseSerializeAble(responseBody: String): Boolean {
     return when (val rootNode = defaultObjectMapper.readTree(responseBody)) {
         null -> false
         else -> rootNode.path("message").isTextual && rootNode.path("status").isNumber && rootNode.path("code").isTextual
