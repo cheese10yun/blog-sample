@@ -9,6 +9,9 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
+import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -117,3 +120,5 @@ data class Member(
     val name: String,
     val email: String
 )
+
+
