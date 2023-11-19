@@ -18,6 +18,7 @@ import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.stereotype.Component
+import org.springframework.web.client.RestTemplate
 
 @SpringBootApplication
 class RestdocsSampleApplication
@@ -44,6 +45,7 @@ class DataSetup(
     }
 }
 
+//inline inline fun <reified T> RestTemplate.responseResult(): ResponseResult<T>
 
 suspend inline fun <reified T> HttpResponse.responseResult(): ResponseResult<T> {
     return when {

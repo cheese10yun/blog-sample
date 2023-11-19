@@ -26,7 +26,6 @@ class MemberClient(
 }
 ```
 
-
 이 코드 예제는 Spring 프레임워크를 사용하여 `RestTemplate`을 활용해 HTTP 통신을 통한 Member 조회 기능을 구현한 것입니다. `getMember` 함수는 회원의 ID를 매개변수로 받아 해당 회원의 정보를 조회합니다. 이 함수는 `RestTemplate`의 `getForObject` 메소드를 사용하여 주어진 URL로부터 회원 정보를 가져옵니다. 여기서 URL은 회원의 ID를 포함하여 동적으로 구성됩니다. `getForObject` 메소드는 지정된 URL에서 JSON 형태의 데이터를 가져와 `Member` 클래스의 인스턴스로 자동 변환합니다. 
 
 
@@ -51,15 +50,13 @@ fun getMember(memberId: Long): ResponseEntity<Member> {
 
 이러한 방식으로 처리하면, 호출하는 측에서 HTTP 응답 코드에 따라 적절한 로직을 구현할 수 있습니다. 그러나 이 방법은 몇 가지 단점이 있을 수 있습니다. 어떤 문제점이 있는지 살펴 보겠습니다.
 
-이 텍스트는 `ResponseEntity<T>` 리턴 타입의 문제점에 대해 설명하고 있습니다. 첫 번째 주요 문제는 이 타입이 스프링 프레임워크에 지나치게 의존적이라는 점입니다. HTTP 클라이언트 라이브러리는 대체 가능성이 높아야 하는데, 특정 라이브러리에 과도하게 의존적인 리턴 타입을 사용하면 라이브러리를 교체할 때 비용이 크게 들게 됩니다. 이는 특히 멀티 모듈 프로젝트에서 HTTP 통신을 담당하는 모듈을 분리하여 관리할 경우 더욱 중요한 고려사항이 됩니다. 특정 라이브러리의 리턴 타입을 사용하면 라이브러리 변경 시 해당 모듈을 사용하는 다른 모듈에도 직접적인 영향을 미치게 됩니다.
+이 텍스트는 `ResponseEntity<T>` 리턴 타입의 문제점에 대해 설명하고 있습니다. 첫 번째 주요 문제는 이 타입이 특정 라이브러리에 지나치게 의존적이라는 점입니다. HTTP 클라이언트 라이브러리는 대체 가능성이 높아야 하는데, 특정 라이브러리에 과도하게 의존적인 리턴 타입을 사용하면 라이브러리를 교체할 때 비용이 크게 들게 됩니다. 이는 특히 멀티 모듈 프로젝트에서 HTTP 통신을 담당하는 모듈을 분리하여 관리할 경우 더욱 중요한 고려사항이 됩니다. 특정 라이브러리의 리턴 타입을 사용하면 라이브러리 변경 시 해당 모듈을 사용하는 다른 모듈에도 직접적인 영향을 미치게 됩니다.
 
 이러한 문제를 해결하기 위해, HTTP 통신을 담당하는 모듈은 이러한 의존성을 내부적으로 관리하여, 모듈을 사용하는 다른 부분이 변경의 영향을 최소화할 수 있도록 해야 합니다. 이는 단순히 HTTP 모듈에만 국한된 문제가 아니라, 전반적인 시스템 설계에서 책임과 역할을 적절하게 부여하고, 각 부분이 그에 맞는 책임과 역할을 수행할 수 있도록 디자인하는 데에도 중요합니다.
 
 ![](https://tech.kakaopay.com/_astro/011.38d51c8e_dYW2O.png)
 
-
-
-두 번째 문제는 HTTP 통신 후 결과 처리의 반복성과 불편함입니다. 아래 코드는 `MemberClient`를 사용해 HTTP를 통해 회원 정보를 조회하는 과정을 보여줍니다:
+두 번째 문제는 HTTP 통신 후 결과 처리의 반복성과 불편함입니다. 아래 코드는 `MemberClient`를 사용해 HTTP를 통해 회원 정보를 조회하는 과정을 보여줍니다.
 
 ```kotlin
 fun xxx() {
@@ -92,13 +89,13 @@ A <- B <- C
 
 ## HTTP Client Sample Code 개선하기
 
+첫 번째 문제 였던 리턴 타입이 특정 라이브러리에 의존적으로 라이브러리 교체에도 사용하는 곳에서 영향을 주지 않게 하는 것과, 두 번째 문제 였던 HTTP 통신 이후 불편 하고 반복적인 처리를 효율적으로 개선 하는 것입니다.
 
 ### 코틀린의 Result 개념
 
-명시적인 오류 처리: 예외 대신 결과 객체를 사용함으로써, 오류가 발생할 수 있는 코드 부분을 명확히 식별할 수 있습니다.  함수 반환 값의 안전성: 함수가 예외를 던지지 않고 Result 객체를 반환함으로써, 함수의 사용자는 반환된 값을 안전하게 처리할 수 있습니다. 유연한 오류 처리: Result 타입은 오류 처리를 위한 다양한 메소드(getOrNull, getOrElse, getOrThrow 등)를 제공하여, 사용자가 상황에 맞게 오류를 처리할 수 있게 합니다.
+명시적인 오류 처리: 예외 대신 결과 객체를 사용함으로써, 오류가 발생할 수 있는 코드 부분을 명확히 식별할 수 있습니다. 함수 반환 값의 안전성: 함수가 예외를 던지지 않고 Result 객체를 반환함으로써, 함수의 사용자는 반환된 값을 안전하게 처리할 수 있습니다. 유연한 오류 처리: Result 타입은 오류 처리를 위한 다양한 메소드(getOrNull, getOrElse, getOrThrow 등)를 제공하여, 사용자가 상황에 맞게 오류를 처리할 수 있게 합니다.
 
 ```kotlin
-
 fun fetchProfile(userId: String): Result<Profile> {
     return try {
         // 데이터 가져오기 성공
@@ -193,49 +190,53 @@ sealed class ResponseResult<out T> {
         }
     }
 }
+
+data class ErrorResponse(
+    val message: String,
+    val code: String,
+    val status: Int
+)
+...
 ```
 
-이 코틀린 코드는 `ResponseResult`라는 `sealed class`를 정의하고 있으며, 이는 제네릭 타입 `T`를 사용하는 결과 처리 클래스입니다. `ResponseResult` 클래스는 API 호출과 같은 작업의 결과를 나타내는 데 사용됩니다. 클래스는 두 가지 서브 클래스를 가지고 있으며, 여러 메소드를 제공합니다. 각 요소를 분석해보겠습니다.
+`ResponseResult`라는 `sealed class`를 정의하고 있습니다, 이는 제네릭 타입 `T`를 사용하는 결과 처리 클래스입니다. `ResponseResult` 클래스는 HTTP 통신 이후 작업의 결과를 나타내는 데 사용됩니다. HTTP 통신 이후 성공 응답을 주는 `Success<T>` 서브 클래스와, 2xx가 아닌 실패의 경우 `ErrorResponse`을 전달받는 `Failure` 서브 클래스의 두 가지 클래스를 가지고 있으며, 여러 메소드들을 제공하고 있습니다. 각 요소를에 대해서 더 설명 드리면 
 
-### 서브 클래스
+
+#### 서브 클래스
 
 1. **Success**: 성공적인 결과를 나타내며, `body`라는 필드를 통해 결과 데이터를 포함합니다.
 2. **Failure**: 실패를 나타내며, `errorResponse`라는 필드를 통해 오류 정보를 포함합니다.
 
-### 프로퍼티
+#### 프로퍼티
 
 - `isSuccess`: 현재 인스턴스가 `Success`인지 여부를 반환합니다.
 - `isFailure`: 현재 인스턴스가 `Failure`인지 여부를 반환합니다.
 
-### 메소드
+#### 메소드
 
 1. **onSuccess**: `Success` 인스턴스일 때 실행할 액션을 정의합니다. `action` 함수는 `body`를 인자로 받습니다.
 2. **onFailure**: `Failure` 인스턴스일 때 실행할 액션을 정의합니다. `action` 함수는 `errorResponse`를 인자로 받습니다.
 3. **getOrNull**: `Success` 인 경우에는 `action` 함수를 실행하고 결과를 반환하며, `Failure` 인 경우에는 `null`을 반환합니다.
 4. **getOrThrow**: `Success` 인 경우에는 `action` 함수를 실행하고 결과를 반환합니다. `Failure` 인 경우에는 오류 상태에 따라 `ServiceException`을 던집니다. 여기서 오류 상태가 클라이언트 오류인지 서버 오류인지에 따라 다른 `ErrorCode`를 사용합니다.
 
-### 오류 처리
+#### 오류 처리
 
 `Failure`의 경우, `ErrorResponse`에 따라 예외 발생 여부를 결정합니다. `getOrThrow` 메소드에서는 `ErrorResponse`의 상태(`status`)를 확인하여 적절한 `ServiceException`을 던집니다. 이 예외는 사용자 정의 예외로 보이며, 오류 코드를 포함하고 있습니다.
 
-### 결론
 
-이 `ResponseResult` 클래스는 API 호출과 같은 작업의 결과를 더 유연하고 안전하게 처리할 수 있도록 설계되었습니다. 성공과 실패 케이스를 명확하게 구분하고, 각 상황에 맞는 로직을 실행할 수 있도록 메소드를 제공합니다. 또한, 예외 처리를 위한 메커니즘이 포함되어 있어, 오류 상황에 대한 세밀한 제어가 가능합니다. 
+#### 정리
 
-
-#### 사용법
+이 `ResponseResult` 클래스는 HTTP 호출과 같은 작업의 결과를 더 유연하고 안전하게 처리할 수 있도록 설계되었습니다. 성공과 실패 케이스를 명확하게 구분하고, 각 상황에 맞는 로직을 실행할 수 있도록 메소드를 제공합니다. 또한, 예외 처리를 위한 메커니즘이 포함되어 있어, 오류 상황에 대한 세밀한 제어가 가능합니다.
 
 
-### 라이브러리 교체
+### ResponseResult HTTP Client 라이브러리에 적용
 
-RestTemplate 같은 경우 코드의 직관성이 떨어지며, 불필요한 의존성 문제, 테스트시에 Application Context 필요한 문제 등등이 있기 때문에 코틀린을 사용한다면 HTTP Client [Fuel](https://github.com/kittinunf/fuel), [Ktor](https://github.com/ktorio/ktor) 라이브러리를 추천드립니다. 간단하고 HTTP Client를 많이 작성하지 않을거라면 Fuel를 권장드리고, 복잡하고 다양한 HTTP 통신을 진행한다면 Ktor을 추천드립니다.
+RestTemplate의 사용은 직관성이 떨어지고, 불필요한 의존성 문제와 테스트 시 Application Context가 필요한 문제 등을 야기할 수 있습니다. 따라서 코틀린을 사용할 경우, HTTP 클라이언트 라이브러리로 [Fuel](https://github.com/kittinunf/fuel) 또는 [Ktor](https://github.com/ktorio/ktor)를 추천합니다. 단순하고 소규모의 HTTP 클라이언트 작업을 할 때는 Fuel이 적합하며, 보다 복잡하고 다양한 HTTP 통신이 필요한 상황에서는 Ktor를 사용하는 것이 좋습니다. **또한, `ResponseResult`는 특정 HTTP 클라이언트 라이브러리에 종속적이지 않게 구현되어 있어, 필요에 따라 RestTemplate를 계속 사용하는 것도 가능합니다.**
 
-* [] 또 문제는 RestTemplate을 그대로 사용해도 무방하다는 거 설명
-
-### HTTP Client 라이브러리에 적용
-
-#### ktor
 ```kotlin
+// 
+
+// ktor 확장하기
 suspend inline fun <reified T> HttpResponse.responseResult(): ResponseResult<T> {
     return when {
         status.isSuccess() -> ResponseResult.Success(body())
@@ -250,14 +251,7 @@ suspend inline fun <reified T> HttpResponse.responseResult(): ResponseResult<T> 
         }
     }
 }
-```
 
-### Fuel
-
-
-### 공통 설정
-
-```kotlin
 /**
  *  표준 [ErrorResponse]를 Serialize 가능 여부
  */
@@ -268,65 +262,24 @@ fun isServiceErrorResponseSerializeAble(responseBody: String): Boolean {
     }
 }
 
-
-val defaultObjectMapper: ObjectMapper = ObjectMapper()
-    .registerKotlinModule()
-    .registerModules(JavaTimeModule(), Jdk8Module())
-    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-    .apply { this.propertyNamingStrategy = PropertyNamingStrategies.SNAKE_CASE }
-
-
 val defaultErrorResponse = ErrorResponse(
     code = ErrorCode.INVALID_INPUT_VALUE
 )
 ```
 
-### HTTP Client 적용
 
-```kotlin
-fun getMember(memberId: Long): ResponseResult<Member> {
-    return runBlocking {
-        client
-            .get("http://example.com/api/members/$memberId")
-            .responseResult<Member>()
-    }
-}
-```
+## ResponseResult 기반 HTTP Response 핸들링
 
 
-### 라이브러리 교체시 사용하는 곳에서 변경사항 최소화 하기
-
-HTTP Client 라이브러리는 교체가 비교적 빈번하게 발생하는 라이브러리이기 때문에 리턴 타입에 특정 라이브러리의 객체로 리턴하게 되면 **변경에 취약하기 때문에 특정 라이브러리에 의존적이지 않게 리턴 타입을 지정하는 것이 좋습니다.**
 
 
-### 호출하는 곳에서 편하게 제어
 
-HTTP 통신 이후 성공, 실패에 따른 호출한 곳에서 HTTP 통신 이후 성공, 실패에 따른 핸들링을 쉽고 간편하게 제어할 수 있어야합니다. 여러 서비스들의 연속적인 호출의 경우
-
-오류가 발생한 곳의 Error Message를 명확하게 전달하는 것도 중요 합니다.
-
-
-### 예외 
-
-
-## ResponseResult
-
-
-### 라이브러리 교체시 사용하는 곳에서 변경사항 최소화 하기
-
-### 호출하는 곳에서 편하게 제어
-
+-----
 * [ ] onSuccess 콜백
 * [ ] onFailure 콜백
 * [ ] getOrNull null 처리 위임
 * [ ] getOrThrow notnull을 보장 받고 싶은 패턴
 * [ ] 오류 전달하기
-
-
-### 손쉽게 테스트 코드 작성하는 방법
-
-
-
 * [ ] 특정 라이브리에대 대해 의존적이지 않는다.
 * [ ] 이전 Error Response를 전달 해야한다.
 * [ ] 내부 Error, 외부 Error 을 구분 해야한다.
