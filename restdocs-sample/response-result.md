@@ -195,11 +195,13 @@ data class ErrorResponse(
     val message: String,
     val code: String,
     val status: Int
-)
-...
+){
+    ...
+}
+    
 ```
 
-`ResponseResult`라는 `sealed class`를 정의하고 있습니다, 이는 제네릭 타입 `T`를 사용하는 결과 처리 클래스입니다. `ResponseResult` 클래스는 HTTP 통신 이후 작업의 결과를 나타내는 데 사용됩니다. HTTP 통신 이후 성공 응답을 주는 `Success<T>` 서브 클래스와, 2xx가 아닌 실패의 경우 `ErrorResponse`을 전달받는 `Failure` 서브 클래스의 두 가지 클래스를 가지고 있으며, 여러 메소드들을 제공하고 있습니다. 각 요소를에 대해서 더 설명 드리면 
+`ResponseResult`라는 `sealed class`를 정의하고 있습니다, 이는 제네릭 타입 `T`를 사용하는 결과 처리 클래스입니다. `ResponseResult` 클래스는 HTTP 통신 이후 작업의 결과를 나타내는 데 사용됩니다. HTTP 통신 이후 성공 응답을 주는 `Success<T>` 서브 클래스와, 2xx가 아닌 실패의 경우 `ErrorResponse`을 전달받는 `Failure` 서브 클래스의 두 가지 클래스를 가지고 있으며, 여러 메소드들을 제공하고 있습니다. 각 요소를에 대해서 더 설명드리겠습니다. 
 
 
 #### 서브 클래스
@@ -234,9 +236,7 @@ data class ErrorResponse(
 RestTemplate의 사용은 직관성이 떨어지고, 불필요한 의존성 문제와 테스트 시 Application Context가 필요한 문제 등을 야기할 수 있습니다. 따라서 코틀린을 사용할 경우, HTTP 클라이언트 라이브러리로 [Fuel](https://github.com/kittinunf/fuel) 또는 [Ktor](https://github.com/ktorio/ktor)를 추천합니다. 단순하고 소규모의 HTTP 클라이언트 작업을 할 때는 Fuel이 적합하며, 보다 복잡하고 다양한 HTTP 통신이 필요한 상황에서는 Ktor를 사용하는 것이 좋습니다. **또한, `ResponseResult`는 특정 HTTP 클라이언트 라이브러리에 종속적이지 않게 구현되어 있어, 필요에 따라 RestTemplate를 계속 사용하는 것도 가능합니다.**
 
 ```kotlin
-// 
-
-// ktor 확장하기
+// ktor 확장 함수
 suspend inline fun <reified T> HttpResponse.responseResult(): ResponseResult<T> {
     return when {
         status.isSuccess() -> ResponseResult.Success(body())
@@ -252,6 +252,25 @@ suspend inline fun <reified T> HttpResponse.responseResult(): ResponseResult<T> 
     }
 }
 
+// RestTemplate 확장 함수
+inline fun <reified T> ResponseEntity<String>.responseResult(): ResponseResult<T> {
+    return when (this.statusCode.is2xxSuccessful) {
+        true -> {
+            ResponseResult.Success(defaultObjectMapper.readValue<T>(body!!))
+        }
+        else -> {
+            val responseBody = this.body.toString()
+            ResponseResult.Failure(
+                when {
+                    isServiceErrorResponseSerializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
+                    else -> defaultErrorResponse
+                }
+            )
+        }
+    }
+}
+
+
 /**
  *  표준 [ErrorResponse]를 Serialize 가능 여부
  */
@@ -266,6 +285,8 @@ val defaultErrorResponse = ErrorResponse(
     code = ErrorCode.INVALID_INPUT_VALUE
 )
 ```
+
+
 
 
 ## ResponseResult 기반 HTTP Response 핸들링

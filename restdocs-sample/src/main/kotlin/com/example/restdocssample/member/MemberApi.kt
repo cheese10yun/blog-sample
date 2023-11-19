@@ -1,5 +1,6 @@
 package com.example.restdocssample.member
 
+import com.example.restdocssample.MemberClient
 import org.hibernate.validator.constraints.Length
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -20,7 +21,8 @@ import javax.validation.constraints.NotNull
 @RestController
 @RequestMapping("/api/members")
 class MemberApi(
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
+    private val memberClient: MemberClient
 ) {
 
     @GetMapping("/{id}")
@@ -29,6 +31,11 @@ class MemberApi(
             throw IllegalArgumentException("$id not fond")
         }
         return MemberResponse(memberRepository.findByIdOrNull(id) ?: throw IllegalArgumentException("$id not fond"))
+    }
+
+    @GetMapping("/{id}/test")
+    fun getMember2(@PathVariable id: Long): Member {
+        return memberClient.getMember3(id).getOrThrow { it }!!
     }
 
     @PostMapping

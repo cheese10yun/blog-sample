@@ -13,3 +13,12 @@ Content-Disposition: form-data; name="file"; filename="openapi3-aaaa-api.yaml"
 
 ###
 
+
+#
+
+GET http://localhost:8080/api/members/5/test
+Content-Type: application/json
+
+###
+GET http://localhost:8787/api/members/1
+Content-Type: application/json

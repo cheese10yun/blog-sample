@@ -1,5 +1,7 @@
 package com.example.restdocssample
 
+import com.example.restdocssample.member.Member
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.DEFAULT
@@ -16,6 +18,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.getForEntity
 import java.lang.IllegalStateException
 
 @Service
@@ -24,15 +27,8 @@ class MemberClient(
 ) {
 
     fun getMember(memberId: Long): ResponseEntity<Member> {
-        val url = "http://example.com/api/members/$memberId"
+        val url = "http://localhost:8080/api/members/$memberId"
         // GET 요청을 보내고 ResponseEntity로 응답을 받음
-
-
-        restTemplate
-            .getForEntity(url, Member::class.java)
-            .responseResult<Member>()
-
-
 
         return restTemplate.getForEntity(url, Member::class.java)
     }
@@ -42,16 +38,24 @@ class MemberClient(
         // GET 요청을 보내고 ResponseEntity로 응답을 받음
         return restTemplate.getForObject(url, Member::class.java)!!
     }
+
+    fun getMember3(memberId: Long): ResponseResult<Member> {
+        return restTemplate
+            .getForEntity<String>("/api/members/$memberId")
+            .responseResult<Member>()
+    }
 }
 
-private fun <T> ResponseEntity<T>.responseResult(): ResponseResult<T> {
 
+inline fun <reified T> ResponseEntity<String>.responseResult(): ResponseResult<T> {
     return when (this.statusCode.is2xxSuccessful) {
-        true -> ResponseResult.Success(body!!)
+        true -> {
+            ResponseResult.Success(defaultObjectMapper.readValue<T>(body!!))
+        }
         else -> {
             val responseBody = this.body.toString()
             ResponseResult.Failure(
-                when{
+                when {
                     isServiceErrorResponseSerializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
                     else -> defaultErrorResponse
                 }
@@ -59,6 +63,21 @@ private fun <T> ResponseEntity<T>.responseResult(): ResponseResult<T> {
         }
     }
 }
+
+//private fun <T : Any> ResponseEntity<T>.responseResult(): ResponseResult<T> {
+//    return when (this.statusCode.is2xxSuccessful) {
+//        true -> ResponseResult.Success(body!!)
+//        else -> {
+//            val responseBody = this.body.toString()
+//            val errorResponse = if (isServiceErrorResponseSerializeAble(responseBody)) {
+//                jacksonObjectMapper().readValue<ErrorResponse>(responseBody)
+//            } else {
+//                ErrorResponse("Error", "Unknown error occurred")
+//            }
+//            ResponseResult.Failure(errorResponse)
+//        }
+//    }
+//}
 
 
 class MemberKtorClient() {
@@ -115,10 +134,10 @@ fun xxx() {
 }
 
 
-data class Member(
-    val id: Long,
-    val name: String,
-    val email: String
-)
+//data class Member(
+//    val id: Long,
+//    val name: String,
+//    val email: String
+//)
 
 
