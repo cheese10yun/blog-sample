@@ -270,7 +270,6 @@ RestTemplate 경우 기본 설정이 2xx가 아닌 경우 예외를 발생 시�
 
 외부나 다른 팀의 서버와 달리, 동일한 팀 내에서 운영되는 서버들의 오류 응답(Error Response)을 통일하는 것이 바람직합니다. 만약 팀 내에서도 서버별로 오류 메시지가 서로 다르면, 4xx 및 5xx 오류에 대한 처리가 더 복잡해집니다. 또한, 이러한 서버들과 연동하는 다른 팀도 4xx 및 5xx 오류에 대해 처리하는 복잡도가 높아질 수 있습니다. 따라서 같은 팀 내에서 서비스하는 서버들은 오류 응답을 통일하여 관리하는 것이 좋습니다. 이렇게 하면 오류 처리가 간소화되고, 다른 팀과의 협업도 원활해질 수 있습니다.
 
-### 통일화된 Error Response
 
 팀 내에서 서비스되는 서버들의 오류 응답을 통일화하는 것은 오류 처리를 간소화하고 코드 비용을 줄이는 데 도움이 됩니다. 예를 들어, 아래의 JSON 구조로 오류 응답이 통일되었다고 가정해 봅시다.
 
@@ -327,6 +326,91 @@ fun xxx() {
 ```
 
 이 코드에서 `onFailure` 블록 내부에서 `ErrorResponse` 객체에 대한 추가 처리를 할 수 있습니다. 이렇게 오류에 대한 응답을 구체적으로 다룰 수 있게 되므로, 예외 상황에 대한 대응이 보다 정교하고 세밀하게 이루어질 수 있습니다.
+
+
+### 실제 적용 케이스
+
+```kotlin
+@Test
+fun `getOrThrow notnull 보장, 오류 발생시 오류 메시지를 그대로 전달`() {
+    memberClient
+        .getMember(1L)
+        .getOrThrow { it }
+}
+
+
+@Test
+fun `getOrNull 통신 실패시 null 응답,`() {
+    val member: Member? = memberClient
+        .getMember(1L)
+        .getOrNull { it }
+
+    // member null 여부에 따른 후속 조치 작업 진행
+}
+
+@Test
+fun `onFailure + onSuccess`() {
+    val orThrow: ResponseResult<Member> = memberClient
+        .getMember(1L)
+        .onFailure { it: ErrorResponse ->
+            // onFailure 오류 발생시 ErrorResponse 기반으로 예외 처리 진행
+        }
+        .onSuccess {
+            it
+        }
+}
+
+@Test
+fun `isSuccess + isFailure`() {
+    // API PUT, POST 등에 사용
+    val result1 = memberClient
+        .getMember(1L)
+        .isSuccess
+
+    val result2 = memberClient
+        .getMember(1L)
+        .isFailure
+}
+
+@Test
+fun `getOrDefault - 통시 실패시 기본 값 할당`() {
+    val orDefault = memberClient
+        .getMember(1L)
+        .getOrDefault(
+            default = Member(
+                email = "",
+                name = "",
+                status = MemberStatus.NORMAL
+
+            ),
+            transform = { it }
+        )
+}
+
+@Test
+fun `조합` () {
+    val orDefault = memberClient
+        .getMember(1L)
+        .onFailure { 
+            it: ErrorResponse->
+            // 실패 케이스 보상 트랜잭션 API 호출
+        }
+        .onSuccess { 
+            // 성공 이후 후속 작업 진행
+            
+        }
+        .getOrDefault(
+            // 혹시라도 오류 발생시 기본 값 응답
+            default = Member(
+                email = "",
+                name = "",
+                status = MemberStatus.NORMAL
+
+            ),
+            transform = { it }
+        )
+}
+```
 
 
 -----
