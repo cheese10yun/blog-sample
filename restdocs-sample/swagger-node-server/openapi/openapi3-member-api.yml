@@ -7,13 +7,15 @@ servers:
 - url: http://localhost:2222
   description: Sandbox server
 tags:
-- name: members
-  description: Members related resources
+- name: EXTERNAL
+  description: 외부 공개 API
+- name: INTERNAL
+  description: 내부 API
 paths:
   /api/members:
     get:
       tags:
-      - members
+      - EXTERNAL
       summary: Member 페이지 조회
       description: |-
         * 블라블라
@@ -61,7 +63,7 @@ paths:
                     }
     post:
       tags:
-      - members
+      - INTERNAL
       summary: Member 생성
       description: |-
         * 블라블라
@@ -108,12 +110,13 @@ paths:
                         "value" : "asd",
                         "reason" : "must be a well-formed email address"
                       } ],
-                      "timestamp" : "2023-10-17T00:05:43.656312"
+                      "timestamp" : "2023-11-23T01:32:24.670011"
                     }
   /api/members/{id}:
     get:
       tags:
-      - members
+      - INTERNAL
+      - EXTERNAL
       summary: Member 조회 - 잘못된 요청
       description: 잘못된 ID 또는 필요한 정보가 누락된 경우에 대한 응답 예시.
       operationId: member-api-test/member_get
@@ -139,7 +142,7 @@ paths:
                       "status" : 400,
                       "code" : "C001",
                       "errors" : [ ],
-                      "timestamp" : "2023-10-17T00:05:43.806972"
+                      "timestamp" : "2023-11-23T01:32:24.815231"
                     }
         "200":
           description: "200"
