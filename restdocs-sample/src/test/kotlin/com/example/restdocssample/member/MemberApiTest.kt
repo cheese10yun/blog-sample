@@ -2,8 +2,10 @@ package com.example.restdocssample.member
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters
 import com.epages.restdocs.apispec.Schema
+import com.example.restdocssample.EXTERNAL
 import com.example.restdocssample.ErrorResponse
 import com.example.restdocssample.FieldError
+import com.example.restdocssample.INTERNAL
 import com.example.restdocssample.SpringWebTestSupport
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
@@ -29,7 +31,7 @@ class MemberApiTest : SpringWebTestSupport() {
                 writeOpenApi(
                     ResourceSnippetParameters
                         .builder()
-                        .tag("members")
+                        .tag(EXTERNAL)
                         .summary("Member 페이지 조회")
                         .description(
                             """
@@ -67,7 +69,7 @@ class MemberApiTest : SpringWebTestSupport() {
                 writeOpenApi(
                     ResourceSnippetParameters
                         .builder()
-                        .tag("members")
+                        .tag(EXTERNAL)
                         .summary("Member 조회")
                         .description(
                             """
@@ -103,7 +105,7 @@ class MemberApiTest : SpringWebTestSupport() {
                 writeOpenApi(
                     ResourceSnippetParameters
                         .builder()
-                        .tag("members")
+                        .tag(INTERNAL)
                         .summary("Member 조회 - 잘못된 요청")
                         .description("잘못된 ID 또는 필요한 정보가 누락된 경우에 대한 응답 예시.")
                         .responseSchema(Schema.schema(ErrorResponse::class.java.simpleName))  // 여기에 오류 응답의 스키마를 지정
@@ -134,7 +136,7 @@ class MemberApiTest : SpringWebTestSupport() {
                 writeOpenApi(
                     ResourceSnippetParameters
                         .builder()
-                        .tag("members")
+                        .tag(INTERNAL)
                         .summary("Member 생성")
                         .description(
                             """
@@ -165,7 +167,7 @@ class MemberApiTest : SpringWebTestSupport() {
                 writeOpenApi(
                     ResourceSnippetParameters
                         .builder()
-                        .tag("members")
+                        .tag(INTERNAL)
                         .summary("Member 등록 - 잘못된 요청")
                         .description("유효성 검사에서 실패하는 경우")
                         .responseSchema(Schema.schema(ErrorResponse::class.java.simpleName))  // 여기에 오류 응답의 스키마를 지정

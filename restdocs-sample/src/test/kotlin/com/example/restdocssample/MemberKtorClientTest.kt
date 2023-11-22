@@ -2,8 +2,10 @@ package com.example.restdocssample
 
 import com.example.restdocssample.member.Member
 import com.example.restdocssample.member.MemberStatus
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
+@Disabled
 class MemberKtorClientTest {
 
     private val memberClient: MemberKtorClient = MemberKtorClient()

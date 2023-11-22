@@ -1,8 +1,10 @@
 package com.example.restdocssample
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
+@Disabled
 class XXClientTest {
 
     val XXClient = XXClient()

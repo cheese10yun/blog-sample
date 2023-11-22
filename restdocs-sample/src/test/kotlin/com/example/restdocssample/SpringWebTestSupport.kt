@@ -187,3 +187,7 @@ data class OpenApiPageResponse(
     val empty: Boolean,
     val content: List<*> = emptyList<Any>()
 )
+
+
+const val EXTERNAL = "EXTERNAL"
+const val INTERNAL = "INTERNAL"
