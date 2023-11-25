@@ -42,6 +42,17 @@ class MemberClient(
     }
 }
 
+class AA(
+    private val memberClient: MemberClient
+) {
+    fun xxx(memberId: Long) {
+        val member: Member = memberClient.getMember2(memberId)
+
+        // 비즈니스로직 처리에 member 객체가 필수 값이다.
+
+    }
+}
+
 
 inline fun <reified T> ResponseEntity<String>.responseResult(): ResponseResult<T> {
     return when (this.statusCode.is2xxSuccessful) {

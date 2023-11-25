@@ -1,15 +1,17 @@
-# HTTP Client 블라블라
+# MSA 환경에 효율적인 HTTP Client 설계 방법 
 
-본 포스팅에서는 애플리케이션의 로직 처리 과정에서 발생하는 여러 서버들 간의 협력이라는 중요한 주제를 다루려고 합니다. 현대의 애플리케이션 아키텍처에서는 하나의 서비스가 독립적으로 모든 기능을 처리하기보다는, 여러 서버들이 상호작용하며 각각의 역할을 수행하곤 합니다. 이러한 상호작용 과정에서 HTTP 통신은 서버 간의 협력을 위한 주요한 수단으로 자주 사용됩니다. 이때, 효율적이고 안정적인 HTTP 클라이언트 코드의 작성은 매우 중요한 고려사항이 됩니다. 따라서, 본 포스팅에서는 이러한 컨텍스트 하에 HTTP 클라이언트 코드를 설계하는 방법에 대해 자세히 살펴보고자 합니다. 특히 HTTP 통신의 경우 실패 케이스를 항상 염두에 두어야 합니다. 어떻게 코드를 설계해야 통신 실패 및 다양한 경우의 수에 따른 제어가 쉽고 직관적으로 진행할 수 있는 방법에 대해서도 다루어보겠습니다.
+현대의 애플리케이션 아키텍처에서는 하나의 서비스가 독립적으로 모든 기능을 처리하기보다는, 여러 서버들이 상호작용하며 각각의 역할을 수행하곤 합니다. 이러한 상호작용 과정에서 HTTP 통신은 서버 간의 협력을 위한 주요한 수단으로 자주 사용됩니다. 이때, 효율적이고 안정적인 HTTP 클라이언트 코드의 작성은 매우 중요한 고려사항이 됩니다. 따라서, 본 포스팅에서는 이러한 컨텍스트 하에 HTTP 클라이언트 코드를 설계하는 방법에 대해 자세히 살펴보고자 합니다. 특히 HTTP 통신에서는 실패 케이스가 불가피하므로, 실패 시 유연한 대처를 가능하게 하는 코드 설계, 통신 실패 및 다양한 시나리오에 대응하는 직관적이고 효과적인 방법에 대해서 다루어보겠습니다.
 
-## HTTP Client 문제점
+## HTTP 클라이언트 문제점
 
-### 오류 응답에 대한 핸들링의 어려움
+먼저 일반적으로 작성되는 HTTP 클라이언트 코드에서 발견되는 다양한 문제점들을 자세히 살펴보고 각 문제 점들을 어떻게 해결했는지 알아보도록 하겠습니다.
 
-Spring 프레임워크를 사용한다면 가장 대중적으로 사용하는 라이브러리인 `RestTemplate`를 이용하여 HTTP 통신으로 Member를 조회하는 코드를 작성하면 아래와 같습니다.
+### HTTP 클라이언트의 예외 상황 처리의 어려움
+
+HTTP 클라이언트 코드를 작성할 때는 항싱 실패 케스에 대해서 염두하고 코드를 작성해야 합니다. 실패에 따른 어떤 고민들을 해야할지 알아 보도록 하겠습니다.
 
 ```kotlin
-data class Member(
+data class MemberResponse(
     val id: Long,
     val name: String,
     val email: String
@@ -20,21 +22,33 @@ class MemberClient(
     private val restTemplate: RestTemplate
 ) {
 
-    fun getMember(memberId: Long): Member {
+    fun getMember(memberId: Long): MemberResponse {
         val url = "http://example.com/api/members/$memberId"
-        return restTemplate.getForObject(url, Member::class.java)!!
+        return restTemplate.getForObject(url, MemberResponse::class.java)!!
     }
 }
 ```
 
-이 코드 예제는 Spring 프레임워크를 사용하여 `RestTemplate`을 활용해 HTTP 통신을 통한 Member 조회 기능을 구현한 것입니다. `getMember` 함수는 회원의 ID를 매개변수로 받아 해당 회원의 정보를 조회합니다. 이 함수는 `RestTemplate`의 `getForObject` 메소드를 사용하여 주어진 URL로부터 회원 정보를 가져옵니다. 여기서 URL은 회원의 ID를 포함하여 동적으로 구성됩니다. `getForObject` 메소드는 지정된 URL에서 JSON 형태의 데이터를 가져와 `Member` 클래스의 인스턴스로 자동 변환합니다. 이 코드는 간단하고 직관적으로 보이지만, **HTTP 통신 실패와 같은 예외 상황에 대한 처리가 필요할 때는 호출하는 측에서 직접적인 예외 핸들링을 해야 합니다.** 예를 들어, 아래와 같은 함수에서 HTTP 응답이 `2xx` 성공 코드가 아닌 경우에 대한 후속 조치가 필요합니다.
+코드 예제는 `RestTemplate을` 사용하여 멤버를 조회 기능을 구현한 것입니다. `getMember` 함수는 회원의 ID를 인자로 받아 해당 회원의 정보를 조회합니다. 응답은 JSON 형태로 반환되며, 이를 MemberResponse 객체로 역직렬화여 `MemberResponse` 객체를 리턴하는 단순한 코드입니다. 하지만 해당 코드를 가져다 사용하는 코드에서는 HTTP 4xx, 5xx 응답과 같은 비정상적인 케이스도 염두를 해야합니다. MemberClient를 사용하는 코드를 살펴보도록 하겠습니다.
+
+#### 응답 값이 필수인 케이스
 
 ```kotlin
-fun xxx() {
-    // HTTP 2xx가 아닌 경우 후속 처리 필요
-    val member: Member = memberClient.getMember(1L)
+fun xxx(memberId: Long) {
+    val member: MemberResponse = memberClient.getMember(memberId)
+    // 비즈니스로직 처리에 member 객체가 필수 값
+    // ...
 }
 ```
+
+`MemberResponse` 객체가 필수 값이기 때문에 4xx, 5xx와 같이 비정상 케이스시에는 오류가 발생합니다.   
+
+
+
+
+이 함수는 `RestTemplate`의 `getForObject` 메소드를 사용하여 주어진 URL로부터 회원 정보를 가져옵니다. 여기서 URL은 회원의 ID를 포함하여 동적으로 구성됩니다. `getForObject` 메소드는 지정된 URL에서 JSON 형태의 데이터를 가져와 `Member` 클래스의 인스턴스로 자동 변환합니다. 이 코드는 간단하고 직관적으로 보이지만, **HTTP 통신 실패와 같은 예외 상황에 대한 처리가 필요할 때는 호출하는 측에서 직접적인 예외 핸들링을 해야 합니다.** 예를 들어, 아래와 같은 함수에서 HTTP 응답이 `2xx` 성공 코드가 아닌 경우에 대한 후속 조치가 필요합니다.
+
+
 
 이 경우, `ResponseEntity<T>`를 반환하여 사용하는 곳에서 더 세밀한 제어를 가능하게 할 수 있습니다. 예를 들어, `getMember` 함수를 다음과 같이 수정할 수 있습니다.
 
