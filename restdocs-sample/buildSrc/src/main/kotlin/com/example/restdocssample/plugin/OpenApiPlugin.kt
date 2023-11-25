@@ -22,7 +22,7 @@ open class OpenApiCustomExtension(project: Project) {
 
     val serverUrl = "http://localhost:2222"
     val serverDescription = "Sandbox server"
-    val format = "yml"
+    val format = "yaml"
 
     val version: String by lazy {
         "${getCurrentGitBranch()}-${getProperty(project)}"
