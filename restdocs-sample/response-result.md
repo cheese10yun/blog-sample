@@ -2,7 +2,6 @@
 
 본 포스팅에서는 애플리케이션의 로직 처리 과정에서 발생하는 여러 서버들 간의 협력이라는 중요한 주제를 다루려고 합니다. 현대의 애플리케이션 아키텍처에서는 하나의 서비스가 독립적으로 모든 기능을 처리하기보다는, 여러 서버들이 상호작용하며 각각의 역할을 수행하곤 합니다. 이러한 상호작용 과정에서 HTTP 통신은 서버 간의 협력을 위한 주요한 수단으로 자주 사용됩니다. 이때, 효율적이고 안정적인 HTTP 클라이언트 코드의 작성은 매우 중요한 고려사항이 됩니다. 따라서, 본 포스팅에서는 이러한 컨텍스트 하에 HTTP 클라이언트 코드를 설계하는 방법에 대해 자세히 살펴보고자 합니다. 특히 HTTP 통신의 경우 실패 케이스를 항상 염두에 두어야 합니다. 어떻게 코드를 설계해야 통신 실패 및 다양한 경우의 수에 따른 제어가 쉽고 직관적으로 진행할 수 있는 방법에 대해서도 다루어보겠습니다.
 
-
 ## HTTP Client 문제점
 
 ### 오류 응답에 대한 핸들링의 어려움
@@ -61,22 +60,17 @@ fun xxx() {
 
 이런 방식으로 처리하면, 호출하는 측에서 HTTP 응답 코드에 따라 적절하게 로직을 구현하여 핸들링할 수 있습니다.
 
-
-
-
-
 ### HTTP Client는 라이브러리는 교체의 어려움
 
-
-`ResponseEntity<T>`와 같은 특정 라이브러리의 리턴 타입을 직접적으로 사용하면 문제가 생길수 있습니다. 이 문제는 이 타입이 특정 라이브러리에 지나치게 의존적이라는 점입니다. HTTP 클라이언트 라이브러리는 대체 가능성이 높아야 하는데, 특정 라이브러리에 과도하게 의존적인 리턴 타입을 사용하면 라이브러리를 교체할 때 비용이 크게 들게 됩니다. 이는 특히 멀티 모듈 프로젝트에서 HTTP 통신을 담당하는 모듈을 분리하여 관리할 경우 더욱 중요한 고려사항이 됩니다. 특정 라이브러리의 리턴 타입을 사용하면 라이브러리 변경 시 해당 모듈을 사용하는 다른 모듈에도 직접적인 영향을 미치게 됩니다.
+HTTP Client는 다른 라이브러리보다 교체를 자주 하는 편에속합니다. 변경될 가능성이 높은 만큼 라이브로리 교체시에도 그 영향 범위도 적게 설계하는 것이 바람직합니다. `ResponseEntity<T>`와 같은 특정 라이브러리의 리턴 타입을 직접적으로 사용하면 문제가 생길수 있습니다. 이 문제는 이 타입이 특정 라이브러리에 지나치게 의존적이라는 점입니다. HTTP 클라이언트 라이브러리는 대체 가능성이 높아야 하는데, 특정 라이브러리에 과도하게 의존적인 리턴 타입을 사용하면 라이브러리를 교체할 때 비용이 크게 들게 됩니다. 이는 특히 멀티 모듈 프로젝트에서 HTTP 통신을 담당하는 모듈을 분리하여 관리할 경우 더욱 중요한 고려사항이 됩니다. 특정 라이브러리의 리턴 타입을 사용하면 라이브러리 변경 시 해당 모듈을 사용하는 다른 모듈에도 직접적인 영향을 미치게 됩니다.
 
 ![](https://tech.kakaopay.com/_astro/011.38d51c8e_dYW2O.png)
 
 이러한 문제를 해결하기 위해, HTTP 통신을 담당하는 모듈은 이러한 의존성을 내부적으로 관리하여, 모듈을 사용하는 다른 부분이 변경의 영향을 최소화할 수 있도록 해야 합니다. 이는 단순히 HTTP 모듈에만 국한된 문제가 아니라, 전반적인 시스템 설계에서 책임과 역할을 적절하게 부여하고, 각 부분이 그에 맞는 책임과 역할을 수행할 수 있도록 디자인하는 데에도 중요합니다.
 
+### MSA 환경에서 오류 전파의 어려움
 
-### MSA 환경에서 오류 전파
-
+MSA 환경에서 오류 전파의 어려움 블라블라
 
 이미지 추가
 
@@ -90,9 +84,9 @@ A <- B <- C
 
 연속적인 서버 간의 통신(예: A -> B -> C)에서는 서버 C의 오류 응답이 서버 A로 전달되며, 이 경우 오류 핸들링이 반복적으로 발생하고, 각 클라이언트 호출 시마다 이러한 상황을 고려해야 하는 부담이 생깁니다.
 
-MSA 환경에서 오류 전파
-
 ```kotlin
+// B API Sample Code
+
 fun xxx() {
     val response = memberClient.getMember(1L) // 1번 회원 조회를 가정
 
@@ -100,19 +94,15 @@ fun xxx() {
         // 비즈니스 로직 진행
     } else {
         // 2xx가 아닌 경우의 처리 로직
+        // 오류가 발생하면 A API에게 전달 하고자하는 경우
         throw IllegalArgumentException("...")
     }
 }
 ```
 
-
-
-
 ## HTTP Client 개선
 
-첫 번째 문제 였던 리턴 타입이 특정 라이브러리에 의존적으로 라이브러리 교체에도 사용하는 곳에서 영향을 주지 않게 하는 것과, 두 번째 문제 였던 HTTP 통신 이후 불편 하고 반복적인 처리를 효율적으로 개선 하는 것입니다.
-
-### 코틀린의 Result 개념
+### HTTP Client 개선 : 코틀린의 Result 개념을 활용한
 
 명시적인 오류 처리: 예외 대신 결과 객체를 사용함으로써, 오류가 발생할 수 있는 코드 부분을 명확히 식별할 수 있습니다. 함수 반환 값의 안전성: 함수가 예외를 던지지 않고 Result 객체를 반환함으로써, 함수의 사용자는 반환된 값을 안전하게 처리할 수 있습니다. 유연한 오류 처리: Result 타입은 오류 처리를 위한 다양한 메소드(getOrNull, getOrElse, getOrThrow 등)를 제공하여, 사용자가 상황에 맞게 오류를 처리할 수 있게 합니다.
 
@@ -248,7 +238,116 @@ data class ErrorResponse(
 
 이 `ResponseResult` 클래스는 HTTP 호출과 같은 작업의 결과를 더 유연하고 안전하게 처리할 수 있도록 설계되었습니다. 성공과 실패 케이스를 명확하게 구분하고, 각 상황에 맞는 로직을 실행할 수 있도록 메소드를 제공합니다. 또한, 예외 처리를 위한 메커니즘이 포함되어 있어, 오류 상황에 대한 세밀한 제어가 가능합니다.
 
-## ResponseResult HTTP Client 라이브러리에 적용
+## 문제 해결
+
+### 오류 응답에 대한 핸들링의 어려움
+
+HTTP 클라이언트 코드는 항시 2xx가 아닌 경우애 대해서 염두를 하고 코드를 작성해야 합니다. 블라블라
+
+#### 2xx 응답을 확정 하고 싶은 경우
+
+```kotlin
+@Test
+fun `getOrThrow notnull 보장, 오류 발생시 오류 메시지를 그대로 전달`() {
+    memberClient
+        .getMember(1L)
+        .getOrThrow { it }
+}
+```
+
+### 2xx 아닌경우 null 바인딩 이후 로직 제어
+
+```kotlin
+@Test
+fun `getOrNull 통신 실패시 null 응답,`() {
+    val member: Member? = memberClient
+        .getMember(1L)
+        .getOrNull { it }
+
+    // member null 여부에 따른 후속 조치 작업 진행
+}
+```
+
+### 오류 발생시 예외 직접 핸들링하고 싶은 경우
+
+```kotlin
+
+@Test
+fun `onFailure + onSuccess`() {
+    val orThrow: ResponseResult<Member> = memberClient
+        .getMember(1L)
+        .onFailure { it: ErrorResponse ->
+            // onFailure 오류 발생시 ErrorResponse 기반으로 예외 처리 진행
+        }
+        .onSuccess {
+            it
+        }
+}
+```
+
+### 성공 or 실패 확인 케이스
+
+```kotlin
+@Test
+fun `isSuccess + isFailure`() {
+    // API PUT, POST 등에 사용
+    val result1 = memberClient
+        .getMember(1L)
+        .isSuccess
+
+    val result2 = memberClient
+        .getMember(1L)
+        .isFailure
+}
+```
+
+### 통신 실패시 기본값 정책 케이스
+
+```kotlin
+@Test
+fun `getOrDefault - 통시 실패시 기본 값 할당`() {
+    val orDefault = memberClient
+        .getMember(1L)
+        .getOrDefault(
+            default = Member(
+                email = "",
+                name = "",
+                status = MemberStatus.NORMAL
+
+            ),
+            transform = { it }
+        )
+}
+```
+
+#### 여러가지 조합하여 핸들링 하고 싶은 경우
+
+```kotlin
+@Test
+fun `조합`() {
+    val orDefault = memberClient
+        .getMember(1L)
+        .onFailure { it: ErrorResponse ->
+            // 실패 케이스 보상 트랜잭션 API 호출
+        }
+        .onSuccess {
+            // 성공 이후 후속 작업 진행
+
+        }
+        .getOrDefault(
+            // 혹시라도 오류 발생시 기본 값 응답
+            default = Member(
+                email = "",
+                name = "",
+                status = MemberStatus.NORMAL
+
+            ),
+            transform = { it }
+        )
+}
+```
+
+### HTTP Client는 라이브러리는 교체의 어려움 해결
 
 RestTemplate의 사용은 직관성이 떨어지고, 불필요한 의존성 문제와 테스트 시 Application Context가 필요한 문제 등을 야기할 수 있습니다. 따라서 코틀린을 사용할 경우, HTTP 클라이언트 라이브러리로 [Fuel](https://github.com/kittinunf/fuel) 또는 [Ktor](https://github.com/ktorio/ktor)를 추천합니다. 단순하고 소규모의 HTTP 클라이언트 작업을 할 때는 Fuel이 적합하며, 보다 복잡하고 다양한 HTTP 통신이 필요한 상황에서는 Ktor를 사용하는 것이 좋습니다. **또한, `ResponseResult`는 특정 HTTP 클라이언트 라이브러리에 종속적이지 않게 구현되어 있어, 필요에 따라 RestTemplate를 계속 사용하는 것도 가능합니다.**
 
@@ -288,10 +387,9 @@ inline fun <reified T> ResponseEntity<String>.responseResult(): ResponseResult<T
 
 RestTemplate 경우 기본 설정이 2xx가 아닌 경우 예외를 발생 시키기 때문에 `ResponseErrorHandler`을 통해서 Custom 설정으로 변경이 필요하며, ResponseEntity 객체에서 2xx 경우에만 시리얼라이즈가 성공적으로 진행하 가능하기 때문에 `ResponseEntity<String>`으로 String 타입을 받고, 2xx 경우에 시리얼라이즈를 진행합니다. 이후 `responseResult<Member>()`으로 `<T>` 타입을 명시적으로 받아서 처리합니다.
 
-### 내부 Error Response 통일 하여 얻는 장점
+### MSA 환경에서 오류 전파의 어려움 해결
 
 외부나 다른 팀의 서버와 달리, 동일한 팀 내에서 운영되는 서버들의 오류 응답(Error Response)을 통일하는 것이 바람직합니다. 만약 팀 내에서도 서버별로 오류 메시지가 서로 다르면, 4xx 및 5xx 오류에 대한 처리가 더 복잡해집니다. 또한, 이러한 서버들과 연동하는 다른 팀도 4xx 및 5xx 오류에 대해 처리하는 복잡도가 높아질 수 있습니다. 따라서 같은 팀 내에서 서비스하는 서버들은 오류 응답을 통일하여 관리하는 것이 좋습니다. 이렇게 하면 오류 처리가 간소화되고, 다른 팀과의 협업도 원활해질 수 있습니다.
-
 
 팀 내에서 서비스되는 서버들의 오류 응답을 통일화하는 것은 오류 처리를 간소화하고 코드 비용을 줄이는 데 도움이 됩니다. 예를 들어, 아래의 JSON 구조로 오류 응답이 통일되었다고 가정해 봅시다.
 
@@ -350,89 +448,7 @@ fun xxx() {
 이 코드에서 `onFailure` 블록 내부에서 `ErrorResponse` 객체에 대한 추가 처리를 할 수 있습니다. 이렇게 오류에 대한 응답을 구체적으로 다룰 수 있게 되므로, 예외 상황에 대한 대응이 보다 정교하고 세밀하게 이루어질 수 있습니다.
 
 
-### 실제 적용 케이스
 
-```kotlin
-@Test
-fun `getOrThrow notnull 보장, 오류 발생시 오류 메시지를 그대로 전달`() {
-    memberClient
-        .getMember(1L)
-        .getOrThrow { it }
-}
-
-
-@Test
-fun `getOrNull 통신 실패시 null 응답,`() {
-    val member: Member? = memberClient
-        .getMember(1L)
-        .getOrNull { it }
-
-    // member null 여부에 따른 후속 조치 작업 진행
-}
-
-@Test
-fun `onFailure + onSuccess`() {
-    val orThrow: ResponseResult<Member> = memberClient
-        .getMember(1L)
-        .onFailure { it: ErrorResponse ->
-            // onFailure 오류 발생시 ErrorResponse 기반으로 예외 처리 진행
-        }
-        .onSuccess {
-            it
-        }
-}
-
-@Test
-fun `isSuccess + isFailure`() {
-    // API PUT, POST 등에 사용
-    val result1 = memberClient
-        .getMember(1L)
-        .isSuccess
-
-    val result2 = memberClient
-        .getMember(1L)
-        .isFailure
-}
-
-@Test
-fun `getOrDefault - 통시 실패시 기본 값 할당`() {
-    val orDefault = memberClient
-        .getMember(1L)
-        .getOrDefault(
-            default = Member(
-                email = "",
-                name = "",
-                status = MemberStatus.NORMAL
-
-            ),
-            transform = { it }
-        )
-}
-
-@Test
-fun `조합` () {
-    val orDefault = memberClient
-        .getMember(1L)
-        .onFailure { 
-            it: ErrorResponse->
-            // 실패 케이스 보상 트랜잭션 API 호출
-        }
-        .onSuccess { 
-            // 성공 이후 후속 작업 진행
-            
-        }
-        .getOrDefault(
-            // 혹시라도 오류 발생시 기본 값 응답
-            default = Member(
-                email = "",
-                name = "",
-                status = MemberStatus.NORMAL
-
-            ),
-            transform = { it }
-        )
-}
-```
 
 
 -----
