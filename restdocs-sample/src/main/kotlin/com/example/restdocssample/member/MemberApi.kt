@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.data.web.PageableDefault
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -36,6 +37,12 @@ class MemberApi(
     @GetMapping("/{id}/test")
     fun getMember2(@PathVariable id: Long): Member {
         return memberClient.getMember3(id).getOrThrow { it }!!
+    }
+
+    @GetMapping("/{id}/test4")
+    fun getMember4(@PathVariable id: Long): ResponseEntity<Member?> {
+        val member4 = memberClient.getMember4(id)
+        return member4
     }
 
     @PostMapping

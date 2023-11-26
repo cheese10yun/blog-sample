@@ -1,14 +1,14 @@
-# MSA 환경에 효율적인 HTTP Client 설계 방법 
+# MSA 환경에 효율적인 HTTP Client 설계 방법
 
 현대의 애플리케이션 아키텍처에서는 하나의 서비스가 독립적으로 모든 기능을 처리하기보다는, 여러 서버들이 상호작용하며 각각의 역할을 수행하곤 합니다. 이러한 상호작용 과정에서 HTTP 통신은 서버 간의 협력을 위한 주요한 수단으로 자주 사용됩니다. 이때, 효율적이고 안정적인 HTTP 클라이언트 코드의 작성은 매우 중요한 고려사항이 됩니다. 따라서, 본 포스팅에서는 이러한 컨텍스트 하에 HTTP 클라이언트 코드를 설계하는 방법에 대해 자세히 살펴보고자 합니다. 특히 HTTP 통신에서는 실패 케이스가 불가피하므로, 실패 시 유연한 대처를 가능하게 하는 코드 설계, 통신 실패 및 다양한 시나리오에 대응하는 직관적이고 효과적인 방법에 대해서 다루어보겠습니다.
 
 ## HTTP 클라이언트 문제점
 
-먼저 일반적으로 작성되는 HTTP 클라이언트 코드에서 발견되는 다양한 문제점들을 자세히 살펴보고 각 문제 점들을 어떻게 해결했는지 알아보도록 하겠습니다.
+먼저 일반적으로 작성되는 HTTP 클라이언트 코드에서 발견되는 다양한 문제점들을 자세히 살펴보도록 하겠습니다.
 
 ### HTTP 클라이언트의 예외 상황 처리의 어려움
 
-HTTP 클라이언트 코드를 작성할 때는 항싱 실패 케스에 대해서 염두하고 코드를 작성해야 합니다. 실패에 따른 어떤 고민들을 해야할지 알아 보도록 하겠습니다.
+HTTP 클라이언트 코드 작성 시, 항상 실패 케이스에 대한 고려를 해야합니다. 이런 실패 케이스에 대한 어려움을 정리해보겠습니다.
 
 ```kotlin
 data class MemberResponse(
@@ -29,62 +29,63 @@ class MemberClient(
 }
 ```
 
-코드 예제는 `RestTemplate을` 사용하여 멤버를 조회 기능을 구현한 것입니다. `getMember` 함수는 회원의 ID를 인자로 받아 해당 회원의 정보를 조회합니다. 응답은 JSON 형태로 반환되며, 이를 MemberResponse 객체로 역직렬화여 `MemberResponse` 객체를 리턴하는 단순한 코드입니다. 하지만 해당 코드를 가져다 사용하는 코드에서는 HTTP 4xx, 5xx 응답과 같은 비정상적인 케이스도 염두를 해야합니다. MemberClient를 사용하는 코드를 살펴보도록 하겠습니다.
-
-#### 응답 값이 필수인 케이스
+코드 예제는 `getMember` 함수는 회원의 ID를 인자로 받아 해당 회원의 정보를 조회합니다. 응답은 JSON 형태로 반환되며, 이를 `MemberResponse` 객체로 역직렬화여 객체를 리턴하는 단순한 코드입니다. 하지만 해당 코드를 사용하는 곳에서는 HTTP 4xx, 5xx 응답과 같은 비정상적인 케이스도 염두를 해야하기 때문에 단순하지만은 않습니다. 어떤 점들을 고려해야할지 살펴 보겠습니다.
 
 ```kotlin
-fun xxx(memberId: Long) {
-    val member: MemberResponse = memberClient.getMember(memberId)
-    // 비즈니스로직 처리에 member 객체가 필수 값
-    // ...
-}
-```
-
-`MemberResponse` 객체가 필수 값이기 때문에 4xx, 5xx와 같이 비정상 케이스시에는 오류가 발생합니다.   
-
-
-
-
-이 함수는 `RestTemplate`의 `getForObject` 메소드를 사용하여 주어진 URL로부터 회원 정보를 가져옵니다. 여기서 URL은 회원의 ID를 포함하여 동적으로 구성됩니다. `getForObject` 메소드는 지정된 URL에서 JSON 형태의 데이터를 가져와 `Member` 클래스의 인스턴스로 자동 변환합니다. 이 코드는 간단하고 직관적으로 보이지만, **HTTP 통신 실패와 같은 예외 상황에 대한 처리가 필요할 때는 호출하는 측에서 직접적인 예외 핸들링을 해야 합니다.** 예를 들어, 아래와 같은 함수에서 HTTP 응답이 `2xx` 성공 코드가 아닌 경우에 대한 후속 조치가 필요합니다.
-
-
-
-이 경우, `ResponseEntity<T>`를 반환하여 사용하는 곳에서 더 세밀한 제어를 가능하게 할 수 있습니다. 예를 들어, `getMember` 함수를 다음과 같이 수정할 수 있습니다.
-
-```kotlin
-fun getMember(memberId: Long): ResponseEntity<Member?> {
-    val url = "http://example.com/api/members/$memberId"
-    // GET 요청을 보내고 ResponseEntity로 응답을 받음
-    return restTemplate.getForEntity(url, Member::class.java)
-}
-
-// getMember 사용 코드
-fun xxx() {
-    val response = memberClient.getMember(1L) // 1번 회원 조회를 가정
-
-    if (response.statusCode.is2xxSuccessful) {
-        // 비즈니스 로직 진행
-    } else {
-        // 2xx가 아닌 경우의 처리 로직
-        throw IllegalArgumentException("...")
+fun `memberResponse 응답이 필수인 경우`(memberId: Long) {
+    try {
+        // 비즈니스로직 처리에 member 객체가 필수 값이다.
+        val member: MemberResponse = memberClient.getMember(memberId)
+    } catch (e: Exception) {
+        throw IllegalArgumentException("....")
     }
 }
 ```
 
-이런 방식으로 처리하면, 호출하는 측에서 HTTP 응답 코드에 따라 적절하게 로직을 구현하여 핸들링할 수 있습니다.
+`MemberResponse` 객체가 비즈니스 로직에 필수적일 때, 4xx나 5xx 같은 비정상적인 HTTP 응답 또는 기타 예외 상황이 발생하면 `getMember()` 함수로부터 `MemberResponse`를 받을 수 없게 됩니다. 이 경우, `try-catch` 블록을 사용하여 이러한 예외 상황을 처리하고, 발생한 오류를 명시적인 예외 메시지로 알리는 것이 한 가지 해결 방법입니다. 그러나 이로 인해 **`getMember` 함수를 사용하는 모든 코드 부분에 `try-catch` 블록을 적용하고, 각 상황에 맞는 예외를 던지는 책임이 사용자에게 전가됩니다.** 이 문제를 해결하기 위한 간단한 방법은 `MemberClient` 내에 아래와 같은 메서드를 제공하는 것입니다.
 
-### HTTP Client는 라이브러리는 교체의 어려움
+```kotlin
+fun getMember(memberId: Long): MemberResponse? {
+    // ..
+    // 예외 케이스인 경우 null 리턴
+    if (xxx) {
+        return null
+    }
+    // 정상 케이스면 memberResponse 응답 
+    return memberResponse
+}
 
-HTTP Client는 다른 라이브러리보다 교체를 자주 하는 편에속합니다. 변경될 가능성이 높은 만큼 라이브로리 교체시에도 그 영향 범위도 적게 설계하는 것이 바람직합니다. `ResponseEntity<T>`와 같은 특정 라이브러리의 리턴 타입을 직접적으로 사용하면 문제가 생길수 있습니다. 이 문제는 이 타입이 특정 라이브러리에 지나치게 의존적이라는 점입니다. HTTP 클라이언트 라이브러리는 대체 가능성이 높아야 하는데, 특정 라이브러리에 과도하게 의존적인 리턴 타입을 사용하면 라이브러리를 교체할 때 비용이 크게 들게 됩니다. 이는 특히 멀티 모듈 프로젝트에서 HTTP 통신을 담당하는 모듈을 분리하여 관리할 경우 더욱 중요한 고려사항이 됩니다. 특정 라이브러리의 리턴 타입을 사용하면 라이브러리 변경 시 해당 모듈을 사용하는 다른 모듈에도 직접적인 영향을 미치게 됩니다.
+fun getMemberOrThrow(memberId: Long): MemberResponse {
+    // ..
+    // 예외 케이스인 경우 Exception 발생
+    if (xxx) {
+        throw IllegalArgumentException("...")
+    }
+    // 정상 케이스면 memberResponse 응답 
+    return memberResponse
+}
+
+fun getMember(memberId: Long): ResponseEntity<Member> {
+    val url = "http://localhost:8080/api/members/$memberId"
+    // GET 요청을 보내고 ResponseEntity로 응답을 받음
+
+    return restTemplate.getForEntity(url, Member::class.java)
+}
+```
+
+그러나 세부적인 예외 처리가 필요한 경우, 이러한 메서드들만으로는 충분하지 않습니다. 오류 응답에 따른 추가적인 복구 정책과 예외 처리가 필요한 상황에서 단순한 null 반환 또는 예외 발생 방식은 불충분합니다. **즉, 클라이언트 코드가 구체적인 예외 처리 전략을 수립할 수 있도록, 오류에 대한 충분한 컨텍스트 정보를 제공하는 것이 필요합니다.**
+
+### HTTP 클라이언트 라이브러리 교체의 어려움
+
+HTTP Client는 다른 라이브러리보다 교체를 자주 하는 편에속합니다. 변경될 가능성이 높은 만큼 라이브로리 교체시에도 그 영향 범위도 적게 설계하는 것이 바람직합니다. 만약 HTTP Status Code 핸들링을 하기 위해서 `ResponseEntity<T>`와 같은 특정 라이브러리의 리턴 타입을 직접적으로 사용하면 라이브러리의 의존도가 지나치게 높아집니다. 이렇게 의졷도가 높아지게 되면 라이브러리를 교체할 때 비용이 크게 들게 됩니다. 이는 특히 멀티 모듈 프로젝트에서 HTTP 통신을 담당하는 모듈을 분리하여 관리할 경우 더욱 교체 비용이 커지게됩니다.
 
 ![](https://tech.kakaopay.com/_astro/011.38d51c8e_dYW2O.png)
 
-이러한 문제를 해결하기 위해, HTTP 통신을 담당하는 모듈은 이러한 의존성을 내부적으로 관리하여, 모듈을 사용하는 다른 부분이 변경의 영향을 최소화할 수 있도록 해야 합니다. 이는 단순히 HTTP 모듈에만 국한된 문제가 아니라, 전반적인 시스템 설계에서 책임과 역할을 적절하게 부여하고, 각 부분이 그에 맞는 책임과 역할을 수행할 수 있도록 디자인하는 데에도 중요합니다.
+이러한 문제를 해결하기 위해, HTTP 통신을 담당하는 모듈은 이러한 의존성을 내부적으로 관리하여, 모듈을 사용하는 다른 부분이 변경의 영향을 최소화할 수 있도록 해야 합니다. 이는 단순히 HTTP 모듈에만 국한된 문제가 아니라, 전반적인 시스템 설계에서 책임과 역할을 적절하게 부여해야 합니다.
 
 ### MSA 환경에서 오류 전파의 어려움
 
-MSA 환경에서 오류 전파의 어려움 블라블라
+MSA 환경에서는 특정 비즈니스 로직을 수행하기 위해서는 많은 서비스들의 HTTP 통신을 통한 협력으로 진행하게 됩니다. 이러한 연속적인 호출의 흐름에서 오류가 발생하게 되면 그 오류 응답을 최초 호출지까지 응답을 내려줘야하는 경우도 생깁니다. 정확한 오류 메시지를 전달해야 해당 오류 메시지를 해결하여 이후 로직을 진행할 수 있기 때문입니다.
 
 이미지 추가
 
@@ -96,7 +97,10 @@ A -> B -> C
 A <- B <- C
 ```
 
-연속적인 서버 간의 통신(예: A -> B -> C)에서는 서버 C의 오류 응답이 서버 A로 전달되며, 이 경우 오류 핸들링이 반복적으로 발생하고, 각 클라이언트 호출 시마다 이러한 상황을 고려해야 하는 부담이 생깁니다.
+연속적인 서버 간의 통신(예: A -> B -> C)에서는 서버 C의 오류 응답이 서버 A까지 전달되며, 이 경우 오류 핸들링이 반복적으로 발생하고, 각 클라이언트 호출 시마다 이러한 상황을 고려해야 하는 부담이 생깁니다.
+
+
+
 
 ```kotlin
 // B API Sample Code

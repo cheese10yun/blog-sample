@@ -22,3 +22,7 @@ Content-Type: application/json
 ###
 GET http://localhost:8787/api/members/1
 Content-Type: application/json
+
+###
+GET http://localhost:8080/api/members/11/test4
+Content-Type: application/json

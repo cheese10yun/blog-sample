@@ -32,7 +32,13 @@ class MemberClient(
     fun getMember2(memberId: Long): Member {
         val url = "http://example.com/api/members/$memberId"
         // GET 요청을 보내고 ResponseEntity로 응답을 받음
-        return restTemplate.getForObject(url, Member::class.java)!!
+        return restTemplate.getForObject(url, Member::class.java) ?: throw IllegalArgumentException("...")
+    }
+
+    fun getMember4(memberId: Long): ResponseEntity<Member?> {
+        val url = "http://localhost:8787/api/members/$memberId"
+        // GET 요청을 보내고 ResponseEntity로 응답을 받음
+        return restTemplate.getForEntity<Member?>(url)
     }
 
     fun getMember3(memberId: Long): ResponseResult<Member> {
@@ -45,11 +51,13 @@ class MemberClient(
 class AA(
     private val memberClient: MemberClient
 ) {
-    fun xxx(memberId: Long) {
-        val member: Member = memberClient.getMember2(memberId)
-
-        // 비즈니스로직 처리에 member 객체가 필수 값이다.
-
+    fun `memberResponse 응답이 필수인 경우`(memberId: Long) {
+        try {
+            // 비즈니스로직 처리에 member 객체가 필수 값이다.
+            val member: Member = memberClient.getMember2(memberId)
+        } catch (e: Exception) {
+            throw IllegalArgumentException("....")
+        }
     }
 }
 
