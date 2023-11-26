@@ -64,12 +64,6 @@ fun getMemberOrThrow(memberId: Long): MemberResponse {
     // 정상 케이스면 memberResponse 응답 
     return memberResponse
 }
-
-fun getMember(memberId: Long): ResponseEntity<Member> {
-    val url = "http://localhost:8080/api/members/$memberId"
-    // GET 요청을 보내고 ResponseEntity로 응답을 받음
-    return restTemplate.getForEntity(url, Member::class.java)
-}
 ```
 
 그러나 세부적인 예외 처리가 필요한 경우, 이러한 메서드들만으로는 충분하지 않습니다. 오류 응답에 따른 추가적인 복구 정책과 예외 처리가 필요한 상황에서 단순한 null 반환 또는 예외 발생 방식은 불충분합니다. **즉, 클라이언트 코드가 구체적인 예외 처리 전략을 수립할 수 있도록, 오류에 대한 충분한 컨텍스트 정보를 제공하는 것이 필요합니다.**
