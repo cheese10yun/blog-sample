@@ -135,42 +135,7 @@ fun xxx() {
 3. **라이브러리 교체시 영향 최소화**: HTTP 클라이언트 라이브러리를 교체할 때 발생할 수 있는 영향을 외부 객체나 모듈에 미치지 않도록 격리해야 합니다.
 4. **분산 환경에서의 오류 메시지 전달**: 분산 환경에서 여러 API 호출이 이루어질 때, 오류를 정확하게 파악하고 메시지를 효과적으로 전달할 수 있어야 합니다.
 
------------
-
-### HTTP Client 개선 : 코틀린의 Result 개념을 활용한
-
-명시적인 오류 처리: 예외 대신 결과 객체를 사용함으로써, 오류가 발생할 수 있는 코드 부분을 명확히 식별할 수 있습니다. 함수 반환 값의 안전성: 함수가 예외를 던지지 않고 Result 객체를 반환함으로써, 함수의 사용자는 반환된 값을 안전하게 처리할 수 있습니다. 유연한 오류 처리: Result 타입은 오류 처리를 위한 다양한 메소드(getOrNull, getOrElse, getOrThrow 등)를 제공하여, 사용자가 상황에 맞게 오류를 처리할 수 있게 합니다.
-
-```kotlin
-fun fetchProfile(userId: String): Result<Profile> {
-    return try {
-        // 데이터 가져오기 성공
-        val profile = getProfileFromServer(userId)
-        Result.success(profile)
-    } catch (e: Exception) {
-        // 오류 발생
-        Result.failure(e)
-    }
-}
-```
-
-```kotlin
-val result = fetchProfile("user123")
-
-// 성공한 경우 처리
-result.onSuccess { profile ->
-    println("Profile loaded: $profile")
-}
-
-// 실패한 경우 처리
-result.onFailure { error ->
-    println("Error occurred: ${error.message}")
-}
-```
-
-이 예시에서 fetchProfile 함수는 Result 타입을 반환합니다. onSuccess 블록은 결과가 성공적일 때 실행되고, onFailure 블록은 오류가 발생했을 때 실행됩니다. 이러한 특징을 이용하면 HTTP Client 응답을 효율적으로 처리할 있어 HTTP Response에 전목 시켜보겠습니다.
-
-## HTTP Client 개선
+## 고려 사항을 준수하는 HTTP Client 코드 만들기
 
 ### 코틀린 Result 개념을 활용한 ResponseResult
 
@@ -510,3 +475,38 @@ fun xxx() {
 * [ ] 내부 Error, 외부 Error에 맞게 Error Response 디시리얼라이즈 정책을 정해야한다.
 * [ ] 테스트 코드 mock 기반으로 작성
 * [ ] Default Value
+
+
+
+## 고려 사항을 준수하는 HTTP Client 코드 만들기
+
+명시적인 오류 처리: 예외 대신 결과 객체를 사용함으로써, 오류가 발생할 수 있는 코드 부분을 명확히 식별할 수 있습니다. 함수 반환 값의 안전성: 함수가 예외를 던지지 않고 Result 객체를 반환함으로써, 함수의 사용자는 반환된 값을 안전하게 처리할 수 있습니다. 유연한 오류 처리: Result 타입은 오류 처리를 위한 다양한 메소드(getOrNull, getOrElse, getOrThrow 등)를 제공하여, 사용자가 상황에 맞게 오류를 처리할 수 있게 합니다.
+
+```kotlin
+fun fetchProfile(userId: String): Result<Profile> {
+    return try {
+        // 데이터 가져오기 성공
+        val profile = getProfileFromServer(userId)
+        Result.success(profile)
+    } catch (e: Exception) {
+        // 오류 발생
+        Result.failure(e)
+    }
+}
+```
+
+```kotlin
+val result = fetchProfile("user123")
+
+// 성공한 경우 처리
+result.onSuccess { profile ->
+    println("Profile loaded: $profile")
+}
+
+// 실패한 경우 처리
+result.onFailure { error ->
+    println("Error occurred: ${error.message}")
+}
+```
+
+이 예시에서 fetchProfile 함수는 Result 타입을 반환합니다. onSuccess 블록은 결과가 성공적일 때 실행되고, onFailure 블록은 오류가 발생했을 때 실행됩니다. 이러한 특징을 이용하면 HTTP Client 응답을 효율적으로 처리할 있어 HTTP Response에 전목 시켜보겠습니다.
