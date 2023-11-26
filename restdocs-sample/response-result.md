@@ -6,7 +6,7 @@
 
 먼저 일반적으로 작성되는 HTTP 클라이언트 코드에서 발견되는 다양한 문제점들을 자세히 살펴보도록 하겠습니다.
 
-### 예외 상황 처리의 고려
+### 다양한 예외적인 케이스에 대한 고려
 
 HTTP 클라이언트 코드 작성 시, 항상 실패 케이스에 대한 고려를 해야합니다. 이런 실패 케이스에 대한 어려움을 정리해보겠습니다.
 
@@ -217,11 +217,7 @@ data class ErrorResponse(
     val message: String,
     val code: String,
     val status: Int
-) {
-    val timestamp: LocalDateTime = LocalDateTime.now()
-    ...
-}
-
+)
 ```
 
 `ResponseResult`라는 `sealed class`를 정의하고 있습니다, 이는 제네릭 타입 `T`를 사용하는 결과 처리 클래스입니다. `ResponseResult` 클래스는 HTTP 통신 이후 작업의 결과를 나타내는 데 사용됩니다. HTTP 통신 이후 성공 응답을 주는 `Success<T>` 서브 클래스와, 2xx가 아닌 실패의 경우 `ErrorResponse`을 전달받는 `Failure` 서브 클래스의 두 가지 클래스를 가지고 있으며, 여러 메소드들을 제공하고 있습니다. 각 요소를에 대해서 더 설명드리겠습니다.
@@ -231,11 +227,6 @@ data class ErrorResponse(
 1. **Success**: 성공적인 결과를 나타내며, `body`라는 필드를 통해 결과 데이터를 포함합니다.
 2. **Failure**: 실패를 나타내며, `errorResponse`라는 필드를 통해 오류 정보를 포함합니다.
 
-#### 프로퍼티
-
-- `isSuccess`: 현재 인스턴스가 `Success`인지 여부를 반환합니다.
-- `isFailure`: 현재 인스턴스가 `Failure`인지 여부를 반환합니다.
-
 #### 메소드
 
 1. **onSuccess**: `Success` 인스턴스일 때 실행할 액션을 정의합니다. `action` 함수는 `body`를 인자로 받습니다.
@@ -243,126 +234,9 @@ data class ErrorResponse(
 3. **getOrNull**: `Success` 인 경우에는 `action` 함수를 실행하고 결과를 반환하며, `Failure` 인 경우에는 `null`을 반환합니다.
 4. **getOrThrow**: `Success` 인 경우에는 `action` 함수를 실행하고 결과를 반환합니다. `Failure` 인 경우에는 오류 상태에 따라 `ServiceException`을 던집니다. 여기서 오류 상태가 클라이언트 오류인지 서버 오류인지에 따라 다른 `ErrorCode`를 사용합니다.
 
-#### 오류 처리
+### 클라이언트 코드에 ResponseResult 적용
 
-`Failure`의 경우, `ErrorResponse`에 따라 예외 발생 여부를 결정합니다. `getOrThrow` 메소드에서는 `ErrorResponse`의 상태(`status`)를 확인하여 적절한 `ServiceException`을 던집니다. 이 예외는 사용자 정의 예외로 보이며, 오류 코드를 포함하고 있습니다.
-
-#### 정리
-
-이 `ResponseResult` 클래스는 HTTP 호출과 같은 작업의 결과를 더 유연하고 안전하게 처리할 수 있도록 설계되었습니다. 성공과 실패 케이스를 명확하게 구분하고, 각 상황에 맞는 로직을 실행할 수 있도록 메소드를 제공합니다. 또한, 예외 처리를 위한 메커니즘이 포함되어 있어, 오류 상황에 대한 세밀한 제어가 가능합니다.
-
-## 문제 해결
-
-### 오류 응답에 대한 핸들링의 어려움
-
-HTTP 클라이언트 코드는 항시 2xx가 아닌 경우애 대해서 염두를 하고 코드를 작성해야 합니다. 블라블라
-
-#### 2xx 응답을 확정 하고 싶은 경우
-
-```kotlin
-@Test
-fun `getOrThrow notnull 보장, 오류 발생시 오류 메시지를 그대로 전달`() {
-    memberClient
-        .getMember(1L)
-        .getOrThrow { it }
-}
-```
-
-### 2xx 아닌경우 null 바인딩 이후 로직 제어
-
-```kotlin
-@Test
-fun `getOrNull 통신 실패시 null 응답,`() {
-    val member: Member? = memberClient
-        .getMember(1L)
-        .getOrNull { it }
-
-    // member null 여부에 따른 후속 조치 작업 진행
-}
-```
-
-### 오류 발생시 예외 직접 핸들링하고 싶은 경우
-
-```kotlin
-
-@Test
-fun `onFailure + onSuccess`() {
-    val orThrow: ResponseResult<Member> = memberClient
-        .getMember(1L)
-        .onFailure { it: ErrorResponse ->
-            // onFailure 오류 발생시 ErrorResponse 기반으로 예외 처리 진행
-        }
-        .onSuccess {
-            it
-        }
-}
-```
-
-### 성공 or 실패 확인 케이스
-
-```kotlin
-@Test
-fun `isSuccess + isFailure`() {
-    // API PUT, POST 등에 사용
-    val result1 = memberClient
-        .getMember(1L)
-        .isSuccess
-
-    val result2 = memberClient
-        .getMember(1L)
-        .isFailure
-}
-```
-
-### 통신 실패시 기본값 정책 케이스
-
-```kotlin
-@Test
-fun `getOrDefault - 통시 실패시 기본 값 할당`() {
-    val orDefault = memberClient
-        .getMember(1L)
-        .getOrDefault(
-            default = Member(
-                email = "",
-                name = "",
-                status = MemberStatus.NORMAL
-
-            ),
-            transform = { it }
-        )
-}
-```
-
-#### 여러가지 조합하여 핸들링 하고 싶은 경우
-
-```kotlin
-@Test
-fun `조합`() {
-    val orDefault = memberClient
-        .getMember(1L)
-        .onFailure { it: ErrorResponse ->
-            // 실패 케이스 보상 트랜잭션 API 호출
-        }
-        .onSuccess {
-            // 성공 이후 후속 작업 진행
-
-        }
-        .getOrDefault(
-            // 혹시라도 오류 발생시 기본 값 응답
-            default = Member(
-                email = "",
-                name = "",
-                status = MemberStatus.NORMAL
-
-            ),
-            transform = { it }
-        )
-}
-```
-
-### HTTP Client는 라이브러리는 교체의 어려움 해결
-
-RestTemplate의 사용은 직관성이 떨어지고, 불필요한 의존성 문제와 테스트 시 Application Context가 필요한 문제 등을 야기할 수 있습니다. 따라서 코틀린을 사용할 경우, HTTP 클라이언트 라이브러리로 [Fuel](https://github.com/kittinunf/fuel) 또는 [Ktor](https://github.com/ktorio/ktor)를 추천합니다. 단순하고 소규모의 HTTP 클라이언트 작업을 할 때는 Fuel이 적합하며, 보다 복잡하고 다양한 HTTP 통신이 필요한 상황에서는 Ktor를 사용하는 것이 좋습니다. **또한, `ResponseResult`는 특정 HTTP 클라이언트 라이브러리에 종속적이지 않게 구현되어 있어, 필요에 따라 RestTemplate를 계속 사용하는 것도 가능합니다.**
+#### 확장 함수를 통한 ResponseResult 적용
 
 ```kotlin
 // ktor 확장 함수
@@ -398,33 +272,12 @@ inline fun <reified T> ResponseEntity<String>.responseResult(): ResponseResult<T
 }
 ```
 
+RestTemplate의 사용은 직관성이 떨어지고, 불필요한 의존성 문제와 테스트 시 Application Context가 필요한 문제 등을 야기할 수 있습니다. 따라서 코틀린을 사용할 경우, HTTP 클라이언트 라이브러리로 [Fuel](https://github.com/kittinunf/fuel) 또는 [Ktor HttpClient](https://api.ktor.io/ktor-client/ktor-client-core/io.ktor.client/-http-client/index.html)를 추천합니다. 단순하고 소규모의 HTTP 클라이언트 작업을 할 때는 Fuel이 적합하며, 보다 복잡하고 다양한 HTTP 통신이 필요한 상황에서는 Ktor를 사용하는 것이 좋습니다. **또한, `ResponseResult`는 특정 HTTP 클라이언트 라이브러리에 종속적이지 않게 구현되어 있어, 필요에 따라 RestTemplate를 계속 사용하는 것도 가능합니다.**
+
 RestTemplate 경우 기본 설정이 2xx가 아닌 경우 예외를 발생 시키기 때문에 `ResponseErrorHandler`을 통해서 Custom 설정으로 변경이 필요하며, ResponseEntity 객체에서 2xx 경우에만 시리얼라이즈가 성공적으로 진행하 가능하기 때문에 `ResponseEntity<String>`으로 String 타입을 받고, 2xx 경우에 시리얼라이즈를 진행합니다. 이후 `responseResult<Member>()`으로 `<T>` 타입을 명시적으로 받아서 처리합니다.
 
-### MSA 환경에서 오류 전파의 어려움 해결
 
-외부나 다른 팀의 서버와 달리, 동일한 팀 내에서 운영되는 서버들의 오류 응답(Error Response)을 통일하는 것이 바람직합니다. 만약 팀 내에서도 서버별로 오류 메시지가 서로 다르면, 4xx 및 5xx 오류에 대한 처리가 더 복잡해집니다. 또한, 이러한 서버들과 연동하는 다른 팀도 4xx 및 5xx 오류에 대해 처리하는 복잡도가 높아질 수 있습니다. 따라서 같은 팀 내에서 서비스하는 서버들은 오류 응답을 통일하여 관리하는 것이 좋습니다. 이렇게 하면 오류 처리가 간소화되고, 다른 팀과의 협업도 원활해질 수 있습니다.
-
-팀 내에서 서비스되는 서버들의 오류 응답을 통일화하는 것은 오류 처리를 간소화하고 코드 비용을 줄이는 데 도움이 됩니다. 예를 들어, 아래의 JSON 구조로 오류 응답이 통일되었다고 가정해 봅시다.
-
-```json
-{
-  "message": "Invalid Value",
-  "status": 400,
-  "code": "C001"
-}
-```
-
-이 경우 아래와 같이, 팀 내 서비스 간의 호출에서 오류가 발생했을 때
-
-```
-# 요청
-A -> B -> C
-
-# 응답
-A <- B <- C
-```
-
-이 오류 메시지는 최초 호출지인 서비스 A까지 전달될 수 있어야 합니다. 오류 메시지가 통일되면 이러한 전달이 용이해지고, 관련 코드 비용도 감소합니다.
+#### 오류 처리
 
 ```kotlin
 // 표준 ErrorResponse 직렬화 가능 여부 확인
@@ -460,6 +313,18 @@ fun xxx() {
 
 
 
+## 고려 사항을 준수 확인
+
+### 일관되고 간결한 예외 처리 케이스 지원
+
+### 라이브러리 교체시 변경 사항을 최소화 지원
+
+### MSA 환경에서의 효율적인 오류 전달 및 핸들링 지원
+
+외부나 다른 팀의 서버와 달리, 동일한 팀 내에서 운영되는 서버들의 오류 응답(Error Response)을 통일하는 것이 바람직합니다. 만약 팀 내에서도 서버별로 오류 메시지가 서로 다르면, 4xx 및 5xx 오류에 대한 처리가 더 복잡해집니다. 또한, 이러한 서버들과 연동하는 다른 팀도 4xx 및 5xx 오류에 대해 처리하는 복잡도가 높아질 수 있습니다. 따라서 같은 팀 내에서 서비스하는 서버들은 오류 응답을 통일하여 관리하는 것이 좋습니다. 이렇게 하면 오류 처리가 간소화되고, 다른 팀과의 협업도 원활해질 수 있습니다.
+
+
+
 
 
 -----
@@ -477,36 +342,3 @@ fun xxx() {
 * [ ] Default Value
 
 
-
-## 고려 사항을 준수하는 HTTP Client 코드 만들기
-
-명시적인 오류 처리: 예외 대신 결과 객체를 사용함으로써, 오류가 발생할 수 있는 코드 부분을 명확히 식별할 수 있습니다. 함수 반환 값의 안전성: 함수가 예외를 던지지 않고 Result 객체를 반환함으로써, 함수의 사용자는 반환된 값을 안전하게 처리할 수 있습니다. 유연한 오류 처리: Result 타입은 오류 처리를 위한 다양한 메소드(getOrNull, getOrElse, getOrThrow 등)를 제공하여, 사용자가 상황에 맞게 오류를 처리할 수 있게 합니다.
-
-```kotlin
-fun fetchProfile(userId: String): Result<Profile> {
-    return try {
-        // 데이터 가져오기 성공
-        val profile = getProfileFromServer(userId)
-        Result.success(profile)
-    } catch (e: Exception) {
-        // 오류 발생
-        Result.failure(e)
-    }
-}
-```
-
-```kotlin
-val result = fetchProfile("user123")
-
-// 성공한 경우 처리
-result.onSuccess { profile ->
-    println("Profile loaded: $profile")
-}
-
-// 실패한 경우 처리
-result.onFailure { error ->
-    println("Error occurred: ${error.message}")
-}
-```
-
-이 예시에서 fetchProfile 함수는 Result 타입을 반환합니다. onSuccess 블록은 결과가 성공적일 때 실행되고, onFailure 블록은 오류가 발생했을 때 실행됩니다. 이러한 특징을 이용하면 HTTP Client 응답을 효율적으로 처리할 있어 HTTP Response에 전목 시켜보겠습니다.
