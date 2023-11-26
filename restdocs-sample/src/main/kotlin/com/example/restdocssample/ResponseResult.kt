@@ -45,6 +45,7 @@ package com.example.restdocssample
 sealed class ResponseResult<out T> {
 
     data class Success<out T>(val body: T) : ResponseResult<T>()
+
     data class Failure(val errorResponse: ErrorResponse) : ResponseResult<Nothing>()
 
     val isSuccess: Boolean

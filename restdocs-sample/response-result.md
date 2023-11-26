@@ -137,8 +137,6 @@ fun xxx() {
 
 -----------
 
-## HTTP Client 개선
-
 ### HTTP Client 개선 : 코틀린의 Result 개념을 활용한
 
 명시적인 오류 처리: 예외 대신 결과 객체를 사용함으로써, 오류가 발생할 수 있는 코드 부분을 명확히 식별할 수 있습니다. 함수 반환 값의 안전성: 함수가 예외를 던지지 않고 Result 객체를 반환함으로써, 함수의 사용자는 반환된 값을 안전하게 처리할 수 있습니다. 유연한 오류 처리: Result 타입은 오류 처리를 위한 다양한 메소드(getOrNull, getOrElse, getOrThrow 등)를 제공하여, 사용자가 상황에 맞게 오류를 처리할 수 있게 합니다.
@@ -172,14 +170,17 @@ result.onFailure { error ->
 
 이 예시에서 fetchProfile 함수는 Result 타입을 반환합니다. onSuccess 블록은 결과가 성공적일 때 실행되고, onFailure 블록은 오류가 발생했을 때 실행됩니다. 이러한 특징을 이용하면 HTTP Client 응답을 효율적으로 처리할 있어 HTTP Response에 전목 시켜보겠습니다.
 
+## HTTP Client 개선
+
 ### 코틀린 Result 개념을 활용한 ResponseResult
 
-코틀린에서 Result 타입은 함수가 성공적으로 결과를 반환했는지, 아니면 예외가 발생했는지를 포장하는 데 사용됩니다. 이는 함수가 예외를 던지는 대신, 성공적인 결과나 실패를 나타내는 객체를 반환하게 만들어, 오류 처리를 더 간결하고 안전하게 할 수 있게 도와줍니다.
+코틀린에서 `Result` 타입은 함수가 성공적으로 결과를 반환했는지, 아니면 예외가 발생했는지를 포장하는 데 사용됩니다. 이는 함수가 예외를 던지는 대신, 성공적인 결과나 실패를 나타내는 객체를 반환하게 만들어, 오류 처리를 더 간결하고 안전하게 할 수 있게 도와줍니다. 이 개념을 Response 객체에도 적용하면 훨씬더 안전하고 간결하게 HTTP 통신 이후 실패, 성공에 따른 후속 조치를 진행할 수 있습니다. 코틀린의 `Result` 개념을 활용한 `ResponseResult<T>` 객체를 만들아 보겠습니다.
 
 ```kotlin
 sealed class ResponseResult<out T> {
 
     data class Success<out T>(val body: T) : ResponseResult<T>()
+
     data class Failure(val errorResponse: ErrorResponse) : ResponseResult<Nothing>()
 
     val isSuccess: Boolean
@@ -188,7 +189,7 @@ sealed class ResponseResult<out T> {
     val isFailure: Boolean
         get() = this is Failure
 
-    /**
+    /**ㅊ
      * [Success] 경우 콜백
      */
     inline fun onSuccess(action: (T) -> Unit): ResponseResult<T> {
@@ -233,6 +234,16 @@ sealed class ResponseResult<out T> {
                     else -> throw ServiceException(errorResponse = errorResponse, code = ErrorCode.SERVER_ERROR)
                 }
             }
+        }
+    }
+
+    /**
+     * [Failure] 상태인 경우 [default] 기반으로 반환하고, [Success] 경우 반환 진행
+     */
+    inline fun <R> getOrDefault(default: R, transform: (T) -> R): R {
+        return when (this) {
+            is Success -> transform(body)
+            is Failure -> default
         }
     }
 }
