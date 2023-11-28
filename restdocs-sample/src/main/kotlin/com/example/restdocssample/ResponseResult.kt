@@ -41,21 +41,38 @@ package com.example.restdocssample
  *      )
  * ~~~
  * 2xx 경우 transform 기반으로 변환, 2xx 아니 경우 default 기반으로 변환
+ *
+ * HTTP 응답을 나타내는 sealed 클래스. 성공 또는 실패의 결과를 포함한다.
+ * @param T 응답 본문의 제네릭 타입
  */
 sealed class ResponseResult<out T> {
 
+    /**
+     * HTTP 2xx 정상 응답을 나타내는 데이터 클래스.
+     *
+     * @param body 응답 본문.
+     */
     data class Success<out T>(val body: T) : ResponseResult<T>()
 
+    /**
+     * HTTP 4xx, 5xx 오류 응답을 나타내는 데이터 클래스.
+     *
+     * @param errorResponse 오류 응답 정보.
+     */
     data class Failure(val errorResponse: ErrorResponse) : ResponseResult<Nothing>()
 
+    // 성공 여부를 확인하는 속성.
     val isSuccess: Boolean
         get() = this is Success
 
+    // 실패 여부를 확인하는 속성.
     val isFailure: Boolean
         get() = this is Failure
 
-    /**ㅊ
-     * [Success] 경우 콜백
+    /**
+     * Success 상태일 때 실행될 콜백 함수.
+     *
+     * @param action 성공 시 실행할 액션.
      */
     inline fun onSuccess(action: (T) -> Unit): ResponseResult<T> {
         if (this is Success) {
@@ -65,10 +82,9 @@ sealed class ResponseResult<out T> {
     }
 
     /**
-     * api a -> api b -> api c ->
-     * c -> b - a
-     * ErrorResponse ->
-     * [Failure] 경우 콜백, 사용하는 곳에서 ErrorResponse에 따라 예외를 발생 여부를 진행
+     * Failure 상태일 때 실행될 콜백 함수.
+     *
+     * @param action 실패 시 실행할 액션.
      */
     inline fun onFailure(action: (ErrorResponse) -> Unit): ResponseResult<T> {
         if (this is Failure) {
@@ -78,17 +94,16 @@ sealed class ResponseResult<out T> {
     }
 
     /**
-     * [Failure] 경우에는 null이 응답 된다.
+     * Failure 상태일 경우 null을 반환하며, 그 외의 경우 주어진 액션을 수행한다.
      */
-    inline fun getOrNull(action: (T) -> @UnsafeVariance T): T? {
-        return when (this) {
-            is Success -> action(body)
-            else -> null
-        }
-    }
+    fun getOrNull(): T? = if (this is Success) body else null
+
 
     /**
-     * [Failure] 경우에는 예외가 발행하기 때문에 Notnull을 보장한다.
+     * Failure 상태인 경우 주어진 default 값을 반환하며, Success 상태일 경우 주어진 변환 함수를 적용한다.
+     *
+     * @param default 기본 반환 값.
+     * @param transform 변환 함수.
      */
     inline fun getOrThrow(action: (T) -> @UnsafeVariance T): T {
         when (this) {
