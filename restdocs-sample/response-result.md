@@ -260,9 +260,6 @@ data class ErrorResponse(
 
 `ResponseResult`는 HTTP 클라이언트 라이브러리에 독립적으로 구현되어 있어, 다양한 클라이언트 라이브러리에 쉽게 적용할 수 있습니다. 코틀린 사용자들에게는 [Fuel](https://github.com/kittinunf/fuel)과 [Ktor HttpClient](https://api.ktor.io/ktor-client/ktor-client-core/io.ktor.client/-http-client/index.html) 라이브러리를 추천합니다. Fuel은 간단하고 소규모의 HTTP 작업에 적합하며, Ktor HttpClient은 보다 복잡하고 다양한 HTTP 통신 요구에 부합합니다. 이러한 HTTP 클라이언트 라이브러리에 코틀린의 확장 함수를 사용하여 `ResponseResult`를 통합하고 적용하는 방법을 살펴보겠습니다.
 
-
-**또한, `ResponseResult`는 특정 HTTP 클라이언트 라이브러리에 종속적이지 않게 구현되어 있어, 필요에 따라 RestTemplate를 계속 사용하는 것도 가능합니다.**
-
 ```kotlin
 // ktor 확장 함수
 suspend inline fun <reified T> HttpResponse.responseResult(): ResponseResult<T> {
@@ -296,8 +293,6 @@ inline fun <reified T> ResponseEntity<String>.responseResult(): ResponseResult<T
     }
 }
 ```
-
-
 
 RestTemplate 경우 기본 설정이 2xx가 아닌 경우 예외를 발생 시키기 때문에 `ResponseErrorHandler`을 통해서 Custom 설정으로 변경이 필요하며, ResponseEntity 객체에서 2xx 경우에만 시리얼라이즈가 성공적으로 진행하 가능하기 때문에 `ResponseEntity<String>`으로 String 타입을 받고, 2xx 경우에 시리얼라이즈를 진행합니다. 이후 `responseResult<Member>()`으로 `<T>` 타입을 명시적으로 받아서 처리합니다.
 
@@ -344,23 +339,3 @@ fun xxx() {
 ### MSA 환경에서의 효율적인 오류 전달 및 핸들링 지원
 
 외부나 다른 팀의 서버와 달리, 동일한 팀 내에서 운영되는 서버들의 오류 응답(Error Response)을 통일하는 것이 바람직합니다. 만약 팀 내에서도 서버별로 오류 메시지가 서로 다르면, 4xx 및 5xx 오류에 대한 처리가 더 복잡해집니다. 또한, 이러한 서버들과 연동하는 다른 팀도 4xx 및 5xx 오류에 대해 처리하는 복잡도가 높아질 수 있습니다. 따라서 같은 팀 내에서 서비스하는 서버들은 오류 응답을 통일하여 관리하는 것이 좋습니다. 이렇게 하면 오류 처리가 간소화되고, 다른 팀과의 협업도 원활해질 수 있습니다.
-
-
-
-
-
------
-
-* [ ] onSuccess 콜백
-* [ ] onFailure 콜백
-* [ ] getOrNull null 처리 위임
-* [ ] getOrThrow notnull을 보장 받고 싶은 패턴
-* [ ] 오류 전달하기
-* [ ] 특정 라이브리에대 대해 의존적이지 않는다.
-* [ ] 이전 Error Response를 전달 해야한다.
-* [ ] 내부 Error, 외부 Error 을 구분 해야한다.
-* [ ] 내부 Error, 외부 Error에 맞게 Error Response 디시리얼라이즈 정책을 정해야한다.
-* [ ] 테스트 코드 mock 기반으로 작성
-* [ ] Default Value
-
-
