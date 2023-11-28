@@ -145,24 +145,33 @@ fun xxx() {
 
 ```kotlin
 sealed class ResponseResult<out T> {
+
     /**
-     * HTTP 2xx 응답을 바인딩
+     * HTTP 2xx 정상 응답을 나타내는 데이터 클래스.
+     *
+     * @param body 응답 본문.
      */
     data class Success<out T>(val body: T) : ResponseResult<T>()
 
     /**
-     * @param errorResponse HTTP 2xx가 아닌 오류 응답 
+     * HTTP 4xx, 5xx 오류 응답을 나타내는 데이터 클래스.
+     *
+     * @param errorResponse 오류 응답 정보.
      */
     data class Failure(val errorResponse: ErrorResponse) : ResponseResult<Nothing>()
 
+    // 성공 여부를 확인하는 속성.
     val isSuccess: Boolean
         get() = this is Success
 
+    // 실패 여부를 확인하는 속성.
     val isFailure: Boolean
         get() = this is Failure
 
-    /**ㅊ
-     * [Success] 경우 콜백
+    /**
+     * Success 상태일 때 실행될 콜백 함수.
+     *
+     * @param action 성공 시 실행할 액션.
      */
     inline fun onSuccess(action: (T) -> Unit): ResponseResult<T> {
         if (this is Success) {
@@ -172,8 +181,9 @@ sealed class ResponseResult<out T> {
     }
 
     /**
-     * ErrorResponse ->
-     * [Failure] 경우 콜백, 사용하는 곳에서 ErrorResponse에 따라 예외를 발생 여부를 진행
+     * Failure 상태일 때 실행될 콜백 함수.
+     *
+     * @param action 실패 시 실행할 액션.
      */
     inline fun onFailure(action: (ErrorResponse) -> Unit): ResponseResult<T> {
         if (this is Failure) {
@@ -183,17 +193,16 @@ sealed class ResponseResult<out T> {
     }
 
     /**
-     * [Failure] 경우에는 null이 응답 된다.
+     * Failure 상태일 경우 null을 반환하며, 그 외의 경우 주어진 액션을 수행한다.
      */
-    inline fun getOrNull(action: (T) -> @UnsafeVariance T): T? {
-        return when (this) {
-            is Success -> action(body)
-            else -> null
-        }
-    }
+    fun getOrNull(): T? = if (this is Success) body else null
+
 
     /**
-     * [Failure] 경우에는 예외가 발행하기 때문에 Notnull을 보장한다.
+     * Failure 상태인 경우 주어진 default 값을 반환하며, Success 상태일 경우 주어진 변환 함수를 적용한다.
+     *
+     * @param default 기본 반환 값.
+     * @param transform 변환 함수.
      */
     inline fun getOrThrow(action: (T) -> @UnsafeVariance T): T {
         when (this) {
@@ -228,23 +237,31 @@ data class ErrorResponse(
 )
 ```
 
-`ResponseResult`라는 `sealed class`를 정의하고 있습니다, 이는 제네릭 타입 `T`를 사용하는 결과 처리 클래스입니다. `ResponseResult` 클래스는 HTTP 통신 이후 작업의 결과를 나타내는 데 사용됩니다. HTTP 통신 이후 성공 응답을 주는 `Success<T>` 서브 클래스와, 2xx가 아닌 실패의 경우 `ErrorResponse`을 전달받는 `Failure` 서브 클래스의 두 가지 클래스를 가지고 있으며, 여러 메소드들을 제공하고 있습니다. 각 요소를에 대해서 더 설명드리겠습니다.
+`ResponseResult`는 코틀린에서 사용되는 `sealed class`로, HTTP 통신 이후의 결과를 나타내는 제네릭 타입 `T`를 사용하는 클래스입니다. 이 클래스는 HTTP 요청의 결과를 처리하고, 그 결과를 분류하여 관리하는 데 사용됩니다. 주요 구성 요소와 기능은 다음과 같습니다:
 
-#### 서브 클래스
+1. **Success<T> 서브 클래스**:
+    - HTTP 통신에서 2xx 성공 응답을 받았을 때 사용됩니다.
+    - 성공 응답의 본문을 나타내는 `body` 파라미터를 포함합니다.
+    - 이 클래스는 성공적인 결과를 포장하여, 후속 처리에서 이를 활용할 수 있도록 합니다.
 
-1. **Success**: 성공적인 결과를 나타내며, `body`라는 필드를 통해 결과 데이터를 포함합니다.
-2. **Failure**: 실패를 나타내며, `errorResponse`라는 필드를 통해 오류 정보를 포함합니다.
+2. **Failure 서브 클래스**:
+    - HTTP 통신에서 2xx가 아닌 실패 응답을 처리합니다.
+    - 실패 응답의 세부 정보를 담은 `ErrorResponse` 객체를 포함합니다.
+    - 이 클래스는 오류 상황을 명확하게 나타내어, 적절한 예외 처리나 로직 분기를 가능하게 합니다.
 
-#### 메소드
+3. **메소드 제공**:
+    - `ResponseResult` 클래스는 성공 및 실패 결과에 대한 다양한 메소드를 제공합니다.
+    - 예를 들어, `onSuccess`와 `onFailure` 메소드를 통해 성공 또는 실패 결과에 대한 콜백을 처리할 수 있습니다.
+    - `getOrNull`, `getOrThrow`, `map`, `flatMap` 등의 메소드는 결과 데이터를 다루는 다양한 방법을 제공합니다.
 
-1. **onSuccess**: `Success` 인스턴스일 때 실행할 액션을 정의합니다. `action` 함수는 `body`를 인자로 받습니다.
-2. **onFailure**: `Failure` 인스턴스일 때 실행할 액션을 정의합니다. `action` 함수는 `errorResponse`를 인자로 받습니다.
-3. **getOrNull**: `Success` 인 경우에는 `action` 함수를 실행하고 결과를 반환하며, `Failure` 인 경우에는 `null`을 반환합니다.
-4. **getOrThrow**: `Success` 인 경우에는 `action` 함수를 실행하고 결과를 반환합니다. `Failure` 인 경우에는 오류 상태에 따라 `ServiceException`을 던집니다. 여기서 오류 상태가 클라이언트 오류인지 서버 오류인지에 따라 다른 `ErrorCode`를 사용합니다.
+이 클래스는 HTTP 클라이언트 구현에서 결과 처리를 더 유연하고 안전하게 만들어, 코드의 가독성과 유지 보수성을 향상시킵니다. 또한, 예외 처리 및 결과 처리 로직을 일관되고 간결하게 작성할 수 있도록 도와줍니다.
 
 ### 클라이언트 코드에 ResponseResult 적용
 
-#### 확장 함수를 통한 ResponseResult 적용
+`ResponseResult`는 HTTP 클라이언트 라이브러리에 독립적으로 구현되어 있어, 다양한 클라이언트 라이브러리에 쉽게 적용할 수 있습니다. 코틀린 사용자들에게는 [Fuel](https://github.com/kittinunf/fuel)과 [Ktor HttpClient](https://api.ktor.io/ktor-client/ktor-client-core/io.ktor.client/-http-client/index.html) 라이브러리를 추천합니다. Fuel은 간단하고 소규모의 HTTP 작업에 적합하며, Ktor HttpClient은 보다 복잡하고 다양한 HTTP 통신 요구에 부합합니다. 이러한 HTTP 클라이언트 라이브러리에 코틀린의 확장 함수를 사용하여 `ResponseResult`를 통합하고 적용하는 방법을 살펴보겠습니다.
+
+
+**또한, `ResponseResult`는 특정 HTTP 클라이언트 라이브러리에 종속적이지 않게 구현되어 있어, 필요에 따라 RestTemplate를 계속 사용하는 것도 가능합니다.**
 
 ```kotlin
 // ktor 확장 함수
@@ -280,7 +297,7 @@ inline fun <reified T> ResponseEntity<String>.responseResult(): ResponseResult<T
 }
 ```
 
-RestTemplate의 사용은 직관성이 떨어지고, 불필요한 의존성 문제와 테스트 시 Application Context가 필요한 문제 등을 야기할 수 있습니다. 따라서 코틀린을 사용할 경우, HTTP 클라이언트 라이브러리로 [Fuel](https://github.com/kittinunf/fuel) 또는 [Ktor HttpClient](https://api.ktor.io/ktor-client/ktor-client-core/io.ktor.client/-http-client/index.html)를 추천합니다. 단순하고 소규모의 HTTP 클라이언트 작업을 할 때는 Fuel이 적합하며, 보다 복잡하고 다양한 HTTP 통신이 필요한 상황에서는 Ktor를 사용하는 것이 좋습니다. **또한, `ResponseResult`는 특정 HTTP 클라이언트 라이브러리에 종속적이지 않게 구현되어 있어, 필요에 따라 RestTemplate를 계속 사용하는 것도 가능합니다.**
+
 
 RestTemplate 경우 기본 설정이 2xx가 아닌 경우 예외를 발생 시키기 때문에 `ResponseErrorHandler`을 통해서 Custom 설정으로 변경이 필요하며, ResponseEntity 객체에서 2xx 경우에만 시리얼라이즈가 성공적으로 진행하 가능하기 때문에 `ResponseEntity<String>`으로 String 타입을 받고, 2xx 경우에 시리얼라이즈를 진행합니다. 이후 `responseResult<Member>()`으로 `<T>` 타입을 명시적으로 받아서 처리합니다.
 
