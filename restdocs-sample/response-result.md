@@ -12,14 +12,14 @@ HTTP 클라이언트 코드 작성 시, 항상 실패 케이스에 대한 고려
 
 ```kotlin
 data class MemberResponse(
-    val id: Long,
-    val name: String,
-    val email: String
+     val id: Long,
+     val name: String,
+     val email: String
 )
 
 @Service
 class MemberClient(
-    private val restTemplate: RestTemplate
+        private val restTemplate: RestTemplate
 ) {
 
     fun getMember(memberId: Long): MemberResponse {
@@ -42,7 +42,9 @@ fun `memberResponse 응답이 필수인 경우`(memberId: Long) {
 }
 ```
 
-`MemberResponse` 객체가 비즈니스 로직에 필수적일 때, 4xx나 5xx 같은 비정상적인 HTTP 응답 또는 기타 예외 상황이 발생하면 `getMember()` 함수로부터 `MemberResponse`를 받을 수 없게 됩니다. 이 경우, `try-catch` 블록을 사용하여 이러한 예외 상황을 처리하고, 발생한 오류를 명시적인 예외 메시지로 알리는 것이 한 가지 해결 방법입니다. 그러나 이로 인해 **`getMember` 함수를 사용하는 모든 코드 부분에 `try-catch` 블록을 적용하고, 각 상황에 맞는 예외를 던지는 책임이 사용자에게 전가됩니다.** 이 문제를 해결하기 위한 간단한 방법은 `MemberClient` 내에 아래와 같은 메서드를 제공하는 것입니다.
+`MemberResponse` 객체가 비즈니스 로직에 필수적일 때, 4xx나 5xx 같은 비정상적인 HTTP 응답 또는 기타 예외 상황이 발생하면 `getMember()` 함수로부터 `MemberResponse`를 받을 수 없게 됩니다. 이 경우, `try-catch` 블록을 사용하여 이러한 예외 상황을 처리하고, 발생한 오류를 명시적인 예외 메시지로 알리는 것이 한 가지 해결 방법입니다. 그러나 이로 인해
+**`getMember` 함수를 사용하는 모든 코드 부분에 `try-catch` 블록을 적용하고, 각 상황에 맞는 예외를 던지는 책임이 사용자에게 전가됩니다.
+** 이 문제를 해결하기 위한 간단한 방법은 `MemberClient` 내에 아래와 같은 메서드를 제공하는 것입니다.
 
 ```kotlin
 fun getMember(memberId: Long): MemberResponse? {
@@ -66,7 +68,8 @@ fun getMemberOrThrow(memberId: Long): MemberResponse {
 }
 ```
 
-그러나 세부적인 예외 처리가 필요한 경우, 이러한 메서드들만으로는 충분하지 않습니다. 오류 응답에 따른 추가적인 복구 정책과 예외 처리가 필요한 상황에서 단순한 null 반환 또는 예외 발생 방식은 불충분합니다. **즉, 클라이언트 코드가 구체적인 예외 처리 전략을 수립할 수 있도록, 오류에 대한 충분한 컨텍스트 정보를 제공하는 것이 필요합니다.**
+그러나 세부적인 예외 처리가 필요한 경우, 이러한 메서드들만으로는 충분하지 않습니다. 오류 응답에 따른 추가적인 복구 정책과 예외 처리가 필요한 상황에서 단순한 null 반환 또는 예외 발생 방식은 불충분합니다. *
+*즉, 클라이언트 코드가 구체적인 예외 처리 전략을 수립할 수 있도록, 오류에 대한 충분한 컨텍스트 정보를 제공하는 것이 필요합니다.**
 
 ### 라이브러리 교체시 변경 사항을 최소화 고려
 
@@ -106,9 +109,9 @@ MSA(마이크로서비스 아키텍처) 환경에서 특정 비즈니스 로직�
 fun getXXX(): Triple<Int, xxxResponse?, ErrorResponse?> {
     // .. HTTP 통신 이후 Status Code를 기준으로 응답 객채 or 오류 객체 전달
     return Triple(
-        first = response.statusCodeValue,
-        second = body,
-        third = errorResponse
+            first = response.statusCodeValue,
+            second = body,
+            third = errorResponse
     )
 }
 
@@ -126,7 +129,8 @@ fun xxx() {
 }
 ```
 
-예를 들어, C API 서버에서 오류가 발생했을 때, B API 서버는 오류 응답을 그대로 전달하기 위해 Triple 객체를 사용합니다. 이 객체는 HTTP 상태 코드, 응답 본문, 오류 응답을 포함하며, 호출하는 곳에서는 이 정보를 바탕으로 상세한 제어를 할 수 있습니다. 성공적인 응답과 오류 응답은 각각 본문과 오류 객체에 대한 Notnull 단언을 통해 처리됩니다. 오류 발생 시, B 서버는 C 서버로부터 전달받은 오류 메시지를 그대로 전달합니다. **그러나 이 방식은 직관적이지 않으며, nullable 처리와 오류 핸들링에 대한 책임이 외부로 전가되어 중복 코드와 과도한 부담을 야기합니다.**
+예를 들어, C API 서버에서 오류가 발생했을 때, B API 서버는 오류 응답을 그대로 전달하기 위해 Triple 객체를 사용합니다. 이 객체는 HTTP 상태 코드, 응답 본문, 오류 응답을 포함하며, 호출하는 곳에서는 이 정보를 바탕으로 상세한 제어를 할 수 있습니다. 성공적인 응답과 오류 응답은 각각 본문과 오류 객체에 대한 Notnull 단언을 통해 처리됩니다. 오류 발생 시, B 서버는 C 서버로부터 전달받은 오류 메시지를 그대로 전달합니다.
+**그러나 이 방식은 직관적이지 않으며, nullable 처리와 오류 핸들링에 대한 책임이 외부로 전가되어 중복 코드와 과도한 부담을 야기합니다.**
 
 ### 고려해야 할 점 정리
 
@@ -231,9 +235,9 @@ sealed class ResponseResult<out T> {
  * 내부 서비스에서 공통으로 사용하는 오류 응답 객체
  */
 data class ErrorResponse(
-    val message: String,
-    val code: String,
-    val status: Int
+     val message: String,
+     val code: String,
+     val status: Int
 )
 ```
 
@@ -260,18 +264,22 @@ data class ErrorResponse(
 
 `ResponseResult`는 HTTP 클라이언트 라이브러리에 독립적으로 구현되어 있어, 다양한 클라이언트 라이브러리에 쉽게 적용할 수 있습니다. 코틀린 사용자들에게는 [Fuel](https://github.com/kittinunf/fuel)과 [Ktor HttpClient](https://api.ktor.io/ktor-client/ktor-client-core/io.ktor.client/-http-client/index.html) 라이브러리를 추천합니다. Fuel은 간단하고 소규모의 HTTP 작업에 적합하며, Ktor HttpClient은 보다 복잡하고 다양한 HTTP 통신 요구에 부합합니다. 이러한 HTTP 클라이언트 라이브러리에 코틀린의 확장 함수를 사용하여 `ResponseResult`를 통합하고 적용하는 방법을 살펴보겠습니다.
 
+#### 확장 함로 ResponseResult 적용
+
+RestTemplate, Fuel, Ktor HttpClient 클라이언트 라이브러리에 코틀린의 확장 함수를 통해서 `ResponseResult`를 적용 시켜보겠습니다.
+
 ```kotlin
-// ktor 확장 함수
+// Ktor HttpClient 확장 함수
 suspend inline fun <reified T> HttpResponse.responseResult(): ResponseResult<T> {
     return when {
         status.isSuccess() -> ResponseResult.Success(body())
         else -> {
             val responseBody = bodyAsText()
             ResponseResult.Failure(
-                when {
-                    isErrorResponseSerializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
-                    else -> defaultErrorResponse
-                }
+                 when {
+                     isErrorResponseDeserializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
+                     else -> defaultErrorResponse
+                 }
             )
         }
     }
@@ -284,23 +292,29 @@ inline fun <reified T> ResponseEntity<String>.responseResult(): ResponseResult<T
         else -> {
             val responseBody = this.body.toString()
             ResponseResult.Failure(
-                when {
-                    isErrorResponseSerializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
-                    else -> defaultErrorResponse
-                }
+                 when {
+                     isErrorResponseDeserializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
+                     else -> defaultErrorResponse
+                 }
             )
         }
     }
 }
 ```
 
-RestTemplate 경우 기본 설정이 2xx가 아닌 경우 예외를 발생 시키기 때문에 `ResponseErrorHandler`을 통해서 Custom 설정으로 변경이 필요하며, ResponseEntity 객체에서 2xx 경우에만 시리얼라이즈가 성공적으로 진행하 가능하기 때문에 `ResponseEntity<String>`으로 String 타입을 받고, 2xx 경우에 시리얼라이즈를 진행합니다. 이후 `responseResult<Member>()`으로 `<T>` 타입을 명시적으로 받아서 처리합니다.
+이 코드의 세부적인 내용을 모두 이해할 필요는 없습니다. 주요 흐름은 다음과 같습니다: 성공적인 2xx 응답의 경우, 받은 데이터를 `<T>` 타입의 객체로 역직렬화 합니다. 2xx가 아닌 다른 응답을 받을 경우, 팀 내에서 정한 표준 `ErrorResponse` 형식으로 역직렬화를 진행합니다. 만약 외부 호출에서 표준 `ErrorResponse` 형식을 따르지 않는 경우, 해당 서버의 `ErrorResponse`에 맞는 객체 타입으로 역직렬화를 수행합니다. 
 
-#### 오류 처리
+이 방법을 통해, 특정 라이브러리에 종속되지 않고 일관적으로 `ResponseResult`를 사용하여 응답 객체를 효과적으로 처리할 수 있습니다.
+
+#### 표준 ErrorResponse 처리
+
+4xx 및 5xx 응답을 받을 때는 먼저 표준 `ErrorResponse` 객체로의 역직렬화 가능성을 확인합니다. 역직렬화가 가능하면 해당 과정을 진행하고, 그렇지 않은 경우에는 기본 `ErrorResponse`를 반환합니다. 이렇게 함으로써, 서버가 표준 응답을 따르지 않거나 일시적으로 다운된 경우에도 대응할 수 있습니다.
 
 ```kotlin
-// 표준 ErrorResponse 직렬화 가능 여부 확인
-fun isErrorResponseSerializeAble(responseBody: String): Boolean {
+/**
+ * 표준 Error Response {"message": "xxx", "code": "C002", "status": 400} 역질려화 가능여부 확인  
+ */
+fun isErrorResponseDeserializeAble(responseBody: String): Boolean {
     return when (val rootNode = defaultObjectMapper.readTree(responseBody)) {
         null -> false
         else -> rootNode.path("message").isTextual && rootNode.path("status").isNumber && rootNode.path("code").isTextual
@@ -313,22 +327,14 @@ val defaultErrorResponse = ErrorResponse(
 )
 ```
 
-`responseResult` 함수에서 2xx가 아닌 경우, 응답받은 오류 응답이 팀 내 표준 오류 메시지인지 확인하고, 맞다면 `ErrorResponse` 객체로 직렬화합니다. 그렇지 않은 경우 기본 `ErrorResponse`를 사용합니다. 예를 들어, 서버가 다운되어 표준 오류 응답을 제공할 수 없는 상황에서 기본 응답을 사용합니다. 이외에도 다양한 상황에 대비한 방어적 로직이 필요합니다.
+이 코드는 HTTP 응답의 본문을 표준 `ErrorResponse` 형식으로 역직렬화할 수 있는지 여부를 확인하는 함수를 정의합니다.
 
-`ErrorResponse` 객체를 사용하면, 오류 발생 시 상세한 예외 처리가 가능해집니다. 예를 들어, `memberClient.getMember` 호출로부터 `ErrorResponse` 객체를 받게 되면, 오류가 발생했을 때 이 객체를 기반으로 추가적인 핸들링을 할 수 있습니다. 아래의 코드 예시는 이러한 상황을 보여줍니다.
+- `isErrorResponseDeserializeAble` 함수는 응답 본문(`responseBody`)을 받아 JSON 구조로 파싱합니다.
+- JSON 노드에서 `message`, `status`, `code` 필드의 존재와 데이터 타입을 검사합니다. `message`는 문자열, `status`는 숫자, `code`는 문자열이어야 합니다.
+- 이 조건들이 충족되면 역직렬화가 가능하다고 판단하고 `true`를 반환합니다. 그렇지 않으면 `false`를 반환합니다.
 
-```kotlin
-fun xxx() {
-    val member = memberClient.getMember(1L)
+또한, `defaultErrorResponse`는 기본 `ErrorResponse` 객체를 정의합니다. 이 객체는 유효하지 않은 입력 값(`INVALID_INPUT_VALUE`)에 대한 에러 코드를 포함합니다. 이는 서버 응답이 표준 형식을 따르지 않거나 파싱할 수 없는 경우에 사용됩니다. 
 
-    member
-        .onFailure { errorResponse: ErrorResponse ->
-            // 오류 발생시 넘겨 받은 errorResponse 객체로 추가 핸들링 가능
-        }
-}
-```
-
-이 코드에서 `onFailure` 블록 내부에서 `ErrorResponse` 객체에 대한 추가 처리를 할 수 있습니다. 이렇게 오류에 대한 응답을 구체적으로 다룰 수 있게 되므로, 예외 상황에 대한 대응이 보다 정교하고 세밀하게 이루어질 수 있습니다.
 
 ## 고려 사항을 준수 확인
 
@@ -337,5 +343,3 @@ fun xxx() {
 ### 라이브러리 교체시 변경 사항을 최소화 지원
 
 ### MSA 환경에서의 효율적인 오류 전달 및 핸들링 지원
-
-외부나 다른 팀의 서버와 달리, 동일한 팀 내에서 운영되는 서버들의 오류 응답(Error Response)을 통일하는 것이 바람직합니다. 만약 팀 내에서도 서버별로 오류 메시지가 서로 다르면, 4xx 및 5xx 오류에 대한 처리가 더 복잡해집니다. 또한, 이러한 서버들과 연동하는 다른 팀도 4xx 및 5xx 오류에 대해 처리하는 복잡도가 높아질 수 있습니다. 따라서 같은 팀 내에서 서비스하는 서버들은 오류 응답을 통일하여 관리하는 것이 좋습니다. 이렇게 하면 오류 처리가 간소화되고, 다른 팀과의 협업도 원활해질 수 있습니다.
