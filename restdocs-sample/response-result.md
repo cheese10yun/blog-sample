@@ -1,14 +1,14 @@
-# MSA 환경에 효율적인 HTTP Client 설계 방법
+# MSA 환경에 효율적인 HTTP 클라이언트 설계 방법
 
 현대의 애플리케이션 아키텍처에서는 하나의 서비스가 독립적으로 모든 기능을 처리하기보다는, 여러 서버들이 상호작용하며 각각의 역할을 수행하곤 합니다. 이러한 상호작용 과정에서 HTTP 통신은 서버 간의 협력을 위한 주요한 수단으로 자주 사용됩니다. 이때, 효율적이고 안정적인 HTTP 클라이언트 코드의 작성은 매우 중요한 고려사항이 됩니다. 따라서, 본 포스팅에서는 이러한 컨텍스트 하에 HTTP 클라이언트 코드를 설계하는 방법에 대해 자세히 살펴보고자 합니다. 특히 HTTP 통신에서는 실패 케이스가 불가피하므로, 실패 시 유연한 대처를 가능하게 하는 코드 설계, 통신 실패 및 다양한 시나리오에 대응하는 직관적이고 효과적인 방법에 대해서 다루어보겠습니다.
 
 ## HTTP 클라이언트 설계 시 고려해야 할 점
 
-먼저 일반적으로 작성되는 HTTP 클라이언트 코드에서 발견되는 다양한 문제점들을 자세히 살펴보도록 하겠습니다.
+HTTP 클라이언트 코드를 작성할 때 주의 깊게 고려해야 할 세부 사항들을 살펴보도록 하겠습니다.
 
 ### 다양한 예외적인 케이스에 대한 고려
 
-HTTP 클라이언트 코드 작성 시, 항상 실패 케이스에 대한 고려를 해야합니다. 이런 실패 케이스에 대한 어려움을 정리해보겠습니다.
+HTTP 클라이언트 코드를 작성할 때는 성공적인 요청뿐만 아니라, **다양한 실패 상황에 대해서도 충분히 고려하는 것이 중요합니다.** 이는 예기치 못한 오류에 대응하고, 더 견고하고 안정적인 애플리케이션을 구축하는 데 필수적입니다.
 
 ```kotlin
 data class MemberResponse(
@@ -42,9 +42,7 @@ fun `memberResponse 응답이 필수인 경우`(memberId: Long) {
 }
 ```
 
-`MemberResponse` 객체가 비즈니스 로직에 필수적일 때, 4xx나 5xx 같은 비정상적인 HTTP 응답 또는 기타 예외 상황이 발생하면 `getMember()` 함수로부터 `MemberResponse`를 받을 수 없게 됩니다. 이 경우, `try-catch` 블록을 사용하여 이러한 예외 상황을 처리하고, 발생한 오류를 명시적인 예외 메시지로 알리는 것이 한 가지 해결 방법입니다. 그러나 이로 인해
-**`getMember` 함수를 사용하는 모든 코드 부분에 `try-catch` 블록을 적용하고, 각 상황에 맞는 예외를 던지는 책임이 사용자에게 전가됩니다.
-** 이 문제를 해결하기 위한 간단한 방법은 `MemberClient` 내에 아래와 같은 메서드를 제공하는 것입니다.
+`MemberResponse` 객체가 비즈니스 로직에 필수적일 때, 4xx나 5xx 같은 비정상적인 HTTP 응답 또는 기타 예외 상황이 발생하면 `getMember()` 함수로부터 `MemberResponse`를 받을 수 없게 됩니다. 이 경우, `try-catch` 블록을 사용하여 이러한 예외 상황을 처리하고, 발생한 오류를 명시적인 예외 메시지로 알리는 것이 한 가지 해결 방법입니다. 그러나 이로 인해 **`getMember` 함수를 사용하는 모든 코드 부분에 `try-catch` 블록을 적용하고, 각 상황에 맞는 예외를 던지는 책임이 사용자에게 전가됩니다.** 이 문제를 해결하기 위한 간단한 방법은 `MemberClient` 내에 아래와 같은 메서드를 제공하는 것입니다.
 
 ```kotlin
 fun getMember(memberId: Long): MemberResponse? {
@@ -77,7 +75,7 @@ HTTP 클라이언트 라이브러리는 다른 라이브러리에 비해 자주 
 
 ![](https://tech.kakaopay.com/_astro/011.38d51c8e_dYW2O.png)
 
-예를 들어, 다음과 같은 코드에서 `getMember()` 메서드의 리턴 타입이 `ResponseEntity<Member>`로 되어 있을 경우, 라이브러리 교체가 필요할 때 모든 관련 코드에 변경이 필요하게 됩니다:
+예를 들어, 다음과 같은 코드에서 `getMember()` 메서드의 리턴 타입이 `ResponseEntity<Member>`로 되어 있을 경우, 라이브러리 교체가 필요할 때 모든 관련 코드에 변경이 필요하게 됩니다.
 
 ```kotlin
 fun order(memberId: Long): Order {
@@ -139,7 +137,7 @@ fun xxx() {
 3. **라이브러리 교체시 영향 최소화**: HTTP 클라이언트 라이브러리를 교체할 때 발생할 수 있는 영향을 외부 객체나 모듈에 미치지 않도록 격리해야 합니다.
 4. **분산 환경에서의 오류 메시지 전달**: 분산 환경에서 여러 API 호출이 이루어질 때, 오류를 정확하게 파악하고 메시지를 효과적으로 전달할 수 있어야 합니다.
 
-## 고려 사항을 준수하는 HTTP Client 코드 만들기
+## 고려 사항을 준수하는 HTTP 클라이언트 코드 만들기
 
 고려해야 할 사항들을 기반으로, 효과적인 HTTP 클라이언트 코드를 개발할 계획입니다. 비즈니스 요구사항에 따라 같은 HTTP 요청일지라도 후속 전략이 다를 수 있습니다. 이에 따라, HTTP 클라이언트는 사용처에서 각각의 요구사항에 맞게 유연하게 핸들링할 수 있도록 설계되어야 합니다. 또한, HTTP 클라이언트는 비즈니스 로직의 책임을 지지 않고 오로지 HTTP 통신에 관한 책임만을 담당합니다. 예를 들어, 특정 멤버 ID에 해당하는 멤버가 없는 경우와 같은 비즈니스 로직에 대한 예외 처리는 HTTP 클라이언트의 역할이 아니며, 클라이언트는 DNS 문제와 같은 통신 관련 이슈에 대해서만 예외 처리를 진행합니다.
 
@@ -260,13 +258,13 @@ data class ErrorResponse(
 
 이 클래스는 HTTP 클라이언트 구현에서 결과 처리를 더 유연하고 안전하게 만들어, 코드의 가독성과 유지 보수성을 향상시킵니다. 또한, 예외 처리 및 결과 처리 로직을 일관되고 간결하게 작성할 수 있도록 도와줍니다.
 
-### 클라이언트 코드에 ResponseResult 적용
+### HTTP 클라이언트 ResponseResult 적용
 
 `ResponseResult`는 HTTP 클라이언트 라이브러리에 독립적으로 구현되어 있어, 다양한 클라이언트 라이브러리에 쉽게 적용할 수 있습니다. 코틀린 사용자들에게는 [Fuel](https://github.com/kittinunf/fuel)과 [Ktor HttpClient](https://api.ktor.io/ktor-client/ktor-client-core/io.ktor.client/-http-client/index.html) 라이브러리를 추천합니다. Fuel은 간단하고 소규모의 HTTP 작업에 적합하며, Ktor HttpClient은 보다 복잡하고 다양한 HTTP 통신 요구에 부합합니다. 이러한 HTTP 클라이언트 라이브러리에 코틀린의 확장 함수를 사용하여 `ResponseResult`를 통합하고 적용하는 방법을 살펴보겠습니다.
 
-#### 확장 함로 ResponseResult 적용
+#### 코틀린 확장함수를 이용하여 ResponseResult 적용
 
-RestTemplate, Fuel, Ktor HttpClient 클라이언트 라이브러리에 코틀린의 확장 함수를 통해서 `ResponseResult`를 적용 시켜보겠습니다.
+RestTemplate, Fuel, Ktor HttpClient 클라이언트 라이브러리에 코틀린의 확장 함수를 활용하여 `ResponseResult`를 적용 시켜보겠습니다.
 
 ```kotlin
 // Ktor HttpClient 확장 함수
@@ -302,9 +300,7 @@ inline fun <reified T> ResponseEntity<String>.responseResult(): ResponseResult<T
 }
 ```
 
-이 코드의 세부적인 내용을 모두 이해할 필요는 없습니다. 주요 흐름은 다음과 같습니다: 성공적인 2xx 응답의 경우, 받은 데이터를 `<T>` 타입의 객체로 역직렬화 합니다. 2xx가 아닌 다른 응답을 받을 경우, 팀 내에서 정한 표준 `ErrorResponse` 형식으로 역직렬화를 진행합니다. 만약 외부 호출에서 표준 `ErrorResponse` 형식을 따르지 않는 경우, 해당 서버의 `ErrorResponse`에 맞는 객체 타입으로 역직렬화를 수행합니다. 
-
-이 방법을 통해, 특정 라이브러리에 종속되지 않고 일관적으로 `ResponseResult`를 사용하여 응답 객체를 효과적으로 처리할 수 있습니다.
+이 코드의 세부적인 내용을 모두 이해할 필요는 없습니다. 주요 흐름은 다음과 같습니다: 성공적인 2xx 응답의 경우, 받은 데이터를 `<T>` 타입의 객체로 역직렬화 합니다. 2xx가 아닌 다른 응답을 받을 경우, 팀 내에서 정한 표준 `ErrorResponse` 형식으로 역직렬화를 진행합니다. 만약 외부 호출에서 표준 `ErrorResponse` 형식을 따르지 않는 경우, 해당 서버의 `ErrorResponse`에 맞는 객체 타입으로 역직렬화를 수행합니다. 이 방법을 통해, 특정 라이브러리에 종속되지 않고 일관적으로 `ResponseResult`를 사용하여 응답 객체를 효과적으로 처리할 수 있습니다.
 
 #### 표준 ErrorResponse 처리
 
@@ -312,7 +308,7 @@ inline fun <reified T> ResponseEntity<String>.responseResult(): ResponseResult<T
 
 ```kotlin
 /**
- * 표준 Error Response {"message": "xxx", "code": "C002", "status": 400} 역질려화 가능여부 확인  
+ * 표준 Error Response {"message": "xxx", "code": "C002", "status": 400} 역작렬화 가능여부 확인
  */
 fun isErrorResponseDeserializeAble(responseBody: String): Boolean {
     return when (val rootNode = defaultObjectMapper.readTree(responseBody)) {
@@ -323,18 +319,11 @@ fun isErrorResponseDeserializeAble(responseBody: String): Boolean {
 
 // 기본 ErrorResponse 객체
 val defaultErrorResponse = ErrorResponse(
-    code = ErrorCode.INVALID_INPUT_VALUE
+     code = ErrorCode.INVALID_INPUT_VALUE
 )
 ```
 
-이 코드는 HTTP 응답의 본문을 표준 `ErrorResponse` 형식으로 역직렬화할 수 있는지 여부를 확인하는 함수를 정의합니다.
-
-- `isErrorResponseDeserializeAble` 함수는 응답 본문(`responseBody`)을 받아 JSON 구조로 파싱합니다.
-- JSON 노드에서 `message`, `status`, `code` 필드의 존재와 데이터 타입을 검사합니다. `message`는 문자열, `status`는 숫자, `code`는 문자열이어야 합니다.
-- 이 조건들이 충족되면 역직렬화가 가능하다고 판단하고 `true`를 반환합니다. 그렇지 않으면 `false`를 반환합니다.
-
-또한, `defaultErrorResponse`는 기본 `ErrorResponse` 객체를 정의합니다. 이 객체는 유효하지 않은 입력 값(`INVALID_INPUT_VALUE`)에 대한 에러 코드를 포함합니다. 이는 서버 응답이 표준 형식을 따르지 않거나 파싱할 수 없는 경우에 사용됩니다. 
-
+`isErrorResponseDeserializeAble` 함수는 오류 응답 본문(`responseBody`)을 받아 JSON 구조로 파싱합니다. JSON 노드에서 역직렬화에 필요한 필드들의 존재와 타입을 검사하여 가능한 경우는 역직렬화를 진행하며, 그렇지 않은 경우는 `defaultErrorResponse`로  `ErrorResponse` 객체를 정의합니다. 이는 서버 응답이 표준 형식을 따르지 않거나 파싱할 수 없는 경우에 사용됩니다. 이로써 4xx, 5xx 경우 `Failure`의 `ErorrResponse` 객체를 항상 보장 받을 수 있게 됩니다.
 
 ## 고려 사항을 준수 확인
 
