@@ -45,6 +45,8 @@ package com.example.restdocssample
  * HTTP 응답을 나타내는 sealed 클래스. 성공 또는 실패의 결과를 포함한다.
  * @param T 응답 본문의 제네릭 타입
  */
+
+
 sealed class ResponseResult<out T> {
 
     /**
@@ -100,61 +102,81 @@ sealed class ResponseResult<out T> {
 
 
     /**
-     * Failure 상태인 경우 주어진 default 값을 반환하며, Success 상태일 경우 주어진 변환 함수를 적용한다.
+     * * [Success] 경우 [Success.body] 응답
+     * * [Failure] 경우 [ApiException] 발생
      *
-     * @param default 기본 반환 값.
-     * @param transform 변환 함수.
      */
-    inline fun getOrThrow(action: (T) -> @UnsafeVariance T): T {
-        when (this) {
-            is Success -> return action(body)
+    fun getOrThrow(): T {
+        return when (this) {
+            is Success -> body
             is Failure -> {
                 when {
-                    errorResponse.status.isClientError() -> throw ServiceException(errorResponse = errorResponse, code = ErrorCode.INVALID_INPUT_VALUE )
-                    else -> throw ServiceException(errorResponse = errorResponse, code = ErrorCode.SERVER_ERROR)
+                    errorResponse.status.isClientError() -> throw ServiceException(
+                        errorResponse = errorResponse,
+                        code = ErrorCode.INVALID_INPUT_VALUE
+                    )
+                    else -> throw ApiException(errorResponse = errorResponse, code = ErrorCode.SERVER_ERROR)
                 }
             }
         }
     }
 
+
+
+    /**
+     * Failure 상태인 경우 주어진 default 값을 반환하며, Success 상태일 경우 주어진 변환 함수를 적용한다.
+     *
+     */
+//    inline fun getOrThrow(action: (T) -> @UnsafeVariance T): T {
+//        when (this) {
+//            is Success -> return action(body)
+//            is Failure -> {
+//                when {
+//                    errorResponse.status.isClientError() -> throw ServiceException(errorResponse = errorResponse, code = ErrorCode.INVALID_INPUT_VALUE)
+//                    else -> throw ServiceException(errorResponse = errorResponse, code = ErrorCode.SERVER_ERROR)
+//                }
+//            }
+//        }
+//    }
+
     /**
      * [Failure] 상태인 경우 [default] 기반으로 반환하고, [Success] 경우 반환 진행
      */
-    inline fun <R> getOrDefault(default: R, transform: (T) -> R): R {
+    fun <R> getOrDefault(default: R, transform: (T) -> R): R {
         return when (this) {
             is Success -> transform(body)
             is Failure -> default
         }
     }
 
-    /**
-     * [Success] 상태인 경우 T -> R 변환
-     */
-    inline fun <R> map(transform: (T) -> R): ResponseResult<R> {
-        return when (this) {
-            is Success -> Success(transform(body))
-            is Failure -> this
-        }
-    }
+//    /**
+//     * [Success] 상태인 경우 T -> R 변환
+//     */
+//    inline fun <R> map(transform: (T) -> R): ResponseResult<R> {
+//        return when (this) {
+//            is Success -> Success(transform(body))
+//            is Failure -> this
+//        }
+//    }
+//
+//    /**
+//     * [Success] 상태인 경우, ResponseResult<T> -> ResponseResult<R> 변환
+//     */
+//    inline fun <R> flatMap(transform: (T) -> ResponseResult<R>): ResponseResult<R> {
+//        return when (this) {
+//            is Success -> transform(body)
+//            is Failure -> this
+//        }
+//    }
 
-    /**
-     * [Success] 상태인 경우, ResponseResult<T> -> ResponseResult<R> 변환
-     */
-    inline fun <R> flatMap(transform: (T) -> ResponseResult<R>): ResponseResult<R> {
-        return when (this) {
-            is Success -> transform(body)
-            is Failure -> this
-        }
-    }
-
-    /**
-     * [Failure] 상태 경우 재시도를 진행하는 경우 사용
-     */
-    inline fun recover(action: (ErrorResponse) -> ResponseResult<@UnsafeVariance T>): ResponseResult<T> {
-        return when (this) {
-            is Failure -> action(errorResponse)
-            else -> this
-        }
-    }
+//    /**
+//     * [Failure] 상태 경우 재시도를 진행하는 경우 사용
+//     */
+//    inline fun recover(action: (ErrorResponse) -> ResponseResult<@UnsafeVariance T>): ResponseResult<T> {
+//        return when (this) {
+//            is Failure -> action(errorResponse)
+//            else -> this
+//        }
+//    }
 
 }

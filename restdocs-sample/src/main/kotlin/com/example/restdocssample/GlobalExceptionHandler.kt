@@ -196,7 +196,12 @@ fun Int.isClientError(): Boolean = this in (400 until 500)
 
 fun Int.isServerError(): Boolean = this in (400 until 500)
 
-class ServiceException(
+open class ServiceException(
     errorResponse: ErrorResponse,
     code: ErrorCode
 ): RuntimeException()
+
+class ApiException(
+    errorResponse: ErrorResponse,
+    code: ErrorCode
+): ServiceException(errorResponse, code)

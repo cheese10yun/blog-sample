@@ -327,7 +327,72 @@ val defaultErrorResponse = ErrorResponse(
 
 ## 고려 사항을 준수 확인
 
+`ResponseResult`를 적용한 HTTP 클라이언트 코드를 검토하여, 이 설계가 실제 요구 사항을 충족하고 유연성을 제공하는지 확인해 보겠습니다.
+
 ### 다양한 예외적인 케이스에 대한 고려 지원
+
+비즈니스 요구사항에 따라 같은 HTTP 요청일지라도 후속 전략이 다를 수 있기 때문에 사용하는 곳에서 일관성 있고 간결하게 제어할 수 있도록 기능을 제공해 주고 있는지 확인 해보겠습니다.
+
+#### 필수 값이 아닌 케이스
+
+```kotlin
+val member: MemberResponse? = memberClient
+    .getMember(1L)
+    .getOrNull()
+```
+
+`getOrNull` 메서드를 사용하여, `memberClient.getMember(1L)` 호출이 2xx 응답이 아닌 경우, `member` 객체가 `null`로 반환됩니다. 이 방식은 `MemberResponse`가 필수 값이 아닐 때 예외를 발생시키지 않고, 결과를 호출한 측에서 제어할 수 있게 해줍니다.
+
+
+#### 필수 값인 케이스 - Exception 발생 Notnull 보장
+
+```kotlin
+val member: MemberResponse = memberClient
+    .getMember(1L)
+    .getOrThrow()
+```
+
+`getOrThrow` 메서드 사용 시, 2xx 범위 외의 응답이 돌아오면 예외를 발생시켜 `MemberResponse` 객체가 null이 아님을 보장합니다. 4xx 또는 5xx 오류에 대해서는 `ApiException`을 통해 발생한 `ErrorResponse`를 클라이언트에게 직접 전달할 수 있으며, 이는 MSA와 같은 분산 환경에서 **연쇄적인 오류 처리에 효과적입니다.**
+
+#### 통신 실패시 Default 제공
+
+```kotlin
+val member: MemberResponse = memberClient
+   .getMember(1L)
+   .getOrDefault(
+       default = MemberResponse(
+           email = "sample@sample.com",
+           name = "sample",
+           status = MemberStatus.NORMAL
+       ),
+       transform = { it }
+   )
+```
+
+`getOrDefault` 메서드 사용사, 호출이 실패할 경우에도 기본 `MemberResponse` 객체를 반환하여 Null 문제를 방지할 수 있습니다. 이 접근 방식은 코드의 안정성을 높이고, 결과값이 항상 Non-null임을 보장하는 데에 도움이 됩니다.
+
+#### 여러 케이스 조합
+
+```kotlin
+val member = memberClient
+    .createXXX(...)
+    .onFailure { errorResponse: ErrorResponse ->
+        // 통신 실패시 callback, 
+    }
+    .onSuccess { response: xxxResponse ->
+       // 통신 성공시 callback
+    }
+    .getOrDefault(
+        // 혹시라도 오류 발생시 기본 값 응답
+        default = xxxResponse(
+            ...
+        ),
+        transform = { it }
+    )
+```
+
+`onFailure`와 `onSuccess`를 사용하여 각각 통신 실패와 성공에 대한 콜백을 처리할 수 있습니다. **`onFailure`는 `ErrorResponse`를 통해 발생한 오류에 대한 구체적인 대응이 가능하며,** 필요에 따라 추가적인 예외 처리나 논리적인 롤백을 구현할 수 있습니다. `onSuccess`는 성공 시 `response` 객체를 받아 후속 작업을 진행할 수 있으며, 실패 경우에도 `getOrDefault`를 통해 기본 값을 제공받습니다. **이러한 방식은 비즈니스 로직에 유연하고 일관된 처리를 가능하게 하며, `ResponseResult`를 필요에 따라 확장하여 사용할 수 있습니다.**
+
 
 ### 라이브러리 교체시 변경 사항을 최소화 지원
 
