@@ -300,15 +300,15 @@ inline fun <reified T> ResponseEntity<String>.responseResult(): ResponseResult<T
 }
 ```
 
-이 코드의 세부적인 내용을 모두 이해할 필요는 없습니다. 주요 흐름은 다음과 같습니다: 성공적인 2xx 응답의 경우, 받은 데이터를 `<T>` 타입의 객체로 역직렬화 합니다. 2xx가 아닌 다른 응답을 받을 경우, 팀 내에서 정한 표준 `ErrorResponse` 형식으로 역직렬화를 진행합니다. 만약 외부 호출에서 표준 `ErrorResponse` 형식을 따르지 않는 경우, 해당 서버의 `ErrorResponse`에 맞는 객체 타입으로 역직렬화를 수행합니다. 이 방법을 통해, 특정 라이브러리에 종속되지 않고 일관적으로 `ResponseResult`를 사용하여 응답 객체를 효과적으로 처리할 수 있습니다.
+이 코드의 세부적인 내용을 모두 이해할 필요는 없습니다. 주요 흐름은 다음과 같습니다: 성공적인 2xx 응답의 경우, 받은 데이터를 `<T>` 타입의 객체로 역직렬화 합니다. 2xx가 아닌 다른 응답을 받을 경우, 팀 내에서 정한 표준 `ErrorResponse` 형식으로 역직렬화를 진행합니다. 만약 외부 호출로 표준 `ErrorResponse` 형식을 따르지 않는 경우, 해당 서버의 `ErrorResponse`에 맞는 객체 타입으로 역직렬화를 수행합니다. 이 방법을 통해, 특정 라이브러리에 종속되지 않고 일관적으로 `ResponseResult`를 사용하여 응답 객체를 효과적으로 처리할 수 있습니다.
 
-#### 표준 ErrorResponse 처리
+#### 표준 ErrorResponse 처리 방법
 
-4xx 및 5xx 응답을 받을 때는 먼저 표준 `ErrorResponse` 객체로의 역직렬화 가능성을 확인합니다. 역직렬화가 가능하면 해당 과정을 진행하고, 그렇지 않은 경우에는 기본 `ErrorResponse`를 반환합니다. 이렇게 함으로써, 서버가 표준 응답을 따르지 않거나 일시적으로 다운된 경우에도 대응할 수 있습니다.
+우리 팀의 내부 API에서는 통일된 표준 Error Response를 사용하는 것이 바람직합니다. 이는 각 API마다 오류 메시지가 다를 경우, 오류 응답을 개별적으로 처리해야 하는 복잡성을 줄이고, 외부 팀과의 협업 시에도 일관된 오류 처리 전략을 유지할 수 있게 합니다. 아래의 코드는 표준 Error Response를 준수하는 경우, 오류를 일관되게 처리할 수 있는 방법을 보여줍니다.
 
 ```kotlin
 /**
- * 표준 Error Response {"message": "xxx", "code": "C002", "status": 400} 역작렬화 가능여부 확인
+ * 표준 Error Response {"message": "xxx", "code": "C002", "status": 400}의 역직렬화 가능 여부를 확인합니다.
  */
 fun isErrorResponseDeserializeAble(responseBody: String): Boolean {
     return when (val rootNode = defaultObjectMapper.readTree(responseBody)) {
@@ -317,13 +317,13 @@ fun isErrorResponseDeserializeAble(responseBody: String): Boolean {
     }
 }
 
-// 기본 ErrorResponse 객체
+// 기본 ErrorResponse 객체 정의
 val defaultErrorResponse = ErrorResponse(
      code = ErrorCode.INVALID_INPUT_VALUE
 )
 ```
 
-`isErrorResponseDeserializeAble` 함수는 오류 응답 본문(`responseBody`)을 받아 JSON 구조로 파싱합니다. JSON 노드에서 역직렬화에 필요한 필드들의 존재와 타입을 검사하여 가능한 경우는 역직렬화를 진행하며, 그렇지 않은 경우는 `defaultErrorResponse`로  `ErrorResponse` 객체를 정의합니다. 이는 서버 응답이 표준 형식을 따르지 않거나 파싱할 수 없는 경우에 사용됩니다. 이로써 4xx, 5xx 경우 `Failure`의 `ErorrResponse` 객체를 항상 보장 받을 수 있게 됩니다.
+`isErrorResponseDeserializeAble` 함수는 오류 응답 본문(`responseBody`)을 JSON 구조로 파싱하여, 필요한 필드들의 존재와 타입을 검사합니다. 이를 통해 역직렬화가 가능한 경우에는 해당 과정을 진행하고, 그렇지 않은 경우에는 `defaultErrorResponse`를 사용하여 `ErrorResponse` 객체를 정의합니다. 이 방법을 사용함으로써, 서버 응답이 표준 형식을 따르지 않거나 파싱할 수 없는 경우에도 4xx 및 5xx 오류에 대한 `ErrorResponse` 객체의 일관된 처리를 보장할 수 있습니다.
 
 ## 고려 사항을 준수 확인
 
