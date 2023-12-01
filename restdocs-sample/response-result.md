@@ -137,7 +137,7 @@ fun xxx() {
 3. **라이브러리 교체시 영향 최소화**: HTTP 클라이언트 라이브러리를 교체할 때 발생할 수 있는 영향을 외부 객체나 모듈에 미치지 않도록 격리해야 합니다.
 4. **분산 환경에서의 오류 메시지 전달**: 분산 환경에서 여러 API 호출이 이루어질 때, 오류를 정확하게 파악하고 메시지를 효과적으로 전달할 수 있어야 합니다.
 
-## 고려 사항을 준수하는 HTTP 클라이언트 코드 만들기
+## 고려 사항을 준수하는 HTTP 클라이언트 설계
 
 고려해야 할 사항들을 기반으로, 효과적인 HTTP 클라이언트 코드를 개발할 계획입니다. 비즈니스 요구사항에 따라 같은 HTTP 요청일지라도 후속 전략이 다를 수 있습니다. 이에 따라, HTTP 클라이언트는 사용처에서 각각의 요구사항에 맞게 유연하게 핸들링할 수 있도록 설계되어야 합니다. 또한, HTTP 클라이언트는 비즈니스 로직의 책임을 지지 않고 오로지 HTTP 통신에 관한 책임만을 담당합니다. 예를 들어, 특정 멤버 ID에 해당하는 멤버가 없는 경우와 같은 비즈니스 로직에 대한 예외 처리는 HTTP 클라이언트의 역할이 아니며, 클라이언트는 DNS 문제와 같은 통신 관련 이슈에 대해서만 예외 처리를 진행합니다.
 
@@ -396,4 +396,107 @@ val member = memberClient
 
 ### 라이브러리 교체시 변경 사항을 최소화 지원
 
+```kotlin
+// RestTemplate 라이브러리 사용
+fun getMemberRestTemplate(memberId: Long): ResponseResult<Member> {
+     return restTemplate
+         .getForEntity<String>("/api/members/$memberId")
+         .responseResult<Member>()
+}
+
+// Ktor HttpClient 라이브러리 사용
+fun getMemberKtor(memberId: Long): ResponseResult<Member> {
+   return runBlocking {
+      client
+         .get("http://localhost:8787/api/members/$memberId")
+         .responseResult<Member>()
+   }
+}
+
+fun xxxx() {
+    // 사용하는 곳에서 어떤 라이브러리를 사용 하더라도 동일하게 처리
+   val memberResponse1: ResponseEntity<MemberResponse> = restTemplate.getMemberRestTemplate(1L).getOrThrow()
+   val memberResponse2: ResponseEntity<MemberResponse> = httpClient.getMemberRestTemplate(1L).getOrThrow()
+}
+```
+
+두 방법 모두 `ResponseResult<T>` 타입을 반환함으로써, 사용하는 라이브러리가 변경되어도 **일관된 응답 처리 방식**을 유지할 수 있습니다. 이 접근 방식은 라이브러리 교체 시 필요한 코드 수정을 최소화하면서도 통일된 방식으로 응답을 처리할 수 있는 유연성을 제공합니다.
+
 ### MSA 환경에서의 효율적인 오류 전달 및 핸들링 지원
+
+
+```mermaid
+sequenceDiagram
+    A API ->> B API: 요청
+    B API ->> C API: 요청
+    C API -->> B API: 오류 응답
+    Note right of B API: {"message": "Invalid Value", "status": 400, "code": "C001"}
+    B API -->> A API: 오류 응답
+    Note right of A API: {"message": "Invalid Value", "status": 400, "code": "C001"}
+```
+
+`getOrThrow` 메서드만 사용하면 MSA와 같은 분산 환경에서 연쇄적인 오류 전달이 손쉽게 전달됩니다.
+
+
+```kotlin
+
+class AServer {
+    ...
+
+   fun callBServer(): XXXResponse {
+      val xxxResponse: XXXResponse = BClient
+         .getXXX()
+         .getOrThrow()
+   }
+    
+}
+
+class BServer {
+   ...
+
+   fun callCServer(): XXXResponse {
+      val xxxResponse: XXXResponse = CClient
+         .getXXX()
+         .getOrThrow()
+   }
+
+}
+
+class CServer {
+
+   ...
+
+   fun xxxx(): XXXResponse {
+       ...
+      // 
+      // {"message": "xxx", "code": "C002", "status": 400} 오류 응답 
+   }
+}
+```
+
+오류가 발생할 경우 `{"message": "xxx", "code": "C002", "status": 400}`와 같은 오류 응답이 A 서버까지 전달됩니다. 이러한 오류 전달 구조를 구현하기 위해서는 특정 설정이 필요합니다.
+
+#### HTTP 통신 실패 Exception 정의
+
+```kotlin
+class ApiException(
+    val errorResponse: ErrorResponse
+): RuntimeException()
+```
+
+HTTP 통신 실패 시에 발생하는 `ApiException` 예외 클래스를 정의합니다. 내부 표준 `ErrorResponse`를 필수 파라미터로 받아 오류 세부 정보를 관리합니다.
+
+#### ApiException 핸들링 
+
+```kotlin
+@ControllerAdvice
+class GlobalExceptionHandler {
+    
+    @ExceptionHandler(ApiException::class)
+    protected fun handleApiException(ex: ApiException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity(ex.errorResponse, HttpStatus.valueOf(ex.errorResponse.status))
+    }
+}
+```
+
+`@ControllerAdvice` 어노테이션을 사용하여 `ApiException` 예외를 핸들링 합니다. `handleApiException` 메서드는 `ApiException`을 인자로 받고, 예외 발생 시 `ErrorResponse` 객체를 이용해 HTTP 상태 코드와 오류 응답을 구성합니다. 이렇게 함으로써, 전달 받은 오류 응답을 그대로 전달 할 수있습니다.

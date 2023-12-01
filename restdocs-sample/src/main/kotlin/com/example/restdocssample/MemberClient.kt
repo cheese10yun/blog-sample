@@ -46,6 +46,12 @@ class MemberClient(
             .getForEntity<String>("/api/members/$memberId")
             .responseResult<Member>()
     }
+
+    fun getMemberByRestTemplate(memberId: Long): ResponseResult<Member> {
+        return restTemplate
+            .getForEntity<String>("/api/members/$memberId")
+            .responseResult<Member>()
+    }
 }
 
 class AA(

@@ -36,7 +36,7 @@ class MemberApi(
 
     @GetMapping("/{id}/test")
     fun getMember2(@PathVariable id: Long): Member {
-        return memberClient.getMember3(id).getOrThrow { it }!!
+        return memberClient.getMember3(id).getOrThrow()
     }
 
     @GetMapping("/{id}/test4")
