@@ -107,9 +107,9 @@ MSA(마이크로서비스 아키텍처) 환경에서 특정 비즈니스 로직�
 fun getXXX(): Triple<Int, xxxResponse?, ErrorResponse?> {
     // .. HTTP 통신 이후 Status Code를 기준으로 응답 객채 or 오류 객체 전달
     return Triple(
-            first = response.statusCodeValue,
-            second = body,
-            third = errorResponse
+         first = response.statusCodeValue,
+         second = body,
+         third = errorResponse
     )
 }
 
