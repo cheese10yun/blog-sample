@@ -112,7 +112,7 @@ sealed class ResponseResult<out T> {
             is Failure -> {
                 when {
                     errorResponse.status.isClientError() -> throw ServiceException(
-                        errorResponse = errorResponse,
+//                        errorResponse = errorResponse,
                         code = ErrorCode.INVALID_INPUT_VALUE
                     )
                     else -> throw ApiException(errorResponse = errorResponse, code = ErrorCode.SERVER_ERROR)
