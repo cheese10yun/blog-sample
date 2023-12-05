@@ -1,6 +1,6 @@
-# MSA 환경에 효율적인 HTTP 클라이언트 설계 방법
+## 시작하며
 
-현대의 애플리케이션 아키텍처에서는 하나의 서비스가 독립적으로 모든 기능을 처리하기보다는, 여러 서버들이 상호작용하며 각각의 역할을 수행하곤 합니다. 이러한 상호작용 과정에서 HTTP 통신은 서버 간의 협력을 위한 주요한 수단으로 자주 사용됩니다. 이때, 효율적이고 안정적인 HTTP 클라이언트 코드의 작성은 매우 중요한 고려 사항이 됩니다. 따라서, 본 포스팅에서는 이러한 컨텍스트 하에 HTTP 클라이언트 코드 설계 시 고려해야 할 부분에 대해서 다룰 예정입니다. 특히 HTTP 통신에서는 실패 케이스가 불가피하므로, 실패 시 유연한 대처를 가능하게 하는 코드 설계, 통신 실패 및 다양한 시나리오에 대응하는 직관적이고 일관성 있게 제어할 수 있어야 합니다.
+안녕하세요, 정산플랫폼팀 윤입니다. 현대의 애플리케이션 아키텍처에서는 하나의 서비스가 독립적으로 모든 기능을 처리하기보다는, 여러 서버들이 상호작용하며 각각의 역할을 수행하곤 합니다. 이러한 상호작용 과정에서 HTTP 통신은 서버 간의 협력을 위한 주요한 수단으로 자주 사용됩니다. 이때, 효율적이고 안정적인 HTTP 클라이언트 코드의 작성은 매우 중요한 고려 사항이 됩니다. 따라서, 본 포스팅에서는 이러한 컨텍스트 하에 HTTP 클라이언트 코드 설계 시 고려해야 할 부분에 대해서 다룰 예정입니다. 특히 HTTP 통신에서는 실패 케이스가 불가피하므로, 실패 시 유연한 대처를 가능하게 하는 코드 설계, 통신 실패 및 다양한 시나리오에 대응하는 직관적이고 일관성 있게 제어할 수 있어야 합니다.
 
 ## HTTP 클라이언트 설계 시 고려해야 할 점
 
@@ -282,6 +282,23 @@ suspend inline fun <reified T> HttpResponse.responseResult(): ResponseResult<T> 
     }
 }
 
+// Fuel 확장 함수
+inline fun <reified T : Any> ResponseResultOf<T>.responseResult(): ResponseResult<T> {
+   return when {
+      second.isSuccessful -> ResponseResult.Success(third.get())
+      else -> {
+         val responseBody = String(this.second.data, Charset.defaultCharset())
+         ResponseResult.Failure(
+            when {
+               isErrorResponseDeserializeAble(responseBody) -> defaultObjectMapper.readValue(responseBody, ErrorResponse::class.java)
+               else -> defaultErrorResponse
+            }
+         )
+      }
+   }
+}
+
+
 // RestTemplate 확장 함수
 inline fun <reified T> ResponseEntity<String>.responseResult(): ResponseResult<T> {
     return when (this.statusCode.is2xxSuccessful) {
@@ -498,3 +515,7 @@ class GlobalExceptionHandler {
 ```
 
 `@ControllerAdvice` 어노테이션을 사용하여 `ApiException` 예외를 핸들링 합니다. `handleApiException` 메서드는 `ApiException`을 인자로 받고, 예외 발생 시 `ErrorResponse` 객체를 이용해 HTTP 상태 코드와 오류 응답을 구성합니다. 이렇게 함으로써, 전달받은 오류 응답을 그대로 전달할 수 있습니다.
+
+## 마치며
+
+HTTP 클라이언트 코드 작성 시, 실패 케이스를 항상 염두에 두어야 하며, 사용하는 곳의 구체적인 비즈니스 요구사항에 맞게 유연하고 일관성 있는 오류 처리 방법을 제공해야 합니다. 이는 코드의 안정성을 높이고 예상치 못한 상황에 대응할 수 있게 해줍니다. 또한, 사용하는 라이브러리가 변경되어도 그 변경이 코드의 다른 부분에 영향을 미치지 않도록 의존성을 잘 격리하여 관리하는 것도 중요합니다. 이렇게 함으로써, 코드의 유지보수성을 향상시키고 장기적으로 안정적인 시스템을 유지할 수 있습니다. 이러한 고려사항들을 충족하는지 확인하고, 필요한 경우 리팩토링을 통해 이러한 방향으로 개선해 보는것도 좋을거 같습니다.
