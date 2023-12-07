@@ -14,7 +14,6 @@ import org.springframework.data.domain.Slice
 import org.springframework.data.mapping.div
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
-import org.springframework.data.mongodb.core.query.Criteria.where
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.repository.MongoRepository
@@ -42,7 +41,8 @@ interface MemberCustomRepository {
         email: String?
     ): Slice<Member>
 
-    fun updateInBulk()
+    fun updateEmail(listOf: List<Pair<() -> Query, () -> Update>>)
+    fun bulkInsert(members: List<Member>)
 }
 
 class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRepository, MongoCustomRepositorySupport<Member>(
@@ -120,13 +120,11 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         )
     }
 
-    override fun updateInBulk() {
-        val listOf = listOf(
-            { Query(where("_id").`is`(1)) } to { Update().set("rule_id", 24) },
-            { Query(where("_id").`is`(4)) } to { Update().set("rule_id", 21) },
-            { Query(where("_id").`is`(5)) } to { Update().set("rule_id", 21) },
-            { Query(where("_id").`is`(2)) } to { Update().set("rule_id", 22) }
-        )
+    override fun updateEmail(listOf: List<Pair<() -> Query, () -> Update>>) {
         updateInBulk(listOf)
+    }
+
+    override fun bulkInsert(members: List<Member>) {
+        insertMany(members)
     }
 }

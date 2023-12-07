@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @RestController
@@ -37,8 +38,32 @@ class MemberController(
 
     @GetMapping("/name")
     fun findByName(
-        @RequestParam(name = "name") name:String
+        @RequestParam(name = "name") name: String
     ): List<Member> {
         return memberRepository.findByName(name)
+    }
+
+    @GetMapping("/test")
+    fun findByName() {
+        val map = (1..100_000).map {
+            Member(
+                memberId = "memberId-$it",
+                name = "name-$it",
+                email = "email-$it",
+                dateJoined = LocalDateTime.now(),
+                dateOfBirth = LocalDate.now(),
+                phoneNumber = "phoneNumber-$it",
+                address = Address(
+                    address = "address-$it",
+                    addressDetail = "addressDetail-$it",
+                    zipCode = "zipCode-$it"
+                ),
+                status = MemberStatus.ACTIVE,
+                pointsAccumulated = it.toBigDecimal(),
+                lastPurchaseDate = LocalDateTime.now()
+            )
+        }
+
+        memberRepository.insert(map)
     }
 }
