@@ -3,6 +3,7 @@ package com.example.mongostudy.member
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
@@ -78,7 +79,7 @@ class MemberController(
     fun updateBulk(
         @RequestParam count: Int,
         @RequestParam name: String,
-    ): Long {
+    ): Double {
 
         val members = memberRepository
             .findAll(PageRequest.of(0, count))
@@ -86,25 +87,31 @@ class MemberController(
             .filterNotNull()
 
 
-        val map = members.map {
-            Pair(
-                first = { Query(Criteria.where("_id").`is`(it.id!!)) },
-                second = { Update().set("name", name) }
-            )
+        val loop = 10
+        val map = (1..loop).map {
+            members.map {
+                Pair(
+                    first = { Query(Criteria.where("_id").`is`(it.id!!)) },
+                    second = { Update().set("name", UUID.randomUUID().toString()) }
+                )
+            }
         }
 
-        val stopWatch = StopWatch()
-        stopWatch.start()
-        memberQueryService.updateBulkTest(map)
-        stopWatch.stop()
 
-        val message = stopWatch.totalTimeMillis
-        println("============")
-        println("size: ${members.size}, $message ms")
-        println("============")
+        val timeTaken = emptyList<Long>().toMutableList()
+        (1..loop).forEachIndexed { index, _ ->
+            val stopWatch = StopWatch()
+            stopWatch.start()
+            memberQueryService.updateBulkTest(map[index], BulkOperations.BulkMode.UNORDERED)
+            stopWatch.stop()
+            val element = stopWatch.totalTimeMillis
+//            println("============")
+//            println("index:${index} bulk size: ${members.size}, $element ms")
+//            println("============")
+            timeTaken.add(element)
+        }
 
-        return message
-
+        return timeTaken.average()
     }
 
 
@@ -112,28 +119,73 @@ class MemberController(
     fun update(
         @RequestParam count: Int,
         @RequestParam name: String,
-    ): Long {
+    ): Double {
         val findAll = memberRepository.findAll(PageRequest.of(0, count))
 
+        val loop = 10
         val members = findAll.content
             .filterNotNull()
 
-        members
-            .forEach {
-                it.name = name
+        val map = (1..loop).map {
+            members.forEach {
+                it.name = UUID.randomUUID().toString()
+            }
+            members
+        }
+
+        val timeTaken = emptyList<Long>().toMutableList()
+        (1..loop).forEachIndexed { index, _ ->
+            val stopWatch = StopWatch()
+            stopWatch.start()
+            memberQueryService.update(map[index])
+            stopWatch.stop()
+            val element = stopWatch.totalTimeMillis
+//            println("============")
+//            println("index:${index} bulk size: ${members.size}, $element ms")
+//            println("============")
+            timeTaken.add(element)
+        }
+
+
+        return timeTaken.average()
+    }
+
+    @GetMapping("/update/updateFirst")
+    fun updateFirst(
+        @RequestParam count: Int,
+        @RequestParam name: String,
+    ): Double {
+        val findAll = memberRepository.findAll(PageRequest.of(0, count))
+
+        val loop = 10
+        val members = findAll.content
+            .filterNotNull()
+
+        val map = (1..loop).map {
+            members.forEach {
+                it.name = UUID.randomUUID().toString()
+            }
+            members
+        }
+
+        val timeTaken = emptyList<Long>().toMutableList()
+        (1..loop).forEachIndexed { index, _ ->
+            val stopWatch = StopWatch()
+            stopWatch.start()
+
+            map[index].forEach {
+                memberRepository.update(it.id!!)
             }
 
+            stopWatch.stop()
+            val element = stopWatch.totalTimeMillis
+            println("============")
+            println("index:${index} updateFirst size: ${members.size}, $element ms")
+            println("============")
+            timeTaken.add(element)
+        }
 
-        val stopWatch = StopWatch()
-        stopWatch.start()
-        memberQueryService.update(members)
-        stopWatch.stop()
 
-        val message = stopWatch.totalTimeMillis
-        println("============")
-        println("size: ${members.size}, $message ms")
-        println("============")
-
-        return message
+        return timeTaken.average()
     }
 }
