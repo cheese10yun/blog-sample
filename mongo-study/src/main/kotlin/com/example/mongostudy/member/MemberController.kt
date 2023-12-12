@@ -1,14 +1,20 @@
 package com.example.mongostudy.member
 
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.web.PageableDefault
+import org.springframework.util.StopWatch
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -43,7 +49,8 @@ class MemberController(
         return memberRepository.findByName(name)
     }
 
-    @GetMapping("/test")
+
+    @GetMapping("/insert")
     fun findByName() {
         val map = (1..100_000).map {
             Member(
@@ -65,5 +72,68 @@ class MemberController(
         }
 
         memberRepository.insert(map)
+    }
+
+    @GetMapping("/update/bulk")
+    fun updateBulk(
+        @RequestParam count: Int,
+        @RequestParam name: String,
+    ): Long {
+
+        val members = memberRepository
+            .findAll(PageRequest.of(0, count))
+            .content
+            .filterNotNull()
+
+
+        val map = members.map {
+            Pair(
+                first = { Query(Criteria.where("_id").`is`(it.id!!)) },
+                second = { Update().set("name", name) }
+            )
+        }
+
+        val stopWatch = StopWatch()
+        stopWatch.start()
+        memberQueryService.updateBulkTest(map)
+        stopWatch.stop()
+
+        val message = stopWatch.totalTimeMillis
+        println("============")
+        println("size: ${members.size}, $message ms")
+        println("============")
+
+        return message
+
+    }
+
+
+    @GetMapping("/update")
+    fun update(
+        @RequestParam count: Int,
+        @RequestParam name: String,
+    ): Long {
+        val findAll = memberRepository.findAll(PageRequest.of(0, count))
+
+        val members = findAll.content
+            .filterNotNull()
+
+        members
+            .forEach {
+                it.name = name
+            }
+
+
+        val stopWatch = StopWatch()
+        stopWatch.start()
+        memberQueryService.update(members)
+        stopWatch.stop()
+
+        val message = stopWatch.totalTimeMillis
+        println("============")
+        println("size: ${members.size}, $message ms")
+        println("============")
+
+        return message
     }
 }

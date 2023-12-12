@@ -41,7 +41,7 @@ interface MemberCustomRepository {
         email: String?
     ): Slice<Member>
 
-    fun updateEmail(listOf: List<Pair<() -> Query, () -> Update>>)
+    fun updateBulkTest(listOf: List<Pair<() -> Query, () -> Update>>)
     fun bulkInsert(members: List<Member>)
 }
 
@@ -120,16 +120,9 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         )
     }
 
-    override fun updateEmail(listOf: List<Pair<() -> Query, () -> Update>>) {
+    override fun updateBulkTest(listOf: List<Pair<() -> Query, () -> Update>>) {
 
-        val query = Query(Criteria.where("_id").`is`(1))
-        val update = Update().set("email", "sample@asd.com")
 
-        mongoTemplate.updateFirst(
-            query,
-            update,
-            documentClass
-        )
 
 
         updateInBulk(listOf)

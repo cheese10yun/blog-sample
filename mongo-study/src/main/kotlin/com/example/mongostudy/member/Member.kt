@@ -18,7 +18,7 @@ class Member(
     val memberId: String,
 
     @Field(name = "name")
-    val name: String,
+    var name: String,
 
     @Field(name = "email")
     val email: String,

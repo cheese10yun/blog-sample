@@ -23,3 +23,18 @@ Content-Type: application/json
 
 ###
 
+
+GET {{host}}{{v1}}/members/update?
+    count=500&
+    name=aaaaaawwwdd
+Content-Type: application/json
+
+###
+
+
+GET {{host}}{{v1}}/members/update/bulk?
+    count=500&
+    name=akwkwkwkw
+Content-Type: application/json
+
+###

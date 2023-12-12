@@ -2,7 +2,6 @@ package com.example.mongostudy.member
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.stereotype.Service
@@ -31,16 +30,11 @@ class MemberQueryService(
         )
     }
 
-    fun updateTest() {
-        val listOf = listOf(
-            { Query(Criteria.where("_id").`is`(1)) } to { Update().set("rule_id", 24) },
-            { Query(Criteria.where("_id").`is`(4)) } to { Update().set("rule_id", 21) },
-            { Query(Criteria.where("_id").`is`(5)) } to { Update().set("rule_id", 21) },
-            { Query(Criteria.where("_id").`is`(2)) } to { Update().set("rule_id", 22) }
-        )
+    fun updateBulkTest(pairs: List<Pair<() -> Query, () -> Update>>) {
+        memberRepository.updateBulkTest(pairs)
+    }
 
-
-
-        memberRepository.updateEmail(listOf)
+    fun update(members: List<Member>) {
+        memberRepository.saveAll(members)
     }
 }

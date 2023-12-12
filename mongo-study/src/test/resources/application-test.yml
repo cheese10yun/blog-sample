@@ -9,8 +9,9 @@ spring:
 
 logging:
     level:
+        root: info
         org.springframework.data.mongodb.core.MongoTemplate: DEBUG
-#        com.example.mongostudy.mongo.MongoCustomRepositorySupport: DEBUG
+        com.example.mongostudy.mongo.MongoCustomRepositorySupport: DEBUG
 
 management:
     endpoint:
