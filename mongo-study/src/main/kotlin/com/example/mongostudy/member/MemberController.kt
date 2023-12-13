@@ -179,9 +179,9 @@ class MemberController(
 
             stopWatch.stop()
             val element = stopWatch.totalTimeMillis
-            println("============")
-            println("index:${index} updateFirst size: ${members.size}, $element ms")
-            println("============")
+//            println("============")
+//            println("index:${index} updateFirst size: ${members.size}, $element ms")
+//            println("============")
             timeTaken.add(element)
         }
 

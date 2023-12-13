@@ -1,3 +1,8 @@
+GET {{host}}{{v1}}/members/insert
+Content-Type: application/json
+
+###
+
 ###
 
 GET {{host}}{{v1}}/members?
@@ -25,8 +30,17 @@ Content-Type: application/json
 
 
 GET {{host}}{{v1}}/members/update?
-    count=500&
+    count=2000&
     name=aaaaaawwwdd
+Content-Type: application/json
+
+###
+
+
+
+GET {{host}}{{v1}}/members/update/updateFirst?
+    count=5000&
+    name=asdasdasdasdasd
 Content-Type: application/json
 
 ###
@@ -34,14 +48,6 @@ Content-Type: application/json
 
 GET {{host}}{{v1}}/members/update/bulk?
     count=10000&
-    name=asdasdasdasdasd
-Content-Type: application/json
-
-###
-
-
-GET {{host}}{{v1}}/members/update/updateFirst?
-    count=200&
     name=asdasdasdasdasd
 Content-Type: application/json
 
