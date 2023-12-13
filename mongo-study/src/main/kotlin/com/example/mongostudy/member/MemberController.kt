@@ -111,7 +111,9 @@ class MemberController(
             timeTaken.add(element)
         }
 
-        return timeTaken.average()
+        val average = timeTaken.average()
+        println("average $average")
+        return average
     }
 
 
@@ -147,7 +149,9 @@ class MemberController(
         }
 
 
-        return timeTaken.average()
+        val average = timeTaken.average()
+        println("average $average")
+        return average
     }
 
     @GetMapping("/update/updateFirst")
@@ -186,6 +190,8 @@ class MemberController(
         }
 
 
-        return timeTaken.average()
+        val average = timeTaken.average()
+        println("average $average")
+        return average
     }
 }
