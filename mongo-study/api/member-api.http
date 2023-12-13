@@ -17,3 +17,32 @@ Content-Type: application/json
 
 ###
 
+
+GET {{host}}{{v1}}/members/test
+Content-Type: application/json
+
+###
+
+
+GET {{host}}{{v1}}/members/update?
+    count=500&
+    name=aaaaaawwwdd
+Content-Type: application/json
+
+###
+
+
+GET {{host}}{{v1}}/members/update/bulk?
+    count=10000&
+    name=asdasdasdasdasd
+Content-Type: application/json
+
+###
+
+
+GET {{host}}{{v1}}/members/update/updateFirst?
+    count=200&
+    name=asdasdasdasdasd
+Content-Type: application/json
+
+###

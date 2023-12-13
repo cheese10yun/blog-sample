@@ -5,6 +5,7 @@ import com.example.mongostudy.mongo.eqIfNotNull
 import com.example.mongostudy.mongo.gtIfNotNull
 import com.example.mongostudy.mongo.gteIfNotNull
 import com.example.mongostudy.mongo.lteIfNotNull
+import com.mongodb.client.result.UpdateResult
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import org.bson.types.ObjectId
@@ -12,15 +13,17 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.mapping.div
+import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
-import org.springframework.data.mongodb.core.query.Criteria.where
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.querydsl.QuerydslPredicateExecutor
+import java.util.*
 
-interface MemberRepository : MongoRepository<Member, ObjectId>, MemberCustomRepository, QuerydslPredicateExecutor<Member>
+interface MemberRepository : MongoRepository<Member, ObjectId>, MemberCustomRepository,
+    QuerydslPredicateExecutor<Member>
 
 interface MemberCustomRepository {
     fun findByName(name: String): List<Member>
@@ -42,13 +45,16 @@ interface MemberCustomRepository {
         email: String?
     ): Slice<Member>
 
-    fun updateInBulk()
+    fun updateBulkTest(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode)
+    fun bulkInsert(members: List<Member>)
+    fun update(id: ObjectId): UpdateResult
 }
 
-class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRepository, MongoCustomRepositorySupport<Member>(
-    Member::class.java,
-    mongoTemplate
-) {
+class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRepository,
+    MongoCustomRepositorySupport<Member>(
+        Member::class.java,
+        mongoTemplate
+    ) {
     override fun findByName(name: String): List<Member> {
         val query = Query(Criteria().eqIfNotNull(Member::name, name))
         return mongoTemplate.find(query, documentClass)
@@ -120,13 +126,19 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         )
     }
 
-    override fun updateInBulk() {
-        val listOf = listOf(
-            { Query(where("_id").`is`(1)) } to { Update().set("rule_id", 24) },
-            { Query(where("_id").`is`(4)) } to { Update().set("rule_id", 21) },
-            { Query(where("_id").`is`(5)) } to { Update().set("rule_id", 21) },
-            { Query(where("_id").`is`(2)) } to { Update().set("rule_id", 22) }
+    override fun updateBulkTest(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode) {
+        updateInBulk(listOf, bulkMode)
+    }
+
+    override fun bulkInsert(members: List<Member>) {
+        insertMany(members)
+    }
+
+    override fun update(id: ObjectId): UpdateResult {
+        return mongoTemplate.updateFirst(
+            Query(Criteria.where("_id").`is`(id)),
+            Update().set("name", UUID.randomUUID().toString()),
+            documentClass
         )
-        updateInBulk(listOf)
     }
 }

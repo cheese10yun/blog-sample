@@ -37,6 +37,8 @@ interface PersonCustomRepository {
         lastName: String,
         pageable: Pageable
     ): Page<Person>
+
+    fun bulkInsert(persons: List<Person>)
 }
 
 class PersonCustomRepositoryImpl(
@@ -77,7 +79,7 @@ class PersonCustomRepositoryImpl(
         return updateMany(criteria, update)
     }
 
-    fun insertMultiplePersons(persons: List<Person>) {
+    override fun bulkInsert(persons: List<Person>) {
         insertMany(persons)
     }
 

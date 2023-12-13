@@ -2,6 +2,9 @@ package com.example.mongostudy.member
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.mongodb.core.BulkOperations
+import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.Update
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -26,5 +29,16 @@ class MemberQueryService(
             dateJoinedTo = dateJoinedTo,
             memberStatus = memberStatus
         )
+    }
+
+    fun updateBulkTest(pairs: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode) {
+        memberRepository.updateBulkTest(pairs, bulkMode)
+    }
+
+    fun update() {
+    }
+
+    fun update(members: List<Member>) {
+        memberRepository.saveAll(members)
     }
 }
