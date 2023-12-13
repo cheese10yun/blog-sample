@@ -141,4 +141,12 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
             documentClass
         )
     }
+
+    fun updateFirst(id: ObjectId): UpdateResult {
+        return mongoTemplate.updateFirst(
+            Query(Criteria.where("_id").`is`(id)),
+            Update().set("name", UUID.randomUUID().toString()),
+            Member::class.java
+        )
+    }
 }

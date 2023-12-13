@@ -1,10 +1,12 @@
 package com.example.mongostudy.mongo
 
 import com.example.mongostudy.logger
+import com.example.mongostudy.member.Member
 import com.mongodb.bulk.BulkWriteResult
 import com.mongodb.client.result.UpdateResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import org.bson.types.ObjectId
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -14,6 +16,7 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
+import java.util.*
 
 abstract class MongoCustomRepositorySupport<T>(
     protected val documentClass: Class<T>,
@@ -66,7 +69,15 @@ abstract class MongoCustomRepositorySupport<T>(
         bulkMode: BulkOperations.BulkMode
     ): BulkWriteResult {
         // BulkOperations 객체를 생성합니다.
-        val bulkOps = mongoTemplate.bulkOps(bulkMode, documentClass)
+        val bulkOps = mongoTemplate.bulkOps(bulkMode, Member::class.java)
+
+
+        bulkOps.updateOne(
+            Query(Criteria.where("_id").`is`(ObjectId("adasd"))),
+            Update().set("name", UUID.randomUUID().toString())
+
+        )
+
 
         // 제공된 리스트를 반복하면서 bulk 연산에 각 update를 추가합니다.
         operations.forEach { (queryCreator, updateCreator) ->
@@ -74,6 +85,20 @@ abstract class MongoCustomRepositorySupport<T>(
         }
 
         // 모든 업데이트를 실행합니다.
+        return bulkOps.execute()
+    }
+
+    fun updateInBulk(
+        ids: List<ObjectId>,
+        bulkMode: BulkOperations.BulkMode = BulkOperations.BulkMode.UNORDERED
+    ): BulkWriteResult {
+        val bulkOps = mongoTemplate.bulkOps(bulkMode, Member::class.java)
+        for (id in ids) {
+            bulkOps.updateOne(
+                Query(Criteria.where("_id").`is`(id)),
+                Update().set("name", UUID.randomUUID().toString())
+            )
+        }
         return bulkOps.execute()
     }
 
