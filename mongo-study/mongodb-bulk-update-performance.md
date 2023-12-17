@@ -150,3 +150,58 @@ fun updateBulk(
 - 대량의 데이터 처리에는 `bulkOps` 메서드 사용이 효율적입니다. `bulkOps(UNORDERED)`와 `bulkOps(ORDERED)` 각각의 장단점이 존재하므로, 이 두 방식 중에서는 특정 환경과 요구사항에 맞게 적절한 옵션을 선택하는 것이 중요합니다.
 
 이러한 결과는 MongoDB 데이터 업데이트 전략을 선택할 때 중요한 고려 사항을 제공합니다. 데이터의 양, 업데이트의 복잡성, 순서의 중요성 등을 고려하여 적절한 방법을 선택할 필요가 있습니다.
+
+## bulkOps 편의 기능 제공
+
+이전 포스팅인 [Spring Data MongoDB Repository 확장](https://cheese10yun.github.io/spring-data-mongo-repository/)에서는 `MongoCustomRepositorySupport`를 사용해 `MongoRepository`에 편의 기능을 추가하고, 보일러플레이트 코드를 줄이는 방법을 소개했습니다. 이 방법은 코드의 재사용성을 높이는 효과가 있습니다. 마찬가지로, `bulkOps`와 같은 반복적인 코드도 `MongoCustomRepositorySupport`에 통합함으로써 더 편리하게 기능을 제공할 수 있습니다. 이렇게 하면 `bulkOps` 관련 코드를 중앙화하여 관리 및 사용의 용이성을 향상시킬 수 있습니다.
+
+### MongoCustomRepositorySupport을 통한 bulkOps 기능 제공
+
+```kotlin
+
+abstract class MongoCustomRepositorySupport<T>(
+    protected val documentClass: Class<T>,
+    protected val mongoTemplate: MongoTemplate
+) {
+
+    protected fun bulkUpdate(
+        operations: List<Pair<() -> Query, () -> Update>>, // Query와 Update 생성자를 위한 람다 리스트
+        bulkMode: BulkOperations.BulkMode
+    ): BulkWriteResult {
+        // BulkOperations 객체를 생성합니다.
+        val bulkOps = mongoTemplate.bulkOps(bulkMode, documentClass)
+
+        // 제공된 리스트를 반복하면서 bulk 연산에 각 update를 추가합니다.
+        operations.forEach { (queryCreator, updateCreator) ->
+            bulkOps.updateOne(queryCreator.invoke(), updateCreator.invoke())
+        }
+
+        // 모든 업데이트를 실행합니다.
+        return bulkOps.execute()
+    }
+}
+
+class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRepository,
+    MongoCustomRepositorySupport<Member>(
+        Member::class.java,
+        mongoTemplate
+    ) {
+
+
+    override fun updateName(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode) {
+        bulkUpdate(listOf, bulkMode)
+    }
+}
+
+fun `updateNmae 사용하는 곳`(pairs: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode) {
+    val pair = listOf(
+        Pair(
+            first = { Query(Criteria.where("_id").`is`(ObjectId("id"))) },
+            second = { Update().set("name", UUID.randomUUID().toString()) }
+        )
+    )
+    memberRepository.updateName(pair, BulkOperations.BulkMode.UNORDERED)
+}
+```
+
+코드는 외부에서 정의된 쿼리와 업데이트 로직을 사용하여 데이터 업데이트를 수행합니다. 코드는 `Pair` 리스트를 통해 각 업데이트 작업에 필요한 `Query`와 `Update` 객체를 정의하고, 이를 `memberRepository`의 `updateName` 메서드에 전달하여 `BulkOperations.BulkMode.UNORDERED` 모드로 업데이트를 진행합니다. 이 방식은 업데이트 과정을 유연하게 처리할 수 있게 해줍니다.

@@ -45,7 +45,7 @@ interface MemberCustomRepository {
         email: String?
     ): Slice<Member>
 
-    fun updateBulkTest(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode)
+    fun updateName(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode)
     fun bulkInsert(members: List<Member>)
     fun update(id: ObjectId): UpdateResult
 }
@@ -126,8 +126,8 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         )
     }
 
-    override fun updateBulkTest(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode) {
-        updateInBulk(listOf, bulkMode)
+    override fun updateName(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode) {
+        bulkUpdate(listOf, bulkMode)
     }
 
     override fun bulkInsert(members: List<Member>) {
