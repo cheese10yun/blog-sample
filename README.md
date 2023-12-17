@@ -7,6 +7,7 @@
 
 ## 2023
 
+* 12-17 [MongoDB Update 성능 측정 및 분석](https://cheese10yun.github.io/spring-data-mongodb-update-performance/)
 * 11-12 [MongoDB 다양한 테스트 케이스를 커버할 수 있는 테스트 데이터 셋업 방법](https://cheese10yun.github.io/spring-data-mongo-test-setup/)
 * 11-04 [Spring Data MongoDB Repository 확장](https://cheese10yun.github.io/spring-data-mongo-repository/)
 * 09-05 [JPA 페이징 Performance 향상 방법](https://cheese10yun.github.io/page-performance/)
