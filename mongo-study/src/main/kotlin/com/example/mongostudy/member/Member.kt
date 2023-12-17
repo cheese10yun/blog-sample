@@ -42,9 +42,7 @@ class Member(
     val pointsAccumulated: BigDecimal,
 
     @Field(name = "last_purchase_date")
-    val lastPurchaseDate: LocalDateTime,
-
-
+    val lastPurchaseDate: LocalDateTime
 ) : Auditable()
 
 enum class MemberStatus {
