@@ -116,7 +116,7 @@ fun updateBulk(
 
 ## 성능 측정 결과
 
-![](images/performance-update.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/5fc6127a0800ca9bce5de5a6c73931b2025b0791/mongo-study/images/performance-update.png)
 
 | rows   | saveAll    | updateFirst | bulkOps(UNORDERED) | bulkOps(ORDERED) |
 |--------|------------|-------------|--------------------|------------------|
