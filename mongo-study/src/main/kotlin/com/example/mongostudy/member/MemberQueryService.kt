@@ -41,7 +41,7 @@ class MemberQueryService(
                 second = { Update().set("name", UUID.randomUUID().toString()) }
             )
         )
-        memberRepository.updateNmae(pair, BulkOperations.BulkMode.UNORDERED)
+//        memberRepository.updateNmae(pair, BulkOperations.BulkMode.UNORDERED)
     }
 
     fun update() {
