@@ -7,6 +7,7 @@
 
 ## 2023
 
+* 12-23 [IntelliJ cannot resolve symbol 에러 해결](https://cheese10yun.github.io/intellij-cannot-resolve-symbol/)
 * 12-17 [MongoDB Update 성능 측정 및 분석](https://cheese10yun.github.io/spring-data-mongodb-update-performance/)
 * 11-12 [MongoDB 다양한 테스트 케이스를 커버할 수 있는 테스트 데이터 셋업 방법](https://cheese10yun.github.io/spring-data-mongo-test-setup/)
 * 11-04 [Spring Data MongoDB Repository 확장](https://cheese10yun.github.io/spring-data-mongo-repository/)
