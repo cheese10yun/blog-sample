@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageRequest
 import org.springframework.transaction.annotation.Transactional
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 import com.example.querydsl.domain.QTeam.team as qTeam
 
 @Transactional

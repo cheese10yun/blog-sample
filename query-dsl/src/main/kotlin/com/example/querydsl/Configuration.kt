@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestTemplate
 import java.time.Duration
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 
 @Configuration
 class Configuration {

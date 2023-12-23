@@ -3,7 +3,7 @@ package com.example.querydsl.domain
 import com.example.querydsl.SpringBootTestSupport
 import org.junit.jupiter.api.Test
 import org.springframework.transaction.annotation.Transactional
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 
 @Transactional
 internal class EntityATest(

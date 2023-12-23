@@ -9,7 +9,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.repository.support.PageableExecutionUtils
+import org.springframework.data.support.PageableExecutionUtils
 
 interface MemberRepository : JpaRepository<Member, Long>, MemberRepositoryCustom
 

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.data.domain.PageRequest
 import org.springframework.transaction.annotation.Transactional
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 
 @Transactional
 internal class MemberRepositoryTest(

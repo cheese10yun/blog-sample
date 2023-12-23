@@ -6,7 +6,7 @@ import com.example.querydsl.dto.QMemberGroupConcat
 import com.querydsl.core.types.dsl.Expressions
 import org.junit.jupiter.api.Test
 import org.springframework.transaction.annotation.Transactional
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 import com.example.querydsl.domain.QMember.member as qMember
 
 @Transactional

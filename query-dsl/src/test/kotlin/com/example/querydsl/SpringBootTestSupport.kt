@@ -11,9 +11,9 @@ import org.springframework.test.context.TestConstructor
 //import org.testcontainers.junit.jupiter.Container
 //import org.testcontainers.junit.jupiter.Testcontainers
 //import java.io.File
-import javax.persistence.EntityManager
-import javax.persistence.EntityManagerFactory
-import javax.persistence.EntityTransaction
+import jakarta.persistence.EntityManager
+import jakarta.persistence.EntityManagerFactory
+import jakarta.persistence.EntityTransaction
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)

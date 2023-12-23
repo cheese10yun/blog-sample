@@ -7,10 +7,10 @@ pluginManagement {
     }
 
     val pluginVersions = mapOf(
-        "org.jetbrains.kotlin" to "1.6.21",
-        "org.jetbrains.kotlin.plugin" to "1.6.21",
-        "org.springframework" to "2.7.4",
-        "io.spring" to "1.0.14.RELEASE"
+        "org.jetbrains.kotlin" to "1.9.21",
+        "org.jetbrains.kotlin.plugin" to "1.9.21",
+        "org.springframework" to "3.2.1",
+        "io.spring" to "1.1.4"
     )
 
     resolutionStrategy {

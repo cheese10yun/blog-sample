@@ -1,7 +1,7 @@
 package com.example.querydsl.domain
 
 import org.springframework.data.jpa.repository.JpaRepository
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "entity_a")

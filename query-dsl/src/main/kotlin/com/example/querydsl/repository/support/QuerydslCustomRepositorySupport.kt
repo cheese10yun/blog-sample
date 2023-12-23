@@ -14,8 +14,8 @@ import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import java.util.function.Function
-import javax.persistence.EntityManager
-import javax.persistence.PersistenceContext
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 
 abstract class QuerydslCustomRepositorySupport(domainClass: Class<*>) : QuerydslRepositorySupport(domainClass) {
 

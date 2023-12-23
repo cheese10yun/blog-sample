@@ -6,6 +6,7 @@ import com.querydsl.core.types.Expression
 import com.querydsl.core.types.dsl.PathBuilder
 import com.querydsl.jpa.impl.JPAQuery
 import com.querydsl.jpa.impl.JPAQueryFactory
+import jakarta.persistence.EntityManager
 import kotlin.properties.Delegates.notNull
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -21,7 +22,7 @@ import org.springframework.data.querydsl.SimpleEntityPathResolver
 import org.springframework.data.support.PageableExecutionUtils
 import org.springframework.stereotype.Repository
 import java.util.function.Function
-import javax.persistence.EntityManager
+//import jakarta.persistence.EntityManager
 
 @Repository
 abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {

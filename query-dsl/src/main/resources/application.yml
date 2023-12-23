@@ -2,7 +2,7 @@ spring:
     main.allow-bean-definition-overriding: true
     jpa:
         database: mysql
-        database-platform: com.example.querydsl.config.MysqlCustomDialect
+#        database-platform: com.example.querydsl.config.MysqlCustomDialect
         generate-ddl: true
         hibernate:
             ddl-auto: create

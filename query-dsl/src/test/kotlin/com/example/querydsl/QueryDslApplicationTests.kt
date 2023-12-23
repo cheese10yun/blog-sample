@@ -7,7 +7,7 @@
 //import org.junit.jupiter.api.Test
 //import org.springframework.transaction.annotation.Transactional
 //import org.testcontainers.junit.jupiter.Testcontainers
-//import javax.persistence.EntityManager
+//import jakarta.persistence.EntityManager
 //
 //@Transactional
 //@Testcontainers

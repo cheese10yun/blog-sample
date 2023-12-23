@@ -6,7 +6,7 @@ import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import org.springframework.transaction.annotation.Transactional
 import java.util.function.Consumer
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 import com.example.querydsl.domain.QMember.member as qMember
 import com.example.querydsl.domain.QTeam.team as qTeam
 
