@@ -18,14 +18,14 @@ class MemberKtorClientTest {
     }
 
 
-//    @Test
-//    fun `getOrNull 통신 실패시 null 응답,`() {
-//        val member: Member? = memberClient
-//                .getMember(1L)
-//                .getOrNull { it }
-//
-//        // member null 여부에 따른 후속 조치 작업 진행
-//    }
+    @Test
+    fun `getOrNull 통신 실패시 null 응답,`() {
+        val member: Member? = memberClient
+                .getMember(1L)
+                .getOrNull()
+
+        // member null 여부에 따른 후속 조치 작업 진행
+    }
 
     @Test
     fun `onFailure + onSuccess`() {
