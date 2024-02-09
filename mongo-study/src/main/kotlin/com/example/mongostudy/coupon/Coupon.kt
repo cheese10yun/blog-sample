@@ -54,7 +54,7 @@ interface CouponRepository : MongoRepository<Coupon, ObjectId>, CouponCustomRepo
 
 interface CouponCustomRepository
 
-class CouponCustomRepositoryIml(mongoTemplate: MongoTemplate) : CouponCustomRepository, MongoCustomRepositorySupport<Coupon>(
-    Coupon::class.java,
-    mongoTemplate
-)
+//class CouponCustomRepositoryIml(mongoTemplate: MongoTemplate) : CouponCustomRepository, MongoCustomRepositorySupport<Coupon>(
+//    Coupon::class.java,
+//    mongoTemplate
+//)

@@ -39,6 +39,8 @@ interface PersonCustomRepository {
     ): Page<Person>
 
     fun bulkInsert(persons: List<Person>)
+    fun updateById(personId: ObjectId, newAddress: String)
+    fun updatePersonsAddress(lastName: String, newAddress: String): Long
 }
 
 class PersonCustomRepositoryImpl(
@@ -66,13 +68,13 @@ class PersonCustomRepositoryImpl(
         )
     }
 
-    fun updateById(personId: ObjectId, newAddress: String) {
+    override fun updateById(personId: ObjectId, newAddress: String) {
         val criteria = Criteria.where("id").`is`(personId)
         val update = Update().set("address", newAddress)
         val partialUpdate = updateOne(criteria, update)
     }
 
-    fun updatePersonsAddress(lastName: String, newAddress: String): Long {
+    override fun updatePersonsAddress(lastName: String, newAddress: String): Long {
         val criteria = Criteria.where("lastName").`is`(lastName)
         val update = Update().set("address", newAddress)
 

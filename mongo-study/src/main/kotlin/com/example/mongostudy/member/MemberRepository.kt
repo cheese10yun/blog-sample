@@ -48,6 +48,8 @@ interface MemberCustomRepository {
     fun updateName(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode)
     fun bulkInsert(members: List<Member>)
     fun update(id: ObjectId): UpdateResult
+    fun findBy(addressDetail: String): List<Member>
+    fun updateFirst(id: ObjectId): UpdateResult
 }
 
 class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRepository,
@@ -55,12 +57,13 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         Member::class.java,
         mongoTemplate
     ) {
+
     override fun findByName(name: String): List<Member> {
         val query = Query(Criteria().eqIfNotNull(Member::name, name))
         return mongoTemplate.find(query, documentClass)
     }
 
-    fun findBy(addressDetail: String): List<Member> {
+    override fun findBy(addressDetail: String): List<Member> {
         val query = Query(Criteria().eqIfNotNull(Member::address / Address::addressDetail, 123))
         return mongoTemplate.find(query, documentClass)
     }
@@ -127,7 +130,7 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
     }
 
     override fun updateName(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode) {
-        bulkUpdate(listOf, bulkMode)
+//        bulkUpdate(listOf, bulkMode)
     }
 
     override fun bulkInsert(members: List<Member>) {
@@ -142,7 +145,7 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         )
     }
 
-    fun updateFirst(id: ObjectId): UpdateResult {
+    override fun updateFirst(id: ObjectId): UpdateResult {
         return mongoTemplate.updateFirst(
             Query(Criteria.where("_id").`is`(id)),
             Update().set("name", UUID.randomUUID().toString()),
