@@ -1,17 +1,14 @@
 package com.example.mongostudy
 
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.testcontainers.shaded.org.apache.commons.lang3.builder.Diff
 
-
-class DiffInfoTest(
+class DiffManagerTest(
     private val diffInfoRepository: DiffInfoRepository
 ) : MongoStudyApplicationTests() {
 
 
     @Test
-    fun name() {
+    fun `calculateDifferences test`() {
         val diffInfo = diffInfoRepository.save(
             DiffInfo(
                 key = "1",
@@ -26,17 +23,8 @@ class DiffInfoTest(
             email = "name_2"
 
         )
-
-
         val originItems = listOf(diffInfo)
-
-
-        val newItems = listOf(
-
-            copy
-        )
-
-
+        val newItems = listOf(copy)
         val calculateDifferences = DiffManager().calculateDifferences(
             originItems = originItems,
             newItems = newItems,
@@ -44,12 +32,7 @@ class DiffInfoTest(
             groupByKey = DiffInfo::key
         )
 
-
         diffInfo.diff = calculateDifferences[diffInfo.key]!!
-
         diffInfoRepository.save(diffInfo)
-
-        println("")
-
     }
 }
