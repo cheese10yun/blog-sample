@@ -17,43 +17,37 @@ class DiffManager {
         associateByKey: (T) -> K,
         groupByKey: (T) -> S
     ): Map<S, Map<String, DiffValue<String, String>>> {
-        val diffMapper = jacksonObjectMapper()
-
-        diffMapper.registerModules(
-            SimpleModule().apply {
-                addSerializer(ObjectId::class.java, ObjectIdSerializer())
-            }
-        )
-
-
+        val diffMapper = jacksonObjectMapper().apply {
+            registerModules(SimpleModule().apply { addSerializer(ObjectId::class.java, ObjectIdSerializer()) })
+        }
         val originalAssociate = originItems.associateBy(associateByKey)
         val newAssociate = newItems.associateBy(associateByKey)
-
         val changes = newAssociate.flatMap { (id, newItem) ->
             val originalItem = originalAssociate[id]
+            when {
+                originalItem != null -> {
+                    val originalNode = diffMapper.valueToTree<JsonNode>(originalItem)
+                    val newNode = diffMapper.valueToTree<JsonNode>(newItem)
+                    val diffNode = JsonDiff.asJson(originalNode, newNode)
 
-            if (originalItem != null) {
-                val originalNode = diffMapper.valueToTree<JsonNode>(originalItem)
-                val newNode = diffMapper.valueToTree<JsonNode>(newItem)
-                val diffNode = JsonDiff.asJson(originalNode, newNode)
+                    when {
+                        diffNode.size() > 0 -> {
+                            diffNode.mapNotNull { node ->
+                                val path = node.get("path").asText().removePrefix("/")
+                                val originValue = originalNode.at("/$path").asText()
+                                val newValue = newNode.at("/$path").asText()
 
-                if (diffNode.size() > 0) {
-                    diffNode.mapNotNull { node ->
-                        val path = node.get("path").asText().removePrefix("/")
-                        val originValue = originalNode.at("/$path").asText()
-                        val newValue = newNode.at("/$path").asText()
-
-                        Triple(
-                            first = groupByKey(newItem),
-                            second = path.replace("/", "."),
-                            third = DiffValue(origin = originValue, new = newValue)
-                        )
+                                Triple(
+                                    first = groupByKey(newItem),
+                                    second = path.replace("/", "."),
+                                    third = DiffValue(origin = originValue, new = newValue)
+                                )
+                            }
+                        }
+                        else -> emptyList()
                     }
-                } else {
-                    emptyList()
                 }
-            } else {
-                emptyList()
+                else -> emptyList()
             }
         }
 
@@ -64,15 +58,9 @@ class DiffManager {
     }
 }
 
-//class ObjectIdSerializer: JsonSerializer<ObjectId>(){
-//    override fun serialize(value: ObjectId, gen: JsonGenerator, serializers: SerializerProvider) {
-//        gen.writeString(value.toString())
-//    }
-//
-//}
-
 class ObjectIdSerializer : JsonSerializer<ObjectId>() {
     override fun serialize(value: ObjectId, gen: JsonGenerator, serializers: SerializerProvider) {
         gen.writeString(value.toString())
     }
 }
+
