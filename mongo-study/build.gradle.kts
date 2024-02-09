@@ -48,8 +48,9 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
 //    testImplementation("org.testcontainers:mongodb")
 
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.8.0")
-    testImplementation("io.kotest:kotest-assertions-core:5.8.0")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.4.2")
+    testImplementation("io.kotest:kotest-assertions-core:5.4.2")
+    testImplementation("io.kotest:kotest-framework-engine:5.4.2")
 }
 
 dependencyManagement {
