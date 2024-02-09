@@ -28,6 +28,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
+    implementation("com.flipkart.zjsonpatch:zjsonpatch:0.4.11")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
@@ -46,6 +47,9 @@ dependencies {
 //    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
     testImplementation("org.testcontainers:junit-jupiter")
 //    testImplementation("org.testcontainers:mongodb")
+
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.8.0")
+    testImplementation("io.kotest:kotest-assertions-core:5.8.0")
 }
 
 dependencyManagement {
