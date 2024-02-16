@@ -1,6 +1,6 @@
 # [코틀린 고급편](https://www.inflearn.com/course/%EC%BD%94%ED%8B%80%EB%A6%B0-%EA%B3%A0%EA%B8%89%ED%8E%B8)
 
-# 제네릭
+# 섹션 1 제네릭
 
 ## 1강 제네릭과 타입 파리미터
 
@@ -197,7 +197,6 @@ fun moveForm(otherCage: Cage2<out T>) {
 
 ![](images/013.png)
 
-
 ```kotlin
 fun moveForm(otherCage: Cage2<in T>) {
     otherCage.animals.addAll(this.animals)
@@ -208,9 +207,189 @@ fun moveForm(otherCage: Cage2<in T>) {
 
 ### 함수에 대해 공변, 반공변 정리
 
-* out: (함수파라미터 입장에서) 생상자, 공변
+* out: (함수 파라미터 입장에서) 생상자, 공변
 * in: (함수 파라미터 입장에서) 소비자, 반공변
 
 ![](images/014.png)
 
 ![](images/015.png)
+
+
+![](images/016.png)
+
+* 코틀린의 List는 불변 컬렉션이라 데이터를 꺼낼 수만 있다.
+* 그러나 contains(), containsAll()은 타입파라미터 E를 받아야 한다.
+* 이런 경우 @UnsafeVariance를 사용한다.
+* **원래는 out 선언지점변성을 활용해 E를 함수 파라미터에 쓸 수 없지만, @UnsafeVariance를 이용해 함수 파라미터에 사용할 수 있다.**
+
+## 5강 제네릭 제약과 제네릭 함수
+
+![](images/017.png)
+
+* 우리는 Cage 클래스에 Animal만 사용하고 싶다.
+* 타입 파라미터에는 Int나 String도 들어올 수 있다.
+* 타입 파라미터 T에 Animal과 Animal의 하위 타입만 들어오게 하고 싶은 경우 타입 파라미터에 제약 조건을 줄 수 있다. 이를 제네릭 제약 이라고 한다.
+
+
+
+```kotlin
+class Cage5<T: Animal> {}
+```
+
+위 처럼 구현할 수 있다.
+
+![](images/018.png)
+
+
+```kotlin
+class Cage5<T>(
+    private val animals: MutableList<T> = mutableListOf()
+) where  T : Animal, T : Comparable<T> {
+
+    fun getFirst(): T {
+        return animals.first()
+    }
+
+    fun put(animal: T) {
+        this.animals.add(animal)
+    }
+}
+```
+
+![](images/019.png)
+
+* <T : Any>를 통해서 non-null 타입 한정에 사용 가능
+
+
+## 6강. 타입 소거와 Star Projection
+
+![](images/020.png)
+
+![](images/021.png)
+
+* 제네릭은 JDK 초기 버전 부터 있던 개념이 아니다. 그러기 떄문에 이전 버전과 호환성을 지켜야 한다.
+* **List<String>도 런타임 때는 타입 정보 String을 제거 하는 방향으로 호환성을 지켰다.**
+* 이로 인해 Java에서는 raw type을 만들 수 있다. List list = List.of(1, 2, 3); (권장되는 방식은 아님)
+* **코틀린은 언어 초기부터 제네릭이 고려되었기 떄문에 raw type을 만들 수 없다.**
+* 하지만 코틀린 JVM 위에서 동작하기 때문에 **런타임 떄는 타입 정보가 사라진다. 이를 타입 소거라 부른다.**
+
+![](images/022.png)
+
+* 런타임 환경에서는 List인지는 확인이 가능해도 String인지 확인할 수 없다.
+
+![](images/023.png)
+
+* star projection, 해당 타입 파라미터에 어떤 타입이 들어 있을지 모른다는 의미
+* 타입 정보만 모를뿐, List의 기능을 사용할 수는 있다.
+
+![](images/024.png)
+
+* data가 List 타입 이니 데이터를 가져올 수 는 있지만 정확히 어떤 타입인지는 모르기 떄문에 Any로 받아야 한다.
+
+![](images/025.png)
+
+* MutableList 안에 어떤 타입이 들어 있을지 모르니 데이터를 넣을 수는 없다.
+
+```kotlin
+fun main() {
+    val num = 3
+    num.toSuperString()
+    // 정상 동작
+    println("${num::class.java}: $num")
+
+    val str = "ABC"
+    str.toSuperString()
+    // 정상 동작
+    println("${str::class.java}: $str")
+}
+
+private fun <T> T.toSuperString() {
+    // 오류 발생 Cannot use 'T' as reified type parameter. Use a class inst
+    println("${T::class.java}: $this")
+}
+```
+
+* 클래스 이름: Value를 출력하는 toSuperString 메소드가 있다.
+* **하지만 위 코드는 컴파일을 할 수 없다. 제네릭 함수에서 타입 파라미터 T에 대해서 클래스 정보를 가져오려고 하는 순간 이 타입 파라미터 정보는 런타임 때 소거 되기 떄문에 정보를 가져올 수 없어서 에러가 발생하게 됩니다.**
+* 반면 클래스 제네릭 타입이 아닌 경우는 타입을 가져올 수 있기 때문에 정상 동작한다.
+* 하지만 우리는 T의 정보를 가져오고 싶은 경우가 있다. 이럴 떄 inline를 + reified 사용한다.
+
+```kotlin
+inline fun <reified T> T.toSuperString() {
+    println("${T::class.java}: $this")
+}
+```
+
+* inline + reified를 시용하면 런타임 시점에도 타입 파라미터 T의 정보가 소실하지 않게 된다.
+* **inline 함수는 코드의 본문을 호출 지점으로 이동시켜 컴파일 되는 함수를 의미한다.**
+* **T 자체를 본문에 옮겨 쓰게 되기 때문에 이 자체가 제네릭의 타입 파라미터로 간주되지 않는다.**
+* reified 키워드도 함계가 있다. reified 키워드가 붙은 T를 이용해 T의 인스턴스를 만들거나 T의 companion object를 가져올 수 없다. 
+
+## 7강. 제네릭 용어 정리 및 간단한 팁
+
+
+
+### 변셩
+
+![](images/026.png)
+
+* 변성이란 어떤 클래스에 계층관계가 있다고 하고 이런 계층 관계가 있는 클래스가 제네릭 클래스의 타입 파라미터로 들어왔을 때 제니릭 클래스의 타입 파라미터에 따라 제네릭 클래스의 상속관계가 어떻게 되는지를 나타내는 용어
+
+
+### 무공변 (in-variant)
+
+![](images/027.png)
+
+* 타입 파라미터끼리 상속관계가 있더라도 제네릭 클래스로 넘어오면 상속관계가 없다는 의미
+* 제네릭 클래스가 무공변한 이유는 자바의 배열은 기본적으로 본경하기 때문에 타입이 안전하지 않는 문제가 많이 생길 수 있다. 그래서 이 문제를 해결 하기 위해서 제네릭 클래스는 아예 원천적으로 차단하기 위해서 무공변하게 설계 되었다.
+
+### 공변 (co-variant)
+
+![](images/028.png)
+
+* co에서도 알 수 있듯이 협력적인 의미가 있다.
+* 타입 파라미터의 상속관계가 제네릭 클래스에도 동일하게 유지된다는 의미이다.
+* 예를 들어 물고기는 금붕어의 상위 타입이니까 물고기 케이지는 그붕어 케이지의 상위 타입으로 간주된다.
+* 기본적으로 제네릭은 무공변하지만 코틀린에서는 out 변셩 키워드를 사용하면 제네릭 클래스의 특정 지점 혹은 전체 지점에서 공변하게 만들 수 있다.
+
+
+### 반공변 (contra-variant)
+
+![](images/029.png)
+
+* 반공변은 공변과 반대로 생각하면 된다.
+* 타입 파라미터의 상속 관계가 제네릭 클래스에서 반대로 유지된다는 의미이다.
+* 코틀린에서는 in 변셩 키워드를 사용해서 제네릭 클래스의 특정 지점 혹은 전체 지점에서 반공변하게 만들 수 있다.
+
+### 선언 지점 변성
+
+![](images/030.png)
+
+* 선언 지점 변성은 클래스 자체를 선언할 떄 이 클래스 전체를 공변하게 하거나 반공변하게 하는 것을 의미한다.
+* 클래스 자차게 공변하거나 반공변하려면 그에 따라 데이터를 생상만 하거나 소비만 해야 한다.
+
+### 사용 지점 변성
+
+![](images/031.png)
+
+* 사용지점 변셩이란 특정 함수 또는 특정 변수에 대해 공변, 반공변을 만드는 방법이다.
+* out, in 키워드를 사용해서 특정 지점에서만 공변하거나 반공변하게 만들 수 있다.
+
+
+### 제네릭 제약
+
+![](images/032.png)
+
+* 제네릭 제약은 타입 파라미터에 대한 제약을 주는 것을 의미한다.
+
+
+### 타입 소거
+
+![](images/033.png)
+
+![](images/034.png)
+
+# 세션 2 지연과 위임
+
+## lateinit과 lazy
+
