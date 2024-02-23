@@ -943,3 +943,50 @@ iterate(listOf(1, 2, 3, 4, 5)) { num ->
 * iterate와 exec이 함께 main 안으로 들어가기 때문에 non-local return이 가능하다.
 * **단, 이 return은 main 함수를 return 하게된다.** (가장 가까운 fun 키워드를 종료하기 때문에)
 * 이것을 방지 하기 위해서는 crossinline 키워드를 사용한다.
+
+## 16강. SAM과 reference
+
+### SAM
+
+```java
+@FunctionalInterface
+public interface Runnable {
+    public abstract void run();
+}
+```
+
+* Sing Abstract Method의 약자로 인터페이스에 단 하나의 추상 메소드만 있는 경우를 의미 
+* 대표적으로 자바의 Runnable, Callable, Comparator 등이 있다. 이것을 SAM 인터페이스라고 말한다.
+
+```kotlin
+fun main(exec: () -> Unit) {
+    val filter: StringFilter =  { s -> s.startsWith("A") } // 컴파일 오류
+    val filter: StringFilter = StringFilter  { s -> s.startsWith("A") } // StringFilter 명시하면 가능
+}
+```
+
+
+![](images/047.png)
+
+* **자바에서는 SAM 인터페이스를 람다(자바의 람다)로 인스턴스화 할 수 있다.**
+* **코틀린에서는 SAM 인터페이스를 람다(코틀린의 람다)로 인스턴스화 할 수 없다.**
+* 코틀린에서 `StringFilter  { s -> s.startsWith("A") }` 코드 전체를 SAM 생성자라고 한다.
+* **코틀린에서는 자바와 다르게 인스턴스화하고 싶은 인터페이스 이름과 람다식을 함께 작성 해야한다.**
+
+
+```kotlin
+fun main() {
+    consumeFilter({ s -> s.startsWith("A") })
+}
+
+fun consumeFilter(filter: StringFilter) {}
+```
+
+![](images/048.png)
+
+* 만약 변수에 넣을게 아니라, 파라미터에 넣을거라면 바로 람다식을 사용할 수 있다.
+* 암시적인 SAM 인스턴스화가 이루어질 경우에는 의도하지 않은 SAM 인스턴스화가 발생할 수 있다.
+* 함수 이름까지 똑같은 두개의 타겟 함수가 있으면 consumeFilter라고만 암시적으로 람다식만 작성하면 이 둘 중 조금더 구체적인 StrinfFilter가 호출된다.
+* 이런 현상을 막으려면 SAM 생성자를 직접적으로 작성하면된다.
+* 코틀린에서 SAM 인터페이스를 만들려면 추상 메소드가 1개인 인터페이스 앞에 fun을 붙이면된다.
+* 물론 코틀린에서는 함수를 1급 시민으로 간주해서 옮길 수 있기 때문에 굳이 SAM 인터페이스를 만들 필요가 없다. 
