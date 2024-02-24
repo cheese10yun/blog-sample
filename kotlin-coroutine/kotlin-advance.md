@@ -989,4 +989,148 @@ fun consumeFilter(filter: StringFilter) {}
 * 함수 이름까지 똑같은 두개의 타겟 함수가 있으면 consumeFilter라고만 암시적으로 람다식만 작성하면 이 둘 중 조금더 구체적인 StrinfFilter가 호출된다.
 * 이런 현상을 막으려면 SAM 생성자를 직접적으로 작성하면된다.
 * 코틀린에서 SAM 인터페이스를 만들려면 추상 메소드가 1개인 인터페이스 앞에 fun을 붙이면된다.
-* 물론 코틀린에서는 함수를 1급 시민으로 간주해서 옮길 수 있기 때문에 굳이 SAM 인터페이스를 만들 필요가 없다. 
+* 물론 코틀린에서는 함수를 1급 시민으로 간주해서 옮길 수 있기 때문에 굳이 SAM 인터페이스를 만들 필요가 없다.
+
+# 세션 5 어노테이션과 리플렉션
+
+## 20강. 코틀린의 어노테이션
+
+### 어노테이션 이란
+
+* 어노테이션은 붙여 개발자에게 의견을 알리거나, 특별한 일이 일어나도록 만들 수 있다.
+* 특별한 일은 리플렉션과 어노테이션이 합쳐졌을 때 일어날 수 있다.
+
+### 어노테이션을 만드는 방법
+
+```kotlin
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS)
+annotation class Shape
+```
+
+* @Retention: 어노테이션이 저장되고 유지되는 방식을 제어한다.
+  * SOURCE: 컴파일러가 코드를 컴파일할 때만 어노테이션 정보를 유지한다.
+  * BINARY: 컴파일러가 클래스 파일을 생성할 때까지 어노테이션 정보를 유지한다.
+  * RUNTIME(기본 값): 클래스 파일이 JVM에 로딩될 때까지 어노테이션 정보를 유지한다.
+* @Target: 어노테이션을 어디에 붙일지 선택할 수 있다.
+  * CLASS: 클래스, 인터페이스, 객체, 어노테이션 클래스
+  * ANNOTATION_CLASS: 어노테이션 클래스
+  * TYPE_PARAMETER: 제네릭 타입 파라미터
+  * PROPERTY: 프로퍼티
+  * FIELD: 필드
+  * LOCAL_VARIABLE: 지역 변수
+  * VALUE_PARAMETER: 파라미터
+  * CONSTRUCTOR: 생성자
+  * FUNCTION: 함수
+  * PROPERTY_GETTER: 프로퍼티 getter
+  * PROPERTY_SETTER: 프로퍼티 setter
+  * TYPE: 타입 사용
+  * EXPRESSION: 표현식
+  * FILE: 파일
+  * TYPEALIAS: 타입 별칭
+  * ALL: 모든 대상
+
+### 어노테이션 생성자를 만드는 방법
+
+```kotlin
+annotation class Shape(
+    val text: String,
+    val number: Int,
+    val clazz: KClass<*>
+)
+```
+* KClass: 코드로 작성한 클래스를 표현한 클래스
+
+![](images/049.png)
+
+* 어노테이션의 정확한 위치가 중요하다. 
+* val name은 geeter 이기도 하기 때문에 getter 함수에 붙인것으로도 해석할 수 있다.
+* 코틀린의 간결한 문법은 한 위치에 다양한 언어적 요소가 위치할 수 있게한다. 그러기 떄문에 정획히 어떤 요소에 어노테이션을 붙였는지 알려주어야 한다.
+* `@get:Shape val name` 으로 정확하게 getter에 붙였다는 것을 명시할 수 있다. 이런 문법을 use-site target 이라고 한다.
+* 여러 언오 요소에 어노테이션을 붙일 수 있다면 param > property > field 순서로 동작한다.
+
+
+```kotlin
+@Target(AnnotationTarget.FILE)
+annotation class Shape
+```
+
+* 만약 어노테이션이 Target을 지정해주고 있다면, 해당 언어 요소에 어노테이션이 붙게 된다.
+
+
+### Repeatable 어노테이션 - 코틀린
+
+```kotlin
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.FILE, AnnotationTarget.CLASS)
+@Repeatable
+annotation class Shape(
+    val text: String,
+    val number: Int,
+    val clazz: KClass<*>
+)
+
+@Shape("a", 1, Sample::class)
+@Shape("b", 1, Sample::class)
+class Sample {
+    
+}
+```
+
+* 코틀린에서는 자바와 달리 Repeatable 어노테이션을 추가하여 반복적으로 어노테이션을 사용할 수 있다.
+* `@Repeatable`이 없으면 Sample 클래스에 `@Shape` 어노테이션을 복수개 설정할 수 없다.
+
+## 21강. 코틀린의 리플렉션
+
+### 리플렉션 활용해 만들 예제
+
+* 함수 executeAll(obj: Any)를 만든다.
+* obj가 @Executable 어노테이션을 갖고 있으면, obj에서 파라미터가 없고 반환 타입이 unit인 함수를 모두 실행한다.
+
+![](images/050.png)
+
+* 결국 reflection api는 우리가 작성한 코드를 표현하는 코드이다. 이러한 정보를 가지고 있는 KClass가 Reflection 객체다
+* 예를 들어 왼쪽에 있는 GoldFish 클래스는 name 이라는 프로퍼티를 가지며, swim 이라는 함수를 가지고 있다.
+
+![](images/051.png)
+
+* K class, K Property, K Function 그외에도 KParameter, KType, KAnnotatedElement 등이 있다.
+
+
+### K Class 얻는 방법
+
+```kotlin
+fun main() {
+    val kClass: KClass<Sample1> = Sample1::class
+
+    val ref = Sample1()
+    val kClass1: KClass<out Sample1> = ref::class
+    
+    val kotlin: KClass<out Any> = Class.forName("kotlin.reflect.KClass").kotlin
+}
+```
+
+* `Class<T>`는 자바의 리플렉션 객체이고 `KClass<T>`는 코틀린의 리플렉션 객체이다.
+* 코틀린의 리플렉션 객체가 별도로 있는 이유는 inner class, inline class, sealed class 등 코틀린만의 특징을 반영하기 위해서이다.
+
+
+### 코틀린 주요 리플렉샌 객체 구조
+
+* kClassifier: 클래스인지 타입 파라미터인지 구분
+* KAnnotatedElement: 어노테이션이 붙을 수 있는 언어 요소
+* KClass: 코틀린 클래스 표현
+* KType: 코틀린에 있는 타입 표현
+* KParameter: 코틀린에 있는 파라미터를 표현
+* KTypeParameter: 코틀린에 있는 타입 파라미터를 표현
+* KCallable: 호출될 수 있는 언어 요소를 표현
+* KFunction: 코틀린에 있는 함수를 표현
+* KProperty: 코틀린에 있는 프로퍼티를 표현
+
+
+## 21강. 코틀린의 리플렉션
+
+## 21강. 코틀린의 리플렉션
+
+# 섹션 6 코틀린을 더 알아보자!
+
+
