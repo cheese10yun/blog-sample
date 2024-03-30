@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 class OrderController {
 
     @GetMapping
-    fun hello(
+    fun getOrder(
         @RequestParam status: String,
         @RequestParam date: String,
     ): OrderResponse {
@@ -22,8 +22,29 @@ class OrderController {
     }
 }
 
+@RestController
+@RequestMapping("/api/v1/shops")
+class ShopController {
+
+    @GetMapping
+    fun getShop(
+        @RequestParam status: String,
+        @RequestParam date: String,
+    ): ShopResponse {
+        return ShopResponse(
+            shopNumber = "1112230",
+            status = status,
+        )
+    }
+}
+
 data class OrderResponse(
     val orderNumber: String,
     val status: String,
     val date: String,
+)
+
+data class ShopResponse(
+    val shopNumber: String,
+    val status: String,
 )
