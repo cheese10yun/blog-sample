@@ -2,6 +2,10 @@ spring:
   application:
     name: boot3
 
+logging:
+  level:
+    org.springframework.web: DEBUG
+
 management:
   endpoints:
     web:
