@@ -56,7 +56,7 @@ Locust의 설치 및 운용의 용이성은 테스트 프로세스를 대폭 단
 
 ### Start new load test
 
-![](imag/locust_005.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/locust/imag/locust_005.png)
 
 Start new load test 버튼을 클릭하여 새로운 부하 테스트를 시작할 수 있습니다. 이 버튼을 클릭하면 다음과 같은 옵션을 설정할 수 있는 팝업 창이 나타납니다.
 
@@ -72,7 +72,7 @@ Start new load test 버튼을 클릭하여 새로운 부하 테스트를 시작�
 
 ### Statistics
 
-![](imag/locust_001.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/locust/imag/locust_001.png)
 
 Statistics 섹션은 현재 진행 중인 테스트의 실시간 통계를 제공합니다. 이 테이블에는 각 요청 유형별로 세분화된 데이터가 포함되어 있으며, 다음과 같은 정보를 확인할 수 있습니다:
 
@@ -86,7 +86,7 @@ Statistics 섹션은 현재 진행 중인 테스트의 실시간 통계를 제�
 
 ### Charts
 
-![](imag/locust_002.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/locust/imag/locust_002.png)
 
 Charts 섹션은 테스트 동안 수집된 데이터를 그래프 형태로 시각화합니다. 이 차트는 테스트의 진행에 따라 동적으로 업데이트되며, 주로 다음과 같은 정보를 제공합니다.
 
@@ -96,11 +96,11 @@ Charts 섹션은 테스트 동안 수집된 데이터를 그래프 형태로 시
 
 ### Download Data
 
-![](imag/locust_003.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/locust/imag/locust_003.png)
 
 Download Data 메뉴는 테스트 결과를 다운로드할 수 있는 옵션을 제공합니다. 테스트의 통계 및 차트 데이터를 CSV 파일 형식으로 내보낼 수 있으며, 이는 보다 심층적인 분석이나 문서화, 또는 다른 팀 구성원과의 공유를 위해 사용될 수 있습니다.
 
-![](imag/locust_004.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/locust/imag/locust_004.png)
 
 특히 Download the Report 메뉴를 통해 테스트 결과를 HTML 형식으로 다운로드할 수 있습니다. 이 HTML 리포트는 테스트의 요약 정보와 세부 통계, 그리고 차트 데이터를 포함하고 있으며, 테스트 결과를 보다 시각적으로 표현할 수 있습니다. 이 리포트는 테스트 결과를 문서화하거나, 다른 팀원과 공유할 때 유용하게 사용될 수 있습니다.
 
