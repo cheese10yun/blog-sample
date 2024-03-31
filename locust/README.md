@@ -104,6 +104,11 @@ Download Data 메뉴는 테스트 결과를 다운로드할 수 있는 옵션을
 
 특히 Download the Report 메뉴를 통해 테스트 결과를 HTML 형식으로 다운로드할 수 있습니다. 이 HTML 리포트는 테스트의 요약 정보와 세부 통계, 그리고 차트 데이터를 포함하고 있으며, 테스트 결과를 보다 시각적으로 표현할 수 있습니다. 이 리포트는 테스트 결과를 문서화하거나, 다른 팀원과 공유할 때 유용하게 사용될 수 있습니다.
 
+
+### Performance Test
+
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/locust/imag/locust_006.png)
+
 ## 정리
 
 Locust는 사용의 용이성과 빠른 테스트 실행 능력으로 개발자에게 탁월한 부하 테스트 도구를 제공합니다. Python 기반으로 간단한 설치와 함께, 누구나 쉽게 테스트를 시작할 수 있으며, 이는 빠른 성능 평가와 적시의 개선으로 이어집니다.
