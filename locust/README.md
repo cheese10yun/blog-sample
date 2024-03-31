@@ -105,9 +105,11 @@ Download Data 메뉴는 테스트 결과를 다운로드할 수 있는 옵션을
 특히 Download the Report 메뉴를 통해 테스트 결과를 HTML 형식으로 다운로드할 수 있습니다. 이 HTML 리포트는 테스트의 요약 정보와 세부 통계, 그리고 차트 데이터를 포함하고 있으며, 테스트 결과를 보다 시각적으로 표현할 수 있습니다. 이 리포트는 테스트 결과를 문서화하거나, 다른 팀원과 공유할 때 유용하게 사용될 수 있습니다.
 
 
-### Performance Test
+### Local Performance Test
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/locust/imag/locust_006.png)
+
+로컬 환경에서의 성능 테스트 결과, 루프백 네트워크를 통해 25,000 TPS를 달성했습니다. 이는 로컬 환경의 특성을 활용한 결과이며, 실제 운영 환경에서는 성능이 다를 수 있지만, 로컬에서 쉽게 높은 TPS를 달성할 수 있다는 점을 시사합니다. 
 
 ## 정리
 
