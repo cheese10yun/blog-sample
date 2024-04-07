@@ -43,7 +43,7 @@ class Advance(HttpUser):
 
 ```
 
-[](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/locust/imag/locust-1-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/locust/imag/locust-1-1.png)
 
 `@task` 데코레이터는 Locust에서 작업의 실행 빈도나 우선순위를 지정하는 데 사용됩니다. 숫자를 인자로 제공함으로써, 특정 작업이 다른 작업들에 비해 상대적으로 얼마나 자주 실행될지 결정할 수 있습니다. 예를 들어, `@task(3)`은 해당 작업이 같은 TaskSet 내 다른 `@task(1)` 작업보다 세 배 더 많이 실행됨을 의미합니다. 이를 통해 실제 사용자 행동을 더 잘 모방한 부하 테스트 시나리오를 구성할 수 있습니다.
 
