@@ -7,7 +7,8 @@
 
 ## 2024
 
-* 03-31 [Locust 성능 테스트 도구 소개](https://cheese10yun.github.io/locust-part-1/)
+* 04-07 [Locust 성능 테스트 도구 소개 Part 2](https://cheese10yun.github.io/locust-part-2/)
+* 03-31 [Locust 성능 테스트 도구 소개 Part 1](https://cheese10yun.github.io/locust-part-1/)
 * 02-25 [IntelliJ 각종 팁](https://cheese10yun.github.io/intellij-tip2/)
 
 ## 2023
