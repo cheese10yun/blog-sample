@@ -1,4 +1,5 @@
 # Locust 기능
+이 글을 읽기 전에, [Locust 성능 테스트 도구 소개](https://cheese10yun.github.io/locust-part-1/)를 먼저 확인해 보시는 것이 좋습니다. 이를 통해 Locust의 기본적인 사용법과 개념을 이해하신 후, 본 글에서 다루는 보다 심화된 사용 방법과 전략에 쉽게 접근하실 수 있습니다.
 
 ## on_start 및 on_stop 메서드
 
