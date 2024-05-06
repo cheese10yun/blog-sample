@@ -43,12 +43,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
-//    implementation("com.querydsl:querydsl-apt:5.0.0:jakarta")
-//    implementation("com.querydsl:querydsl-core:5.0.0")
-
-//    implementation("com.querydsl:querydsl-jpa")
-
+    implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
 
 //    implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
@@ -57,7 +52,7 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-    annotationProcessor(group = "com.querydsl", name = "querydsl-apt", classifier = "jpa")
+    annotationProcessor(group = "com.querydsl", name = "querydsl-apt", classifier = "jpa", version = "5.1.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
@@ -65,7 +60,7 @@ dependencies {
 //    testImplementation("org.testcontainers:junit-jupiter:1.14.3")
 //    testImplementation("org.testcontainers:mysql:1.14.3")
 
-    kapt("com.querydsl:querydsl-apt:5.0.0:jakarta")
+    kapt("com.querydsl:querydsl-apt:5.1.0:jakarta")
 
     implementation("io.github.serpro69:kotlin-faker:1.12.0")
 }
