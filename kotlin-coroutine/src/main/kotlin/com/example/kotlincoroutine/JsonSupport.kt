@@ -1,5 +1,8 @@
 package com.example.kotlincoroutine
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 object JsonSupport {
 
     /**
@@ -55,3 +58,5 @@ object JsonSupport {
         return result.toString()
     }
 }
+
+fun <A : Any> A.logger(): Lazy<Logger> = lazy { LoggerFactory.getLogger(this.javaClass) }

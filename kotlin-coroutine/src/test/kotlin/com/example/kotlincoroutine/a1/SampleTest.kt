@@ -1,5 +1,7 @@
 package com.example.kotlincoroutine.a1
 
+import com.example.kotlincoroutine.logger
+import kotlin.properties.Delegates
 import org.junit.jupiter.api.Test
 
 typealias UserPointAssociation = Pair<User, UserPoint>
@@ -71,8 +73,14 @@ data class UserPoint(
 
 class UserPointCalculator(
     private val userRepository: UserRepository,
-    private val userPointRepository: UserPointRepository
+    private val userPointRepository: UserPointRepository,
+    private val userClient: UserClient,
 ) {
+
+    private val useraClient: UserClient by Delegates.notNull()
+
+    private val log by logger()
+
     fun calculate() {
         val users = userRepository.findUserByIds(listOf(1, 2, 3))
         val points = userPointRepository.findUserPoint(listOf(1, 2, 3))
@@ -107,13 +115,25 @@ class UserPointCalculator(
         }
 
         val (user, userPoint) = userPointAssociations.first()
+    }
 
+    fun getUser(userId: Long): User {
+        return runCatching { userClient.getUser(userId) }
+            .onFailure { throw IllegalArgumentException("Failed to fetch user data for user ID $userId") }
+            .getOrThrow()
     }
 }
 
 interface UserRepository {
 
     fun findUserByIds(ids: List<Long>): List<User>
+    fun findById(id: Long): User
+}
+
+interface UserClient {
+
+    fun findUserByIds(ids: List<Long>): List<User>
+    fun getUser(id: Long): User
 }
 
 interface UserPointRepository {
