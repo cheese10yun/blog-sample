@@ -1,15 +1,13 @@
 package com.example.kotlincoroutine
 
 import org.assertj.core.api.BDDAssertions.then
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 class ResponseResultTest {
 
     @Test
     fun `getOrElse - Success`() {
-        val result = ResponseResult.Success(42)
+        val result = ResponseResult.Success()
         val value = result.getOrElse(
             default = 0,
             onSuccess = { it + 10 }
@@ -31,15 +29,15 @@ class ResponseResultTest {
 
     @Test
     fun `flatMap - Success to Success`() {
-        val result = ResponseResult.Success(42)
-        val transformed = result.flatMap { ResponseResult.Success(it * 2) }
+        val result = ResponseResult.Success()
+        val transformed = result.flatMap { ResponseResult.Success() }
 
-        then(transformed).isEqualTo(ResponseResult.Success(84))
+        then(transformed).isEqualTo(ResponseResult.Success())
     }
 
     @Test
     fun `flatMap - Success to Failure`() {
-        val result = ResponseResult.Success(42)
+        val result = ResponseResult.Success()
         val errorResponse = ErrorResponse(404, "Not Found")
         val transformed = result.flatMap { ResponseResult.Failure(errorResponse) }
 
@@ -51,13 +49,13 @@ class ResponseResultTest {
     fun `flatMap - Failure`() {
         val errorResponse = ErrorResponse(500, "Internal Server Error")
         val result = ResponseResult.Failure(errorResponse)
-        val transformed = result.flatMap { ResponseResult.Success(42) }
+        val transformed = result.flatMap { ResponseResult.Success() }
         then(transformed).isEqualTo(ResponseResult.Failure(errorResponse))
     }
 
     @Test
     fun `onComplete - Success`() {
-        val result = ResponseResult.Success(42)
+        val result = ResponseResult.Success()
         var successValue = 0
         var failureValue = ErrorResponse(0, "")
 
@@ -88,7 +86,7 @@ class ResponseResultTest {
 
     @Test
     fun `isSuccess - Success`() {
-        val result = ResponseResult.Success(42)
+        val result = ResponseResult.Success()
         then(result.isSuccess).isTrue()
 
         result.body
@@ -110,7 +108,7 @@ class ResponseResultTest {
         val recoveredResult = failureResult.recover { errorResponse ->
             // 실패 시 복구 로직
             if (errorResponse.status == 404) {
-                ResponseResult.Success(0) // 404 에러 시 디폴트 값으로 복구
+                ResponseResult.Success() // 404 에러 시 디폴트 값으로 복구
             } else {
                 ResponseResult.Failure(ErrorResponse(500, "Internal Server Error")) // 기타 에러 시 다른 에러 응답으로 복구
             }
