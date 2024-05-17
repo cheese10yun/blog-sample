@@ -114,6 +114,7 @@ class MemberKtorClient() {
 
     fun getMember(memberId: Long): ResponseResult<Member> {
         return runBlocking {
+
             client
                 .get("http://localhost:8787/api/members/$memberId")
                 .responseResult<Member>()
