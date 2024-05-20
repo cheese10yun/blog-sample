@@ -82,14 +82,14 @@ class FlatMapMergeStudyTest {
 
     @Test
     fun getOrderFlow3(): Unit = runBlocking {
-        val intRange = 1..10_000
+        val intRange = 1..1_000
         val stopWatch = StopWatch()
         val flatMapMergeStudy = FlatMapMergeStudy()
         val orderRequests = (intRange).map { OrderRequest("$it") }
 
         log.info("${Thread.activeCount()} thread active at the start")
         stopWatch.start()
-        val response = flatMapMergeStudy.getOrderFlow3(orderRequests)
+        val response = flatMapMergeStudy.getOrderFlow3(orderRequests, 300)
         stopWatch.stop()
 
         // 2,228ms
@@ -130,6 +130,39 @@ class FlatMapMergeStudyTest {
          * 500, 100, 1641,
          * 500, 300, 700,
          * 500, 500, 390,
+         */
+    }
+
+    @Test
+    fun orderRequests4(): Unit = runBlocking {
+        val intRange = 1..1_000
+        val stopWatch = StopWatch()
+        val flatMapMergeStudy = FlatMapMergeStudy()
+        val orderRequests = (intRange).map { OrderRequest("$it") }
+
+        val concurrency = 920
+
+        log.info("${Thread.activeCount()} thread active at the start")
+        stopWatch.start()
+        val response = flatMapMergeStudy.getOrderFlow4(orderRequests, concurrency)
+        stopWatch.stop()
+        log.info("${Thread.activeCount()} thread active at the end")
+        println("===============")
+        println("size: ${response.size}, ${stopWatch.totalTimeMillis} ms")
+        println("===============")
+
+        /**
+         * 1,000 rows test
+         *
+         * 16, 19278
+         * 50, 6174
+         * 100, 3146
+         * 200, 1612
+         * 300, 1312
+         * 400, 1013
+         * 500, 720
+         * 700, 714
+         * 800, 712
          */
     }
 

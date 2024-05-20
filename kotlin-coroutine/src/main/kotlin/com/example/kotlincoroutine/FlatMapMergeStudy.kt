@@ -67,6 +67,29 @@ class FlatMapMergeStudy {
             }
     }
 
+    @OptIn(FlowPreview::class)
+    suspend fun getOrderFlow4(orderRequests: List<OrderRequest>, concurrency: Int): List<OrderResponse> {
+        log.info("===================")
+        log.info("concurrency: $concurrency")
+        log.info("===================")
+
+        return orderRequests
+            .asFlow()
+            .flatMapMerge(concurrency) { request -> // 동시 실행할 코루틴 수 제한
+                flow {
+                    orderClient
+                        .getOrder(request)
+                        .onFailure { log.error("Failure: $it") }
+                        .onSuccess {
+                            log.info("Success: $it")
+                            emit(it)
+                        }
+
+                }
+            }
+            .toList()
+    }
+
     fun getOrderSync(orderRequests: List<OrderRequest>): List<OrderResponse> {
         return orderRequests
             .map {
@@ -80,10 +103,7 @@ class FlatMapMergeStudy {
 
 
     @OptIn(FlowPreview::class)
-    suspend fun getOrderFlow3(orderRequests: List<OrderRequest>): List<OrderResponse> {
-        val cpuCount = Runtime.getRuntime().availableProcessors()
-        val concurrency = cpuCount * 2 // CPU 코어 수의 2배로 동시 실행할 코루틴 수를 설정
-
+    suspend fun getOrderFlow3(orderRequests: List<OrderRequest>, concurrency: Int): List<OrderResponse> {
         val currentActiveCoroutines = AtomicInteger(0)
         val maxActiveCoroutines = AtomicInteger(0)
         val threadNames = mutableSetOf<String>()
@@ -107,7 +127,7 @@ class FlatMapMergeStudy {
                     }
                     response.onFailure { log.error("Failure: $it") }
                     response.onSuccess {
-                        log.info("Success: $it")
+//                        log.info("Success: $it")
                         emit(it)
                     }
 
@@ -117,7 +137,7 @@ class FlatMapMergeStudy {
             .toList()
             .also {
                 log.info("Max active coroutines: ${maxActiveCoroutines.get()}")
-                log.info("Threads used: $threadNames")
+//                log.info("Threads used: $threadNames")
             }
     }
 }
