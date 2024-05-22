@@ -20,23 +20,23 @@ sequenceDiagram
 
 ```kotlin
 class OrderClient {
-    fun getOrder(orderRequest: OrderRequest): ResponseResult<OrderResponse> {
-        return runBlocking {
-            delay(300) // 300ms 지연, 실제 API를 호출하지 않고 시간만 지연 
-            ResponseResult.Success(OrderResponse(orderRequest.productId))
-        }
-    }
+   fun getOrder(orderRequest: OrderRequest): ResponseResult<OrderResponse> {
+      return runBlocking {
+         delay(300) // 300ms 지연, 실제 API를 호출하지 않고 시간만 지연 
+         ResponseResult.Success(OrderResponse(orderRequest.productId))
+      }
+   }
 }
 
 fun getOrderSync(orderRequests: List<OrderRequest>): List<OrderResponse> {
-    return orderRequests
-        .map {
-            orderClient
-                .getOrder(it) // 300ms 지연
-                .onFailure { log.error("Failure: $it") }
-                .onSuccess { log.info("Success: $it") }
-                .getOrThrow()
-        }
+   return orderRequests
+      .map {
+         orderClient
+            .getOrder(it) // 300ms 지연
+            .onFailure { log.error("Failure: $it") }
+            .onSuccess { log.info("Success: $it") }
+            .getOrThrow()
+      }
 }
 ```
 
@@ -46,17 +46,17 @@ fun getOrderSync(orderRequests: List<OrderRequest>): List<OrderResponse> {
 
 @Test
 fun getOrderSync() {
-    val stopWatch = StopWatch()
-    val flatMapMergeStudy = FlatMapMergeStudy()
-    val orderRequests = (1..100).map { OrderRequest("$it") }
+   val stopWatch = StopWatch()
+   val flatMapMergeStudy = FlatMapMergeStudy()
+   val orderRequests = (1..100).map { OrderRequest("$it") }
 
-    stopWatch.start()
-    val response = flatMapMergeStudy.getOrderSync(orderRequests)
-    stopWatch.stop()
-    println(stopWatch.totalTimeMillis)
+   stopWatch.start()
+   val response = flatMapMergeStudy.getOrderSync(orderRequests)
+   stopWatch.stop()
+   println(stopWatch.totalTimeMillis)
 
-    // 30,528ms
-    println(response)
+   // 30,528ms
+   println(response)
 }
 ```
 
@@ -67,20 +67,20 @@ Kotlin의 코루틴을 이용한 비동기 프로그래밍은 성능을 크게 �
 ```kotlin
 @OptIn(FlowPreview::class)
 suspend fun getOrderFlow(orderRequests: List<OrderRequest>): List<OrderResponse> {
-    return orderRequests
-        .asFlow()
-        .flatMapMerge { request ->
-            flow {
-                orderClient
-                    .getOrder(request)
-                    .onFailure { log.error("Failure: $it") }
-                    .onSuccess {
-                        log.info("Success: $it")
-                        emit(it)
-                    }
-            }
-        }
-        .toList()
+   return orderRequests
+      .asFlow()
+      .flatMapMerge { request ->
+         flow {
+            orderClient
+               .getOrder(request)
+               .onFailure { log.error("Failure: $it") }
+               .onSuccess {
+                  log.info("Success: $it")
+                  emit(it)
+               }
+         }
+      }
+      .toList()
 }
 ```
 
@@ -91,30 +91,30 @@ suspend fun getOrderFlow(orderRequests: List<OrderRequest>): List<OrderResponse>
 ```kotlin
 @Test
 fun getOrderFlow(): Unit = runBlocking {
-        val stopWatch = StopWatch()
-        val flatMapMergeStudy = FlatMapMergeStudy()
-        val orderRequests = (1..100).map { OrderRequest("$it") }
+      val stopWatch = StopWatch()
+      val flatMapMergeStudy = FlatMapMergeStudy()
+      val orderRequests = (1..100).map { OrderRequest("$it") }
 
-        stopWatch.start()
-        val response = flatMapMergeStudy.getOrderFlow(orderRequests)
-        stopWatch.stop()
-        // 2,228ms
-        println(stopWatch.totalTimeMillis)
-    }
+      stopWatch.start()
+      val response = flatMapMergeStudy.getOrderFlow(orderRequests)
+      stopWatch.stop()
+      // 2,228ms
+      println(stopWatch.totalTimeMillis)
+   }
 ```
 
 이론상 100개의 요청을 동시에 처리하면 300ms 정도의 시간이 소요되어야 하지만, 실제로는 2,228ms가 소요됩니다. 이는 다음과 같은 요인들로 인한 것입니다.
 
 1. **코루틴 생성과 컨텍스트 전환 오버헤드**:
-    - 코루틴을 생성하고 실행할 때 발생하는 오버헤드는 무시할 수 없는 시간 지연을 초래할 수 있습니다.
-    - 특히, `flatMapMerge`를 사용하여 다수의 코루틴을 병렬로 실행할 때, 각 코루틴의 생성과 컨텍스트 전환 비용이 누적되어 총 실행 시간이 증가할 수 있습니다.
+   - 코루틴을 생성하고 실행할 때 발생하는 오버헤드는 무시할 수 없는 시간 지연을 초래할 수 있습니다.
+   - 특히, `flatMapMerge`를 사용하여 다수의 코루틴을 병렬로 실행할 때, 각 코루틴의 생성과 컨텍스트 전환 비용이 누적되어 총 실행 시간이 증가할 수 있습니다.
 2. **`flatMapMerge`의 병합 과정**:
-    - `flatMapMerge`는 여러 플로우를 병합하면서 각 플로우의 결과를 수집합니다.
-    - 이 과정에서 발생하는 추가적인 작업들, 예를 들어 플로우의 결과를 수집하고 병합하는 오버헤드가 존재할 수 있습니다.
-    - 이 오버헤드는 특히 플로우의 개수가 많을 때 더 크게 작용합니다.
+   - `flatMapMerge`는 여러 플로우를 병합하면서 각 플로우의 결과를 수집합니다.
+   - 이 과정에서 발생하는 추가적인 작업들, 예를 들어 플로우의 결과를 수집하고 병합하는 오버헤드가 존재할 수 있습니다.
+   - 이 오버헤드는 특히 플로우의 개수가 많을 때 더 크게 작용합니다.
 3. **`emit` 호출과 플로우 수집의 지연**:
-    - 각 플로우에서 `emit`을 호출하고, 최종적으로 `toList`로 수집하는 과정에서 발생하는 지연도 무시할 수 없습니다.
-    - `emit`은 비동기적으로 데이터를 내보내는 작업이므로, 여러 번 호출될 때 지연이 누적될 수 있습니다.
+   - 각 플로우에서 `emit`을 호출하고, 최종적으로 `toList`로 수집하는 과정에서 발생하는 지연도 무시할 수 없습니다.
+   - `emit`은 비동기적으로 데이터를 내보내는 작업이므로, 여러 번 호출될 때 지연이 누적될 수 있습니다.
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/result_001.png)
 
@@ -233,7 +233,7 @@ flatMapMerge의 concurrency 파라미터는 동시에 실행되는 코루틴 수
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/result_006.png)
 
-1,000개의 요청을 처리하는 데 있어, 동기식 방식은 305,359ms가 소요되었습니다. 그러나 Flow Concurrency 16을 사용하면 처리 시간이 19,321ms로 줄어들어 약 93.67%의 성능 향상을 보였습니다. Concurrency를 500으로 설정했을 때는 처리 시간이 720ms로 줄어들어 약 99.76%의 성능 향상이 있었습니다. 이는 코루틴이 적은 양의 스레드로도 많은 데이터를 효율적으로 처리할 수 있음을 보여줍니다. 동기식 방식에서는 각 요청이 순차적으로 처리되어 전체 처리 시간이 길어지지만, 코루틴을 사용하면 여러 요청을 동시에 처리할 수 있어 처리 속도가 크게 향상됩니다. 따라서, 시스템 자원을 효율적으로 사용하고, 특히 IO 바운드 작업에서 코루틴의 효율성이 두드러집니다. 적절한 Concurrency 설정을 통해 애플리케이션의 성능을 극대화할 수 있습니다.
+1,000개의 요청을 처리하는 데 있어, 동기식 방식은 305,359ms가 소요되었으며 Flow Concurrency 16을 사용하면 처리 시간이 19,321ms로 줄어들어 약 93.67%의 성능 향상을 보였습니다. Concurrency 500으로 설정하면 처리 시간이 720ms로 더 향상됩니다. 이는 코루틴이 적은 양의 스레드로도 많은 데이터를 효율적으로 처리할 수 있음을 보여줍니다.
 
 
 ### Concurrency Size 성능 최적화 시 고려 사항
@@ -241,8 +241,6 @@ flatMapMerge의 concurrency 파라미터는 동시에 실행되는 코루틴 수
 성능은 크게 향상됐지만 무턱대고 concurrency 값을 늘리는 것은 해결책이 아닙니다. concurrency 값을 너무 크게 설정하면 오히려 시스템 자원을 과도하게 사용하게 되어 성능 저하가 발생할 수 있습니다. 따라서 여러 코루틴을 사용하는 것은 자원을 더 많이 사용하게 되므로, 각자의 리소스와 환경에 맞는 concurrency 값을 적절하게 설정하는 것이 중요합니다. 시스템의 CPU, 메모리, 네트워크 대역폭 등을 고려하여 최적의 concurrency 값을 설정해야 합니다.
 
 또한 배치 애플리케이션처럼 특정 작업만 하고 애플리케이션이 종료되는 환경에서는 concurrency 값을 높여 처리량을 극대화하는 것이 좋습니다. 이런 경우에는 단기간에 최대한 많은 작업을 처리하는 것이 목표이므로, 가능한 한 높은 concurrency 값을 설정하여 성능을 최적화할 수 있습니다.
-
-
 
 
 ## 출처
