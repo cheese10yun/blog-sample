@@ -116,7 +116,7 @@ fun getOrderFlow(): Unit = runBlocking {
     - 각 플로우에서 `emit`을 호출하고, 최종적으로 `toList`로 수집하는 과정에서 발생하는 지연도 무시할 수 없습니다.
     - `emit`은 비동기적으로 데이터를 내보내는 작업이므로, 여러 번 호출될 때 지연이 누적될 수 있습니다.
 
-![](images/result_001.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/result_001.png)
 
 | Rows  | getOrderSync (ms) | getOrderFlow (ms) | Improvement (%) |
 |-------|-------------------|-------------------|-----------------|
@@ -168,7 +168,7 @@ fun `코루틴 생성 테스트`() = runBlocking {
 
 다음은 테스트 결과입니다. 다양한 수의 코루틴을 생성했을 때 사용되는 스레드 수를 보여줍니다.
 
-![](images/result_003.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/result_003.png)
 
 | amount  | 시작 시 활성 스레드 수 | 종료 시 활성 스레드 수 |
 |---------|---------------|---------------|
@@ -219,7 +219,7 @@ suspend fun getOrderFlow4(orderRequests: List<OrderRequest>, concurrency: Int): 
 
 flatMapMerge의 concurrency 파라미터는 동시에 실행되는 코루틴 수를 테스트 코드에서 지정할 수 있도록 코드를 수정합니다. 지정하지 않으면 기본값은 `DEFAULT_CONCURRENCY`로 설정됩니다. 위 예제에서는 16으로 지정된 상태입니다. 다음은 1,000개의 요청을 처리할 때 다양한 `concurrency` 값에 따른 성능 테스트 결과입니다
 
-![](images/result_004.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/result_004.png)
 
 | Concurrency | Time (ms) |
 |-------------|-----------|
