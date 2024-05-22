@@ -140,7 +140,7 @@ class FlatMapMergeStudyTest {
         val flatMapMergeStudy = FlatMapMergeStudy()
         val orderRequests = (intRange).map { OrderRequest("$it") }
 
-        val concurrency = 920
+        val concurrency = 822
 
         log.info("${Thread.activeCount()} thread active at the start")
         stopWatch.start()

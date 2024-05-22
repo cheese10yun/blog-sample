@@ -22,7 +22,7 @@ sequenceDiagram
 class OrderClient {
     fun getOrder(orderRequest: OrderRequest): ResponseResult<OrderResponse> {
         return runBlocking {
-            delay(300)
+            delay(300) // 300ms 지연, 실제 API를 호출하지 않고 시간만 지연 
             ResponseResult.Success(OrderResponse(orderRequest.productId))
         }
     }
@@ -217,9 +217,9 @@ suspend fun getOrderFlow4(orderRequests: List<OrderRequest>, concurrency: Int): 
 }
 ```
 
-flatMapMerge의 concurrency 파라미터는 동시에 실행되는 코루틴 수를 테스트 코드에서 지정할 수 있도록 코드를 수정합니다. 지정하지 않으면 기본값은 `DEFAULT_CONCURRENCY`로 설정됩니다. 위 예제에서는 16으로 지정된 상태입니다. 다음은 1,000개의 요청을 처리할 때 다양한 `concurrency` 값에 따른 성능 테스트 결과입니다:
+flatMapMerge의 concurrency 파라미터는 동시에 실행되는 코루틴 수를 테스트 코드에서 지정할 수 있도록 코드를 수정합니다. 지정하지 않으면 기본값은 `DEFAULT_CONCURRENCY`로 설정됩니다. 위 예제에서는 16으로 지정된 상태입니다. 다음은 1,000개의 요청을 처리할 때 다양한 `concurrency` 값에 따른 성능 테스트 결과입니다
 
-![](images/result_001.png)
+![](images/result_004.png)
 
 | Concurrency | Time (ms) |
 |-------------|-----------|
@@ -231,86 +231,8 @@ flatMapMerge의 concurrency 파라미터는 동시에 실행되는 코루틴 수
 | 400         | 1,013     |
 | 500         | 720       |
 
-### 정리
+위 결과에서 알 수 있듯이, `concurrency` 값을 늘릴수록 전체 처리 시간이 줄어듭니다. 특히, `concurrency` 값을 16에서 500까지 늘렸을 때, 전체 처리 시간이 19,278ms에서 720ms로 크게 감소한 것을 확인할 수 있습니다. 이는 `concurrency` 값을 적절히 설정하면 성능을 크게 향상시킬 수 있다는 것을 보여줍니다. 
 
-----------
+성능은 크게 향상됐지만 무턱대고 concurrency 값을 늘리는 것은 해결책이 아닙니다. concurrency 값을 너무 크게 설정하면 오히려 시스템 자원을 과도하게 사용하게 되어 성능 저하가 발생할 수 있습니다. 따라서 여러 코루틴을 사용하는 것은 자원을 더 많이 사용하게 되므로, 각자의 리소스와 환경에 맞는 concurrency 값을 적절하게 설정하는 것이 중요합니다. 시스템의 CPU, 메모리, 네트워크 대역폭 등을 고려하여 최적의 concurrency 값을 설정해야 합니다.
 
-### Concurrency 조절의 장점과 단점
-
-#### 장점
-
-1. **성능 향상**:
-    - `concurrency`를 늘리면 더 많은 작업을 병렬로 처리할 수 있어, 전체 처리 시간이 단축될 수 있습니다. 특히 IO 바운드 작업에서는 동시 실행되는 코루틴 수가 많을수록 성능 향상이 더 뚜렷합니다.
-
-2. **자원 활용 극대화**:
-    - 시스템의 CPU와 메모리를 더욱 효율적으로 사용할 수 있습니다. 적절한 `concurrency` 설정은 시스템 리소스를 최대한 활용하여 작업 처리량을 증가시킵니다.
-
-#### 단점
-
-1. **자원 고갈 위험**:
-    - `concurrency`를 너무 크게 설정하면 시스템의 CPU, 메모리 등의 자원이 고갈될 수 있습니다. 이는 시스템의 성능 저하 또는 응답 시간 증가를 초래할 수 있습니다.
-
-2. **복잡성 증가**:
-    - 동시 실행되는 코루틴 수가 많아질수록 코드의 복잡성이 증가할 수 있습니다. 이는 디버깅과 유지보수를 어렵게 만들 수 있습니다.
-
-3. **스레드 컨텍스트 전환 오버헤드**:
-    - 너무 많은 코루틴이 동시에 실행되면 스레드 컨텍스트 전환 오버헤드가 증가하여, 오히려 성능이 저하될 수 있습니다.
-
-### Concurrency 설정 시 주의할 점
-
-1. **시스템 리소스 고려**:
-    - 시스템의 CPU 코어 수와 메모리 용량을 고려하여 적절한 `concurrency` 값을 설정해야 합니다. 일반적으로, CPU 코어 수의 2배에서 4배 사이로 설정하는 것이 좋습니다.
-
-2. **성능 테스트**:
-    - 다양한 `concurrency` 값을 사용하여 성능 테스트를 수행하고, 가장 효율적인 값을 선택해야 합니다. 이는 실제 환경에서 가장 적합한 값을 찾는 데 도움이 됩니다.
-
-3. **에러 처리**:
-    - 동시 실행되는 작업이 많아질수록 에러 발생 가능성도 높아집니다. 적절한 에러 처리 로직을 구현하여 안정성을 확보해야 합니다.
-
-### 코드 예제
-
-아래는 `concurrency` 값을 조절하여 성능 테스트를 수행하는 예제 코드입니다:
-
-```kotlin
-@OptIn(FlowPreview::class)
-suspend fun getOrderFlow4(orderRequests: List<OrderRequest>, concurrency: Int): List<OrderResponse> {
-    log.info("===================")
-    log.info("concurrency: $concurrency")
-    log.info("===================")
-
-    return orderRequests
-        .asFlow()
-        .flatMapMerge(concurrency) { request -> // 동시 실행할 코루틴 수 제한
-            flow {
-                orderClient
-                    .getOrder(request)
-                    .onFailure { log.error("Failure: $it") }
-                    .onSuccess {
-                        // log.info("Success: $it")
-                        emit(it)
-                    }
-            }
-        }
-        .toList()
-}
-
-fun main() = runBlocking {
-    val flatMapMergeStudy = FlatMapMergeStudy()
-    val orderRequests = (1..100).map { OrderRequest("$it") }
-
-    val concurrencyLevels = listOf(1, 2, 4, 8, 16, 32, 64)
-    concurrencyLevels.forEach { concurrency ->
-        val time = measureTimeMillis {
-            val response = flatMapMergeStudy.getOrderFlow4(orderRequests, concurrency)
-            println(response)
-        }
-        println("Concurrency: $concurrency, 걸린 시간: ${time}ms")
-    }
-}
-```
-
-위 코드에서는 다양한 `concurrency` 값을 사용하여 성능 테스트를 수행합니다. 각 `concurrency` 값에 대해 전체 요청을 처리하는 데 걸리는 시간을 측정하여, 가장 효율적인 `concurrency` 값을 찾을 수 있습니다.
-
-### 결론
-
-Concurrency(동시성)는 코루틴을 활용한 비동기 프로그래밍에서 중요한 개념입니다. 적절한 `concurrency` 값을 설정하면 성능을 크게 향상시킬 수 있지만, 시스템 리소스를 고려하여 신중하게 설정해야 합니다. 성능 테스트를 통해 최적의 값을 찾고, 에러 처리를 포함한 안정성 확보도 중요합니다. 이러한 접근 방식을 통해 효율적이고 안정적인 비동기 프로그래밍을 구현할 수 있습니다.
+또한 배치 애플리케이션처럼 특정 작업만 하고 애플리케이션이 종료되는 환경에서는 concurrency 값을 높여 처리량을 극대화하는 것이 좋습니다. 이런 경우에는 단기간에 최대한 많은 작업을 처리하는 것이 목표이므로, 가능한 한 높은 concurrency 값을 설정하여 성능을 최적화할 수 있습니다.

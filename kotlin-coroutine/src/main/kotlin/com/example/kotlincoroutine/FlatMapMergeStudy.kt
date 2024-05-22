@@ -81,7 +81,7 @@ class FlatMapMergeStudy {
                         .getOrder(request)
                         .onFailure { log.error("Failure: $it") }
                         .onSuccess {
-                            log.info("Success: $it")
+//                            log.info("Success: $it")
                             emit(it)
                         }
 
@@ -149,7 +149,7 @@ data class OrderRequest(val productId: String)
 class OrderClient {
     fun getOrder(orderRequest: OrderRequest): ResponseResult<OrderResponse> {
         return runBlocking {
-            delay(300)
+//            delay(300)
             ResponseResult.Success(OrderResponse(orderRequest.productId))
         }
     }
