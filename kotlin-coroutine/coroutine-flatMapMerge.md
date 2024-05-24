@@ -1,4 +1,4 @@
-# 코루틴을 이용한 성능 개선: `Flow`를 활용한 다중 요청 처리
+# Kotlin 코루틴으로 성능 개선: Flow를 활용한 다중 요청 처리
 
 Kotlin의 코루틴을 이용한 비동기 프로그래밍은 성능을 크게 향상시킬 수 있는 강력한 도구입니다. 특히 `Flow`를 활용하여 여러 요청을 동시에 처리하는 방식은 효율적인 비동기 처리를 가능하게 합니다. 이 포스팅에서는는 `Flow`를 사용하여 다중 요청을 처리하는 방법과 이론적 배경, 그리고 이를 사용할 때 주의할 점에 대해 다루겠습니다.
 
@@ -236,7 +236,7 @@ flatMapMerge의 concurrency 파라미터는 동시에 실행되는 코루틴 수
 
 위 결과에서 알 수 있듯이, `concurrency` 값을 늘릴수록 전체 처리 시간이 줄어듭니다. 특히, `concurrency` 값을 16에서 500까지 늘렸을 때, 전체 처리 시간이 19,278ms에서 720ms로 크게 감소한 것을 확인할 수 있습니다. 이는 `concurrency` 값을 적절히 설정하면 성능을 크게 향상시킬 수 있다는 것을 보여줍니다.
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/result_006.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/result_007.png)
 
 1,000개의 요청을 처리하는 데 있어, 동기식 방식은 305,359ms가 소요되었으며 Flow Concurrency 16을 사용하면 처리 시간이 19,321ms로 줄어들어 약 93.67%의 성능 향상을 보였습니다. Concurrency 500으로 설정하면 처리 시간이 720ms로 더 향상됩니다. 이는 코루틴이 적은 양의 스레드로도 많은 데이터를 효율적으로 처리할 수 있음을 보여줍니다.
 

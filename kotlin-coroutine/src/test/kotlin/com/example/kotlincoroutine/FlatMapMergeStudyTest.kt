@@ -135,12 +135,12 @@ class FlatMapMergeStudyTest {
 
     @Test
     fun orderRequests4(): Unit = runBlocking {
-        val intRange = 1..100
+        val intRange = 1..1000
         val stopWatch = StopWatch()
         val flatMapMergeStudy = FlatMapMergeStudy()
         val orderRequests = (intRange).map { OrderRequest("$it") }
 
-        val concurrency = 100
+        val concurrency = 500
 
         log.info("${Thread.activeCount()} thread active at the start")
         stopWatch.start()
