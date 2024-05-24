@@ -152,6 +152,13 @@ class FlatMapMergeStudyTest {
         println("===============")
 
         /**
+         * 10 4
+         * 50 4
+         * 100 4
+         * 500
+         */
+
+        /**
          * 1,000 rows test
          *
          * 16, 19278

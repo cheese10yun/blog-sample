@@ -81,7 +81,7 @@ class FlatMapMergeStudy {
                         .getOrder(request)
                         .onFailure { log.error("Failure: $it") }
                         .onSuccess {
-                            log.info("Success: $it")
+//                            log.info("Success: $it")
                             emit(it)
                         }
 
