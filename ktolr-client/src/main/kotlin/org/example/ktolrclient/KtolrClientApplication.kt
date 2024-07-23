@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class KtolrClientApplication
 
 fun main(args: Array<String>) {
-    runApplication<KtolrClientApplication>(*args)
+	runApplication<KtolrClientApplication>(*args)
 }
