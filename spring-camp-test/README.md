@@ -50,6 +50,7 @@ fun `Shop 등록 테스트 케이스`() {
 ## 신규 가맹점 등록 Flow
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/images/011.jpeg)
+![](images/part3/실무에서%20적용하는%20테스트%20코드%20작성%20방법과%20노하우-작업용.131.jpeg)
 
 서비스 규모가 점차 커지면서, 파트너 서비스가 독립적인 애플리케이션으로 분리되어, 사업자 번호만 입력하면 파트너 서비스에 질의하여 등록하는 플로우로 변경되었습니다.
 
