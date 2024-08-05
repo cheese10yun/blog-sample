@@ -8,6 +8,7 @@ class KtolrClientApplicationTests {
 
 	@Test
 	fun contextLoads() {
+		println("Hello, World!")
 	}
 
 }

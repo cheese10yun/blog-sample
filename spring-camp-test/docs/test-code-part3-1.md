@@ -1,7 +1,15 @@
-# 실무에서 적용하는 테스트 코드 작성 방법과 노하우 Part 3: Given 지옥에서 벗어나기 - 객체 기반 데이터 셋업의 한계 
+# 실무에서 적용하는 테스트 코드 작성 방법과 노하우 Part 3: Given 지옥에서 벗어나기 - 객체 기반 데이터 셋업의 한계
 
 지난 시리즈에서는 Mock Test를 효율적으로 작성하는 방법과 테스트 코드로부터 피드백을 받는 방법에 대해 다루었습니다. Part 1: 효율적인 Mock Test에서는 Mock Test의 중요성과 작성 방법에 대해 설명했으며, Part 2: 테스트 코드로부터 피드백 받기에서는 테스트 코드를 통해 얻을 수 있는 인사이트와 개선 방법을 소개했습니다.
 이번 글에서는 테스트 코드 작성 시 자주 겪게 되는 Given 단계에서의 어려움을 극복하는 방법에 대해 다루어 보겠습니다. 테스트의 Given 단계는 준비 단계로서, 많은 경우 이 단계에서 복잡한 데이터 셋업이 어렵고 불편하기 때문에 다양한 테스트 코드를 작성하기가 어려워지고, 그 결과로 폭넓은 테스트 커버리지를 확보하기 힘들어집니다. 이를 해결하기 위한 전략과 실무에서 활용할 수 있는 팁들을 알아보겠습니다.
+
+특히 객체 기반으로 테스트 Given 데이터 셋업의 한계가 무엇이며 이를 어떻게 극복할지에 대해서 다루어보겠습니다.
+
+
+지난 시리즈에서는 Mock Test를 효율적으로 작성하는 방법과 테스트 코드로부터 피드백을 받는 방법에 대해 다루었습니다. [Part 1: 효율적인 Mock Test](https://tech.kakaopay.com/post/mock-test-code/)에서는 Mock Test의 중요성과 작성 방법에 대해 설명했으며, [Part 2: 테스트 코드로부터 피드백 받기](https://tech.kakaopay.com/post/mock-test-code-part-2/)에서는 테스트 코드를 통해 얻을 수 있는 인사이트와 개선 방법을 소개했습니다.
+
+이번 글에서는 테스트 코드 작성 시 자주 겪게 되는 Given 단계에서의 어려움을 극복하는 방법에 대해 다루어 보겠습니다. Given 단계는 테스트의 준비 단계로서, 이 단계에서 복잡한 데이터 셋업이 자주 요구되며, 이로 인해 다양한 테스트 코드를 작성하기 어려워지고, 결국 폭넓은 테스트 커버리지를 확보하기 힘들어집니다. 이러한 문제를 해결하기 위한 전략과 실무에서 활용할 수 있는 팁들을 소개하겠습니다. 특히 객체 기반 테스트에서 Given 데이터 셋업의 한계와 이를 극복하는 방법에 대해 자세히 설명할 것입니다.
+
 
 ## Given 단계의 어려움
 
@@ -99,26 +107,26 @@ internal fun `주문 API TEST`() {
 
 ```json
 {
-    "order_number": "A00001",
-    "status": "READY",
-    "price": 1000,
-    "address": {
-        "zip_code": "023",
-        "address": "서울 중구 을지로 65",
-        "detail": "SK텔레콤빌딩 4층 수펙스홀"
+  "order_number": "A00001",
+  "status": "READY",
+  "price": 1000,
+  "address": {
+    "zip_code": "023",
+    "address": "서울 중구 을지로 65",
+    "detail": "SK텔레콤빌딩 4층 수펙스홀"
+  },
+  "products": [
+    {
+      "name": "에어 조던 XXXVII 로우 PF",
+      "size": "230",
+      "tags": ["신발", "나이키", "에어 조던"]
     },
-    "products": [
-        {
-            "name": "에어 조던 XXXVII 로우 PF",
-            "size": "230",
-            "tags": ["신발", "나이키", "에어 조던"]
-        },
-        {
-            "name": "나이키 에어맥스 1 '86 OG G",
-            "size": "240",
-            "tags": ["신발", "나이키", "에어맥스"]
-        }
-    ]
+    {
+      "name": "나이키 에어맥스 1 '86 OG G",
+      "size": "240",
+      "tags": ["신발", "나이키", "에어맥스"]
+    }
+  ]
 }
 ```
 
@@ -260,10 +268,10 @@ values ('order-number-1', 'PRODUCT_PREPARATION');
 fun `상품 준비중 to 배송 시작 status 변경 테스트`() {
     // given
     val order = orderRepository.findAll().first()
-    
+
     // when
     order.updateStatusDeliveryStarted()
-    
+
     // then
     assertThat(order.status).isEqualTo(OrderStatus.DELIVERY_STARTED)
 }
