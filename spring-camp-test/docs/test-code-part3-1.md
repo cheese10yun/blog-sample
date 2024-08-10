@@ -256,11 +256,16 @@ VALUES (1, NOW()),
 
 // delete
 .sql
-delete from member...;
-delete from coupon...;
-delete from product...;
-delete from payment...;
-delete from orders...;
+delete
+from member...;
+delete
+from coupon...;
+delete
+from product...;
+delete
+from payment...;
+delete
+from orders...;
 ```
 
 ```kotlin
@@ -293,7 +298,9 @@ fun `sql test code2`() {
 }
 ```
 
-이 예제에서는 `@SqlGroup`을 사용하여 여러 SQL 파일을 한 번에 실행하고 관리할 수 있습니다. `schema.sql`과 `setup.sql` 파일을 통해 데이터베이스 스키마와 데이터를 설정한 후, 테스트 메소드 실행 후 delete.sql 파일을 통해 데이터를 정리할 수 있습니다. 이처럼 `@Sql`과 `@SqlGroup`을 활용하면 복잡한 데이터 구조를 손쉽게 설정하고 관리할 수 있으며, 테스트 코드 작성 시 주요 관심사에 집중할 수 있습니다.
+이 예제에서는 `@SqlGroup`을 사용하여 여러 SQL 파일을 한 번에 실행하고 관리할 수 있습니다. `schema.sql`과 `setup.sql` 파일을 통해 데이터베이스 스키마와 데이터를 설정한 후, 테스트 메소드 실행 후 `delete.sql` 파일을 통해 데이터를 정리할 수 있습니다. 이처럼 `@Sql`과 `@SqlGroup`을 활용하면 복잡한 데이터 구조를 손쉽게 설정하고 관리할 수 있으며, 테스트 코드 작성 시 주요 관심사에 집중할 수 있습니다. 또한, 여러 데이터베이스를 사용하는 경우에는 데이터소스를 지정하여 복잡한 데이터 구성도 보다 편리하게 설정할 수 있어, 다양한 환경에서의 테스트가 더욱 용이해집니다.
+
+특히, 다양한 데이터를 에그리게이션(aggregation)하여 데이터를 가공하는 배치 애플리케이션의 테스트 코드에서는 이러한 방식이 매우 적합합니다. 복잡한 데이터 변환과 집계 작업을 손쉽게 검증할 수 있도록, 여러 단계의 데이터 셋업과 정리가 필요한 경우에도 `@Sql`과 `@SqlGroup`을 통해 효율적으로 테스트 환경을 구축할 수 있습니다.
 
 ### 요약
 
