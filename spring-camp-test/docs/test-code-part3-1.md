@@ -256,17 +256,14 @@ VALUES (1, NOW()),
 
 // delete
 .sql
-delete
-from member...;
-delete
-from coupon...;
-delete
-from product...;
-delete
-from payment...;
-delete
-from orders...;
+delete from member...;
+delete from coupon...;
+delete from product...;
+delete from payment...;
+delete from orders...;
 ```
+
+`*.sql` 파일을 통해 스키마를 설정하고, FK(외래 키) 관계를 가진 데이터를 직관적이고 쉽게 설정할 수 있습니다. 또한, 테스트 후 데이터를 삭제하는 쿼리를 통해 테스트 환경을 초기 상태로 되돌리는 방법도 포함되어 있어, 데이터 셋업과 정리 과정을 명확하게 관리할 수 있습니다.
 
 ```kotlin
 @SqlGroup(
@@ -288,13 +285,12 @@ from orders...;
     )
 )
 @Test
-fun `sql test code2`() {
-    // given
+fun `sql test`() {
     // when
     val payments = paymentRepository.findAll().toList()
     // then
     then(payments).hasSize(12)
-    println("sql test code")
+    ...
 }
 ```
 
