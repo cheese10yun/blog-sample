@@ -217,7 +217,7 @@ JSON 파일을 사용한 테스트 데이터 셋업은 객체 기반 설정의 �
 
 ![](/images/part3/실무에서%20적용하는%20테스트%20코드%20작성%20방법과%20노하우-작업용.153.jpeg)
 
-이러한 문제를 해결하기 위해 `@Sql` 기반의 데이터 셋업을 활용할 수 있습니다. `@Sql`을 사용하면 특정 데이터를 손쉽게 설정할 수 있습니다. 이는 테스트 코드에서 특정 시점의 상태를 설정하고 유지보수하기가 훨씬 용이해지는 방법입니다. 예를 들어, 아래와 같이 `@Sql` 어노테이션을 사용하여 데이터베이스의 특정 상태를 직접 설정할 수 있습니다. 이 방식은 외부 SQL 파일을 읽어와 데이터를 설정하기 때문에, 불필요한 상태 전환 로직을 우회하여 테스트의 주요 관심사에 집중할 수 있습니다.
+이러한 문제를 해결하기 위해 @Sql 기반의 데이터 셋업을 활용할 수 있습니다. @Sql 어노테이션을 사용하면 특정 데이터를 손쉽게 설정할 수 있으며, 이를 통해 테스트 코드에서 특정 시점의 상태를 보다 쉽게 관리할 수 있습니다. 예를 들어, 아래 코드에서는 @Sql 어노테이션을 사용하여 데이터베이스의 특정 상태를 직접 설정하고, 불필요한 상태 전환 로직을 우회하여 테스트의 주요 관심사에 집중할 수 있습니다.
 
 ```kotlin
 @Test
@@ -234,17 +234,99 @@ fun `상품 준비중 to 배송 시작 status 변경 테스트`() {
 }
 ```
 
-`@Sql` 어노테이션은 테스트 실행 전에 지정된 SQL 파일을 실행하여 데이터베이스의 상태를 원하는 대로 셋업해줍니다. 이를 통해 직접 코드로 상태를 변경하는 복잡한 로직을 피하고, 테스트의 핵심인 특정 상태의 기능을 검증하는 데 집중할 수 있습니다. 이러한 접근 방식은 코드의 가독성을 높이고 유지보수를 용이하게 합니다.
+`@Sql` 어노테이션은 테스트 실행 전에 지정된 SQL 파일을 실행하여 데이터베이스의 상태를 원하는 대로 셋업해줍니다. 이 방법은 복잡한 로직을 직접 코드로 처리하지 않고, SQL 파일을 통해 필요한 상태를 설정할 수 있어 테스트의 핵심 기능을 검증하는 데 집중할 수 있습니다. 이러한 접근 방식은 코드의 가독성을 높이고 유지보수를 용이하게 합니다.
+
+![](/images/part3/order.png)
+
+또한, 위 이미지는 복잡한 연관관계를 가진 주문 시스템을 나타내고 있습니다. 이 시스템은 상품, 회원, 쿠폰, 결제 정보 등 여러 요소가 결합된 복잡한 구조로 이루어져 있으며, 이러한 구조 속에서 객체 간의 연관관계와 외래 키(FK) 제약 조건을 처리하는 것은 매우 번거롭고 복잡할 수 있습니다.
+
+이를 해결하기 위해 `@SqlGroup`을 사용하여 복잡한 데이터 셋업을 보다 쉽게 관리할 수 있습니다. 예를 들어, 아래의 SQL 스크립트와 코드 예제를 통해 복잡한 데이터베이스 연관관계를 간단히 설정할 수 있습니다.
+
+```sql
+// schema.sql
+CREATE TABLE member ...;
+CREATE TABLE coupon ...;
+CREATE TABLE product ...;
+CREATE TABLE payment ...;
+CREATE TABLE orders ...;
+
+// payment-setup.sql
+INSERT INTO member (name, email)
+VALUES ('John Doe', 'john@example.com'),
+       ('Jane Smith', 'jane@example.com');
+
+INSERT INTO coupon (discount, member_id)
+VALUES (10.00, 1),
+       (15.00, 2);
+
+INSERT INTO product (name, price)
+VALUES ('Product A', 100.00),
+       ('Product B', 200.00);
+
+INSERT INTO payment (order_id, amount, payment_date)
+VALUES (1, 300.00, NOW()),
+       (2, 600.00, NOW());
+
+INSERT INTO orders (orderer_id, created_at)
+VALUES (1, NOW()),
+       (2, NOW());
+
+// delete.sql
+delete from member ...;
+delete from coupon ...;
+delete from product ...;
+delete from payment ...;
+delete from orders ...;
+```
+
+
+```kotlin
+@SqlGroup(
+    Sql(
+        value = ["/schema.sql", "/payment-setup.sql"],
+        config = SqlConfig(
+            dataSource = "dataSource",
+            transactionManager = "transactionManager"
+        ),
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
+    ),
+    Sql(
+        value = ["/delete.sql"],
+        config = SqlConfig(
+            dataSource = "dataSource",
+            transactionManager = "transactionManager"
+        ),
+        executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
+    )
+)
+@Test
+fun `sql test code2`() {
+    // given
+    // when
+    val payments = paymentRepository.findAll().toList()
+    // then
+    then(payments).hasSize(12)
+    println("sql test code")
+}
+```
+
+이 예제에서는 @SqlGroup을 사용하여 여러 SQL 파일을 한 번에 실행하고 관리할 수 있습니다. schema.sql과 payment-setup.sql 파일을 통해 데이터베이스 스키마와 데이터를 설정한 후, 테스트 메소드 실행 후 delete.sql 파일을 통해 데이터를 정리할 수 있습니다. 이처럼 @Sql과 @SqlGroup을 활용하면 복잡한 데이터 구조를 손쉽게 설정하고 관리할 수 있으며, 테스트 코드 작성 시 주요 관심사에 집중할 수 있습니다.
+
 
 ### @Sql 기반 데이터 셋업의 주요 장점
 
-1. **비즈니스 로직과의 분리**: 비즈니스 로직 변경과 독립적으로 테스트 셋업을 수행할 수 있어, 테스트가 관심 있는 동작에 집중할 수 있도록 합니다.
-2. **유연성**: SQL 스크립트를 통해 복잡한 데이터 시나리오를 빠르게 설정할 수 있어 객체 생성을 반복적으로 하지 않아도 됩니다.
-3. **유지보수 용이성**: 테스트 데이터 셋업을 SQL 스크립트로 관리함으로써, 데이터 준비와 테스트 검증을 분리하여 코드를 더 깔끔하고 유지보수하기 쉽게 만듭니다.
-4. **일관성**: SQL을 사용하여 여러 테스트에 동일한 데이터 상태를 사용할 수 있어, 더 일관적이고 신뢰할 수 있는 테스트 결과를 제공합니다.
+1. **비즈니스 로직과의 분리**: 비즈니스 로직의 변경과 무관하게 테스트 셋업을 수행할 수 있어, 테스트가 필요한 동작에 집중할 수 있습니다.
+2. **유연성**: SQL 스크립트를 통해 복잡한 데이터 시나리오를 빠르게 설정할 수 있으며, 객체 생성을 반복적으로 하지 않아도 됩니다.
+3. **유지보수 용이성**: SQL 스크립트를 통해 테스트 데이터 셋업을 관리함으로써, 데이터 준비와 테스트 검증을 분리하여 코드를 더 깔끔하고 유지보수하기 쉽게 만듭니다.
+4. **일관성**: SQL을 사용하여 여러 테스트에 동일한 데이터 상태를 유지할 수 있어, 일관적이고 신뢰할 수 있는 테스트 결과를 제공합니다.
 
-이러한 접근 방식은 코드의 복잡성을 줄이고, 테스트 코드의 유지보수성을 향상시켜, 진정으로 중요한 로직과 동작에 집중할 수 있도록 도와줍니다.
+이러한 접근 방식은 코드의 복잡성을 줄이고, 테스트 코드의 유지보수성을 향상시켜, 중요한 로직과 동작에 집중할 수 있도록 도와줍니다.
+
+
 
 ## 마치며
 
 객체 기반으로 복잡한 데이터 셋업을 테스트 코드에 작성하는 것은 불편할 뿐만 아니라, 다양한 데이터 셋업의 방해가 되어 폭넓고 다양한 테스트 코드를 작성하는 데 장애물이 됩니다. 이러한 복잡한 데이터 설정은 JSON이나 SQL과 같은 방식으로 관리하는 것이 훨씬 더 효율적입니다. 이러한 접근 방식을 통해 우리는 테스트의 주요 관심사에 집중하여 더 간결하고 효과적인 테스트 코드를 작성할 수 있게 됩니다.
+
+
+
