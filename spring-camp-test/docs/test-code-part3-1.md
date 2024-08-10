@@ -57,25 +57,25 @@ internal fun `주문 API TEST`() {
 
 ### 복잡한 객체 구조 설정
 
-![](/images/part3/실무에서%20적용하는%20테스트%20코드%20작성%20방법과%20노하우-작업용.136.jpeg)
+![](/images/part3/003.jpeg)
 
 주문 API에 필드가 추가되면, 각 필드를 객체로 생성하고 설정해야 합니다. 예를 들어, product 필드가 추가되면 이를 객체 리스트로 만들어야 하고, 각 product에 대해 개별적으로 객체를 생성해야 합니다. 이러한 반복 작업은 코드의 가독성을 떨어뜨리고, 유지보수에 어려움을 줍니다.
 
 ### 중첩된 데이터 구조 처리의 복잡성
 
-![](/images/part3/실무에서%20적용하는%20테스트%20코드%20작성%20방법과%20노하우-작업용.137.jpeg)
+![](/images/part3/004.jpeg)
 
 tags와 같은 중첩된 리스트 구조는 각 객체 내에 또 다른 리스트가 존재하는 형태로, 데이터 구조가 복잡해집니다. 이는 객체 생성 시 여러 단계의 중첩 리스트를 설정해야 하며, 실수를 유발할 가능성이 높아지고 코드 복잡성을 증가시킵니다. 리스트의 중첩은 특히 대규모 테스트 데이터 생성 시 문제가 됩니다.
 
 ### 데이터 포맷 일관성 유지의 어려움
 
-![](/images/part3/실무에서%20적용하는%20테스트%20코드%20작성%20방법과%20노하우-작업용.138.jpeg)
+![](/images/part3/005.jpeg)
 
 API 스펙 변경 시, 특히 필드명이 CamelCase나 SnakeCase로 변경될 경우 객체 생성 로직도 이에 맞춰 모두 수정해야 합니다. 이는 JSON 필드명이 CamelCase로 되어 있는 경우 더욱 복잡성을 증가시키며, 데이터 포맷 일관성을 유지하는 데 어려움을 줍니다. 코드 일관성을 유지하기 위한 많은 작업이 요구됩니다.
 
 ### 유효하지 않은 데이터 테스트의 제약
 
-![](/images/part3/실무에서%20적용하는%20테스트%20코드%20작성%20방법과%20노하우-작업용.139.jpeg)
+![](/images/part3/006.jpeg)
 
 Enum 타입의 status 필드는 정의되지 않은 값을 테스트하기 어려운 환경을 만듭니다. 객체 기반 설정에서는 올바른 값만을 전송하도록 강제되기 때문에, 비정상적인 데이터 입력 시나리오를 테스트하기 위해서는 추가적인 예외 처리를 해야 합니다. 이는 코드를 더욱 복잡하게 만들고, 다양한 테스트 케이스 적용을 어렵게 합니다.
 
@@ -207,7 +207,7 @@ JSON 파일을 사용한 테스트 데이터 셋업은 객체 기반 설정의 �
 
 ### 객체 기반 특정 데이터 셋업이 필요한 경우
 
-![](/images/part3/실무에서%20적용하는%20테스트%20코드%20작성%20방법과%20노하우-작업용.149.jpeg)
+![](/images/part3/002.jpeg)
 
 테스트 코드를 작성할 때 특정 시점의 데이터를 설정해야 하는 경우가 많습니다. 예를 들어, 상품 준비 단계에서 배송 시작 단계로 넘어가는 테스트 코드를 작성하려면, 상품 준비 상태의 객체를 생성해야 합니다. 이때, setter 메서드가 열려 있다면 객체를 쉽게 설정할 수 있지만, 모든 setter를 열어 데이터를 조작하는 방식은 적절하지 않을 수 있습니다. 따라서, setter가 없는 프로젝트의 경우 상품 준비 상태로 데이터를 직접 설정하기가 어려워질 수 있습니다.
 
@@ -215,24 +215,9 @@ JSON 파일을 사용한 테스트 데이터 셋업은 객체 기반 설정의 �
 
 ### 객체 기반 테스트 코드의 복잡성 문제 해결 방법
 
-![](/images/part3/실무에서%20적용하는%20테스트%20코드%20작성%20방법과%20노하우-작업용.153.jpeg)
+![](/images/part3/001.jpeg)
 
 이러한 문제를 해결하기 위해 @Sql 기반의 데이터 셋업을 활용할 수 있습니다. @Sql 어노테이션을 사용하면 특정 데이터를 손쉽게 설정할 수 있으며, 이를 통해 테스트 코드에서 특정 시점의 상태를 보다 쉽게 관리할 수 있습니다. 예를 들어, 아래 코드에서는 @Sql 어노테이션을 사용하여 데이터베이스의 특정 상태를 직접 설정하고, 불필요한 상태 전환 로직을 우회하여 테스트의 주요 관심사에 집중할 수 있습니다.
-
-```kotlin
-@Test
-@Sql("/order-setup.sql")
-fun `상품 준비중 to 배송 시작 status 변경 테스트`() {
-    // given
-    val order = orderRepository.findAll().first()
-
-    // when
-    order.updateStatusDeliveryStarted()
-
-    // then
-    then(order.status).isEqualTo(OrderStatus.DELIVERY_STARTED)
-}
-```
 
 `@Sql` 어노테이션은 테스트 실행 전에 지정된 SQL 파일을 실행하여 데이터베이스의 상태를 원하는 대로 셋업해줍니다. 이 방법은 복잡한 로직을 직접 코드로 처리하지 않고, SQL 파일을 통해 필요한 상태를 설정할 수 있어 테스트의 핵심 기능을 검증하는 데 집중할 수 있습니다. 이러한 접근 방식은 코드의 가독성을 높이고 유지보수를 용이하게 합니다.
 
@@ -244,11 +229,11 @@ fun `상품 준비중 to 배송 시작 status 변경 테스트`() {
 
 ```sql
 // schema.sql
-CREATE TABLE member ...;
-CREATE TABLE coupon ...;
-CREATE TABLE product ...;
-CREATE TABLE payment ...;
-CREATE TABLE orders ...;
+CREATE TABLE member...;
+CREATE TABLE coupon...;
+CREATE TABLE product...;
+CREATE TABLE payment...;
+CREATE TABLE orders...;
 
 // payment-setup.sql
 INSERT INTO member (name, email)
@@ -271,14 +256,19 @@ INSERT INTO orders (orderer_id, created_at)
 VALUES (1, NOW()),
        (2, NOW());
 
-// delete.sql
-delete from member ...;
-delete from coupon ...;
-delete from product ...;
-delete from payment ...;
-delete from orders ...;
+// delete
+.sql
+delete
+from member...;
+delete
+from coupon...;
+delete
+from product...;
+delete
+from payment...;
+delete
+from orders...;
 ```
-
 
 ```kotlin
 @SqlGroup(
@@ -312,7 +302,6 @@ fun `sql test code2`() {
 
 이 예제에서는 @SqlGroup을 사용하여 여러 SQL 파일을 한 번에 실행하고 관리할 수 있습니다. schema.sql과 payment-setup.sql 파일을 통해 데이터베이스 스키마와 데이터를 설정한 후, 테스트 메소드 실행 후 delete.sql 파일을 통해 데이터를 정리할 수 있습니다. 이처럼 @Sql과 @SqlGroup을 활용하면 복잡한 데이터 구조를 손쉽게 설정하고 관리할 수 있으며, 테스트 코드 작성 시 주요 관심사에 집중할 수 있습니다.
 
-
 ### @Sql 기반 데이터 셋업의 주요 장점
 
 1. **비즈니스 로직과의 분리**: 비즈니스 로직의 변경과 무관하게 테스트 셋업을 수행할 수 있어, 테스트가 필요한 동작에 집중할 수 있습니다.
@@ -321,8 +310,6 @@ fun `sql test code2`() {
 4. **일관성**: SQL을 사용하여 여러 테스트에 동일한 데이터 상태를 유지할 수 있어, 일관적이고 신뢰할 수 있는 테스트 결과를 제공합니다.
 
 이러한 접근 방식은 코드의 복잡성을 줄이고, 테스트 코드의 유지보수성을 향상시켜, 중요한 로직과 동작에 집중할 수 있도록 도와줍니다.
-
-
 
 ## 마치며
 
