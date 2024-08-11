@@ -6,7 +6,7 @@
 
 ## 객체 기반 데이터 셋업의 난관
 
-![](/images/part3/order.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/images/part3/order.png)
 
 실무에서 주문과 관련된 테스트 코드를 작성할 때, 다양한 데이터를 여러 케이스에 맞게 셋업해야 하는 상황을 자주 맞닥뜨리게 됩니다. 예를 들어, 할인 쿠폰을 적용할 때는 쿠폰의 할인율, 적용 가능한 제품, 업체와의 쿠폰 분담 비율 등 여러 가지 변수를 고려해야 합니다. 이러한 다양한 변수들이 얽히고설켜 복잡한 데이터 셋업이 필요하게 됩니다.
 
@@ -20,7 +20,7 @@
 
 ## JSON 요청 테스트 코드의 복잡성 문제
 
-![](/images/part3/007.jpeg)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/images/part3/007.jpeg)
 
 사용자가 주문을 진행할 때, 주문 정보를 담은 JSON 데이터를 주문 API에 전송하게 됩니다. 이 과정에서 API 요청을 처리하는 테스트 코드를 작성해야 할 경우, 다음과 같이 작성할 수 있습니다.
 
@@ -57,25 +57,25 @@ internal fun `주문 API TEST`() {
 
 ### 복잡한 객체 구조 설정
 
-![](/images/part3/003.jpeg)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/images/part3/003.jpeg)
 
 주문 API에 필드가 추가되면, 각 필드를 객체로 생성하고 설정해야 합니다. 예를 들어, product 필드가 추가되면 이를 객체 리스트로 만들어야 하고, 각 product에 대해 개별적으로 객체를 생성해야 합니다. 이러한 반복 작업은 코드의 가독성을 떨어뜨리고, 유지보수에 어려움을 줍니다.
 
 ### 중첩된 데이터 구조 처리의 복잡성
 
-![](/images/part3/004.jpeg)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/images/part3/004.jpeg)
 
 tags와 같은 중첩된 리스트 구조는 각 객체 내에 또 다른 리스트가 존재하는 형태로, 데이터 구조가 복잡해집니다. 이는 객체 생성 시 여러 단계의 중첩 리스트를 설정해야 하며, 실수를 유발할 가능성이 높아지고 코드 복잡성을 증가시킵니다. 리스트의 중첩은 특히 대규모 테스트 데이터 생성 시 문제가 됩니다.
 
 ### 데이터 포맷 일관성 유지의 어려움
 
-![](/images/part3/005.jpeg)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/images/part3/005.jpeg)
 
 API 스펙 변경 시, 특히 필드명이 CamelCase나 SnakeCase로 변경될 경우 객체 생성 로직도 이에 맞춰 모두 수정해야 합니다. 이는 JSON 필드명이 CamelCase로 되어 있는 경우 더욱 복잡성을 증가시키며, 데이터 포맷 일관성을 유지하는 데 어려움을 줍니다. 코드 일관성을 유지하기 위한 많은 작업이 요구됩니다.
 
 ### 유효하지 않은 데이터 테스트의 제약
 
-![](/images/part3/006.jpeg)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/images/part3/006.jpeg)
 
 Enum 타입의 status 필드는 정의되지 않은 값을 테스트하기 어려운 환경을 만듭니다. 객체 기반 설정에서는 올바른 값만을 전송하도록 강제되기 때문에, 비정상적인 데이터 입력 시나리오를 테스트하기 위해서는 추가적인 예외 처리를 해야 합니다. 이는 코드를 더욱 복잡하게 만들고, 다양한 테스트 케이스 적용을 어렵게 합니다.
 
@@ -210,7 +210,7 @@ fun readJson(path: String): String {
 
 ## 특정 상태의 데이터 셋업이 필요한 경우
 
-![](/images/part3/002.jpeg)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/images/part3/002.jpeg)
 
 테스트 코드를 작성할 때 특정 시점의 데이터를 설정해야 하는 경우가 많습니다. 예를 들어, 상품 준비 단계에서 배송 시작 단계로 넘어가는 테스트 코드를 작성하려면, 상품 준비 상태의 객체를 생성해야 합니다. 이때, setter 메서드가 열려 있다면 객체를 쉽게 설정할 수 있지만, 모든 setter를 열어 데이터를 조작하는 방식은 적절하지 않을 수 있습니다. 따라서, setter가 없는 프로젝트의 경우 상품 준비 상태로 데이터를 직접 설정하기가 어려워질 수 있습니다.
 
@@ -218,11 +218,11 @@ fun readJson(path: String): String {
 
 ## 특정 상태의 데이터 셋업이 필요한 경우 해결 방법
 
-![](/images/part3/001.jpeg)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/images/part3/001.jpeg)
 
 이러한 문제를 해결하기 위해 `@Sql` 기반의 데이터 셋업을 활용할 수 있습니다. `@Sql` 어노테이션은 테스트 실행 전에 지정된 SQL 파일을 실행하여 데이터베이스의 상태를 원하는 대로 셋업해줍니다. 이 방법은 복잡한 로직을 직접 코드로 처리하지 않고, SQL 파일을 통해 필요한 상태를 설정할 수 있어 테스트의 핵심 기능을 검증하는 데 집중할 수 있습니다. 이를 통해 객체 기반 테스트 코드의 복잡성을 줄이고, 테스트 코드 작성의 효율성을 높일 수 있습니다.
 
-![](/images/part3/order.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/images/part3/order.png)
 
 또한, 위 이미지는 복잡한 연관관계를 가진 주문 시스템을 나타내고 있습니다. 이 시스템은 상품, 회원, 쿠폰, 결제 정보 등 여러 요소가 결합된 복잡한 구조로 이루어져 있으며, 이러한 구조 속에서 객체 간의 연관관계와 외래 키(FK) 제약 조건을 처리하는 것은 매우 번거롭고 복잡할 수 있습니다.
 
