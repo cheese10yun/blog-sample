@@ -11,7 +11,8 @@ plugins {
 
 group = "com.example"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
+java.targetCompatibility = JavaVersion.VERSION_17
 
 configurations {
     compileOnly {
@@ -24,8 +25,13 @@ allprojects {
         mavenCentral()
         maven { url = uri("https://repo.spring.io/milestone") }
         maven { url = uri("https://repo.spring.io/snapshot") }
+
+    }
+    dependencies {
+
     }
 }
+
 
 subprojects {
     apply(plugin = "java")
@@ -35,7 +41,6 @@ subprojects {
     apply(plugin = "io.spring.dependency-management")
     apply(plugin = "java-test-fixtures")
 
-
     allOpen {
         annotation("javax.persistence.Entity")
         annotation("javax.persistence.Embeddable")
@@ -44,6 +49,9 @@ subprojects {
 
 
     dependencies {
+
+        testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:1.0.23")
+
         implementation("org.jetbrains.kotlin:kotlin-reflect")
         compileOnly("org.springframework.boot:spring-boot-configuration-processor")
 
@@ -67,7 +75,7 @@ subprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "11"
+            jvmTarget = "17"
         }
     }
 
