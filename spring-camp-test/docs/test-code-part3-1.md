@@ -203,7 +203,10 @@ fun readJson(path: String): String {
 
 ### 요약
 
-JSON 파일을 사용한 테스트 데이터 셋업은 객체 기반 설정의 복잡성을 효과적으로 줄이고, 테스트의 주요 관심사에 집중할 수 있게 합니다. JSON을 통해 데이터 구조를 쉽게 정의하고 관리할 수 있어, 다양한 테스트 시나리오를 더 간단하게 구현할 수 있습니다. 이러한 접근 방식은 테스트 코드의 가독성을 높이고, 유지보수를 용이하게 하며, 테스트의 핵심인 시스템의 견고함과 신뢰성을 높이는 데 기여합니다. 이러한 방법을 통해 개발자는 복잡한 객체 생성 작업에서 벗어나, 시스템의 주요 관심사와 기능을 검증하는 데 집중할 수 있습니다.
+* **객체 기반 설정의 복잡성 감소**: JSON 파일을 사용하여 복잡한 객체 구조를 단순화하고, 테스트의 주요 관심사에 집중할 수 있습니다.
+* **유지보수 용이성**: JSON 파일을 통해 데이터 구조를 쉽게 정의하고 관리하여, 코드의 가독성을 높이고 유지보수를 용이하게 합니다.
+* **테스트 커버리지 확장**: 다양한 테스트 시나리오를 더 간단하게 구현할 수 있어, 시스템의 견고함과 신뢰성을 높이는 데 기여합니다.
+* **효율적인 데이터 셋업**: JSON 파일을 사용함으로써 반복적인 객체 생성 작업에서 벗어나, 주요 기능 검증에 집중할 수 있습니다.
 
 ## 특정 상태의 데이터 셋업이 필요한 경우
 
@@ -234,25 +237,25 @@ CREATE TABLE payment...;
 CREATE TABLE orders...;
 
 // setup.sql
-INSERT INTO member (name, email)
-VALUES ('John Doe', 'john@example.com'),
-       ('Jane Smith', 'jane@example.com');
+INSERT INTO member (id, name, email)
+VALUES (1, 'John Doe', 'john@example.com'),
+       (2, 'Jane Smith', 'jane@example.com');
 
-INSERT INTO coupon (discount, member_id)
-VALUES (10.00, 1),
-       (15.00, 2);
+INSERT INTO coupon (id, discount, member_id)
+VALUES (1, 10.00, 1),
+       (2, 15.00, 2);
 
-INSERT INTO product (name, price)
-VALUES ('Product A', 100.00),
-       ('Product B', 200.00);
+INSERT INTO product (id, name, price)
+VALUES (1, 'Product A', 100.00),
+       (2, 'Product B', 200.00);
 
-INSERT INTO payment (order_id, amount, payment_date)
-VALUES (1, 300.00, NOW()),
-       (2, 600.00, NOW());
+INSERT INTO payment (id, order_id, amount, payment_date)
+VALUES (1, 1, 300.00, NOW()),
+       (2, 2, 600.00, NOW());
 
-INSERT INTO orders (orderer_id, created_at)
-VALUES (1, NOW()),
-       (2, NOW());
+INSERT INTO orders (id, orderer_id, created_at)
+VALUES (1, 1, NOW()),
+       (2, 2, NOW());
 
 // delete
 .sql
@@ -304,8 +307,6 @@ fun `sql test`() {
 2. **유연성**: SQL 스크립트를 통해 복잡한 데이터 시나리오를 빠르게 설정할 수 있으며, 객체 생성을 반복적으로 하지 않아도 됩니다.
 3. **유지보수 용이성**: SQL 스크립트를 통해 테스트 데이터 셋업을 관리함으로써, 데이터 준비와 테스트 검증을 분리하여 코드를 더 깔끔하고 유지보수하기 쉽게 만듭니다.
 4. **일관성**: SQL을 사용하여 여러 테스트에 동일한 데이터 상태를 유지할 수 있어, 일관적이고 신뢰할 수 있는 테스트 결과를 제공합니다.
-
-이러한 접근 방식은 코드의 복잡성을 줄이고, 테스트 코드의 유지보수성을 향상시켜, 중요한 로직과 동작에 집중할 수 있도록 도와줍니다.
 
 ## 마치며
 
