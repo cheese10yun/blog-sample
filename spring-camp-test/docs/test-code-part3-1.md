@@ -1,4 +1,4 @@
-# 실무에서 적용하는 테스트 코드 작성 방법과 노하우 Part 3: Given 지옥에서 벗어나기 - 객체 기반 데이터 셋업의 난관과 해결책
+# 실무에서 적용하는 테스트 코드 작성 방법과 노하우 Part 3: Given 지옥에서 벗어나기 - 객체 기반 데이터 셋업의 한계
 
 지난 시리즈에서는 Mock Test를 효율적으로 작성하는 방법과 테스트 코드로부터 피드백을 받는 방법에 대해 다루었습니다. [Part 1: 효율적인 Mock Test](https://tech.kakaopay.com/post/mock-test-code/)에서는 Mock Test의 중요성과 작성 방법에 대해 설명했으며, [Part 2: 테스트 코드로부터 피드백 받기](https://tech.kakaopay.com/post/mock-test-code-part-2/)에서는 테스트 코드를 통해 얻을 수 있는 인사이트와 개선 방법을 소개했습니다.
 
