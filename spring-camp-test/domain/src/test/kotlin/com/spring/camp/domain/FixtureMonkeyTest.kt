@@ -68,10 +68,10 @@ class FixtureMonkey {
 
 
         // when
-        val actual = fixtureMonkey.giveMeBuilder<Order>()
-            .setExp(Order::orderNo, "1")
-            .setExp(Order::productName, "Line Sally")
-            .minSizeExp(Order::items, 1)
+        val actual = fixtureMonkey.giveMeBuilder<OrderFixture>()
+            .setExp(OrderFixture::orderNo, "1")
+            .setExp(OrderFixture::productName, "Line Sally")
+            .minSizeExp(OrderFixture::items, 1)
             .sample()
 
         // then
@@ -83,7 +83,7 @@ class FixtureMonkey {
 
 }
 
-data class Order (
+data class OrderFixture (
     val id: Long,
     val orderNo: String,
     val productName: String,
