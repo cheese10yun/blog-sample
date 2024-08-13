@@ -12,7 +12,13 @@ class ClientTestConfiguration {
     @Primary
     fun mockPartnerClient() = mock(PartnerClient::class.java)!!
 
+    @Bean
+    @Primary
+    fun mockExchangeRateClient() = mock(ExchangeRateClient::class.java)!!
+
 //    @Bean
 //    @Primary
 //    fun mockPartnerClientService() = mock(PartnerClientService::class.java)!!
 }
+
+ class ExchangeRateClient

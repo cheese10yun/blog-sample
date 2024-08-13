@@ -1,5 +1,6 @@
 package com.spring.camp.io
 
+import java.time.LocalDate
 import kotlin.properties.Delegates
 import org.assertj.core.api.BDDAssertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -54,6 +55,27 @@ class PartnerClientMockServerTest(
             partnerClient.getPartnerBy(brn)
         }
             .isInstanceOf(IllegalArgumentException::class.java)
+    }
+
+    @Test
+    fun `주문일자 기준 `() {
+        //given
+        val orderDate = LocalDate.of(2024, 8, 2)
+        mockServer
+            .expect(requestTo("http://localhost:8787/api/v1/exchange-rate/USD-to-KRW/${orderDate}"))
+            .andExpect(method(HttpMethod.GET))
+            .andRespond(
+                withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(
+                        """
+                            {
+                              "exchange_rate": "1,369.50"
+                            }
+                        """.trimIndent()
+                    )
+            )
+
     }
 
     @Test

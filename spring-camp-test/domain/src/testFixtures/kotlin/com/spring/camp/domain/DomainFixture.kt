@@ -2,7 +2,7 @@ package com.spring.camp.domain
 
 import java.time.LocalDate
 
-object DomainFixTure {
+object DomainFixture {
     fun order(
         customerName: String = "홍길동",
         orderDate: LocalDate = LocalDate.of(2024, 4, 4),
@@ -14,7 +14,7 @@ object DomainFixTure {
         shippingCost: Double = 10.11,
         taxAmount: Double = 12.13,
         discount: Double = 14.15,
-        notes: String? = null
+        notes: String? = null,
     ): Order {
         return Order(
             customerName = customerName,
@@ -33,7 +33,8 @@ object DomainFixTure {
 
     fun coupon(
         code: String = "COUPON_CODE",
-        order: Order
+        discount: Double = 10.0,
+//        order: Order
     ): Coupon {
         return Coupon(
             code = code,
