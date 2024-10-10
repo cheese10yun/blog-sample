@@ -40,5 +40,5 @@ dependencies {
     implementation("io.ktor:ktor-client-logging:2.1.1")
     implementation("io.ktor:ktor-client-content-negotiation:2.1.1")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.1")
-    compileOnlyApi("com.epages:restdocs-api-spec-gradle-plugin:0.9.5")
+    compileOnlyApi("com.epages:restdocs-api-spec-gradle-plugin:0.10.3")
 }

@@ -21,6 +21,9 @@ version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
+    maven {
+        url = uri("https://maven.aliyun.com/repository/central")
+    }
     mavenCentral()
     gradlePluginPortal()
 
@@ -44,6 +47,9 @@ dependencies {
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
     testImplementation("com.epages:restdocs-api-spec-mockmvc:0.16.4")
 
+
+    runtimeOnly("com.mysql:mysql-connector-j")
+
     implementation("io.ktor:ktor-client-core:2.1.1") // Ktor core
     implementation("io.ktor:ktor-client-cio:2.1.1") // CIO 엔진
     implementation("io.ktor:ktor-client-logging:2.1.1")
@@ -52,7 +58,7 @@ dependencies {
 
     testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:0.6.8")
 
-    runtimeOnly("com.h2database:h2")
+//    runtimeOnly("com.h2database:h2")
     asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
 
     implementation("org.apache.httpcomponents:httpclient:4.5.13")

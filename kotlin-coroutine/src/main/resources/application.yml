@@ -2,17 +2,20 @@ server:
     port: 8080
 
 spring:
-    application:
-        name: member-api
     jackson:
-      property-naming-strategy: SNAKE_CASE
+        property-naming-strategy: SNAKE_CASE
 
+    jpa:
+        hibernate:
+            ddl-auto: create-drop
+        show-sql: false
 
     datasource:
         url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=Asia/Seoul&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false
         username: root
         password:
         driver-class-name: com.mysql.cj.jdbc.Driver
+
         hikari:
             maximum-pool-size: 50
             minimum-idle: 25
@@ -21,3 +24,4 @@ spring:
         dbcp2:
             test-on-borrow: true
             validation-query: select 1
+        type: com.zaxxer.hikari.HikariDataSource
