@@ -10,23 +10,23 @@ Kotlin의 코루틴을 이용한 비동기 프로그래밍은 성능을 크게 �
 
 ```kotlin
 class OrderClient {
-    fun getOrder(orderRequest: OrderRequest): ResponseResult<OrderResponse> {
-        return runBlocking {
-            delay(300) // 300ms 지연, 실제 API를 호출하지 않고 시간만 지연 
-            ResponseResult.Success(OrderResponse(orderRequest.productId))
-        }
-    }
+   fun getOrder(orderRequest: OrderRequest): ResponseResult<OrderResponse> {
+      return runBlocking {
+         delay(300) // 300ms 지연, 실제 API를 호출하지 않고 시간만 지연 
+         ResponseResult.Success(OrderResponse(orderRequest.productId))
+      }
+   }
 }
 
 fun getOrderSync(orderRequests: List<OrderRequest>): List<OrderResponse> {
-    return orderRequests
-        .map {
-            orderClient
-                .getOrder(it) // 300ms 지연
-                .onFailure { log.error("Failure: $it") }
-                .onSuccess { log.info("Success: $it") }
-                .getOrThrow()
-        }
+   return orderRequests
+      .map {
+         orderClient
+            .getOrder(it) // 300ms 지연
+            .onFailure { log.error("Failure: $it") }
+            .onSuccess { log.info("Success: $it") }
+            .getOrThrow()
+      }
 }
 ```
 
@@ -36,17 +36,17 @@ fun getOrderSync(orderRequests: List<OrderRequest>): List<OrderResponse> {
 
 @Test
 fun getOrderSync() {
-    val stopWatch = StopWatch()
-    val flatMapMergeStudy = FlatMapMergeStudy()
-    val orderRequests = (1..100).map { OrderRequest("$it") }
+   val stopWatch = StopWatch()
+   val flatMapMergeStudy = FlatMapMergeStudy()
+   val orderRequests = (1..100).map { OrderRequest("$it") }
 
-    stopWatch.start()
-    val response = flatMapMergeStudy.getOrderSync(orderRequests)
-    stopWatch.stop()
-    println(stopWatch.totalTimeMillis)
+   stopWatch.start()
+   val response = flatMapMergeStudy.getOrderSync(orderRequests)
+   stopWatch.stop()
+   println(stopWatch.totalTimeMillis)
 
-    // 30,528ms
-    println(response)
+   // 30,528ms
+   println(response)
 }
 ```
 
@@ -58,20 +58,20 @@ Kotlin의 코루틴은 비동기 작업을 손쉽게 처리할 수 있는 강력
 ```kotlin
 @OptIn(FlowPreview::class)
 suspend fun getOrderFlow(orderRequests: List<OrderRequest>): List<OrderResponse> {
-    return orderRequests
-        .asFlow()
-        .flatMapMerge { request ->
-            flow {
-                orderClient
-                    .getOrder(request)
-                    .onFailure { log.error("Failure: $it") }
-                    .onSuccess {
-                        log.info("Success: $it")
-                        emit(it)
-                    }
-            }
-        }
-        .toList()
+   return orderRequests
+      .asFlow()
+      .flatMapMerge { request ->
+         flow {
+            orderClient
+               .getOrder(request)
+               .onFailure { log.error("Failure: $it") }
+               .onSuccess {
+                  log.info("Success: $it")
+                  emit(it)
+               }
+         }
+      }
+      .toList()
 }
 ```
 
@@ -82,16 +82,16 @@ suspend fun getOrderFlow(orderRequests: List<OrderRequest>): List<OrderResponse>
 ```kotlin
 @Test
 fun getOrderFlow(): Unit = runBlocking {
-        val stopWatch = StopWatch()
-        val flatMapMergeStudy = FlatMapMergeStudy()
-        val orderRequests = (1..100).map { OrderRequest("$it") }
+      val stopWatch = StopWatch()
+      val flatMapMergeStudy = FlatMapMergeStudy()
+      val orderRequests = (1..100).map { OrderRequest("$it") }
 
-        stopWatch.start()
-        val response = flatMapMergeStudy.getOrderFlow(orderRequests)
-        stopWatch.stop()
-        // 2,228ms
-        println(stopWatch.totalTimeMillis)
-    }
+      stopWatch.start()
+      val response = flatMapMergeStudy.getOrderFlow(orderRequests)
+      stopWatch.stop()
+      // 2,228ms
+      println(stopWatch.totalTimeMillis)
+   }
 ```
 
 이론상 100개의 요청을 동시에 처리하면 300ms 정도의 시간이 소요되어야 하지만, 실제로는 2,228ms가 소요됩니다. 이는 다음과 같은 요인들로 인한 것입니다.
@@ -139,26 +139,26 @@ Kotlin 문서에서는 코루틴을 경량 스레드라고 합니다. 이는 대
 ```kotlin
 // 코드 출처 코틀린 동시성 프로그래밍 
 suspend fun createCoroutines(amount: Int) {
-    val jobs = ArrayList<Job>()
-    for (i in 1..amount) {
-        jobs += GlobalScope.launch {
-            delay(1000)
-        }
-    }
-    jobs.forEach { it.join() }
+   val jobs = ArrayList<Job>()
+   for (i in 1..amount) {
+      jobs += GlobalScope.launch {
+         delay(1000)
+      }
+   }
+   jobs.forEach { it.join() }
 }
 
 @Test
 @DelicateCoroutinesApi
 fun `코루틴 생성 테스트`() = runBlocking {
-    println("${Thread.activeCount()} thread active at the start")
+   println("${Thread.activeCount()} thread active at the start")
 
-    val time = measureTimeMillis {
-        createCoroutines(100)
-    }
+   val time = measureTimeMillis {
+      createCoroutines(100)
+   }
 
-    println("${Thread.activeCount()} thread active at the end")
-    println("Took $time ms")
+   println("${Thread.activeCount()} thread active at the end")
+   println("Took $time ms")
 }
 ```
 
@@ -246,7 +246,7 @@ flatMapMerge의 concurrency 파라미터는 동시에 실행되는 코루틴 수
 
 또한 배치 애플리케이션처럼 특정 작업만 하고 애플리케이션이 종료되는 환경에서는 concurrency 값을 높여 처리량을 극대화하는 것이 좋습니다. 이런 경우에는 단기간에 최대한 많은 작업을 처리하는 것이 목표이므로, 가능한 한 높은 concurrency 값을 설정하여 성능을 최적화할 수 있습니다.
 
-### 코루틴은 더 적은 스레드로 더 많은 동시성을 처리한다
+## 코루틴은 더 적은 스레드로 더 많은 동시성을 처리한다
 
 ```kotlin
 private fun rxAndBulkWriter(): ItemWriter<StoreProjection> {
@@ -273,8 +273,6 @@ RxJava에서 flow 방식으로 처리하는 코드는 코루틴과 비교해볼 
 ![](https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/parallelflowable.sequential.png)
 
 RxJava와 같은 라이브러리에서는 동시성 처리를 위해 CPU 코어 수에 맞춰 스레드를 생성하는 것이 일반적입니다. 예를 들어, CPU가 4코어라면 4개의 스레드를 생성해 병렬로 작업을 처리합니다. 이 방식은 각 스레드에 작업을 분배해 동시에 여러 작업을 처리할 수 있지만, 스레드의 생성과 컨텍스트 전환에서 발생하는 비용이 성능에 영향을 미칠 수 있습니다. 스레드 수가 많아질수록 시스템 자원을 더 많이 소비하게 됩니다.
-
-### 코루틴: 더 적은 스레드로 더 많은 동시성 처리
 
 코틀린의 코루틴은 동시성 프로그래밍에 있어서 더 효율적인 대안을 제공합니다. 코루틴은 스레드보다 훨씬 가벼우며, 하나의 스레드에서 여러 개의 코루틴을 실행할 수 있습니다. 코루틴은 스레드처럼 독립적인 작업 단위이지만, 스레드보다 적은 자원을 사용하고 빠르게 컨텍스트 전환을 할 수 있습니다.
 
