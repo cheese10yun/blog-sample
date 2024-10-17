@@ -4,39 +4,29 @@ Kotlin의 코루틴을 이용한 비동기 프로그래밍은 성능을 크게 �
 
 ## 시나리오
 
-```mermaid
-sequenceDiagram
-    participant Client
-    participant API
-
-    loop 100 times
-        Client ->> API: Send Request
-        Note right of API: Processing (300ms)
-        API -->> Client: Response
-    end
-```
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/result_005.png)
 
 300ms가 발생하는 API 요청을 100번 반복하는 시나리오를 가정해봅시다. 동기적으로 처리하면 100번의 요청을 처리하는 데 30초가 걸립니다.
 
 ```kotlin
 class OrderClient {
-   fun getOrder(orderRequest: OrderRequest): ResponseResult<OrderResponse> {
-      return runBlocking {
-         delay(300) // 300ms 지연, 실제 API를 호출하지 않고 시간만 지연 
-         ResponseResult.Success(OrderResponse(orderRequest.productId))
-      }
-   }
+    fun getOrder(orderRequest: OrderRequest): ResponseResult<OrderResponse> {
+        return runBlocking {
+            delay(300) // 300ms 지연, 실제 API를 호출하지 않고 시간만 지연 
+            ResponseResult.Success(OrderResponse(orderRequest.productId))
+        }
+    }
 }
 
 fun getOrderSync(orderRequests: List<OrderRequest>): List<OrderResponse> {
-   return orderRequests
-      .map {
-         orderClient
-            .getOrder(it) // 300ms 지연
-            .onFailure { log.error("Failure: $it") }
-            .onSuccess { log.info("Success: $it") }
-            .getOrThrow()
-      }
+    return orderRequests
+        .map {
+            orderClient
+                .getOrder(it) // 300ms 지연
+                .onFailure { log.error("Failure: $it") }
+                .onSuccess { log.info("Success: $it") }
+                .getOrThrow()
+        }
 }
 ```
 
@@ -46,41 +36,42 @@ fun getOrderSync(orderRequests: List<OrderRequest>): List<OrderResponse> {
 
 @Test
 fun getOrderSync() {
-   val stopWatch = StopWatch()
-   val flatMapMergeStudy = FlatMapMergeStudy()
-   val orderRequests = (1..100).map { OrderRequest("$it") }
+    val stopWatch = StopWatch()
+    val flatMapMergeStudy = FlatMapMergeStudy()
+    val orderRequests = (1..100).map { OrderRequest("$it") }
 
-   stopWatch.start()
-   val response = flatMapMergeStudy.getOrderSync(orderRequests)
-   stopWatch.stop()
-   println(stopWatch.totalTimeMillis)
+    stopWatch.start()
+    val response = flatMapMergeStudy.getOrderSync(orderRequests)
+    stopWatch.stop()
+    println(stopWatch.totalTimeMillis)
 
-   // 30,528ms
-   println(response)
+    // 30,528ms
+    println(response)
 }
 ```
 
 ## 코루틴 `Flow`를 이용한 성능 개선
 
-Kotlin의 코루틴을 이용한 비동기 프로그래밍은 성능을 크게 향상시킬 수 있는 강력한 도구입니다. 특히 Flow를 활용하여 여러 요청을 동시에 처리하는 방식은 효율적인 비동기 처리를 가능하게 합니다. 이 블로그에서는 flatMapMerge를 사용하여 다중 요청을 처리하는 방법과 이론적 배경, 그리고 이를 사용할 때 주의할 점에 대해 다루겠습니다.
+Kotlin의 코루틴은 비동기 작업을 손쉽게 처리할 수 있는 강력한 도구입니다. 특히 Flow를 활용하면 여러 비동기 요청을 효율적으로 처리할 수 있습니다. Flow는 데이터 스트림을 처리하는 코루틴 기반 API로, 여러 개의 작업을 동시에 병렬로 수행할 수 있도록 지원합니다. 이번 섹션에서는 Flow의 flatMapMerge를 사용하여 다수의 API 요청을 효율적으로 처리하는 방법과, 이를 통해 얻을 수 있는 성능 향상에 대해 다뤄보겠습니다.
+
 
 ```kotlin
 @OptIn(FlowPreview::class)
 suspend fun getOrderFlow(orderRequests: List<OrderRequest>): List<OrderResponse> {
-   return orderRequests
-      .asFlow()
-      .flatMapMerge { request ->
-         flow {
-            orderClient
-               .getOrder(request)
-               .onFailure { log.error("Failure: $it") }
-               .onSuccess {
-                  log.info("Success: $it")
-                  emit(it)
-               }
-         }
-      }
-      .toList()
+    return orderRequests
+        .asFlow()
+        .flatMapMerge { request ->
+            flow {
+                orderClient
+                    .getOrder(request)
+                    .onFailure { log.error("Failure: $it") }
+                    .onSuccess {
+                        log.info("Success: $it")
+                        emit(it)
+                    }
+            }
+        }
+        .toList()
 }
 ```
 
@@ -91,16 +82,16 @@ suspend fun getOrderFlow(orderRequests: List<OrderRequest>): List<OrderResponse>
 ```kotlin
 @Test
 fun getOrderFlow(): Unit = runBlocking {
-      val stopWatch = StopWatch()
-      val flatMapMergeStudy = FlatMapMergeStudy()
-      val orderRequests = (1..100).map { OrderRequest("$it") }
+        val stopWatch = StopWatch()
+        val flatMapMergeStudy = FlatMapMergeStudy()
+        val orderRequests = (1..100).map { OrderRequest("$it") }
 
-      stopWatch.start()
-      val response = flatMapMergeStudy.getOrderFlow(orderRequests)
-      stopWatch.stop()
-      // 2,228ms
-      println(stopWatch.totalTimeMillis)
-   }
+        stopWatch.start()
+        val response = flatMapMergeStudy.getOrderFlow(orderRequests)
+        stopWatch.stop()
+        // 2,228ms
+        println(stopWatch.totalTimeMillis)
+    }
 ```
 
 이론상 100개의 요청을 동시에 처리하면 300ms 정도의 시간이 소요되어야 하지만, 실제로는 2,228ms가 소요됩니다. 이는 다음과 같은 요인들로 인한 것입니다.
@@ -114,10 +105,10 @@ fun getOrderFlow(): Unit = runBlocking {
    - 이 오버헤드는 특히 플로우의 개수가 많을 때 더 크게 작용합니다.
 3. **`emit` 호출과 플로우 수집의 지연**
    - 각 플로우에서 `emit`을 호출하고, 최종적으로 `toList`로 수집하는 과정에서 발생하는 지연도 무시할 수 없습니다.
-   - `emit`은 비동기적으로 데이터를 내보내는 작업이므로, 여러 번 호출될 때 지연이 누적될 수 있습니다. 
+   - `emit`은 비동기적으로 데이터를 내보내는 작업이므로, 여러 번 호출될 때 지연이 누적될 수 있습니다.
 4. **기본 Concurrency 설정**
-   - flatMapMerge의 기본 concurrency 값은 16이며, 이 코드는 기본값으로 동작합니다. 
-   - Concurrency 16으로 동작할 때 100개의 요청을 처리하는 데 소요되는 시간은 100 / 16 * 300 = 1875ms 정도입니다. 
+   - flatMapMerge의 기본 concurrency 값은 16이며, 이 코드는 기본값으로 동작합니다.
+   - Concurrency 16으로 동작할 때 100개의 요청을 처리하는 데 소요되는 시간은 100 / 16 * 300 = 1875ms 정도입니다.
    - 이 시간은 앞서 언급한 1, 2, 3번 항목들과 함께 작업을 수행해야 하므로 추가적인 지연이 발생할 수 있습니다.
    - **특히, Concurrency 16으로 처리하는 시간이 가장 오래 걸리며, 이는 전체 처리 시간에 크게 영향을 미칩니다.**
 
@@ -201,22 +192,22 @@ Kotlin의 `flatMapMerge`에서 `concurrency` 파라미터는 동시에 병렬로
 
 ```kotlin
 @OptIn(FlowPreview::class)
-suspend fun getOrderFlow4(orderRequests: List<OrderRequest>, concurrency: Int): List<OrderResponse> {
-    return orderRequests
-        .asFlow()
-        // concurrency 동시 실행할 코루틴 수 제한, 
-        .flatMapMerge(concurrency) { request ->
-            flow {
-                orderClient
-                    .getOrder(request)
-                    .onFailure { log.error("Failure: $it") }
-                    .onSuccess {
-                        log.info("Success: $it")
-                        emit(it)
-                    }
-            }
-        }
-        .toList()
+suspend fun getOrderFlow(orderRequests: List<OrderRequest>, concurrency: Int): List<OrderResponse> {
+   return orderRequests
+      .asFlow()
+      // concurrency 동시 실행할 코루틴 수 제한, 
+      .flatMapMerge(concurrency) { request ->
+         flow {
+            orderClient
+               .getOrder(request)
+               .onFailure { log.error("Failure: $it") }
+               .onSuccess {
+                  log.info("Success: $it")
+                  emit(it)
+               }
+         }
+      }
+      .toList()
 }
 ```
 
