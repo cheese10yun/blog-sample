@@ -20,35 +20,83 @@ Java 애플리케이션에서 가장 널리 사용되는 커넥션 풀 중 하�
 | **validationTimeout**         | 커넥션이 유효한지 확인하는 데 사용할 수 있는 최대 시간입니다. 유효성을 검사하는 데 사용됩니다.                 |
 | **idleTimeout**               | 유휴 상태의 커넥션이 유지될 수 있는 최대 시간입니다. 이 시간이 지나면 유휴 커넥션은 제거됩니다.                |
 
-### 커넥션 풀에서의 시나리오
+### 커넥션 풀 시나리오 설명
 
-**상황**: 커넥션 풀의 `maximumPoolSize`가 10인 경우를 가정해보겠습니다. 10명의 사용자가 각각 1초에 한 번씩 요청을 보내고, 각 요청은 약 1초의 시간이 소요됩니다.
+![](/images/mysql-connection-pool-1.png)
 
-1. **첫 번째 요청**: 사용자가 1초 동안 요청을 보냅니다. 커넥션 풀에서 1개의 연결을 할당하여 데이터를 처리하고, 1초 후에 반환합니다. 이때, `activeConnections`는 1개, `idleConnections`는 9개입니다.
+**상황**: `maximumPoolSize`가 10인 커넥션 풀을 가진 애플리케이션에서, 10명의 사용자가 각각 1초에 한 번씩 요청을 보낸다고 가정해보겠습니다. 각 요청은 약 1초가 소요됩니다. 아래 시나리오는 커넥션 풀의 상태를 각 단계별로 설명합니다.
 
-2. **동시 요청 (10명)**: 10명의 사용자가 동시에 요청을 보냅니다. `activeConnections`는 10개가 되고, `idleConnections`는 0개가 됩니다. 이때, 10개의 커넥션이 모두 사용 중입니다.
+#### 1. 첫 번째 요청: 1명의 사용자가 요청을 보냄
 
-3. **추가 요청 발생**: 만약 10명의 사용자가 동시에 1초에 1번씩 요청을 보내는 상황에서 11번째 요청이 들어온다면, 커넥션 풀이 꽉 차 있기 때문에 `threadsAwaitingConnection`에 해당 요청이 대기하게 됩니다. 이 대기 중인 요청의 수는 `threadsAwaitingConnection`으로 관리됩니다. `totalConnections`는 여전히 10 (`activeConnections + idleConnections`)으로 유지됩니다.
+첫 번째 사용자가 요청을 보내면, 커넥션 풀에서 1개의 커넥션이 할당되어 데이터를 처리합니다. 나머지 9개의 커넥션은 유휴 상태로 남아 있습니다.
 
-4. **1초 후 첫 번째 요청 처리 완료**: 1초 후 첫 번째 요청이 완료되면, 사용된 커넥션은 다시 유휴 상태로 돌아갑니다. 이제 `activeConnections`는 9개, `idleConnections`는 1개가 됩니다. 이때, 대기 중이던 11번째 요청이 처리되기 위해 풀에서 남은 유휴 커넥션을 할당받습니다.
+- `totalConnections = 10`
+- `activeConnections = 1`
+- `idleConnections = 9`
 
-### 각 필드에 대한 시나리오 설명
+#### 2. 동시 요청: 1~5명의 사용자가 동시에 요청
 
-- **maximumPoolSize**: 커넥션 풀에서 생성할 수 있는 최대 커넥션 수로, 이 시나리오에서는 10개입니다. 즉, 동시에 10개의 요청을 처리할 수 있습니다. 10개 이상의 요청이 들어오면 추가 요청은 대기 상태에 들어갑니다.
+1명에서 5명의 사용자가 동시에 요청을 보냅니다. 커넥션 풀에서 각각의 요청에 커넥션을 할당하여 총 5개의 커넥션이 사용 중이고, 나머지 5개는 유휴 상태로 남아 있습니다.
 
-- **activeConnections**: 현재 처리 중인 요청에 할당된 커넥션 수를 나타냅니다. 위 시나리오에서 동시 요청 10건이 발생하면 `activeConnections`는 10개가 됩니다.
+- `totalConnections = 10`
+- `activeConnections = 5`
+- `idleConnections = 5`
 
-- **idleConnections**: 요청이 없는 동안 유휴 상태로 대기 중인 커넥션 수입니다. 위 시나리오에서 첫 번째 요청이 처리될 때 `idleConnections`는 9개이며, 10개 요청이 모두 발생하면 `idleConnections`는 0이 됩니다.
+#### 3. 동시 요청: 10명의 사용자가 동시에 요청
 
-- **totalConnections**: `activeConnections`와 `idleConnections`의 합으로, 총 커넥션 풀에서 관리하는 커넥션 수를 나타냅니다. 이 수는 `maximumPoolSize` 이상으로 증가하지 않습니다.
+10명의 사용자가 동시에 요청을 보냅니다. 이때 커넥션 풀의 모든 커넥션이 사용 중이 되어, 유휴 커넥션이 없습니다. 추가로 들어오는 요청은 대기 상태로 들어갑니다.
 
-### 추가적으로 고려할 필드: `connectionTimeout`과 `validationTimeout`
+- `totalConnections = 10`
+- `activeConnections = 10`
+- `idleConnections = 0`
 
-- **connectionTimeout**: 만약 대기 중인 요청(즉, `threadsAwaitingConnection`에 있는 요청)이 `connectionTimeout` 내에 커넥션을 할당받지 못하면 예외가 발생합니다. 예를 들어, `connectionTimeout`이 2초로 설정되어 있고 11번째 요청이 들어왔을 때 2초 동안 커넥션을 할당받지 못하면, 요청은 실패하게 됩니다.
+#### 4. 추가 요청 발생: 11번째 요청
 
-- **validationTimeout**: 풀에서 커넥션을 빌려올 때 해당 커넥션이 유효한지 확인하는 시간입니다. 만약 유효성 검사를 통과하지 못하거나 `validationTimeout`을 초과하면, 해당 커넥션은 사용되지 않고 새로운 커넥션이 할당됩니다.
+10개의 커넥션이 모두 사용 중인 상태에서 11번째 요청이 들어오면, 해당 요청은 대기 상태로 들어가며 `threadsAwaitingConnection`이 1로 증가합니다. 이 요청은 커넥션이 반환될 때까지 기다리게 됩니다.
 
----
+- `totalConnections = 10`
+- `activeConnections = 10`
+- `idleConnections = 0`
+- `threadsAwaitingConnection = 1`
+
+#### 5. 요청 처리 완료: 1초 후 첫 번째 요청 완료
+
+1초 후 첫 번째 요청이 완료되면 커넥션은 유휴 상태로 돌아갑니다. 이때 대기 중이던 11번째 요청이 처리되기 위해 반환된 커넥션을 할당받습니다.
+
+- `totalConnections = 10`
+- `activeConnections = 9`
+- `idleConnections = 1`
+- `threadsAwaitingConnection = 0`
+
+### 각 필드에 대한 시나리오 설명 (이미지에 맞춰 설명)
+
+* **maximumPoolSize**:
+    - **설명**: 커넥션 풀에서 관리할 수 있는 최대 커넥션 수를 나타냅니다. 이 시나리오에서는 10개로 설정되어 있어, 동시에 최대 10개의 요청을 처리할 수 있습니다.
+    - **이미지 설명**: 이미지에서 `totalConnections = 10`으로 설정되어 있으며, 이는 커넥션 풀에서 관리할 수 있는 총 커넥션이 10개임을 의미합니다.
+
+* **activeConnections**:
+    - **설명**: 현재 요청을 처리 중인 커넥션의 수입니다. 동시 요청이 10건 발생하면 `activeConnections`는 10이 됩니다. 더 이상 여유가 없는 상태에서 추가 요청이 들어오면 대기 상태가 됩니다.
+    - **이미지 설명**: 첫 번째 그림에서 `activeConnections = 1`로, 한 개의 요청이 활성화된 상태입니다. 두 번째 그림에서는 `activeConnections = 5`로, 5명이 동시에 요청을 보내고 있습니다. 세 번째 그림에서는 `activeConnections = 10`으로, 모든 커넥션이 활성화되어 추가 요청을 처리할 수 없는 상태입니다.
+
+* **idleConnections**:
+    - **설명**: 유휴 상태로 대기 중인 커넥션의 수를 나타냅니다. 예를 들어, 첫 번째 요청이 처리될 때 `idleConnections`는 9개이며, 모든 커넥션이 활성화되면 `idleConnections`는 0이 됩니다.
+    - **이미지 설명**: 첫 번째 그림에서 `idleConnections = 9`로, 9개의 커넥션이 대기 상태입니다. 두 번째 그림에서는 `idleConnections = 5`, 세 번째 그림에서는 `idleConnections = 0`으로, 모든 커넥션이 사용 중인 상태입니다.
+
+* **totalConnections**:
+    - **설명**: 커넥션 풀에서 관리하고 있는 총 커넥션 수로, `activeConnections`와 `idleConnections`의 합입니다. 이 값은 `maximumPoolSize` 내에서 유지되며, 동시 요청이 많을수록 `idleConnections`가 줄어듭니다.
+    - **이미지 설명**: 세 개의 그림 모두 `totalConnections = 10`으로, 이는 커넥션 풀에서 관리하는 커넥션이 총 10개임을 나타냅니다.
+
+* **threadsAwaitingConnection**:
+    - **설명**: 커넥션이 모두 사용 중일 때 대기 중인 요청의 수를 나타냅니다. 예를 들어, 10명의 사용자가 모두 커넥션을 사용 중일 때 추가 요청이 발생하면, 그 요청은 대기 상태로 들어가 `threadsAwaitingConnection`이 증가합니다.
+    - **이미지 설명**: 마지막 그림에서는 모든 커넥션이 사용 중이기 때문에, 추가 요청이 발생하면 대기 상태로 들어가게 됩니다.
+
+* **connectionTimeout**:
+    - **설명**: 대기 중인 요청이 커넥션을 얻기 위해 기다릴 수 있는 최대 시간을 나타냅니다. 예를 들어, `connectionTimeout`이 2초로 설정된 경우, 대기 중인 요청이 2초 내에 커넥션을 할당받지 못하면 요청은 실패하게 됩니다.
+    - **이미지 설명**: 마지막 그림에서 모든 커넥션이 사용 중인 상태에서 추가 요청이 들어오면, `connectionTimeout` 내에 커넥션을 할당받지 못할 경우 해당 요청은 실패하게 됩니다.
+
+* **validationTimeout**:
+    - **설명**: 풀에서 커넥션을 빌려올 때 해당 커넥션이 유효한지 확인하는 시간입니다. 이 시간이 초과되면 해당 커넥션은 사용되지 않고 새로운 커넥션이 할당됩니다.
+    - **이미지 설명**: 유휴 상태로 오래 있던 커넥션은 유효성 검사에서 실패할 수 있으며, 이 경우 새로운 커넥션이 할당됩니다. 이미지에서는 유휴 상태의 커넥션들이 대기 중인 상태를 보여줍니다.
 
 ### 결론
 

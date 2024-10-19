@@ -12,44 +12,30 @@ import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("")
+@RequestMapping
 class SampleController(
     private val dataSource: DataSource,
     private val memberRepository: MemberRepository
 ) {
     private val log = LoggerFactory.getLogger(javaClass)!!
 
-    @GetMapping("/api/v1/shops")
-    fun sample1(): Member {
-//        val targetDataSource = (dataSource as LazyConnectionDataSourceProxy).targetDataSource
+    @GetMapping("/api/v1/members")
+    fun sample(): Member {
+        // 1 ~ 100 사이의 랜덤으로 member 조회
+        val findById = memberRepository.findById(Random.nextInt(1, 101).toLong()).get()
 
-        val randomNumber = Random.nextInt(1, 101).toLong()
-
-        val findById = memberRepository.findById(randomNumber).get()
-
-        return findById
-    }
-
-    @GetMapping("/api/v1/orders")
-    fun sample2(): Member {
-//        val targetDataSource = (dataSource as LazyConnectionDataSourceProxy).targetDataSource
-
-        val randomNumber = Random.nextInt(1, 101).toLong()
-
-        val findById = memberRepository.findById(randomNumber).get()
         val targetDataSource = dataSource.unwrap(HikariDataSource::class.java)
         val hikariDataSource = targetDataSource as HikariDataSource
         val hikariPoolMXBean = hikariDataSource.hikariPoolMXBean
         val hikariConfigMXBean = hikariDataSource.hikariConfigMXBean
 
-        val trimIndent =
+        val log =
             """
             totalConnections : ${hikariPoolMXBean.totalConnections}
             activeConnections : ${hikariPoolMXBean.activeConnections}
@@ -62,7 +48,7 @@ class SampleController(
             idleTimeout : ${hikariConfigMXBean.idleTimeout}
             """.trimIndent()
 
-        log.info(trimIndent)
+        this.log.info(log)
 
         return findById
     }
