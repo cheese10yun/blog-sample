@@ -44,7 +44,6 @@ class SampleController(
         val randomNumber = Random.nextInt(1, 101).toLong()
 
         val findById = memberRepository.findById(randomNumber).get()
-//         targetDataSource를 HikariDataSource로 캐스팅
         val targetDataSource = dataSource.unwrap(HikariDataSource::class.java)
         val hikariDataSource = targetDataSource as HikariDataSource
         val hikariPoolMXBean = hikariDataSource.hikariPoolMXBean
