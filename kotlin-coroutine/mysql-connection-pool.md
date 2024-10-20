@@ -142,14 +142,42 @@ class SampleService(
 
   이 상태는 **모든 10개의 커넥션이 활성화**되어 요청을 처리 중이며, 더 이상 유휴 커넥션이 남아있지 않습니다. 이때 **4개의 추가 요청이 들어와 대기** 중입니다. `threadsAwaitingConnection` 값이 4로 증가한 이유는, 요청을 처리할 수 있는 유휴 커넥션이 없기 때문입니다.
 
+
 ### 커넥션 풀 동작 및 타임아웃 발생
 
-커넥션 풀이 설정된 `totalConnections`만큼 활성화된 경우, 그 이후에 들어오는 요청은 **대기 상태**에 들어갑니다. 이때 **대기 시간이 오래 걸릴 수 있으며**, 이 대기 시간이 너무 길어지면 **타임아웃**이 발생하게 됩니다. 이때 사용되는 주요 타임아웃 설정은 다음과 같습니다:
+커넥션 풀이 설정된 `maximumPoolSize`만큼 활성화된 경우, 그 이후에 들어오는 요청은 **대기 상태**에 들어가게 됩니다. 이때 **대기 시간이 길어질 수 있으며**, 이러한 대기 시간이 너무 길어지면 **타임아웃**이 발생할 수 있습니다. 타임아웃이 발생하는 주요 원인은 다음과 같습니다:
 
-- **connection-timeout**: 커넥션을 얻기 위해 스레드가 대기할 수 있는 최대 시간입니다. 예를 들어, `connection-timeout`이 30초로 설정되어 있으면, 커넥션 풀에서 사용 가능한 커넥션을 30초 동안 얻지 못하면 타임아웃이 발생합니다. 이 타임아웃은 대기 중인 요청이 얼마 동안 기다릴 수 있는지에 대한 한계를 설정합니다.
+- **connection-timeout**: 커넥션을 얻기 위해 스레드가 대기할 수 있는 최대 시간을 의미합니다. 예를 들어, `connection-timeout`이 30초로 설정되어 있다면, 커넥션 풀이 사용 가능한 커넥션을 30초 동안 제공하지 못할 경우 타임아웃이 발생하게 됩니다. 이 설정은 대기 중인 요청이 얼마 동안 기다릴 수 있는지를 제한합니다.
 
-커넥션 풀은 **한정된 자원**을 효율적으로 관리하여 시스템의 안정성을 유지하는 좋은 방법입니다. 그러나, 요청량이 설정된 `maximum-pool-size`를 초과하게 되면 대기 상태가 발생할 수 있으며, 이를 방지하기 위해 적절한 타임아웃 값을 설정하고, 필요 시 풀 크기를 조정하는 것이 중요합니다.
+커넥션 풀은 **한정된 자원**을 효율적으로 관리하여 시스템의 안정성을 유지하는 좋은 방법입니다. 그러나, 만약 요청량이 설정된 `maximumPoolSize`를 초과하게 되면 대기 상태가 발생할 수 있습니다. 이러한 상황을 방지하기 위해 적절한 **타임아웃** 값을 설정하고, 필요에 따라 풀 크기를 조정하는 것이 중요합니다.
 
-## 결론
+---
 
-커넥션 풀에서의 **totalConnections**, **activeConnections**, **idleConnections**, 그리고 **threadsAwaitingConnection** 상태는 시스템의 리소스 관리 상태를 명확히 보여줍니다. 모든 커넥션이 활성화된 상태에서 추가 요청이 들어오면 대기 시간이 길어지고, 이때 타임아웃 설정에 따라 요청이 실패할 수 있습니다. 이러한 상황을 방지하기 위해서는 적절한 타임아웃 설정과 풀 크기 조정이 필요하며, 이를 통해 안정적이고 효율적인 시스템을 구축할 수 있습니다.
+### connection-timeout 설정과 TPS 증가로 인한 오류 발생
+
+```yaml
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 10         # 최대 커넥션 수
+      minimum-idle: 10              # 최소 유휴 커넥션 수
+      connection-timeout: 250       # 커넥션을 가져올 때 대기할 최대 시간 (밀리초)
+```
+
+위 설정에서 `connection-timeout`을 250ms로 지정한 경우, **TPS**가 10을 초과하게 되면 **threadsAwaitingConnection**에 대기하는 시간이 250ms를 넘을 수 있습니다. 이 상황이 발생하면, 커넥션 풀은 설정된 대기 시간보다 오래 걸리기 때문에 타임아웃 오류가 발생하게 됩니다.
+
+#### 예시 시나리오
+
+![](images/mysql-connection-pool-3.png)
+
+이미지에서와 같이, `RPS`(Request Per Second)가 10 이상일 때 커넥션 풀의 한계로 인해 대기 중인 요청이 발생하고, 그 대기 시간이 `250ms`를 초과하면 오류가 발생합니다. 이때 `Failures/s`가 증가하는 것을 확인할 수 있습니다. 이는 타임아웃 설정과 관련이 있으며, 커넥션 풀의 자원 한계와 처리량을 적절히 맞춰야 하는 이유를 보여줍니다.
+
+**오류 메시지 예시**:
+
+```
+java.sql.SQLTransientConnectionException: Sample-HikariPool - Connection is not available, request timed out after 251ms.
+	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:696) ~[HikariCP-4.0.3.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:197) 
+```
+
+이 오류는 대기 시간이 설정된 `connection-timeout`을 초과했음을 의미하며, 커넥션 풀이 추가 요청을 처리할 수 없다는 것을 나타냅니다.
