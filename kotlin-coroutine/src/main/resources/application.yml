@@ -9,7 +9,6 @@ spring:
         hibernate:
             ddl-auto: create-drop
         show-sql: false
-
     datasource:
         url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=Asia/Seoul&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false
         username: root
@@ -17,10 +16,24 @@ spring:
         driver-class-name: com.mysql.cj.jdbc.Driver
 
         hikari:
-            maximum-pool-size: 50
-            minimum-idle: 25
-            connection-timeout: 90000
-            max-lifetime: 90000
+            maximum-pool-size: 10           # 최대 커넥션 수
+            minimum-idle: 10                # 최소 유휴 커넥션 수
+            connection-timeout: 30000       # 커넥션을 가져올 때 대기할 최대 시간 (밀리초)
+            max-lifetime: 1800000           # 커넥션이 유지될 최대 시간 (밀리초)
+            idle-timeout: 600000            # 유휴 커넥션이 유지될 최대 시간 (밀리초)
+            leak-detection-threshold: 2000  # 커넥션 리크를 감지할 기준 시간 (밀리초)
+            pool-name: Sample-HikariPool    # 커넥션 풀 이름
+            auto-commit: true               # 자동 커밋 여부
+            validation-timeout: 5000        # 커넥션 유효성 검사를 위한 최대 시간 (밀리초)
+            read-only: false                # 읽기 전용 모드 여부
+            isolate-internal-queries: false # 내부 쿼리 격리 여부
+            allow-pool-suspension: false    # 커넥션 풀 일시 정지 허용 여부
+            initialization-fail-timeout: 1  # 초기화 실패 시 타임아웃 (밀리초)
+            data-source-properties: # 추가적인 데이터 소스 설정
+                cachePrepStmts: true
+                prepStmtCacheSize: 250
+                prepStmtCacheSqlLimit: 2048
+                useServerPrepStmts: true
         dbcp2:
             test-on-borrow: true
             validation-query: select 1
