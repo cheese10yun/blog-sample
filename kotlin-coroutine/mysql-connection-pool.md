@@ -28,7 +28,7 @@ Java 애플리케이션에서 가장 널리 사용되는 커넥션 풀 중 하�
 
 ## 커넥션 풀 시나리오 설명
 
-![](images/mysql-connection-pool-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/mysql-connection-pool-1.png)
 
 **상황**: `maximumPoolSize`가 10인 커넥션 풀을 가진 애플리케이션에서, 10명의 사용자가 각각 1초에 한 번씩 요청을 보낸다고 가정해보겠습니다. 각 요청은 약 1초가 소요됩니다. 아래 시나리오는 커넥션 풀의 상태를 각 단계별로 설명합니다.
 
@@ -121,7 +121,7 @@ class SampleService(
 
 ## Connection Pool 측정
 
-![](images/mysql-connection-pool-2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/mysql-connection-pool-2.png)
 
 애플리케이션에서 커넥션 풀을 사용할 때, 커넥션 풀의 상태를 지속적으로 모니터링하는 것은 매우 중요합니다. 아래와 같은 로그는 **10 TPS (초당 트랜잭션)**를 지속적으로 유지할 때 발생한 로그입니다. 이때 평균 응답 시간은 약 1,000ms로 나타나며, 이는 TPS 수준을 고려했을 때 시스템이 적정 수준에서 작동하고 있음을 보여줍니다.
 
@@ -164,7 +164,7 @@ spring:
 
 위 설정에서 `connection-timeout`을 250ms로 지정한 경우, **TPS**가 10을 초과하게 되면 **threadsAwaitingConnection**에 대기하는 시간이 250ms를 넘을 수 있습니다. 이 상황이 발생하면, 커넥션 풀은 설정된 대기 시간보다 오래 걸리기 때문에 타임아웃 오류가 발생하게 됩니다.
 
-![](images/mysql-connection-pool-3.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/mysql-connection-pool-3.png)
 
 이미지에서와 같이, `RPS`(Request Per Second)가 10 이상일 때 커넥션 풀의 한계로 인해 대기 중인 요청이 발생하고, 그 대기 시간이 `250ms`를 초과하면 오류가 발생합니다. 이때 `Failures/s`가 증가하는 것을 확인할 수 있습니다. 이는 타임아웃 설정과 관련이 있으며, 커넥션 풀의 자원 한계와 처리량을 적절히 맞춰야 하는 이유를 보여줍니다.
 
