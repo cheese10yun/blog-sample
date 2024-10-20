@@ -1,4 +1,4 @@
-# MySQL Connection Pool
+# MySQL Connection Pool 관리: HikariCP 설정 및 타임아웃 처리
 
 ## Connection Pool이란?
 
