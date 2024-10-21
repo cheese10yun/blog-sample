@@ -29,11 +29,11 @@ spring:
             isolate-internal-queries: false # 내부 쿼리 격리 여부
             allow-pool-suspension: false    # 커넥션 풀 일시 정지 허용 여부
             initialization-fail-timeout: 1  # 초기화 실패 시 타임아웃 (밀리초)
-            data-source-properties: # 추가적인 데이터 소스 설정
-                cachePrepStmts: true
-                prepStmtCacheSize: 250
-                prepStmtCacheSqlLimit: 2048
-                useServerPrepStmts: true
+#            data-source-properties: # 추가적인 데이터 소스 설정
+#                cachePrepStmts: true
+#                prepStmtCacheSize: 250
+#                prepStmtCacheSqlLimit: 2048
+#                useServerPrepStmts: true
         dbcp2:
             test-on-borrow: true
             validation-query: select 1
