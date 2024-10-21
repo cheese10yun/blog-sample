@@ -47,7 +47,7 @@ class SampleService(
     @Transactional
     fun getMember(): Member {
         val findById = memberRepository.findById(Random.nextInt(1, 101).toLong()).get()
-//        runBlocking { delay(1000) }
+        runBlocking { delay(1000) }
         val targetDataSource = dataSource.unwrap(HikariDataSource::class.java)
         val hikariDataSource = targetDataSource as HikariDataSource
         val hikariPoolMXBean = hikariDataSource.hikariPoolMXBean
@@ -55,6 +55,7 @@ class SampleService(
         val log =
             """
             totalConnections : ${hikariPoolMXBean.totalConnections}
+            maximumPoolSize : ${hikariConfigMXBean.maximumPoolSize}
             activeConnections : ${hikariPoolMXBean.activeConnections}
             idleConnections : ${hikariPoolMXBean.idleConnections}
             threadsAwaitingConnection : ${hikariPoolMXBean.threadsAwaitingConnection}
