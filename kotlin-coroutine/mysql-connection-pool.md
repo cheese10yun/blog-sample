@@ -205,7 +205,42 @@ fun getMember(): Member {
 
 ### connection-timeout 시간 조정
 
-`connection-timeout`을 적절히 늘려 대기 중인 요청이 조금 더 오래 기다릴 수 있게 조정할 수 있습니다. 예를 들어, 250ms에서 500ms로 설정을 늘리면, 커넥션이 반환되기까지 더 많은 시간을 허용하게 되어 타임아웃 오류가 줄어들 수 있습니다. 다만, 너무 긴 시간으로 설정할 경우 다른 요청들이 더 오랜 시간 동안 대기해야 하므로 신중히 설정해야 합니다.
+`connection-timeout` 설정은 대기 중인 요청이 커넥션을 얻기 위해 기다릴 수 있는 시간을 조정하는 중요한 요소입니다. 만약 요청량이 많아 **maximumPoolSize**에 도달했을 때, `connection-timeout`을 적절히 늘려주면 대기 중인 요청이 커넥션을 할당받기까지 더 오랜 시간을 허용할 수 있습니다. 예를 들어, `connection-timeout`을 250ms에서 2,500ms로 늘리면, 커넥션 반환 대기 시간을 더 길게 설정함으로써 **타임아웃 오류**를 줄일 수 있습니다. 하지만, 너무 긴 대기 시간을 설정하면 그만큼 **응답 시간이 지연**될 수 있으므로 신중하게 설정해야 합니다.
+
+아래는 `connection-timeout`을 2,500ms로 설정하고 테스트한 설정 예시입니다:
+
+```yaml
+spring:
+    datasource:
+        hikari:
+            maximum-pool-size: 10         # 최대 커넥션 수
+            minimum-idle: 10              # 최소 유휴 커넥션 수
+            connection-timeout: 2500      # 커넥션을 가져올 때 대기할 최대 시간 (밀리초)
+```
+
+이 설정에서, `delay(1000)`는 유지하면서 `connection-timeout`을 2,500ms로 변경한 후 테스트를 진행하였습니다.
+
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/mysql-connection-pool-6.png)
+
+테스트 결과는 아래와 같습니다:
+
+```plaintext
+totalConnections : 10
+maximumPoolSize : 10
+activeConnections : 10
+idleConnections : 0
+threadsAwaitingConnection : 20
+```
+
+- **totalConnections**: 10개 커넥션이 모두 사용 중입니다.
+- **maximumPoolSize**: 설정된 최대 커넥션 수는 10개입니다.
+- **activeConnections**: 현재 10개의 커넥션이 활성화되어 있습니다.
+- **idleConnections**: 유휴 커넥션이 없으며, 모든 커넥션이 사용 중입니다.
+- **threadsAwaitingConnection**: 20개의 요청이 대기 중입니다.
+
+**connection-timeout** 설정이 2,500ms로 변경됨에 따라, **threadsAwaitingConnection**에서 대기하는 시간이 길어졌습니다. 결과적으로 **타임아웃 오류는 발생하지 않았지만**, 응답 시간이 더 길어졌습니다. 이는 각 요청에 대해 `delay(1000)`으로 인한 1,000ms의 블로킹 시간과 **threadsAwaitingConnection**에서 대기한 시간이 합쳐져 응답 시간이 느려진 것입니다.
+
+이런 경우, 타임아웃을 길게 설정하는 것은 타임아웃 오류를 방지할 수 있지만, 동시에 **응답 속도**가 저하될 수 있습니다. 따라서, **connection-timeout**은 요청의 특성과 트래픽 패턴에 맞추어 적절한 값을 설정하는 것이 매우 중요합니다.
 
 ### maximum-pool-size 증가
 
@@ -242,13 +277,6 @@ idleConnections : 17
 이 상황에서는 **maximumPoolSize**가 100으로 설정되어 있지만, 모든 커넥션이 사용 중이지 않기 때문에 **자원 낭비를 최소화**할 수 있습니다. 요청이 몰리지 않는 상태에서는 `activeConnections`가 13개에 머무르고, 나머지 17개는 유휴 상태로 남아있습니다. 이처럼 **최대 커넥션 수**는 설정했지만, 필요할 때만 커넥션이 활성화되고 나머지는 유휴 상태를 유지하는 방식으로 효율적인 자원 관리가 가능합니다.
 
 따라서, `maximum-pool-size`는 트래픽이 몰릴 경우를 대비해 충분히 큰 값으로 설정할 수 있지만, 시스템 자원에 부담을 주지 않도록 **실제 트래픽**과 **자원 사용량**을 분석하여 적절한 값으로 설정하는 것이 중요합니다.
-
-
-
-
----
-
-`connection-timeout` 오류를 방지하기 위해서는 위와 같은 여러 가지 방법을 적절히 활용해야 합니다. **쿼리 최적화**는 가장 근본적인 성능 개선 방법이며, 이를 통해 커넥션 반환 시간을 단축할 수 있습니다. 또한, **timeout 설정**을 상황에 맞게 조정하거나 **maximum-pool-size**를 늘려 대기 시간을 줄일 수 있습니다. 다만, 이러한 설정 값들은 무작정 크게 늘린다고 좋은 해결책이 되는 것은 아니며, **애플리케이션의 특성**과 **시스템 자원**을 고려하여 최적의 값을 찾아야 합니다.
 
 ## 결론
 
