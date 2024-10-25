@@ -36,14 +36,39 @@ spring:
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/mysql-connection-pool-1-1.png)
 
-1. **minimum-idle: 10, maximum-pool-size: 10 설정**:
-   이 경우, 커넥션 풀의 크기가 고정되어 있으며, 최소한의 커넥션을 유지하고 최대 10개의 커넥션까지만 사용 가능합니다. `idleConnections`는 0이고, `activeConnections`는 10으로, 풀에 있는 모든 커넥션이 활성화된 상태입니다.
-2. **TPS 200대에 응답 지연 발생**:
-   트래픽이 증가하여 TPS가 200에 도달했을 때, 커넥션 풀이 한계에 도달하여 더 이상 커넥션을 할당할 수 없기 때문에 성능 저하가 발생합니다. 이로 인해 `threadsAwaitingConnection`이 71개로 증가하며, 이는 커넥션을 기다리고 있는 스레드의 수를 의미합니다. 커넥션 풀이 부족하여 대기 시간이 길어져 응답 속도가 늦어지는 것을 나타냅니다.
+위 이미지는 커넥션 풀 설정이 **minimum-idle: 10, maximum-pool-size: 10**으로 설정된 상황에서, TPS가 증가함에 따라 성능이 어떻게 변화하는지를 시각화한 결과입니다.
+
+- **첫 번째 그래프 (Total Requests per Second)**:
+    - 이 그래프는 초당 요청 처리량(RPS, 초록색 라인)과 실패한 요청(Failures, 빨간색 라인)을 보여줍니다.
+    - TPS가 50에서 200까지 점진적으로 증가하면서도, 실패한 요청은 발생하지 않았습니다. 이는 시스템이 최대 커넥션 풀이 가득 찼을 때도 요청을 대기시키며 처리하는 것을 의미합니다.
+- **두 번째 그래프 (Response Times)**:
+    - 응답 시간 그래프에서는 **95th 퍼센타일**(보라색 라인)이 급격히 상승하는 순간이 보입니다. 이는 TPS가 200대에 도달했을 때 응답 시간이 길어지는 현상을 나타냅니다. 이는 커넥션 풀이 가득 차서 새로운 요청이 대기 상태로 전환되었기 때문입니다.
+    - 그 후 트래픽이 유지되는 동안 응답 시간이 다시 안정화되는 모습이 보이는데, 이는 스레드 대기 시간이 감소하면서 시스템이 다시 원활히 작동하기 시작한 것을 보여줍니다.
+- **세 번째 그래프 (Number of Users)**:
+    - 사용자의 수는 시간에 따라 지속적으로 증가하며, 시스템의 부하를 점점 더 많이 가하는 상황을 묘사하고 있습니다. 사용자가 100명 이상일 때 커넥션 풀의 한계에 도달하면서 성능 저하가 발생하기 시작합니다.
 
 ### 로그 분석
 
-로그에서 나타난 주요 지표는 다음과 같습니다:
+```kotlin
+
+val targetDataSource = dataSource.unwrap(HikariDataSource::class.java)
+val hikariDataSource = targetDataSource as HikariDataSource
+val hikariPoolMXBean = hikariDataSource.hikariPoolMXBean
+val hikariConfigMXBean = hikariDataSource.hikariConfigMXBean
+val log =
+    """
+   totalConnections : ${hikariPoolMXBean.totalConnections}
+   activeConnections : ${hikariPoolMXBean.activeConnections}
+   idleConnections : ${hikariPoolMXBean.idleConnections}
+   threadsAwaitingConnection : ${hikariPoolMXBean.threadsAwaitingConnection}
+   maxLifetime : ${hikariConfigMXBean.maxLifetime}
+   maximumPoolSize : ${hikariConfigMXBean.maximumPoolSize}
+   minimumIdle : ${hikariConfigMXBean.minimumIdle}
+   connectionTimeout : ${hikariConfigMXBean.connectionTimeout}
+   validationTimeout : ${hikariConfigMXBean.validationTimeout}
+   idleTimeout : ${hikariConfigMXBean.idleTimeout}
+   """.trimIndent()
+```
 
 - **totalConnections: 10**: 총 10개의 커넥션이 생성되어 있음.
 - **activeConnections: 10**: 모든 커넥션이 현재 활성 상태로 사용 중임.
