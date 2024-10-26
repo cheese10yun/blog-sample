@@ -37,11 +37,7 @@ interface MemberCustomRepository {
     fun updateFirst(id: ObjectId): UpdateResult
 }
 
-class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRepository,
-    MongoCustomRepositorySupport<Member>(
-        Member::class.java,
-        mongoTemplate
-    ) {
+class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRepository, MongoCustomRepositorySupport<Member>(Member::class.java, mongoTemplate) {
 
     override fun findByName(name: String): List<Member> {
         val query = Query(Criteria().eqIfNotNull(Member::name, name))
