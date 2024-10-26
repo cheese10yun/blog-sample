@@ -4,8 +4,12 @@ import org.bson.Document
 import org.springframework.data.convert.PropertyValueConverter
 import org.springframework.data.convert.ValueConversionContext
 
-class DiffConverter :
-    PropertyValueConverter<Map<String, DiffValue<String, String>>, Document, ValueConversionContext<*>> {
+class DiffConverter : PropertyValueConverter<Map<String, DiffValue<String, String>>, Document, ValueConversionContext<*>> {
+
+    companion object {
+        private val ORIGIN = "origin"
+        private val NEW = "new"
+    }
 
     override fun read(
         value: Document,
@@ -16,8 +20,8 @@ class DiffConverter :
             val key = it.key!!
 
             val pair = key to DiffValue(
-                origin = diffValue["origin"].toString(),
-                new = diffValue["new"].toString(),
+                origin = diffValue[ORIGIN].toString(),
+                new = diffValue[NEW].toString(),
             )
             pair
         }
@@ -28,14 +32,12 @@ class DiffConverter :
         value: Map<String, DiffValue<String, String>>,
         context: ValueConversionContext<*>
     ): Document {
-
         val mapValues = value.mapValues { (key, value) ->
             mapOf(
-                "origin" to value.origin,
-                "new" to value.new
+                ORIGIN to value.origin,
+                NEW to value.new
             )
         }
         return Document(mapValues)
-
     }
 }

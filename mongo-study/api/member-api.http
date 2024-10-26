@@ -7,8 +7,7 @@ Content-Type: application/json
 
 GET {{host}}{{v1}}/members?
     page=0&
-    size=10&
-    email=member3
+    size=10
 Content-Type: application/json
 
 ###
