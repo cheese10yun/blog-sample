@@ -7,6 +7,8 @@
 
 ## 2024
 
+* 10-26 [HikariCP로 MySQL Connection Pool 최적화하기](https://cheese10yun.github.io/mysql-connection-pool-timeout-1/)
+* 10-21 [MySQL Connection Pool 관리 - HikariCP 설정 및 타임아웃 처리](https://cheese10yun.github.io/mysql-connection-pool-timeout/)
 * 05-23 [코루틴을 이용한 성능 개선 - Flow를 활용한 다중 요청 처리](https://cheese10yun.github.io/kotlin-flow/)
 * 05-06 [Kotlin 자주 사용하는 패턴 정리](https://github.com/cheese10yun/blog-sample/blob/master/kotlin-coroutine/Kotlin-pattern.md)
 * 04-07 [Locust 성능 테스트 도구 소개 Part 2](https://cheese10yun.github.io/locust-part-2/)
