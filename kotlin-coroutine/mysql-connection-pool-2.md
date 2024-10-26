@@ -38,7 +38,7 @@ Spring Boot 애플리케이션에서 TPS가 높아질 때, HikariCP의 커넥션
 
 ### 상황 설명
 
-다음 코드는 Spring Boot와 Kotlin 환경에서 설정된 컨트롤러와 서비스 로직입니다. 컨트롤러에서는 `SampleService`의 `getMember()` 메서드를 호출하며, 이 메서드는 1~100 사이의 랜덤 ID로 `Member` 엔티티를 조회한 후, 1초의 지연 시간을 둔 뒤 커넥션 풀의 현재 상태를 로깅합니다.
+다음 코드는 Spring Boot와 Kotlin 환경에서 설정된 컨트롤러와 서비스 로직입니다. 컨트롤러에서는 `SampleService`의 `getMember()` 메서드를 호출하며, 이 메서드는 1~100 사이의 랜덤 ID로 `Member` 엔티티를 PK를 기반으로 조회한 후, 1초의 지연 시간을 둔 뒤 커넥션 풀의 현재 상태를 로깅합니다.
 
 ```kotlin
 @RestController
@@ -93,6 +93,8 @@ class SampleService(
 이 코드는 지연을 위해 1초 동안 대기한 후, HikariCP 커넥션 풀의 상태를 로깅하여 현재 커넥션 풀 상황을 모니터링할 수 있게 합니다.
 
 ### 성능 테스트 결과 (위 이미지 설명)
+
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/mysql-connection-pool-1-1.png)
 
 위 이미지는 커넥션 풀 설정이 **minimum-idle: 10, maximum-pool-size: 10**으로 설정된 상황에서, TPS가 증가함에 따라 성능이 어떻게 변화하는지를 시각화한 결과입니다.
 
