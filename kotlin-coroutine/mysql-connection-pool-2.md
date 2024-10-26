@@ -11,14 +11,13 @@ spring:
     datasource:
         hikari:
             minimum-idle: 10
-            maximum-pool-size: 50
+            maximum-pool-size: 10
             idle-timeout: 30000
             connection-timeout: 20000
-            pool-name: "HikariCP"
 ```
 
 - **minimum-idle**: 최소 유휴 커넥션 수입니다. 초기 설정 시 최소한의 커넥션(여기서는 10개)만 유지하여, TPS가 낮을 때 리소스를 절약할 수 있습니다.
-- **maximum-pool-size**: 커넥션 풀의 최대 크기입니다. TPS가 높아질 때 최대 50개의 커넥션까지 생성하여 요청을 처리할 수 있게 설정합니다.
+- **maximum-pool-size**: 커넥션 풀의 최대 크기입니다. TPS가 높아질 때 최대 10개의 커넥션까지 생성하여 요청을 처리할 수 있게 설정합니다.
 - **idle-timeout**: 지정된 시간(밀리초) 동안 유휴 상태인 커넥션이 있을 경우 풀에서 제거합니다. 트래픽이 낮아질 때 자동으로 풀 크기를 줄이는 데 기여합니다.
 - **connection-timeout**: 커넥션을 얻기 위해 대기하는 최대 시간입니다. 이 시간 내에 커넥션을 확보하지 못하면 예외가 발생합니다.
 
@@ -136,7 +135,7 @@ class SampleService(
 
 ## 해결 방안
 
-1. **maximum-pool-size 증가**: 현재의 TPS 수요를 충족하기 위해 `maximum-pool-size` 값을 늘려야 합니다. 예를 들어, 50 이상으로 설정하여 커넥션 풀이 더 많은 요청을 처리할 수 있도록 하면, 요청 대기 시간과 실패를 줄일 수 있습니다.
+1. **maximum-pool-size 증가**: 현재의 TPS 수요를 충족하기 위해 `maximum-pool-size` 값을 늘려야 합니다. 예를 들어, 10 이상으로 설정하여 커넥션 풀이 더 많은 요청을 처리할 수 있도록 하면, 요청 대기 시간과 실패를 줄일 수 있습니다.
 2. **동적 커넥션 관리**: HikariCP의 특성을 활용해 `minimum-idle`과 `maximum-pool-size`를 적절히 조정하여 트래픽 변화에 유연하게 대응할 수 있도록 합니다. TPS가 높아질 때는 커넥션 풀이 자동으로 확장되도록 하고, TPS가 감소할 때는 최소한의 커넥션만 유지해 리소스를 절약하도록 설정하는 것이 좋습니다.
 3. **모니터링 및 지속적인 튜닝**: 커넥션 풀의 상태를 지속적으로 모니터링하여, 트래픽 패턴에 맞게 적절히 튜닝하는 것이 필요합니다. 정기적인 모니터링을 통해 TPS와 응답 시간 변화를 관찰하고, 필요에 따라 `maximum-pool-size`, `connectionTimeout` 등의 설정을 조정하여 최적의 성능을 유지할 수 있습니다.
 
