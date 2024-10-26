@@ -80,6 +80,21 @@ abstract class MongoCustomRepositorySupport<T>(
         return bulkOps.execute()
     }
 
+    protected fun bulkDelete(
+        query: Query,
+        bulkMode: BulkOperations.BulkMode
+    ): BulkWriteResult {
+        return mongoTemplate
+            .bulkOps(bulkMode, documentClass)
+            .remove(query)
+            .execute()
+    }
+
+    fun deleteByIds(ids: List<ObjectId>) {
+        val query = Query(Criteria.where("_id").`in`(ids))
+        mongoTemplate.remove(query, documentClass)
+    }
+
 //    protected fun bulkUpdate(
 //        ids: List<ObjectId>,
 //        bulkMode: BulkOperations.BulkMode = BulkOperations.BulkMode.UNORDERED
@@ -111,7 +126,6 @@ abstract class MongoCustomRepositorySupport<T>(
         val result = mongoTemplate.updateMulti(query, update, documentClass)
         return result.modifiedCount
     }
-
 
     /**
      * 여러 도메인 객체를 한 번에 MongoDB에 삽입합니다.
