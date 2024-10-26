@@ -15,8 +15,8 @@ spring:
         password:
         driver-class-name: com.mysql.cj.jdbc.Driver
 
-        hikari:
-            maximum-pool-size: 200           # 최대 커넥션 수
+#        hikari:
+#            maximum-pool-size: 200           # 최대 커넥션 수
 #            minimum-idle: 10                # 최소 유휴 커넥션 수
 #            connection-timeout: 2500        # 커넥션을 가져올 때 대기할 최대 시간 (밀리초)
 #            max-lifetime: 1800000           # 커넥션이 유지될 최대 시간 (밀리초)

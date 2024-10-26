@@ -32,50 +32,92 @@ spring:
 
 ## TPS가 높아지는 상황에서의 커넥션 풀 동작 분석
 
+Spring Boot 애플리케이션에서 TPS가 높아질 때, HikariCP의 커넥션 풀이 어떻게 반응하고 성능에 어떤 영향을 미치는지 살펴보겠습니다. 이 테스트는 `minimum-idle: 10`과 `maximum-pool-size: 10` 설정을 사용해, 커넥션 풀의 확장성과 한계점을 확인하는 데 중점을 두었습니다.
+
+애플리케이션은 지속적으로 증가하는 사용자 요청을 처리하며, TPS가 증가함에 따라 커넥션 풀이 최대에 도달하는 시점에서 성능 지연과 요청 실패가 발생하는 과정을 시각적으로 분석했습니다.
+
 ### 상황 설명
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/mysql-connection-pool-1-1.png)
+다음 코드는 Spring Boot와 Kotlin 환경에서 설정된 컨트롤러와 서비스 로직입니다. 컨트롤러에서는 `SampleService`의 `getMember()` 메서드를 호출하며, 이 메서드는 1~100 사이의 랜덤 ID로 `Member` 엔티티를 조회한 후, 1초의 지연 시간을 둔 뒤 커넥션 풀의 현재 상태를 로깅합니다.
+
+```kotlin
+@RestController
+@RequestMapping
+class SampleController(
+    private val SampleService: SampleService
+) {
+    
+    @GetMapping("/api/v1/members")
+    fun sample(): Member {
+        // 1 ~ 100 사이의 랜덤으로 member 조회
+        return SampleService.getMember()
+    }
+}
+```
+
+```kotlin
+@Service
+class SampleService(
+    private val dataSource: DataSource,
+    private val memberRepository: MemberRepository
+) {
+    private val log = LoggerFactory.getLogger(javaClass)!!
+
+    @Transactional
+    fun getMember(): Member {
+        val findById = memberRepository.findById(Random.nextInt(1, 100).toLong()).get()
+        runBlocking { delay(1000) }
+        val targetDataSource = dataSource.unwrap(HikariDataSource::class.java)
+        val hikariDataSource = targetDataSource as HikariDataSource
+        val hikariPoolMXBean = hikariDataSource.hikariPoolMXBean
+        val hikariConfigMXBean = hikariDataSource.hikariConfigMXBean
+        val log =
+            """
+            totalConnections : ${hikariPoolMXBean.totalConnections}
+            activeConnections : ${hikariPoolMXBean.activeConnections}
+            idleConnections : ${hikariPoolMXBean.idleConnections}
+            threadsAwaitingConnection : ${hikariPoolMXBean.threadsAwaitingConnection}
+            maxLifetime : ${hikariConfigMXBean.maxLifetime}
+            maximumPoolSize : ${hikariConfigMXBean.maximumPoolSize}
+            minimumIdle : ${hikariConfigMXBean.minimumIdle}
+            connectionTimeout : ${hikariConfigMXBean.connectionTimeout}
+            validationTimeout : ${hikariConfigMXBean.validationTimeout}
+            idleTimeout : ${hikariConfigMXBean.idleTimeout}
+            """.trimIndent()
+        this.log.info(log)
+        return findById
+    }
+}
+```
+
+이 코드는 지연을 위해 1초 동안 대기한 후, HikariCP 커넥션 풀의 상태를 로깅하여 현재 커넥션 풀 상황을 모니터링할 수 있게 합니다.
+
+### 성능 테스트 결과 (위 이미지 설명)
 
 위 이미지는 커넥션 풀 설정이 **minimum-idle: 10, maximum-pool-size: 10**으로 설정된 상황에서, TPS가 증가함에 따라 성능이 어떻게 변화하는지를 시각화한 결과입니다.
 
 - **Total Requests per Second**:
-    - 이 그래프는 초당 요청 처리량(RPS, 초록색 라인)과 실패한 요청(Failures, 빨간색 라인)을 보여줍니다.
-    - TPS가 50에서 200까지 점진적으로 증가하면서도, 실패한 요청은 발생하지 않았습니다. 이는 시스템이 최대 커넥션 풀이 가득 찼을 때도 요청을 대기시키며 처리하는 것을 의미합니다.
+  - 이 그래프는 초당 요청 처리량(RPS, 초록색 라인)과 실패한 요청(Failures, 빨간색 라인)을 보여줍니다.
+  - TPS가 50에서 200까지 점진적으로 증가하면서도, 실패한 요청은 발생하지 않았습니다. 이는 시스템이 최대 커넥션 풀이 가득 찼을 때도 요청을 대기시키며 처리하는 것을 의미합니다.
 - **Response Times**:
-    - 응답 시간 그래프에서는 **95th 퍼센타일**(보라색 라인)이 급격히 상승하는 순간이 보입니다. 이는 TPS가 200대에 도달했을 때 응답 시간이 길어지는 현상을 나타냅니다. 이는 커넥션 풀이 가득 차서 새로운 요청이 대기 상태로 전환되었기 때문입니다.
-    - 그 후 트래픽이 유지되는 동안 응답 시간이 다시 안정화되는 모습이 보이는데, 이는 스레드 대기 시간이 감소하면서 시스템이 다시 원활히 작동하기 시작한 것을 보여줍니다.
+  - 응답 시간 그래프에서는 **95th 퍼센타일**(보라색 라인)이 급격히 상승하는 순간이 보입니다. 이는 TPS가 200대에 도달했을 때 응답 시간이 길어지는 현상을 나타냅니다. 이는 커넥션 풀이 가득 차서 새로운 요청이 대기 상태로 전환되었기 때문입니다.
+  - 그 후 트래픽이 유지되는 동안 응답 시간이 다시 안정화되는 모습이 보이는데, 이는 스레드 대기 시간이 감소하면서 시스템이 다시 원활히 작동하기 시작한 것을 보여줍니다.
 - **Number of Users**:
-    - 사용자의 수는 시간에 따라 지속적으로 증가하며, 시스템의 부하를 점점 더 많이 가하는 상황을 묘사하고 있습니다. 사용자가 100명 이상일 때 커넥션 풀의 한계에 도달하면서 성능 저하가 발생하기 시작합니다.
+  - 사용자의 수는 시간에 따라 지속적으로 증가하며, 시스템의 부하를 점점 더 많이 가하는 상황을 묘사하고 있습니다. 사용자가 100명 이상일 때 커넥션 풀의 한계에 도달하면서 성능 저하가 발생하기 시작합니다.
 
 ### 로그 분석
 
-```kotlin
+- **activeConnections**: 10 - 현재 활성 상태인 모든 커넥션이 사용 중입니다.
+- **idleConnections**: 0 - 유휴 상태의 커넥션은 없습니다.
+- **threadsAwaitingConnection**: 84 - 84개의 스레드가 커넥션을 기다리고 있습니다.
+- **maxLifetime**: 1800000 (밀리초) - 커넥션의 최대 수명입니다.
+- **maximumPoolSize**: 10 - 최대 커넥션 풀 크기가 10으로 설정되어 있습니다.
+- **minimumIdle**: 10 - 최소 유휴 커넥션이 10으로 설정되어 있습니다.
+- **connectionTimeout**: 30000 (밀리초) - 커넥션을 얻기 위해 대기할 수 있는 최대 시간입니다.
+- **validationTimeout**: 5000 (밀리초) - 커넥션 유효성 검사를 위한 시간입니다.
+- **idleTimeout**: 600000 (밀리초) - 유휴 커넥션을 유지하는 최대 시간입니다.
 
-val targetDataSource = dataSource.unwrap(HikariDataSource::class.java)
-val hikariDataSource = targetDataSource as HikariDataSource
-val hikariPoolMXBean = hikariDataSource.hikariPoolMXBean
-val hikariConfigMXBean = hikariDataSource.hikariConfigMXBean
-val log =
-    """
-   totalConnections : ${hikariPoolMXBean.totalConnections}
-   activeConnections : ${hikariPoolMXBean.activeConnections}
-   idleConnections : ${hikariPoolMXBean.idleConnections}
-   threadsAwaitingConnection : ${hikariPoolMXBean.threadsAwaitingConnection}
-   maxLifetime : ${hikariConfigMXBean.maxLifetime}
-   maximumPoolSize : ${hikariConfigMXBean.maximumPoolSize}
-   minimumIdle : ${hikariConfigMXBean.minimumIdle}
-   connectionTimeout : ${hikariConfigMXBean.connectionTimeout}
-   validationTimeout : ${hikariConfigMXBean.validationTimeout}
-   idleTimeout : ${hikariConfigMXBean.idleTimeout}
-   """.trimIndent()
-```
-
-- **totalConnections: 10**: 총 10개의 커넥션이 생성되어 있음.
-- **activeConnections: 10**: 모든 커넥션이 현재 활성 상태로 사용 중임.
-- **idleConnections: 0**: 유휴 상태인 커넥션은 없음.
-- **threadsAwaitingConnection: 71**: 71개의 스레드가 커넥션을 기다리고 있음.
-- **maximumPoolSize: 10**: 커넥션 풀의 최대 크기가 10으로 설정되어 있음.
-- **minimumIdle: 10**: 최소 유휴 커넥션이 10으로 설정되어 있음.
+이 로그는 커넥션 풀이 한계에 도달하여 더 이상 커넥션을 확장할 수 없고, 여러 스레드가 커넥션을 기다리면서 성능 저하가 발생하고 있음을 보여줍니다.
 
 ### 문제 원인
 

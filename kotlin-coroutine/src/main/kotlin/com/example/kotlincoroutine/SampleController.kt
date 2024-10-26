@@ -27,11 +27,9 @@ class SampleController(
     private val SampleService: SampleService
 ) {
 
-
     @GetMapping("/api/v1/members")
     fun sample(): Member {
         // 1 ~ 100 사이의 랜덤으로 member 조회
-
         return SampleService.getMember()
     }
 }
@@ -46,8 +44,8 @@ class SampleService(
 
     @Transactional
     fun getMember(): Member {
-        val findById = memberRepository.findById(Random.nextInt(1, 101).toLong()).get()
-//        runBlocking { delay(1000) }
+        val findById = memberRepository.findById(Random.nextInt(1, 100).toLong()).get()
+        runBlocking { delay(1000) }
         val targetDataSource = dataSource.unwrap(HikariDataSource::class.java)
         val hikariDataSource = targetDataSource as HikariDataSource
         val hikariPoolMXBean = hikariDataSource.hikariPoolMXBean
@@ -64,21 +62,8 @@ class SampleService(
             connectionTimeout : ${hikariConfigMXBean.connectionTimeout}
             validationTimeout : ${hikariConfigMXBean.validationTimeout}
             idleTimeout : ${hikariConfigMXBean.idleTimeout}
-           
             """.trimIndent()
-
         this.log.info(log)
-
-//        val log =
-//            """
-//            totalConnections : ${hikariPoolMXBean.totalConnections}
-//            activeConnections : ${hikariPoolMXBean.activeConnections}
-//            idleConnections : ${hikariPoolMXBean.idleConnections}
-//            threadsAwaitingConnection : ${hikariPoolMXBean.threadsAwaitingConnection}
-//            """.trimIndent()
-//
-//        this.log.info(log)
-
         return findById
     }
 }
