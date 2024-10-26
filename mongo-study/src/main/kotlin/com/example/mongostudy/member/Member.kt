@@ -16,11 +16,31 @@ import org.springframework.data.mongodb.core.mapping.DBRef
 )
 @Document(collection = "members")
 class Member(
+    @Field(name = "name")
+    val name: String,
+
+    @Field(name = "address")
+    val address: Address,
+
     @Field(name = "member_id")
     val memberId: String,
 
     @Field(name = "content")
-    val content: Content
+    val content: Content,
+
+    @Field(name = "email")
+    val email: String,
+
+    @Field(name = "status")
+    val status: MemberStatus,
+
+    @Field(name = "points_accumulated")
+    val pointsAccumulated: BigDecimal,
+
+    @Field(name = "date_joined")
+    val dateJoined: LocalDateTime,
+
+
 ) : Auditable()
 
 data class Content(

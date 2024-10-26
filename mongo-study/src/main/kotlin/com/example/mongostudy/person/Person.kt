@@ -84,7 +84,6 @@ class PersonCustomRepositoryImpl(
     override fun bulkInsert(persons: List<Person>) {
         insertMany(persons)
     }
-
 }
 
 
