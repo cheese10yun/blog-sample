@@ -39,8 +39,6 @@ class Member(
 
     @Field(name = "date_joined")
     val dateJoined: LocalDateTime,
-
-
 ) : Auditable()
 
 data class Content(
