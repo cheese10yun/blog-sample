@@ -30,21 +30,8 @@ interface MemberCustomRepository {
     fun findByEmail(email: String): List<Member>
     fun findActiveMembers(): List<Member>
     fun findMembersWithPointsOver(points: BigDecimal): List<Member>
-    fun findPageBy(
-        pageable: Pageable,
-        name: String?,
-        email: String?,
-        dateJoinedFrom: LocalDateTime?,
-        dateJoinedTo: LocalDateTime?,
-        memberStatus: MemberStatus?
-    ): Page<Member>
-
-    fun findSlice(
-        pageable: Pageable,
-        name: String?,
-        email: String?
-    ): Slice<Member>
-
+    fun findPageBy(pageable: Pageable, name: String?, email: String?, dateJoinedFrom: LocalDateTime?, dateJoinedTo: LocalDateTime?, memberStatus: MemberStatus?): Page<Member>
+    fun findSlice(pageable: Pageable, name: String?, email: String?): Slice<Member>
     fun updateName(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode)
     fun bulkInsert(members: List<Member>)
     fun update(id: ObjectId): UpdateResult
