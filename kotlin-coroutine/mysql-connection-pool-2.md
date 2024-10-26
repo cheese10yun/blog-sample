@@ -94,7 +94,7 @@ class SampleService(
 
 ### 성능 테스트 결과 (위 이미지 설명)
 
-(![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/mysql-connection-pool-1-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/mysql-connection-pool-1-1.png)
 
 위 이미지는 커넥션 풀 설정이 **minimum-idle: 10, maximum-pool-size: 10**으로 설정된 상황에서, TPS가 증가함에 따라 성능이 어떻게 변화하는지를 시각화한 결과입니다.
 
@@ -142,6 +142,28 @@ class SampleService(
 
 이러한 방안들은 트래픽 변동에 따라 유연하게 커넥션 풀을 관리하고, 시스템 성능을 최적화하는 데 도움이 됩니다.
 
-### maximum-pool-size 조정
+### 성능 테스트 결과 분석: maximum-pool-size를 200으로 조정한 경우
 
-maximum-pool-size을 200 조정
+```yaml
+spring:
+    datasource:
+        hikari:
+            maximum-pool-size: 200
+```
+
+위와 같이 `maximum-pool-size`를 200으로 설정하여 테스트를 진행한 결과, 커넥션 풀이 충분히 확장 가능해지면서 시스템 성능이 크게 개선되었습니다. 주요 개선 사항은 다음과 같습니다.
+
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/kotlin-coroutine/images/mysql-connection-pool-1-2.png)
+
+- **Total Requests per Second (RPS)**:
+  - RPS가 점진적으로 증가하여 높은 TPS를 안정적으로 처리할 수 있게 되었습니다. 초당 요청 처리량이 약 150까지 증가했음에도 불구하고, 실패한 요청(Failures/s)은 발생하지 않았습니다.
+  - 이는 커넥션 풀이 충분히 확장되어, 모든 요청이 처리되는 동안 커넥션 부족으로 인한 대기 시간이 발생하지 않았음을 의미합니다.
+- **Response Times**:
+  - 응답 시간 그래프에서 50th 및 95th 퍼센타일 응답 시간이 비교적 안정적인 수준을 유지하고 있습니다.
+  - 95th 퍼센타일 응답 시간은 약 3,000ms 이하로, 50th 퍼센타일은 약 1,000ms 내외로 유지되었습니다. 이는 고TPS 상황에서도 일관된 응답 속도를 제공할 수 있음을 보여줍니다.
+  - 이전 설정에서 발생했던 응답 시간의 급격한 증가가 해소되어, 사용자 경험이 크게 개선되었습니다.
+- **Failures/s 비율**:
+  - 요청 실패율이 0으로 유지되었습니다. `maximum-pool-size`를 200으로 설정한 덕분에, `connectionTimeout`으로 인해 대기 상태에서 실패하는 요청이 없었습니다.
+  - 이로써 고TPS 상황에서도 안정적인 서비스가 가능해졌으며, 대량의 동시 요청을 처리하는 데 적합한 환경이 조성되었습니다.
+
+이와 같은 결과는 `maximum-pool-size`를 충분히 큰 값으로 설정함으로써 커넥션 풀이 TPS 상승에 유연하게 대응할 수 있고, 응답 지연과 요청 실패를 최소화할 수 있음을 보여줍니다. 이를 통해 시스템은 높은 TPS 환경에서도 안정적이고 일관된 성능을 제공할 수 있습니다.
