@@ -1,80 +1,45 @@
-각각의 주제에 맞춰 `Spring Data MongoDB`와 `Kotlin`으로 간단한 샘플 코드를 작성해 보겠습니다.
+### MongoDB Update Methods 성능 비교 초안
 
-### 3. 대용량 데이터 삭제 성능 테스트
+이번 성능 테스트에서는 MongoDB에서 여러 업데이트 및 삽입 작업을 수행할 수 있는 다양한 방법들 - **updateMulti & insertMany**, **upsert**, 그리고 **saveAll** - 을 비교하여 성능 차이를 분석하려고 합니다. 각 방법의 사용 목적과 처리 방식이 다르기 때문에, 실제 환경에서의 성능 차이를 파악하는 것이 중요합니다.
 
-대량 데이터 삭제 시 `bulkOps`를 활용한 성능 테스트 예제입니다.
+#### 테스트 목적
 
-```kotlin
-@Service
-class LargeDataDeleteService(
-    private val mongoTemplate: MongoTemplate
-) {
-    fun deleteLargeData(criteria: Criteria) {
-        val query = Query(criteria)
+- 동일한 데이터 세트에 대해 `updateMulti & insertMany`, `upsert`, `saveAll`의 성능을 비교합니다.
+- 데이터를 업데이트하거나 삽입할 때 각 방법이 어떤 장단점이 있는지, 그리고 어떤 시나리오에서 가장 효율적인지를 파악합니다.
 
-        // bulkOps를 사용한 대량 삭제
-        mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, MyDocument::class.java)
-            .remove(query)
-            .execute()
-    }
-}
-```
+#### 테스트 시나리오
 
-- `Criteria`를 통해 조건을 설정하고 `bulkOps`를 사용해 조건에 맞는 대량 데이터를 삭제하는 코드입니다. `BulkMode.UNORDERED`로 설정하여 삭제 속도를 높일 수 있습니다.
+1. **updateMulti & insertMany**
 
-### 4. Update와 Upsert 성능 테스트
+   - **데이터 존재 여부 확인 후 진행**: 먼저 데이터베이스에 해당 문서가 있는지 확인합니다. 존재하면 `updateMulti`로 업데이트하고, 존재하지 않는 경우 `insertMany`를 통해 새 데이터를 삽입합니다.
+   - 이 방식은 데이터의 존재 여부를 사전에 확인하는 작업이 포함되므로, 이 과정에서 추가적인 데이터 검색 비용이 발생할 수 있습니다.
 
-`update`와 `upsert` 두 가지 방식으로 데이터를 업데이트하는 성능을 비교할 수 있는 코드입니다.
+2. **upsert**
 
-```kotlin
-@Service
-class UpdateUpsertService(
-    private val mongoTemplate: MongoTemplate
-) {
-    fun updateData(criteria: Criteria, update: Update) {
-        val query = Query(criteria)
+   - **데이터 존재 여부와 상관없이 바로 실행**: 데이터가 없으면 삽입하고, 있으면 업데이트하는 단일 작업으로 진행됩니다. MongoDB의 `upsert` 옵션을 사용하면 한 번의 쿼리로 삽입과 업데이트를 처리할 수 있어 코드가 간결해집니다.
+   - 그러나 `upsert`는 데이터 존재 여부를 확인하는 내부 작업이 있기 때문에, 많은 데이터에 대해서는 성능이 저하될 수 있습니다.
 
-        // 일반적인 업데이트
-        mongoTemplate.updateMulti(query, update, MyDocument::class.java)
-    }
+3. **saveAll** (Spring Data MongoDB Repository)
 
-    fun upsertData(criteria: Criteria, update: Update) {
-        val query = Query(criteria)
+   - **데이터 리스트를 일괄 저장**: `saveAll` 메서드는 주어진 데이터 리스트를 데이터베이스에 저장합니다. 존재 여부를 별도로 확인하지 않고 일괄 저장 작업을 수행하며, 기본적으로 모든 데이터에 대해 저장 또는 업데이트를 진행합니다.
+   - `saveAll`은 Spring Data JPA의 방식과 유사하며, 내부적으로 각 데이터를 처리하면서 데이터 존재 여부를 체크합니다.
 
-        // Upsert (문서가 없으면 삽입)
-        mongoTemplate.upsert(query, update, MyDocument::class.java)
-    }
-}
-```
+#### 예상 성능 차이 분석
 
-- `updateMulti` 메서드는 조건에 맞는 기존 문서만 업데이트하고, `upsert` 메서드는 문서가 존재하지 않을 경우 새로 생성합니다.
-- 두 메서드의 성능을 비교해 업데이트 시나리오에 따른 적합한 방법을 선택할 수 있습니다.
+- **updateMulti & insertMany**: 데이터가 많을 경우, 데이터를 미리 조회하는 과정이 추가되기 때문에 성능에 영향을 줄 수 있습니다. 다만, 데이터를 사전에 확인한 후 필요할 때만 삽입하거나 업데이트하기 때문에 불필요한 작업을 줄일 수 있는 장점이 있습니다.
+- **upsert**: 데이터가 없을 가능성이 높거나 데이터의 삽입과 업데이트가 빈번한 경우 `upsert`가 효율적일 수 있습니다. 하지만 모든 데이터에 대해 존재 여부를 자동으로 확인하고 처리하므로, 데이터가 많아질수록 성능이 떨어질 수 있습니다.
+- **saveAll**: 모든 데이터를 일괄 저장하는 방식으로, 데이터가 존재하는지 여부를 따로 관리하지 않습니다. 이로 인해 작은 데이터 세트에서는 편리하지만, 대량의 데이터에 대해 불필요한 업데이트가 발생하여 성능이 저하될 가능성이 있습니다.
 
-### 5. MongoDB Transaction 성능 테스트 및 최적화
+#### 테스트 방법 및 지표
 
-MongoDB의 트랜잭션 기능을 사용하여 여러 작업을 묶어 수행하는 성능을 테스트하는 예제입니다.
+- **데이터 세트**: 동일한 조건을 가지는 데이터 세트를 사용합니다.
+- **테스트 지표**: 각 방법의 **처리 시간**, **CPU 사용률**, **네트워크 호출 횟수** 등을 비교합니다.
+- **테스트 환경**: 동일한 MongoDB 인스턴스 및 동일한 하드웨어 환경에서 테스트하여 공정성을 확보합니다.
 
-```kotlin
-@Service
-class TransactionService(
-    private val mongoTemplate: MongoTemplate,
-    private val mongoTransactionManager: MongoTransactionManager
-) {
-    fun executeInTransaction(criteria: Criteria, update: Update) {
-        val transactionTemplate = TransactionTemplate(mongoTransactionManager)
+#### 결론 예상
 
-        transactionTemplate.execute {
-            val query = Query(criteria)
+- **작은 데이터 세트**의 경우 `saveAll`이 간편하고 효율적일 수 있지만, **대량의 데이터**에서는 `updateMulti & insertMany`와 `upsert`가 더 효율적일 수 있습니다.
+- 데이터 존재 여부를 미리 알고 있다면 `updateMulti & insertMany` 방식이 유리할 수 있지만, 그렇지 않다면 `upsert`가 더 간편하게 구현할 수 있는 장점이 있습니다.
 
-            // 예제: 업데이트 및 데이터 추가를 트랜잭션으로 묶기
-            mongoTemplate.updateMulti(query, update, MyDocument::class.java)
-            mongoTemplate.save(MyDocument("newDocumentId", "data"))
-        }
-    }
-}
-```
+이 테스트를 통해 각 방법의 성능과 상황별 적합성을 비교하고, 어떤 방식이 실무에서 효율적인 선택이 될 수 있는지 알아보고자 합니다.
 
-- `TransactionTemplate`을 사용하여 트랜잭션 내에서 여러 작업을 수행합니다.
-- 이 예제에서는 `updateMulti`와 `save`를 트랜잭션으로 묶어서 실행하여 작업이 원자적으로 처리되도록 합니다.
-
-위 코드를 통해 각 주제에 대한 기본적인 테스트와 성능 비교가 가능합니다. 필요에 따라 로그 추가 및 다양한 조건으로 확장하여 실제 성능을 측정할 수 있습니다.
