@@ -1,5 +1,6 @@
 package com.example.mongostudy.member
 
+import com.example.mongostudy.order.Order
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -59,8 +60,6 @@ class MemberController(
                 name = "name-$it",
                 email = "email-$it",
                 dateJoined = LocalDateTime.now(),
-                dateOfBirth = LocalDate.now(),
-                phoneNumber = "phoneNumber-$it",
                 address = Address(
                     address = "address-$it",
                     addressDetail = "addressDetail-$it",
@@ -68,7 +67,6 @@ class MemberController(
                 ),
                 status = MemberStatus.ACTIVE,
                 pointsAccumulated = it.toBigDecimal(),
-                lastPurchaseDate = LocalDateTime.now()
             )
         }
 

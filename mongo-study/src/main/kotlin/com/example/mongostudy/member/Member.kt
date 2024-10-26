@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef
 @Document(collection = "members")
 class Member(
     @Field(name = "name")
-    val name: String,
+    var name: String,
 
     @Field(name = "address")
     val address: Address,
@@ -25,8 +25,8 @@ class Member(
     @Field(name = "member_id")
     val memberId: String,
 
-    @Field(name = "content")
-    val content: Content,
+//    @Field(name = "content")
+//    val content: Content,
 
     @Field(name = "email")
     val email: String,

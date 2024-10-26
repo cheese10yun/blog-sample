@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/persons")
 class PersonController(
     private val personRepository: PersonRepository,
-    private val personQueryService: PersonQueryService
+//    private val personQueryService: PersonQueryService
 ) {
 
     @GetMapping
@@ -23,12 +23,12 @@ class PersonController(
         return personRepository.findAll()
     }
 
-    @GetMapping("/query")
-    fun getQuery(
-        @RequestParam("firstName") firstName: String
-    ): List<Person> {
-        return personQueryService.findBy(firstName)
-    }
+//    @GetMapping("/query")
+//    fun getQuery(
+//        @RequestParam("firstName") firstName: String
+//    ): List<Person> {
+//        return personQueryService.findBy(firstName)
+//    }
 
 
     @GetMapping("/test")
@@ -42,9 +42,9 @@ class PersonController(
         )
     }
 
-    @GetMapping("/sample")
-    fun sample(
-    ) = personQueryService.groupByLastName()
+//    @GetMapping("/sample")
+//    fun sample(
+//    ) = personQueryService.groupByLastName()
 
     @PostMapping("/")
     fun createPerson(@RequestBody person: Person): Person {
@@ -56,8 +56,8 @@ class PersonController(
         return personRepository.findById(id).orElse(null)
     }
 
-    @GetMapping("/sample/test")
-    fun sampleTest(@RequestParam name: String): List<Person> {
-        return personQueryService.findByName(name)
-    }
+//    @GetMapping("/sample/test")
+//    fun sampleTest(@RequestParam name: String): List<Person> {
+//        return personQueryService.findByName(name)
+//    }
 }

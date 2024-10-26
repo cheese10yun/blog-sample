@@ -80,19 +80,19 @@ abstract class MongoCustomRepositorySupport<T>(
         return bulkOps.execute()
     }
 
-    protected fun bulkUpdate(
-        ids: List<ObjectId>,
-        bulkMode: BulkOperations.BulkMode = BulkOperations.BulkMode.UNORDERED
-    ): BulkWriteResult {
-        val bulkOps = mongoTemplate.bulkOps(bulkMode, Member::class.java)
-        for (id in ids) {
-            bulkOps.updateOne(
-                Query(Criteria.where("_id").`is`(id)),
-                Update().set("name", UUID.randomUUID().toString())
-            )
-        }
-        return bulkOps.execute()
-    }
+//    protected fun bulkUpdate(
+//        ids: List<ObjectId>,
+//        bulkMode: BulkOperations.BulkMode = BulkOperations.BulkMode.UNORDERED
+//    ): BulkWriteResult {
+//        val bulkOps = mongoTemplate.bulkOps(bulkMode, Member::class.java)
+//        for (id in ids) {
+//            bulkOps.updateOne(
+//                Query(Criteria.where("_id").`is`(id)),
+//                Update().set("name", UUID.randomUUID().toString())
+//            )
+//        }
+//        return bulkOps.execute()
+//    }
 
     protected fun findFirst(queryBuilder: (Query) -> Query): T? {
         val query = queryBuilder(Query())

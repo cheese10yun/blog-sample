@@ -32,12 +32,12 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    implementation("com.querydsl:querydsl-mongodb:5.0.0"){
-        exclude(group = "org.mongodb", module = "mongo-java-driver")
-    }
-
-
-    kapt("com.querydsl:querydsl-apt:5.0.0")
+//    implementation("com.querydsl:querydsl-mongodb:5.0.0"){
+//        exclude(group = "org.mongodb", module = "mongo-java-driver")
+//    }
+//
+//
+//    kapt("com.querydsl:querydsl-apt:5.0.0")
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
@@ -45,12 +45,12 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 //    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
-    testImplementation("org.testcontainers:junit-jupiter")
+//    testImplementation("org.testcontainers:junit-jupiter")
 //    testImplementation("org.testcontainers:mongodb")
 
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.4.2")
-    testImplementation("io.kotest:kotest-assertions-core:5.4.2")
-    testImplementation("io.kotest:kotest-framework-engine:5.4.2")
+//    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.4.2")
+//    testImplementation("io.kotest:kotest-assertions-core:5.4.2")
+//    testImplementation("io.kotest:kotest-framework-engine:5.4.2")
 }
 
 dependencyManagement {

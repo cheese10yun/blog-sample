@@ -19,11 +19,9 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.repository.MongoRepository
-import org.springframework.data.querydsl.QuerydslPredicateExecutor
 import java.util.*
 
-interface MemberRepository : MongoRepository<Member, ObjectId>, MemberCustomRepository,
-    QuerydslPredicateExecutor<Member>
+interface MemberRepository : MongoRepository<Member, ObjectId>, MemberCustomRepository
 
 interface MemberCustomRepository {
     fun findByName(name: String): List<Member>
@@ -117,7 +115,7 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
     }
 
     override fun updateName(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode) {
-//        bulkUpdate(listOf, bulkMode)
+        bulkUpdate(listOf, bulkMode)
     }
 
     override fun bulkInsert(members: List<Member>) {
