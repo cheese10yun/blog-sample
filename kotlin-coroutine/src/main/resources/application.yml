@@ -14,13 +14,13 @@ spring:
         username: root
         password:
         driver-class-name: com.mysql.cj.jdbc.Driver
-
+        type: com.zaxxer.hikari.HikariDataSource
         hikari:
             maximum-pool-size: 200           # 최대 커넥션 수
             minimum-idle: 10                 # 최소 유휴 커넥션 수
 #            connection-timeout: 2500        # 커넥션을 가져올 때 대기할 최대 시간 (밀리초)
-#            max-lifetime: 1800000           # 커넥션이 유지될 최대 시간 (밀리초)
-#            idle-timeout: 600000            # 유휴 커넥션이 유지될 최대 시간 (밀리초)
+            max-lifetime: 300000             # 커넥션이 유지될 최대 시간 (밀리초)
+            idle-timeout: 250000              # 커넥션이 유휴 상태로 유지될 최대 시간 (밀리초)
 #            leak-detection-threshold: 2000  # 커넥션 리크를 감지할 기준 시간 (밀리초)
 #            pool-name: Sample-HikariPool    # 커넥션 풀 이름
 #            auto-commit: true               # 자동 커밋 여부
@@ -34,7 +34,6 @@ spring:
 #                prepStmtCacheSize: 250
 #                prepStmtCacheSqlLimit: 2048
 #                useServerPrepStmts: true
-        dbcp2:
-            test-on-borrow: true
-            validation-query: select 1
-        type: com.zaxxer.hikari.HikariDataSource
+#        dbcp2:
+#            test-on-borrow: true
+#            validation-query: select 1
