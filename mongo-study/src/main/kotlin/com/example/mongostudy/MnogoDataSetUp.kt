@@ -18,65 +18,75 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
+import org.springframework.core.env.Environment
+import org.springframework.core.env.Profiles
 
 @Component
 class MnogoDataSetUp(
     private val orderRepository: OrderRepository,
     private val memberRepository: MemberRepository,
-    private val couponRepository: CouponRepository
+    private val couponRepository: CouponRepository,
+    private val environment: Environment
 ) : ApplicationRunner {
 
     private val random = Random
 
     override fun run(args: ApplicationArguments) {
 
-        val members = (1..50).map {
-            Member(
-                memberId = UUID.randomUUID().toString(),
-                name = "Member $it",
-                email = "member$it@example.com",
-                dateJoined = LocalDateTime.now(),
-                address = Address(
-                    address = "address $it",
-                    addressDetail = "address detail $it",
-                    zipCode = "zip code - $it"
-                ),
-                status = MemberStatus.values()[Random.nextInt(MemberStatus.values().size)],
-                pointsAccumulated = BigDecimal(Random.nextInt(1000)),
-            )
-        }
-        memberRepository.saveAll(members)
 
-        val coupons = (1..50).map {
-            Coupon(
-                couponId = "COUPON$it",
-                couponName = "Coupon $it",
-                discountAmount = BigDecimal(Random.nextInt(100)),
-                expiryDate = LocalDate.now().plusDays(Random.nextLong(100)),
-                status = CouponStatus.values()[Random.nextInt(CouponStatus.values().size)],
-                memberId = members[Random.nextInt(members.size)].memberId,
-                issuedDate = LocalDateTime.now().minusDays(Random.nextLong(30)),
-                usedDate = LocalDateTime.now(),
-                couponType = "TYPE${Random.nextInt(5)}",
-                minimumOrderValue = BigDecimal(50 + Random.nextInt(50))
-            )
-        }
-        couponRepository.saveAll(coupons)
+        if (environment.activeProfiles.contains("test").not()) {
 
-        val orders = (1..50).map {
-            Order(
-                orderId = "ORDER$it",
-                orderDate = LocalDateTime.now().minusHours(Random.nextLong(720)),
-                productName = "Product $it",
-                productPrice = BigDecimal(10 + Random.nextInt(90)),
-                shippingAddress = "Shipping Address $it",
-                orderStatus = OrderStatus.values()[Random.nextInt(OrderStatus.values().size)],
-                paymentMethod = "METHOD${Random.nextInt(5)}",
-                memberId = members[Random.nextInt(members.size)].memberId,
-                deliveryDate = LocalDate.now().plusDays(Random.nextLong(10)),
-                quantity = Random.nextInt(5) + 1
-            )
+            val members = (1..50).map {
+                Member(
+                    memberId = UUID.randomUUID().toString(),
+                    name = "Member $it",
+                    email = "member$it@example.com",
+                    dateJoined = LocalDateTime.now(),
+                    address = Address(
+                        address = "address $it",
+                        addressDetail = "address detail $it",
+                        zipCode = "zip code - $it"
+                    ),
+                    status = MemberStatus.values()[Random.nextInt(MemberStatus.values().size)],
+                    pointsAccumulated = BigDecimal(Random.nextInt(1000)),
+                )
+            }
+            memberRepository.saveAll(members)
+
+            val coupons = (1..50).map {
+                Coupon(
+                    couponId = "COUPON$it",
+                    couponName = "Coupon $it",
+                    discountAmount = BigDecimal(Random.nextInt(100)),
+                    expiryDate = LocalDate.now().plusDays(Random.nextLong(100)),
+                    status = CouponStatus.values()[Random.nextInt(CouponStatus.values().size)],
+                    memberId = members[Random.nextInt(members.size)].memberId,
+                    issuedDate = LocalDateTime.now().minusDays(Random.nextLong(30)),
+                    usedDate = LocalDateTime.now(),
+                    couponType = "TYPE${Random.nextInt(5)}",
+                    minimumOrderValue = BigDecimal(50 + Random.nextInt(50))
+                )
+            }
+            couponRepository.saveAll(coupons)
+
+            val orders = (1..50).map {
+                Order(
+                    orderId = "ORDER$it",
+                    orderDate = LocalDateTime.now().minusHours(Random.nextLong(720)),
+                    productName = "Product $it",
+                    productPrice = BigDecimal(10 + Random.nextInt(90)),
+                    shippingAddress = "Shipping Address $it",
+                    orderStatus = OrderStatus.values()[Random.nextInt(OrderStatus.values().size)],
+                    paymentMethod = "METHOD${Random.nextInt(5)}",
+                    memberId = members[Random.nextInt(members.size)].memberId,
+                    deliveryDate = LocalDate.now().plusDays(Random.nextLong(10)),
+                    quantity = Random.nextInt(5) + 1
+                )
+            }
+            orderRepository.saveAll(orders)
         }
-        orderRepository.saveAll(orders)
+
+
+
     }
 }

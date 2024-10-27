@@ -25,9 +25,6 @@ class Member(
     @Field(name = "member_id")
     val memberId: String,
 
-//    @Field(name = "content")
-//    val content: Content,
-
     @Field(name = "email")
     val email: String,
 

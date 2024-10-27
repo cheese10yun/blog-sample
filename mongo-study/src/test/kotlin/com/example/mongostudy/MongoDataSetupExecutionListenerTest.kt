@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 import java.util.function.Consumer
 
 class MongoDataSetupExecutionListenerTest(
-    private val mongoTemplate: MongoTemplate
+//    private val mongoTemplate: MongoTemplate
 ) : MongoStudyApplicationTests() {
 
     @AfterAll

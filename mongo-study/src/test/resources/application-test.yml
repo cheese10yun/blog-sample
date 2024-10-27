@@ -1,10 +1,9 @@
 spring:
     data:
         mongodb:
-            uri: mongodb+srv://service:service@cluster0.qhhygdz.mongodb.net/test
-            username: service
-            password: service
-            database: mongo_study
+
+
+
 
 
 logging:
