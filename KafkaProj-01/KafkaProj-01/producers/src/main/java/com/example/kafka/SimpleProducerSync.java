@@ -22,14 +22,13 @@ public class SimpleProducerSync {
 
         props.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "121.168.58.79:9092");
 
+        // advertised.listeners=PLAINTEXT_INTERNAL://192.168.0.99:9092,PLAINTEXT_EXTERNAL://121.168.58.79:9092
+
         props.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         props.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
-
         final KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(props);
-
         final ProducerRecord<String, String> producerRecord = new ProducerRecord<>(topicName, "hello world2");
-
 
         try {
             final RecordMetadata recordMetadata = kafkaProducer.send(producerRecord).get();
