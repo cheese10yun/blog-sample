@@ -111,7 +111,7 @@ value class Email(val value: String) {
 class User private constructor(
     var id: Long? = null,
     var name: String,
-    val email: EJ
+    val email: Email,
     var stats: UserStats
 ) {
     companion object {
