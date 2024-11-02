@@ -21,3 +21,7 @@ spring:
         dbcp2:
             test-on-borrow: true
             validation-query: select 1
+    jpa:
+        show-sql: false
+        hibernate:
+            ddl-auto: create-drop

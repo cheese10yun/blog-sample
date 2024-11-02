@@ -7,6 +7,7 @@ plugins {
     kotlin("jvm") version "1.8.20"
     kotlin("plugin.spring") version "1.8.20"
     kotlin("plugin.jpa") version "1.8.20"
+//    id("org.springdoc.openapi-gradle-plugin") version "1.6.14"
 }
 
 group = "com.example"
@@ -29,6 +30,9 @@ dependencies {
 //    runtimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.15")
+//    implementation("org.springdoc:springdoc-openapi-ui:1.6.14")
 
     runtimeOnly("com.mysql:mysql-connector-j")
 

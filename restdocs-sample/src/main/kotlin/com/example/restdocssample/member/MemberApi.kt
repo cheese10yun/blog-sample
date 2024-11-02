@@ -62,9 +62,9 @@ class MemberApi(
 }
 
 class MemberResponse(member: Member) {
-    @field:NotNull
-    @field:NotEmpty
-    @field:Length(min = 1, max = 2)
+//    @field:NotNull
+//    @field:NotEmpty
+//    @field:Length(min = 1, max = 2)
     val id = member.id!!
 
     @field:NotEmpty
