@@ -7,6 +7,7 @@
 
 ## 2024
 
+* 11-02 [Kotlin 객체 생성의 안전성과 유효성 강화하기](https://cheese10yun.github.io/kotlin-pattern-2/)
 * 10-26 [HikariCP로 MySQL Connection Pool 최적화하기](https://cheese10yun.github.io/mysql-connection-pool-timeout-1/)
 * 10-21 [MySQL Connection Pool 관리 - HikariCP 설정 및 타임아웃 처리](https://cheese10yun.github.io/mysql-connection-pool-timeout/)
 * 05-23 [코루틴을 이용한 성능 개선 - Flow를 활용한 다중 요청 처리](https://cheese10yun.github.io/kotlin-flow/)
