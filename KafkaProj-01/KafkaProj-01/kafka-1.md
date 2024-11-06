@@ -13,4 +13,4 @@
 
 ## Producer의 메시지 배치 전송 내부 메커니즘 - Record Batch와 Record Accumulator 이해
 
-* [ ] 메시지 배치 전송의 이해 정리
+* [ ] 메시지 배치 전송의 이해 정리cd 
