@@ -34,31 +34,32 @@ class AppRunner(
     override fun run(args: ApplicationArguments) {
         saveOrder()
         saveCoupon()
-        saveMember()
-        saveAddress()
+//        saveMember()
+//        saveAddress()
     }
 
     private fun saveOrder() {
-        (1..10).map {
-            val order = Order(
+        val orders = (1..10).map {
+            Order(
                 productName = "product-${it}",
                 quantity = it,
                 price = 100.0
             )
-            orderRepository.save(order)
         }
+
+        orderRepository.saveAll(orders)
     }
 
     private fun saveCoupon() {
-        (1..100).map {
-            val coupon = Coupon(
+        val coupons = (1..100).map {
+            Coupon(
                 id = it.toString(),
                 discount = 0.1,
                 code = "CODE-${it}",
                 valid = true,
             )
-            couponRepository.save(coupon)
         }
+        couponRepository.saveAll(coupons)
     }
 
     private fun saveMember() {

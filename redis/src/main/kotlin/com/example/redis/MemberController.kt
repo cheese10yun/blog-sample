@@ -3,18 +3,24 @@ package com.example.redis
 import com.zaxxer.hikari.HikariDataSource
 import javax.sql.DataSource
 import kotlin.jvm.optionals.getOrNull
-import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping()
+@RequestMapping
 class MemberController(
     private val memberRepository: MemberRepository,
     private val addressRepository: AddressRepository,
-    private val dataSource: DataSource
+    private val dataSource: DataSource,
+    private val redisConnectionPoolSample: RedisConnectionPoolSample,
 ) {
+
+    @GetMapping("/api/redis")
+    fun getRedis(): Pair<Coupon?, Order?> {
+        return redisConnectionPoolSample.get()
+    }
+
     @GetMapping("/api/members")
     fun getMember(): Member? {
         memberRepository.findById(1).getOrNull()
@@ -45,9 +51,4 @@ class MemberController(
             """.trimIndent()
         return addressRepository.findAll().toList()
     }
-}
-
-@Service
-class RedisConnectionPoolSample() {
-
 }
