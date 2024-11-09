@@ -15,9 +15,9 @@ spring:
         client-type: lettuce
         lettuce:
             pool:
-                max-active: 1000
-                max-idle: 1000
-                min-idle: 1000
+                max-active: 100
+                max-idle: 100
+                min-idle: 100
 
     datasource:
         url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=Asia/Seoul&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false

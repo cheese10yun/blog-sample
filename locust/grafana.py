@@ -28,21 +28,21 @@ class Grafana(HttpUser):
             name="/api/v1/members"
         )
 
-    @task
-    def getAddress(self):
-        order_params = [
-            ("PENDING", "2023-01-01-2023-01-31"),
-            ("SHIPPED", "2023-02-01-2023-02-28"),
-            ("COMPLETED", "2023-03-01-2023-03-31")
-        ]
-        query_params = random.choice(order_params)
-        params = {
-            "status": query_params[0],
-            "date": query_params[1]
-        }
-        self.client.get(
-            "/api/members",
-            headers={"Content-Type": "application/json"},
-            params=params,
-            name="/api/v1/address"
-        )
+    # @task
+    # def getAddress(self):
+    #     order_params = [
+    #         ("PENDING", "2023-01-01-2023-01-31"),
+    #         ("SHIPPED", "2023-02-01-2023-02-28"),
+    #         ("COMPLETED", "2023-03-01-2023-03-31")
+    #     ]
+    #     query_params = random.choice(order_params)
+    #     params = {
+    #         "status": query_params[0],
+    #         "date": query_params[1]
+    #     }
+    #     self.client.get(
+    #         "/api/address",
+    #         headers={"Content-Type": "application/json"},
+    #         params=params,
+    #         name="/api/address"
+    #     )
