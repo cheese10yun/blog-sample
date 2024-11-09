@@ -26,24 +26,40 @@ fun main(args: Array<String>) {
 class AppRunner(
     private val chatService: ChatService,
     private val memberRepository: MemberRepository,
-    private val addressRepository: AddressRepository
+    private val addressRepository: AddressRepository,
+    private val couponRepository:CouponRepository,
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments) {
-        println("Application Started...")
-//        chatService.enterChatRoom("chat1")
+        saveCoupon()
+        saveMember()
+        saveAddress()
+    }
 
+    private fun saveCoupon() {
+        (1..100).map {
+            val coupon = Coupon(
+                id = it.toString(),
+                discount = 0.1,
+                code = "CODE-${it}",
+                valid = true,
+            )
+            couponRepository.save(coupon)
+        }
+    }
 
-//        val members = (1..100).map {
-//            Member(
-//                id = it.toString(),
-//                ttl = 1000L,
-//            )
-//        }
-//        memberRepository.saveAll(members)
+    private fun saveMember() {
+        val members = (1..100).map {
+            Member(
+                id = it.toString(),
+                ttl = 1000L,
+            )
+        }
+        memberRepository.saveAll(members)
+    }
 
-
-        val addresses = (1..100).map{
+    private fun saveAddress() {
+        val addresses = (1..100).map {
             Address(
                 street = "moderatius-${it}",
                 city = "Noordeloos-${it}",

@@ -8,6 +8,18 @@ Redis의 싱글 스레드 구조는 서버가 동시에 여러 클라이언트�
 
 ### 시나리오: Redis와 MySQL 연동 작업
 
+```mermaid
+sequenceDiagram
+    participant Server
+    participant Redis
+    participant MySQL
+    Server->>Redis: 쿠폰 조회 요청 (10ms)
+    Redis-->>Server: 쿠폰 조회 응답
+    Server->>MySQL: 주문 정보 조회 요청 (2,500ms)
+    MySQL-->>Server: 주문 정보 조회 응답
+    Server-->>Server: 최종 응답 반환
+```
+
 다음과 같은 시나리오를 가정해보겠습니다. 애플리케이션에서 API 요청이 들어왔을 때, Redis에서 쿠폰 정보를 조회하고 이후 MySQL에서 회원 정보를 조회하는 동기식 코드로 구성되어 있습니다.
 
 - **Redis 쿠폰 조회**: 빠르게 처리됨 (10ms 소요)
