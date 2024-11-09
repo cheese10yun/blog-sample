@@ -28,12 +28,25 @@ class AppRunner(
     private val memberRepository: MemberRepository,
     private val addressRepository: AddressRepository,
     private val couponRepository:CouponRepository,
+    private val orderRepository: OrderRepository
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments) {
+        saveOrder()
         saveCoupon()
         saveMember()
         saveAddress()
+    }
+
+    private fun saveOrder() {
+        (1..10).map {
+            val order = Order(
+                productName = "product-${it}",
+                quantity = it,
+                price = 100.0
+            )
+            orderRepository.save(order)
+        }
     }
 
     private fun saveCoupon() {
