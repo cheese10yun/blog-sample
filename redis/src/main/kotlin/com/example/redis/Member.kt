@@ -5,12 +5,10 @@ import org.springframework.data.redis.core.RedisHash
 import org.springframework.data.redis.core.TimeToLive
 import org.springframework.data.repository.CrudRepository
 
-@RedisHash(
-    value = "member"
-)
+@RedisHash(value = "member")
 data class Member(
     @Id
-    var id: Long? = null,
+    var id: String? = null,
 
     @TimeToLive
     val ttl: Long = 20

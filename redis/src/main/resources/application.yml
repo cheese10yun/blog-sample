@@ -1,3 +1,6 @@
+#server:
+#    port: 0
+
 spring:
     main:
         web-application-type: servlet
@@ -7,13 +10,45 @@ spring:
     session:
         store-type: redis
     redis:
-        host: 127.0.0.1
+        host: 192.168.0.99
         port: 6379
-        password: root
+        client-type: lettuce
+        lettuce:
+            pool:
+                max-active: 1000
+                max-idle: 1000
+                min-idle: 1000
 
+    datasource:
+        url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=Asia/Seoul&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false
+        username: root
+        password:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        hikari:
+            maximum-pool-size: 50
+            minimum-idle: 25
+            connection-timeout: 90000
+            max-lifetime: 90000
+        dbcp2:
+            test-on-borrow: true
+            validation-query: select 1
+    jpa:
+        show-sql: false
+        hibernate:
+            ddl-auto: create-drop
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: "*"
+    metrics:
+        export:
+            prometheus:
+                enabled: true
 
 logging:
     level:
         root: INFO
-        redis.clients: TRACE
-        org.springframework.data: TRACE
+#        redis.clients: TRACE
+#        org.springframework.data: TRACE
