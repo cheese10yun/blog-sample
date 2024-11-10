@@ -32,8 +32,8 @@ class AppRunner(
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments) {
-//        saveOrder()
-//        saveCoupon()
+        saveOrder()
+        saveCoupon()
 //        saveMember()
 //        saveAddress()
     }

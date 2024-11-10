@@ -17,29 +17,57 @@ class RedisConnectionPoolSample(
 
 ) {
 
-    fun get2(id: String): Boolean {
+    fun get2(id: String): Coupon? {
         printLettuceConnection()
-        couponRepository.existsByCode("CODE-$id")
-        couponRepository.findByCode("CODE-$id")
-        couponRepository.findByIdOrNull("CODE-$id")
+//        val existsByCode = couponRepository.existsByCode("CODE-$id")
+//        val findByCode = couponRepository.findByCode("CODE-$id")
+//        val findByIdOrNull = couponRepository.findByIdOrNull(id)
+        val ids = (1..100).map { it.toString() }
+        couponRepository.findAllById(ids)
+        couponRepository.findAllById(ids)
+        couponRepository.findAllById(ids)
+        couponRepository.findAllById(ids)
+        couponRepository.findAllById(ids)
+//
 
-        return couponRepository.existsByCode("CODE-$id")
+//        val a1 = couponRepository.findByDiscountGreaterThan(id.toDouble())
+//        val a2 = couponRepository.findByDiscount(id.toDouble())
+//        val a3 = couponRepository.findByDiscountBetween(id.toDouble(), id.toDouble())
+//        val a4 = couponRepository.findByValid()
+//        val a5 = couponRepository.findByCodeStartingWith("CODE-$id")
+//        val a6 = couponRepository.findByCodeEndingWith("CODE-$id")
+//        val a7 = couponRepository.findByCodeContaining("CODE-$id")
+//        val a8 = couponRepository.findByIdIn(listOf(id))
+//        val a9 = couponRepository.findByValidAndDiscountGreaterThan(true, id.toDouble())
+//        val a10 = couponRepository.existsByValidAndDiscountLessThan(true, id.toDouble())
+//        val a11 = couponRepository.findCouponsByDiscountGreaterThan(id.toDouble())
+
+
+//        val a12 = couponRepository.findCouponByCode("CODE-$id")
+
+        return couponRepository.findByIdOrNull(id)
     }
 
-    fun get(id: String): Pair<Boolean, Order?> {
-        val coupon = couponRepository.existsByCode("CODE-$id")
+    fun get(id: String): Pair<Coupon?, Order?> {
+        val coupon = couponRepository.findByIdOrNull(id)
+        val ids = (1..100).map { it.toString() }
+        couponRepository.findAllById(ids)
+        couponRepository.findAllById(ids)
+        couponRepository.findAllById(ids)
+        couponRepository.findAllById(ids)
+        couponRepository.findAllById(ids)
         val order = orderRepository.findByIdOrNull(id.toLong())
         Thread.sleep(2500)
 //        runBlocking { delay(2500) }
 
-        printLettuceConnection()
+//        printLettuceConnection()
 //        printHikariConnection()
 
         return Pair(coupon, order)
     }
 
 
-    private fun printHikariConnection(){
+    private fun printHikariConnection() {
         val targetDataSource = dataSource.unwrap(HikariDataSource::class.java)
         val hikariDataSource = targetDataSource as HikariDataSource
         val hikariPoolMXBean = hikariDataSource.hikariPoolMXBean
