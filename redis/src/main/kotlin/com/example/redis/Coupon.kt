@@ -9,11 +9,18 @@ import org.springframework.data.repository.CrudRepository
 data class Coupon(
     @Id
     var id: String? = null,
-    @TimeToLive
-    val ttl: Long = 60,
+//    @TimeToLive
+//    val ttl: Long = 60,
     val discount: Double,
     val code: String,
     val valid: Boolean,
 )
 
-interface CouponRepository : CrudRepository<Coupon, String>
+interface CouponRepository : CrudRepository<Coupon, String> {
+
+    fun findByCode(code: String): Coupon?
+
+    fun deleteByCode(code: String)
+
+    fun existsByCode(code: String): Boolean
+}

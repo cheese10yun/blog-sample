@@ -6,4 +6,10 @@ GET http://localhost:8080/api/address
 ###
 
 
-GET http://localhost:8080/api/redis
+GET http://localhost:8080/api/composite
+
+###
+
+GET http://localhost:8080/api/redis?id=5
+
+###

@@ -1,19 +1,25 @@
-package com.example.redis
-
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.data.redis.connection.RedisConnectionFactory
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
-import org.springframework.data.redis.listener.RedisMessageListenerContainer
-
-
-@Configuration
-class RedisConfig {
-
-//    @Bean
-//    fun redisConnectionFactory(): RedisConnectionFactory {
-//        return LettuceConnectionFactory()
-//    }
+//package com.example.redis
+//
+//import org.springframework.context.annotation.Bean
+//import org.springframework.context.annotation.Configuration
+//import org.springframework.context.annotation.Primary
+//import org.springframework.data.redis.connection.RedisConnectionFactory
+//import org.springframework.data.redis.connection.RedisPassword
+//import org.springframework.data.redis.connection.RedisStandaloneConfiguration
+//import org.springframework.data.redis.connection.lettuce.LettuceConnection
+//import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
+//import org.springframework.data.redis.core.RedisTemplate
+//import org.springframework.data.redis.core.StringRedisTemplate
+//import org.springframework.data.redis.listener.RedisMessageListenerContainer
+//
+//
+//@Configuration
+//class RedisConfig {
+//
+////    @Bean
+////    fun redisConnectionFactory(): RedisConnectionFactory {
+////        return LettuceConnectionFactory()
+////    }
 //
 //    @Bean
 //    fun redisContainer(
@@ -23,20 +29,20 @@ class RedisConfig {
 //        container.setConnectionFactory(redisConnectionFactory)
 //        return container
 //    }
-
-//    @Bean
-//    fun redisConnectionFactory(): RedisConnectionFactory {
-//        return LettuceConnectionFactory()
-//    }
-
+//
+////    @Bean
+////    fun redisConnectionFactory(): RedisConnectionFactory {
+////        return LettuceConnectionFactory()
+////    }
+//
 //    @Bean
 //    fun redisContainer(): RedisMessageListenerContainer {
 //        val container = RedisMessageListenerContainer()
 //        container.setConnectionFactory(redisConnectionFactory())
 //        return container
 //    }
-
-
+//
+//
 //    @Bean
 //    @Primary
 //    fun redisTemplate(redisConnectionFactory: LettuceConnectionFactory): RedisTemplate<*, *> =
@@ -54,8 +60,8 @@ class RedisConfig {
 //        template.setEnableTransactionSupport(true)
 //        return template
 //    }
-
-
+//
+//
 //    @Bean
 //    @Primary
 //    fun redisConnectionFactory(): LettuceConnectionFactory =
@@ -67,5 +73,5 @@ class RedisConfig {
 //                LettuceConnection.PipeliningFlushPolicy.buffered(1000)
 //            )
 //        }
-
-}
+//
+//}

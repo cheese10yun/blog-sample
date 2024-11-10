@@ -5,6 +5,7 @@ import javax.sql.DataSource
 import kotlin.jvm.optionals.getOrNull
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -17,21 +18,25 @@ class MemberController(
 ) {
 
     @GetMapping("/api/redis")
-    fun getRedis(): Pair<Coupon?, Order?> {
-        return redisConnectionPoolSample.get()
-    }
+    fun getRedis(
+        @RequestParam("id") id: String
+    ) = redisConnectionPoolSample.get2(id)
+
+    @GetMapping("/api/composite")
+    fun getRedis2(
+        @RequestParam("id") id: String
+    ) = redisConnectionPoolSample.get(id)
+
 
     @GetMapping("/api/members")
     fun getMember(): Member? {
         memberRepository.findById(1).getOrNull()
         memberRepository.findById(35).getOrNull()
         return memberRepository.findById(42).getOrNull()
-//        return memberRepository.findAll().toList()
     }
 
     @GetMapping("/api/address")
     fun getAddress(): List<Address> {
-
         val targetDataSource = dataSource.unwrap(HikariDataSource::class.java)
         val hikariDataSource = targetDataSource as HikariDataSource
         val hikariPoolMXBean = hikariDataSource.hikariPoolMXBean

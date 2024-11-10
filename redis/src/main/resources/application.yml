@@ -13,11 +13,16 @@ spring:
         host: 192.168.0.99
         port: 6379
         client-type: lettuce
-        lettuce:
-            pool:
-                max-active: 100
-                max-idle: 100
-                min-idle: 100
+#        lettuce:
+#            pool:
+#                max-active: 1
+#                max-idle: 1
+#                min-idle: 1
+#        jedis:
+#            pool:
+#                max-active: 1
+#                max-idle: 1
+#                min-idle: 1
 
     datasource:
         url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=Asia/Seoul&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false

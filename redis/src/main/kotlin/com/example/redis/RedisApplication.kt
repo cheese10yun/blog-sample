@@ -24,7 +24,7 @@ fun main(args: Array<String>) {
 
 @Configuration
 class AppRunner(
-    private val chatService: ChatService,
+//    private val chatService: ChatService,
     private val memberRepository: MemberRepository,
     private val addressRepository: AddressRepository,
     private val couponRepository:CouponRepository,
@@ -32,8 +32,8 @@ class AppRunner(
 ) : ApplicationRunner {
 
     override fun run(args: ApplicationArguments) {
-        saveOrder()
-        saveCoupon()
+//        saveOrder()
+//        saveCoupon()
 //        saveMember()
 //        saveAddress()
     }
@@ -85,29 +85,29 @@ class AppRunner(
     }
 }
 
-@Service
-class ChatService(
-    private val container: RedisMessageListenerContainer,
-    private val redisTemplate: RedisTemplate<String, String>
-) : MessageListener {
-
-    fun enterChatRoom(chatRoomName: String) {
-        container.addMessageListener(this, ChannelTopic(chatRoomName))
-
-        val scanner = Scanner(System.`in`)
-        while (scanner.hasNextLine()) {
-            val line = scanner.next()
-            if (line == "q") {
-                println("Quit....")
-                break
-            } else {
-                redisTemplate.convertAndSend(chatRoomName, line)
-            }
-        }
-    }
-
-
-    override fun onMessage(message: Message, pattern: ByteArray?) {
-        println("Message $message")
-    }
-}
+//@Service
+//class ChatService(
+//    private val container: RedisMessageListenerContainer,
+//    private val redisTemplate: RedisTemplate<String, String>
+//) : MessageListener {
+//
+//    fun enterChatRoom(chatRoomName: String) {
+//        container.addMessageListener(this, ChannelTopic(chatRoomName))
+//
+//        val scanner = Scanner(System.`in`)
+//        while (scanner.hasNextLine()) {
+//            val line = scanner.next()
+//            if (line == "q") {
+//                println("Quit....")
+//                break
+//            } else {
+//                redisTemplate.convertAndSend(chatRoomName, line)
+//            }
+//        }
+//    }
+//
+//
+//    override fun onMessage(message: Message, pattern: ByteArray?) {
+//        println("Message $message")
+//    }
+//}
