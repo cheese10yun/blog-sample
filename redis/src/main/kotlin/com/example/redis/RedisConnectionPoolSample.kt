@@ -17,17 +17,17 @@ class RedisConnectionPoolSample(
 
 ) {
 
-    fun get2(id: String): Coupon? {
+    fun get2(id: String): MutableIterable<Coupon> {
         printLettuceConnection()
 //        val existsByCode = couponRepository.existsByCode("CODE-$id")
 //        val findByCode = couponRepository.findByCode("CODE-$id")
 //        val findByIdOrNull = couponRepository.findByIdOrNull(id)
         val ids = (1..100).map { it.toString() }
-        couponRepository.findAllById(ids)
-        couponRepository.findAllById(ids)
-        couponRepository.findAllById(ids)
-        couponRepository.findAllById(ids)
-        couponRepository.findAllById(ids)
+//        couponRepository.findAllById(ids)
+//        couponRepository.findAllById(ids)
+//        couponRepository.findAllById(ids)
+//        couponRepository.findAllById(ids)
+//        couponRepository.findAllById(ids)
 //
 
 //        val a1 = couponRepository.findByDiscountGreaterThan(id.toDouble())
@@ -45,7 +45,8 @@ class RedisConnectionPoolSample(
 
 //        val a12 = couponRepository.findCouponByCode("CODE-$id")
 
-        return couponRepository.findByIdOrNull(id)
+//        return couponRepository.findByIdOrNull(id)
+        return couponRepository.findAllById(ids)
     }
 
     fun get(id: String): Pair<Coupon?, Order?> {

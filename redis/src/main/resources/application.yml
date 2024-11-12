@@ -15,9 +15,9 @@ spring:
         client-type: lettuce
         lettuce:
             pool:
-                max-active: 100
-                max-idle: 100
-                min-idle: 100
+                max-active: 1
+                max-idle: 1
+                min-idle: 1
 
 
     datasource:

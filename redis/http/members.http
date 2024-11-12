@@ -9,6 +9,6 @@ GET http://localhost:8080/api/composite?id=5
 
 ###
 
-GET http://localhost:63653/api/redis?id=10
+GET http://localhost:8080/api/redis?id=10
 
 ###ㄷ
