@@ -49,3 +49,24 @@ Redis가 싱글 스레드로 동작하기 때문에 Lettuce 커넥션 풀이 의
 
 이와 같은 방식으로 Lettuce 커넥션 풀을 잘 활용하면 Redis의 싱글 스레드 특성에도 불구하고 애플리케이션의 성능을 최대한 끌어올릴 수 있다는 점을 기억해 두세요.
 
+![](docs/redis-server-instance-1.png)
+
+![](docs/redis-server-instance-4.png)
+
+```bash
+$ INFO clients
+# Clients
+connected_clients:10
+cluster_connections:0
+maxclients:10000
+client_recent_max_input_buffer:20480
+client_recent_max_output_buffer:0
+blocked_clients:0
+tracking_clients:0
+pubsub_clients:0
+watching_clients:0
+clients_in_timeout_table:0
+total_watched_keys:0
+total_blocking_keys:0
+total_blocking_keys_on_nokey:0
+```
