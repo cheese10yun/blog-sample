@@ -45,3 +45,28 @@ KafkaProducer 객체의 send() 메소드는 호출 시 마다 하나의 Producer
 * Producer와 Broker간의 전송이 매우 빠르고 Producer에서 메시지를 적절한 Record Accumulator에누적된다면 linger.ms를 0으로 설정하여 빠르게 전송하는 것이 더 효율적일 수 있음
 * 전반적인 Producer와 Broker간의 전송이 느리다면 linger.ms를 높여서 메시지가 배치로 적용될 수 있는 확율을 높이는 시도를 해볼 만함
 * linger.ms는 보통 20ms 이하로 설정 권장
+
+## Producer의 동기(Sync)와 비동기(Async)에서 배치 전송 차이
+
+* 기본적으로 KafkaProducer 객체의 send() 메소드는 비동기이며 Batch 기반으로 메시지 전송
+* Callback 기반의 Async는 비동기적으로 메시지를 보내면서 RecordMetadata를 Client가 받을 수 있는 방식을 제공
+* Callback 기반의 Async는 여러 개의 메시지가 Batch로 만들어짐
+* `RecordMetaData recordMetadata = producer.send(record, callback).get();`와 같은 방식으로 개별 메세지 별로 응답을 받을 때까지 block이 되는 방식으로는 메시지 배치처리가 불가, 전송은 배치레벨이지만 배치에 메시지는 단 1개
+
+## Producer의 전송/재전송 내부 메커니즘 및 재 전송 동작 관련 주요 파라미터의 이해
+
+![](/images/kafka-05.png)
+
+| 옵션                 | 설명                                                                                |
+|--------------------|-----------------------------------------------------------------------------------|
+| max.block.ms       | Send() 호출시 Record Accumulator에 입력하지 못하고 block되는 최대 시간,<br/> 초과시 Timeout Exception |
+| linger.ms          | Sender Thread가 Record Accumulator에서 배치별로 가져가기 위한 최대 대기시간                          |
+| request.timeout.ms | 전송에 걸리는 최대 시간 <br/> 전송 재 시도 대기시간 제외 초과시 retry를 하거나 Timeout Exception 발생           |
+| retry.backoff.ms   | 전송 재 시도를 위한 대기시간                                                                  |
+| deliver.timeout.ms | Producer 메시지(배치) 전송에 허영된 최대 시간, 초과시간시  Timeout Exception 발생                       |
+
+* deliver.timeout.ms >= linger.ms + request.timeout.ms 이상으로 설정 해야함
+* retries = 10, retry.backoff.ms = 30, request.timeout.ms = 10,000ms
+* retry.backoff.ms는 재 전송 주기 시간을 설정
+* retries = 10, retry.backoff.ms = 30, request.timeout.ms = 10,000ms 경우에는 request.timeout.ms 기다린후 재 전송을하기전 30ms 이후 재전송 시도, 이와 같은 방식으로 재 전송을 10회 retry 해보고 더이상 retry 시도 하지 안흥ㅁ
+* 만약 10회 이내에 request.timeout.ms에 도달하면 더 이상 retry 하지 않음
