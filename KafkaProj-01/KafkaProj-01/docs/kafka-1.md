@@ -24,7 +24,6 @@ KafkaProducer 객체의 send() 메소드는 호출 시 마다 하나의 Producer
 
 ![](/images/kafka-02.png)
 
-
 ### Kafka Producer Record Accumulator
 
 * Record Accumulator는 Partitioner에 의해서 메시지 배치가 전송이 될 토픽과 Partiotion에 따라 저장되는 KafkaProducer 메모리 영역
@@ -32,3 +31,17 @@ KafkaProducer 객체의 send() 메소드는 호출 시 마다 하나의 Producer
 * KafkaProducer의 Main Thread는 send() 메소드를 호출하고 Record Accumulator에 데이터 저장하고 Sender Thread는 별개로 데이터를 브로커로 전송
 
 ![](/images/kafka-03.png)
+
+### Producer의 linger.ms와 batch.size
+
+* Sender Thread는 기본적으로 전송할 준비가 되어 있으면 Record Accumulator에서 1개의 Batch를 가져갈 수도, 여러 개의 Batch를 가져갈 수도 있음. 또한 Batch에 미시지가 다 차지 않아도 가져 갈 수있음
+* linger.ms를 0보다 크게 설정하여 Sender Thread가 하나의 Record Batch를 가져갈 때 일정 시간 대기하여 Record Batch에 메시지를 보다 많이 채울 수 있도록 적용
+
+![](/images/kafka-04.png)
+
+### Producer의 linger.ms에 대한 고찰
+
+* linger.ms를 반드시 0보다 크게 설정할 필요는 없음
+* Producer와 Broker간의 전송이 매우 빠르고 Producer에서 메시지를 적절한 Record Accumulator에누적된다면 linger.ms를 0으로 설정하여 빠르게 전송하는 것이 더 효율적일 수 있음
+* 전반적인 Producer와 Broker간의 전송이 느리다면 linger.ms를 높여서 메시지가 배치로 적용될 수 있는 확율을 높이는 시도를 해볼 만함
+* linger.ms는 보통 20ms 이하로 설정 권장
