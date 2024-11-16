@@ -139,10 +139,21 @@ totalConnections: 1, activeConnections: 1, idleConnections: 0, threadsAwaitingCo
 
 위 로그는 `getComposite` 호출로 인해 커넥션이 점유된 상태에서 `getMySql` 호출이 대기 중인 상황을 보여줍니다.
 
-Hikari 커넥션 풀 관리는 스레드를 블록 시키는 방식으로 진행되며, idle한 커넥션이 없는 경우 `threadsAwaitingConnection`에 대기 요청이 쌓이고, 앞선 커넥션들이 반환되어야 다시 `activeConnections`로 전환될 수 있습니다.
+실제 응답 시간을 확인해보면, `/api/mysql`만 호출하는 경우 응답 시간이 매우 빠른 것을 확인할 수 있습니다. 예를 들어:
 
-그렇다면 Redis Lettuce 커넥션 풀은 어떻게 동작하는지 살펴보겠습니다. 동일하게 스레드를 블록 시킨다면 지연이 발생할 것이고, 그렇지 않다면 MySQL의 지연과 상관없이 추가적인 Redis 호출에 대한 응답을 할 것입니다.
+```
+Response code: 200; Time: 24ms (24 ms); Content length: 64 bytes (64 B)
+```
 
+그러나 `/api/composite`를 호출한 이후에 `/api/mysql`를 호출하게 되면, 응답 시간이 느려지는 것을 확인할 수 있습니다.
+
+```
+Response code: 200; Time: 1112ms (1 s 112 ms); Content length: 64 bytes (64 B)
+```
+
+이는 Hikari 커넥션 풀이 스레드를 블록 시키는 방식으로 동작하기 때문이며, idle한 커넥션이 없을 경우 `threadsAwaitingConnection`에 대기 요청이 쌓이고, 앞선 커넥션들이 반환되어야 비로소 다시 `activeConnections`로 전환될 수 있기 때문입니다.
+
+그렇다면 Redis Lettuce 커넥션 풀은 어떻게 동작하는지 살펴보겠습니다. Lettuce에서도 동일하게 스레드를 블록 시킨다면 지연이 발생할 것이며, 반대로 블록하지 않는다면 MySQL의 지연과 상관없이 추가적인 Redis 호출에 대해 빠르게 응답할 수 있을 것입니다.
 
 
 
