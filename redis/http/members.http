@@ -5,6 +5,10 @@ GET http://localhost:8080/api/address
 
 ###
 
+GET http://localhost:8080/api/mysql?id=10
+
+###ㄷ
+
 GET http://localhost:8080/api/composite?id=5
 
 ###
@@ -12,3 +16,5 @@ GET http://localhost:8080/api/composite?id=5
 GET http://localhost:8080/api/redis?id=10
 
 ###ㄷ
+
+

@@ -14,17 +14,15 @@ Redis Lettuce 커넥션 풀의 역할을 이해하기 위해, 먼저 전통적�
 sequenceDiagram
     participant Server
     participant MySQL
-    Server->>MySQL: 주문 정보 조회 요청
-    MySQL-->>Server: 주문 정보 조회 응답 (2,500ms 소요)
+    Server ->> MySQL: 주문 정보 조회 요청
+    MySQL -->> Server: 주문 정보 조회 응답 (2,500ms 소요)
 ```
 
 전통적인 Hikari Connection Pool에서는 애플리케이션이 주문 정보를 조회하기 위해 커넥션 풀에서 하나의 커넥션을 가져옵니다. 아래 그림에서 볼 수 있듯이, **idleConnections**가 10개라면, 그 중 하나의 커넥션을 가져와 **activeConnections**로 전환하게 됩니다. 이 경우 **idleConnections**는 9개로 줄고, **activeConnections**는 1개가 됩니다. 전체 **totalConnections**는 변하지 않고 유지됩니다.
 
-
 ![Hikari Connection Pool - Idle to Active](https://raw.githubusercontent.com/cheese10yun/blog-sample/refs/heads/master/redis/docs/connection-pool-001.png)
 
 만약 요청이 많이 들어와 응답이 지연되고 있는 경우를 생각해 봅시다. 아래 그림처럼 **maximum-pool-size**가 10개인 상황에서, 모든 10개의 커넥션이 **activeConnections**로 전환되어 사용 중이라면, 추가적인 요청은 **threadsAwaitingConnection**으로 들어가 대기하게 됩니다. 즉, 사용 가능한 커넥션이 없기 때문에 요청 스레드는 커넥션이 반환될 때까지 기다려야 합니다.
-
 
 ![Hikari Connection Pool - Threads Awaiting Connection](https://raw.githubusercontent.com/cheese10yun/blog-sample/refs/heads/master/redis/docs/connection-pool-002.png)
 
@@ -41,11 +39,11 @@ sequenceDiagram
     participant Server
     participant Redis
     participant MySQL
-    Server->>Redis: 쿠폰 조회 요청 
-    Redis-->>Server: 쿠폰 조회 응답 (10ms)
-    Server->>MySQL: 주문 정보 조회 요청 (2,500ms)
-    MySQL-->>Server: 주문 정보 조회 응답
-    Server-->>Server: 최종 응답 반환
+    Server ->> Redis: 쿠폰 조회 요청
+    Redis -->> Server: 쿠폰 조회 응답 (10ms)
+    Server ->> MySQL: 주문 정보 조회 요청 (2,500ms)
+    MySQL -->> Server: 주문 정보 조회 응답
+    Server -->> Server: 최종 응답 반환
 ```
 
 위의 시나리오에서 애플리케이션은 먼저 Redis에서 쿠폰 정보를 조회한 후, MySQL에서 주문 정보를 조회합니다. Redis 쿠폰 조회는 10ms 만에 응답이 오지만, 이후 이어지는 MySQL 조회는 2,500ms가 걸립니다. 이 상황에서 Redis Lettuce 커넥션 풀이 어떻게 동작하는지를 이해하는 것이 중요합니다.
@@ -53,6 +51,98 @@ sequenceDiagram
 Redis에 쿠폰 조회 요청을 보내면, 10ms 내에 쿠폰 정보가 응답됩니다. 여기서 Lettuce 커넥션 풀이 1개만 있다고 가정해 보겠습니다. 만약 이 상황이 전통적인 커넥션 풀 구조였다면, MySQL 데이터 조회(2,500ms)가 완료되기 전까지 하나뿐인 Redis 커넥션이 블록되어 Redis에 대한 추가적인 요청을 처리할 수 없었을 것입니다. 이는 Redis 서버가 이미 응답을 완료했음에도 불구하고, 애플리케이션 측에서 더 이상 Redis에 대한 요청을 처리할 수 없게 된다는 문제를 야기합니다.
 
 그러나 Redis Lettuce의 경우 비동기적으로 동작할 수 있습니다. Redis 서버에서 응답을 내린 후 해당 커넥션이 즉시 반환된다면, MySQL 조회가 진행 중이더라도 Redis에 대한 새로운 요청을 처리할 수 있게 됩니다. 이는 Redis 서버가 싱글 스레드로 동작하더라도 Lettuce 클라이언트 측에서는 추가적인 요청을 계속해서 보낼 수 있는 가능성을 열어줍니다. 그렇다면 실제로 Redis Lettuce가 이러한 방식으로 동작하는지, 아니면 다른 방식으로 동작하는지 **코드를 통해 더 자세히 살펴보겠습니다**.
+
+```kotlin
+@RestController
+@RequestMapping
+class MemberController(
+    private val redisConnectionPoolSample: RedisConnectionPoolSample,
+) {
+
+    @GetMapping("/api/redis")
+    fun getRedis(@RequestParam("id") id: String) = redisConnectionPoolSample.getRedis(id)
+
+    @GetMapping("/api/mysql")
+    fun getMySql(@RequestParam("id") id: Long) = redisConnectionPoolSample.getMySql(id)
+
+    @GetMapping("/api/composite")
+    fun getRedis2(@RequestParam("id") id: String) = redisConnectionPoolSample.getComposite(id)
+}
+
+@Service
+class RedisConnectionPoolSample(
+    private val couponRepository: CouponRepository,
+    private val orderRepository: OrderRepository
+
+) {
+
+    fun getRedis(id: String): Coupon? {
+        return couponRepository.findByIdOrNull(id)
+    }
+
+
+    fun getMySql(id: Long): Order? {
+        printHikariConnection()
+        return orderRepository.findByIdOrNull(id)
+    }
+
+    fun getComposite(id: String): Pair<Coupon?, Order?> {
+        val coupon = couponRepository.findByIdOrNull(id)
+        val order = orderRepository.findByIdOrNull(id.toLong())
+        Thread.sleep(2500) // 2.5초 대기
+        printHikariConnection()
+        return Pair(coupon, order)
+    }
+
+    private fun printHikariConnection() {
+        val targetDataSource = dataSource.unwrap(HikariDataSource::class.java)
+        val hikariDataSource = targetDataSource as HikariDataSource
+        val hikariPoolMXBean = hikariDataSource.hikariPoolMXBean
+        val hikariConfigMXBean = hikariDataSource.hikariConfigMXBean
+
+        val log = buildString {
+            append("totalConnections: ${hikariPoolMXBean.totalConnections}, ")
+            append("activeConnections: ${hikariPoolMXBean.activeConnections}, ")
+            append("idleConnections: ${hikariPoolMXBean.idleConnections}, ")
+            append("threadsAwaitingConnection: ${hikariPoolMXBean.threadsAwaitingConnection}")
+        }
+        println(log)
+    }
+}
+```
+
+* /api/redis는 단순히 redis id 기준으로 조회
+* /api/mysql 단순히 mysql 조회
+* /api/composite는 redis 조회 후, mysql 조회 2.5초 대기 이후 응답
+* Thread.sleep(2500) 대기하는 구간에서
+* lettuce connection max-idle 1개, max-active 1개, hikari maximum-pool-size: 1, minimum-idle: 1 으로 설정
+
+### 시나리오: getComposite 호출 이후 getMySql 호출
+
+Hikari 설정은 maximum-pool-size가 1이고, minimum-idle이 1로 되어 있으며, `getComposite` 호출 시 사용 가능한 1개의 커넥션 중 하나를 사용하여 작업을 진행합니다.
+
+이때 로그:
+
+```txt
+totalConnections: 1, activeConnections: 1, idleConnections: 0, threadsAwaitingConnection: 0
+```
+
+위 로그를 통해 알 수 있듯이, 하나의 커넥션이 사용 중이며, 대기 중인 스레드는 없습니다.
+
+이 상태에서 `getMySql` 호출을 시도하면, 사용 가능한 **idle 커넥션**이 없기 때문에 `getComposite` 호출이 끝난 후 반환된 커넥션을 사용해야 합니다. 이로 인해 **threadsAwaitingConnection** 상태에서 대기하게 되고, 지연이 발생합니다. 이후 **threadsAwaitingConnection**에서 대기하던 요청이 **activeConnections**로 전환되면, `getMySql` 호출에서 해당 커넥션을 사용할 수 있게 됩니다.
+
+이때 로그:
+
+```txt
+totalConnections: 1, activeConnections: 1, idleConnections: 0, threadsAwaitingConnection: 1
+```
+
+위 로그는 `getComposite` 호출로 인해 커넥션이 점유된 상태에서 `getMySql` 호출이 대기 중인 상황을 보여줍니다.
+
+Hikari 커넥션 풀 관리는 스레드를 블록 시키는 방식으로 진행되며, idle한 커넥션이 없는 경우 `threadsAwaitingConnection`에 대기 요청이 쌓이고, 앞선 커넥션들이 반환되어야 다시 `activeConnections`로 전환될 수 있습니다.
+
+그렇다면 Redis Lettuce 커넥션 풀은 어떻게 동작하는지 살펴보겠습니다. 동일하게 스레드를 블록 시킨다면 지연이 발생할 것이고, 그렇지 않다면 MySQL의 지연과 상관없이 추가적인 Redis 호출에 대한 응답을 할 것입니다.
+
 
 
 

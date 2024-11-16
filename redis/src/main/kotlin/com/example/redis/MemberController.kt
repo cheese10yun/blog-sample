@@ -18,14 +18,13 @@ class MemberController(
 ) {
 
     @GetMapping("/api/redis")
-    fun getRedis(
-        @RequestParam("id") id: String
-    ) = redisConnectionPoolSample.get2(id)
+    fun getRedis(@RequestParam("id") id: String) = redisConnectionPoolSample.getRedis(id)
+
+    @GetMapping("/api/mysql")
+    fun getMySql(@RequestParam("id") id: Long) = redisConnectionPoolSample.getMySql(id)
 
     @GetMapping("/api/composite")
-    fun getRedis2(
-        @RequestParam("id") id: String
-    ) = redisConnectionPoolSample.get(id)
+    fun getComposite(@RequestParam("id") id: String) = redisConnectionPoolSample.getComposite(id)
 
 
     @GetMapping("/api/members")

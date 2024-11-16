@@ -17,12 +17,12 @@ class RedisConnectionPoolSample(
 
 ) {
 
-    fun get2(id: String): MutableIterable<Coupon> {
+    fun getRedis(id: String): Coupon? {
         printLettuceConnection()
 //        val existsByCode = couponRepository.existsByCode("CODE-$id")
 //        val findByCode = couponRepository.findByCode("CODE-$id")
 //        val findByIdOrNull = couponRepository.findByIdOrNull(id)
-        val ids = (1..100).map { it.toString() }
+//        val ids = (1..100).map { it.toString() }
 //        couponRepository.findAllById(ids)
 //        couponRepository.findAllById(ids)
 //        couponRepository.findAllById(ids)
@@ -45,26 +45,38 @@ class RedisConnectionPoolSample(
 
 //        val a12 = couponRepository.findCouponByCode("CODE-$id")
 
-//        return couponRepository.findByIdOrNull(id)
-        return couponRepository.findAllById(ids)
+        return couponRepository.findByIdOrNull(id)
+//        return couponRepository.findAllById(ids)
     }
 
-    fun get(id: String): Pair<Coupon?, Order?> {
+//    fun get(id: String): Pair<Coupon?, Order?> {
+//        val coupon = couponRepository.findByIdOrNull(id)
+//        val ids = (1..100).map { it.toString() }
+//        couponRepository.findAllById(ids)
+//        val order = orderRepository.findByIdOrNull(id.toLong())
+//        Thread.sleep(2500)
+////        runBlocking { delay(2500) }
+//
+////        printLettuceConnection()
+////        printHikariConnection()
+//
+//        return Pair(coupon, order)
+//    }
+
+    fun getComposite(id: String): Pair<Coupon?, Order?> {
         val coupon = couponRepository.findByIdOrNull(id)
-        val ids = (1..100).map { it.toString() }
-        couponRepository.findAllById(ids)
-        couponRepository.findAllById(ids)
-        couponRepository.findAllById(ids)
-        couponRepository.findAllById(ids)
-        couponRepository.findAllById(ids)
         val order = orderRepository.findByIdOrNull(id.toLong())
         Thread.sleep(2500)
 //        runBlocking { delay(2500) }
-
-//        printLettuceConnection()
-//        printHikariConnection()
+        printLettuceConnection()
+        printHikariConnection()
 
         return Pair(coupon, order)
+    }
+
+    fun getMySql(id: Long): Order? {
+        printHikariConnection()
+        return orderRepository.findByIdOrNull(id)
     }
 
 
