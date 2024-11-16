@@ -110,6 +110,7 @@ class RedisConnectionPoolSample(
         val hikariDataSource = targetDataSource as HikariDataSource
         val hikariPoolMXBean = hikariDataSource.hikariPoolMXBean
         val hikariConfigMXBean = hikariDataSource.hikariConfigMXBean
+        hikariConfigMXBean.minimumIdle
 
         val log = buildString {
             append("totalConnections: ${hikariPoolMXBean.totalConnections}, ")
