@@ -43,7 +43,6 @@ sequenceDiagram
     Redis -->> Server: 쿠폰 조회 응답 (10ms)
     Server ->> MySQL: 주문 정보 조회 요청 (2,500ms)
     MySQL -->> Server: 주문 정보 조회 응답
-    Server -->> Server: 최종 응답 반환
 ```
 
 위의 시나리오에서 애플리케이션은 먼저 Redis에서 쿠폰 정보를 조회한 후, MySQL에서 주문 정보를 조회합니다. Redis 쿠폰 조회는 10ms 만에 응답이 오지만, 이후 이어지는 MySQL 조회는 2,500ms가 걸립니다. 이 상황에서 Redis Lettuce 커넥션 풀이 어떻게 동작하는지를 이해하는 것이 중요합니다.
@@ -159,11 +158,11 @@ sequenceDiagram
     Controller ->> Service: getComposite 호출
     Service ->> MySQL: MySQL 조회 요청
     MySQL -->> Service: MySQL 응답 (2,500ms 대기)
-    Service -->> Controller: 응답 반환
     Controller ->> Service: getMySql 호출
-    Service ->> MySQL: MySQL 조회 요청 (idle 커넥션이 없어 대기)
+    Service -->> Controller: getComposite 응답 반환
+    Service ->> MySQL: MySQL 조회 요청 (idle 커넥션이 없어 대기 했었음)
     MySQL -->> Service: MySQL 응답 (대기 후 응답)
-    Service -->> Controller: 응답 반환
+    Service -->> Controller: getMySql 응답 반환
 ```
 
 이는 Hikari 커넥션 풀이 스레드를 블록 시키는 방식으로 동작하기 때문이며, idle한 커넥션이 없을 경우 `threadsAwaitingConnection`에 대기 요청이 쌓이고, 앞선 커넥션들이 반환되어야 비로소 다시 `activeConnections`로 전환될 수 있기 때문입니다.
@@ -197,13 +196,13 @@ sequenceDiagram
     Controller ->> Service: getComposite 호출
     Service ->> Redis: Redis 조회 요청
     Redis -->> Service: Redis 응답 (10ms)
-    Service ->> MySQL: MySQL 조회 요청 (2,500ms)
-    MySQL -->> Service: MySQL 응답
-    Service -->> Controller: 응답 반환
+    Service ->> MySQL: MySQL 조회 요청
+    MySQL -->> Service: MySQL 응답 (2,500ms)
     Controller ->> Service: getRedis 호출
+    Service -->> Controller: getComposite 응답 반환
     Service ->> Redis: Redis 조회 요청 (지연 없이 응답)
     Redis -->> Service: Redis 응답
-    Service -->> Controller: 응답 반환
+    Service -->> Controller: getRedis 응답 반환
 ```
 
 이를 통해 지연이 없는 것을 볼 때, Lettuce 커넥션 풀은 스레드를 블록하지 않고, 추가적인 요청에 대해 빠르게 응답할 수 있음을 확인할 수 있습니다. 이는 MySQL의 Hikari 커넥션 풀이 스레드를 블록하여 대기 시간이 발생하는 것과 대비됩니다. Hikari에서는 커넥션이 반환될 때까지 대기해야 하므로 지연이 발생할 수 있지만, Lettuce는 이러한 지연 없이 추가 요청에 신속하게 응답할 수 있습니다.
