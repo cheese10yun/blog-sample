@@ -157,7 +157,7 @@ sequenceDiagram
     participant Service
     participant MySQL
     Controller ->> Service: getComposite 호출
-    Server ->> MySQL: MySQL 조회 요청
+    Service ->> MySQL: MySQL 조회 요청
     MySQL -->> Service: MySQL 응답 (2,500ms 대기)
     Service -->> Controller: 응답 반환
     Controller ->> Service: getMySql 호출
