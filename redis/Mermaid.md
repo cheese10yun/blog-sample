@@ -100,28 +100,28 @@ Zenuml을 사용하여 시퀀스 다이어그램을 쉽게 표현할 수 있습�
 
 ```mermaid
 zenuml
-title Order Service
-@Actor Client #FFEBE6
-@Boundary OrderController #0747A6
-@EC2 <<BFF>> OrderService #E3FCEF
-group BusinessService {
-  @Lambda PurchaseService
-  @AzureFunction InvoiceService
-}
-
-@Starter(Client)
-// `POST /orders`
-OrderController.post(payload) {
-  OrderService.create(payload) {
-    order = new Order(payload)
-    if(order != null) {
-      par {
-        PurchaseService.createPO(order)
-        InvoiceService.createInvoice(order)      
-      }      
+    title Order Service
+    @Actor Client #FFEBE6
+    @Boundary OrderController #0747A6
+    @EC2 <<BFF>> OrderService #E3FCEF
+    group BusinessService {
+      @Lambda PurchaseService
+      @AzureFunction InvoiceService
     }
-  }
-}
+    
+    @Starter(Client)
+    // `POST /orders`
+    OrderController.post(payload) {
+      OrderService.create(payload) {
+        order = new Order(payload)
+        if(order != null) {
+          par {
+            PurchaseService.createPO(order)
+            InvoiceService.createInvoice(order)      
+          }      
+        }
+      }
+    }
 ```
 
 Zenuml 코드 (Sequence Diagram):
