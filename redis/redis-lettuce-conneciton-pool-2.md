@@ -20,12 +20,12 @@ sequenceDiagram
 
 전통적인 Hikari Connection Pool에서는 애플리케이션이 주문 정보를 조회하기 위해 커넥션 풀에서 하나의 커넥션을 가져옵니다. 예를 들어, **idleConnections**가 10개라면, 그 중 하나의 커넥션을 가져와 **activeConnections**로 전환하게 됩니다. 이 경우 **idleConnections**는 9개로 줄고, **activeConnections**는 1개가 됩니다. 전체 **totalConnections**는 변하지 않고 유지됩니다.
 
-![](./docs/connection-pool-001.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/refs/heads/master/redis/docs/connection-pool-001.png)
 
 
 만약 요청이 많이 들어와 응답이 지연되고 있는 경우를 생각해 봅시다. **maximum-pool-size**가 10개인 상황에서, 모든 10개의 커넥션이 **activeConnections**로 전환되어 사용 중이라면, 추가적인 요청은 **threadsAwaitingConnection**으로 들어가 대기하게 됩니다. 즉, 사용 가능한 커넥션이 없기 때문에 요청 스레드는 커넥션이 반환될 때까지 기다려야 합니다.
 
-![](./docs/connection-pool-002.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/refs/heads/master/redis/docs/connection-pool-002.png)
 
 
 이와 같이 전통적인 커넥션 풀의 개념에서는, **요청 스레드마다 활성화된 커넥션을 사용**하며, 해당 스레드가 작업을 끝내기 전까지는 **커넥션을 점유**하게 됩니다. 이는 데이터베이스의 동시 연결 수와 처리 능력을 효과적으로 관리할 수 있는 방법이지만, 커넥션이 사용 중일 때 대기하는 요청들이 발생할 수 있다는 단점이 있습니다.
