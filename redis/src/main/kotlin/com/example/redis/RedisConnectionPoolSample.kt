@@ -1,7 +1,15 @@
 package com.example.redis
 
 import com.zaxxer.hikari.HikariDataSource
+import io.lettuce.core.metrics.DefaultCommandLatencyCollectorOptions
+import io.lettuce.core.resource.ClientResources
 import javax.sql.DataSource
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration
 import org.springframework.data.repository.findByIdOrNull
@@ -17,12 +25,29 @@ class RedisConnectionPoolSample(
 
 ) {
 
-    fun getRedis(id: String): Coupon? {
+    @OptIn(FlowPreview::class)
+     fun getRedis(id: String): Any? {
         printLettuceConnection()
 //        val existsByCode = couponRepository.existsByCode("CODE-$id")
 //        val findByCode = couponRepository.findByCode("CODE-$id")
 //        val findByIdOrNull = couponRepository.findByIdOrNull(id)
-//        val ids = (1..100).map { it.toString() }
+        val ids = (1..50).map { it.toString() }
+
+        val runBlocking = runBlocking {
+
+            ids
+                .asFlow()
+                .flatMapMerge { it ->
+                    flow {
+                        emit(couponRepository.findByIdOrNull(it))
+                    }
+                }
+                .toList()
+        }
+
+        return  runBlocking
+
+
 //        couponRepository.findAllById(ids)
 //        couponRepository.findAllById(ids)
 //        couponRepository.findAllById(ids)
@@ -45,8 +70,8 @@ class RedisConnectionPoolSample(
 
 //        val a12 = couponRepository.findCouponByCode("CODE-$id")
 
-        return couponRepository.findByIdOrNull(id)
-//        return couponRepository.findAllById(ids)
+//            return couponRepository.findByIdOrNull(id)
+//        couponRepository.findAllById(ids)
     }
 
 //    fun get(id: String): Pair<Coupon?, Order?> {

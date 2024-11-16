@@ -1,6 +1,10 @@
 #server:
 #    port: 0
 
+#server:
+#    tomcat:
+#        max-connections:
+
 spring:
     main:
         web-application-type: servlet
@@ -15,10 +19,12 @@ spring:
         client-type: lettuce
         lettuce:
             pool:
-                max-active: 1
-                max-idle: 1
-                min-idle: 1
-
+                max-active: 2
+                max-idle: 2
+                min-idle: 2
+                enabled: true
+                max-wait: 1000ms
+                time-between-eviction-runs: 1000ms
 
     datasource:
         url: jdbc:mysql://localhost:3366/batch_study?useSSL=false&serverTimezone=Asia/Seoul&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false
@@ -44,6 +50,8 @@ management:
             exposure:
                 include: "*"
     metrics:
+        enable:
+            all: true
         export:
             prometheus:
                 enabled: true

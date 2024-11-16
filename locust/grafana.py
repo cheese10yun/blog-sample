@@ -1,10 +1,11 @@
-from locust import HttpUser, task, constant
+from locust import HttpUser, task, constant, between
 import random
 
 
 class Grafana(HttpUser):
     # wait_time = between(1, 2)  # 각 요청 사이의 대기 시간(초)
-    wait_time = constant(0.01)  # 모든 요청 사이에 3초의 고정된 대기 시간 설정
+    # wait_time = constant(1)  # 모든 요청 사이에 3초의 고정된 대기 시간 설정
+    wait_time = between(0.01, 0.02)  # 매우 짧은 대기 시간 설정
     # wait_time = constant_throughput(1)  # 초당 최대 1번 작업 실행으로 조정하여 대기 시간 설정
     # wait_time = constant_pacing(10)  # 최소 10초 간격으로 작업 실행이 보장되도록 대기 시간 설정
     host = "http://localhost:8080"  # 테스트 대상 호스트 주소 지정
