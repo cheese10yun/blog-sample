@@ -57,13 +57,13 @@ KafkaProducer 객체의 send() 메소드는 호출 시 마다 하나의 Producer
 
 ![](/images/kafka-05.png)
 
-| 옵션                 | 설명                                                                                |
-|--------------------|-----------------------------------------------------------------------------------|
+| 옵션                 | 설명                                                                               |
+|--------------------|----------------------------------------------------------------------------------|
 | max.block.ms       | Send() 호출시 Record Accumulator에 입력하지 못하고 block되는 최대 시간,<br/> 초과시 Timeout Exception |
-| linger.ms          | Sender Thread가 Record Accumulator에서 배치별로 가져가기 위한 최대 대기시간                          |
-| request.timeout.ms | 전송에 걸리는 최대 시간 <br/> 전송 재 시도 대기시간 제외 초과시 retry를 하거나 Timeout Exception 발생           |
-| retry.backoff.ms   | 전송 재 시도를 위한 대기시간                                                                  |
-| deliver.timeout.ms | Producer 메시지(배치) 전송에 허영된 최대 시간, 초과시간시  Timeout Exception 발생                       |
+| linger.ms          | Sender Thread가 Record Accumulator에서 배치별로 가져가기 위한 최대 대기시간                         |
+| request.timeout.ms | 전송에 걸리는 최대 시간 <br/> 전송 재 시도 대기시간 제외 초과시 retry를 하거나 Timeout Exception 발생          |
+| retry.backoff.ms   | 전송 재 시도를 위한 대기시간                                                                 |
+| deliver.timeout.ms | Producer 메시지(배치) 전송에 허용된 최대 시간, 초과시 Timeout Exception 발생                         |
 
 * deliver.timeout.ms >= linger.ms + request.timeout.ms 이상으로 설정 해야함
 * retries = 10, retry.backoff.ms = 30, request.timeout.ms = 10,000ms

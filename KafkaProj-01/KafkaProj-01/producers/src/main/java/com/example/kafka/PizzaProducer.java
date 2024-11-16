@@ -116,6 +116,9 @@ public class PizzaProducer {
         props.setProperty(ProducerConfig.LINGER_MS_CONFIG, "20");
 
 
+        props.setProperty(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, "50000");
+
+
         //KafkaProducer object creation
         KafkaProducer<String, String> kafkaProducer = new KafkaProducer<String, String>(props);
 
