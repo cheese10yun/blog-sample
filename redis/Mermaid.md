@@ -235,4 +235,4 @@ Mermaid는 코드 기반의 다이어그램 도구로서, 유지보수성, 수�
 
 ## 출처
 
-* [Mermaid Live Editor]\([https://mermaid.live/edit](https://mermaid.live/edit))
+* [Mermaid Live Editor](https://mermaid.live/)
