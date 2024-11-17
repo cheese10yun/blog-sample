@@ -51,6 +51,8 @@ Redis에 쿠폰 조회 요청을 보내면, 10ms 내에 쿠폰 정보가 응답�
 
 그러나 Redis Lettuce의 경우 비동기적으로 동작할 수 있습니다. Redis 서버에서 응답을 내린 후 해당 커넥션이 즉시 반환된다면, MySQL 조회가 진행 중이더라도 Redis에 대한 새로운 요청을 처리할 수 있게 됩니다. 이는 Redis 서버가 싱글 스레드로 동작하더라도 Lettuce 클라이언트 측에서는 추가적인 요청을 계속해서 보낼 수 있는 가능성을 열어줍니다. 그렇다면 실제로 Redis Lettuce가 이러한 방식으로 동작하는지, 아니면 다른 방식으로 동작하는지 **코드를 통해 더 자세히 살펴보겠습니다**.
 
+
+## Redis Lettuce와 Hikari 동작 비교를 위한 코드
 ```kotlin
 @RestController
 @RequestMapping
@@ -122,8 +124,6 @@ class RedisConnectionPoolSample(
 
 Hikari 설정은 `maximum-pool-size=1`, `minimum-idle=1`로 구성되어 있으며, `getComposite` 호출 시 사용 가능한 단 하나의 커넥션을 사용하여 작업이 진행됩니다. 이번 테스트의 목적은 **`/api/composite` 호출 이후 `getMySql` 호출의 응답 속도를 확인**하는 것입니다. 만약 Hikari Connection Pool이 블로킹 방식으로 동작한다면 `getComposite` 호출 중 MySQL 조회 요청으로 점유된 커넥션이 반환되지 않아 `getMySql` 요청은 대기 상태에 놓이고 응답 시간이 지연될 것입니다. 반대로 MySQL 조회 요청이 빠르게 완료되거나, 추가적인 idle 커넥션이 있다면 `getMySql` 요청은 지연 없이 처리될 수 있습니다.
 
-
-
 이때 로그:
 
 ```txt
@@ -150,7 +150,6 @@ totalConnections: 1, activeConnections: 1, idleConnections: 0, threadsAwaitingCo
 
 테스트 결과, `/api/composite` 호출 이후 `getMySql` 요청은 대기 상태에 놓이며, MySQL 조회 작업이 완료되어 커넥션이 반환된 이후에 처리되는 것을 확인할 수 있었습니다. 이는 Hikari Connection Pool이 동기적이며, 사용 중인 커넥션이 반환될 때까지 대기 상태에 놓이는 블로킹 방식으로 동작하기 때문입니다.
 
-
 #### 동작 흐름
 
 ```mermaid
@@ -167,7 +166,6 @@ sequenceDiagram
     MySQL -->> Service: MySQL B 응답
     Service -->> Controller: getMySql 응답 반환
 ```
-
 
 Hikari Connection Pool의 동작 방식은 아래와 같습니다.
 
@@ -194,7 +192,6 @@ Hikari Connection Pool의 동작 방식은 아래와 같습니다.
 ### 시나리오: getComposite 호출 이후 getRedis 호출
 
 Lettuce 설정은 `max-active=1`, `max-idle=1`, `min-idle=1`로 구성되어 있으며, `getComposite` 호출 시 사용 가능한 단 하나의 커넥션을 사용하여 작업이 진행됩니다. 이번 테스트의 목적은 **`/api/composite` 호출 이후 `getRedis` 호출의 응답 속도를 확인**하는 것입니다. 만약 Lettuce가 블록되는 방식으로 동작한다면 `getComposite` 호출 중 Redis 조회 요청으로 점유된 커넥션이 MySQL 작업이 끝날 때까지 반환되지 않아 `getRedis` 요청은 대기 상태에 놓이고 응답 시간이 지연될 것입니다. 반대로 Lettuce가 비동기적이며 블로킹되지 않는 방식으로 동작한다면 `getComposite` 호출 중에도 커넥션이 Redis 요청 응답 후 즉시 반환되므로, `getRedis` 요청이 지연 없이 처리될 것입니다.
-
 
 #### 테스트 결과
 
@@ -229,14 +226,22 @@ sequenceDiagram
     Service -->> Controller: getRedis 응답 반환
 ```
 
+1. **`getComposite` 호출**:  
+   `Controller`가 `getComposite` 요청을 보냅니다. `Service`는 먼저 Redis 조회를 수행하며, 이 작업은 10ms 만에 완료되고 커넥션은 즉시 반환됩니다. 이후 MySQL 조회를 시작하며, MySQL 조회 작업은 2,500ms가 소요됩니다.
+2. **`getRedis` 호출**:  
+   MySQL 조회가 진행 중인 상태에서 `Controller`가 `getRedis` 요청을 보냅니다. Redis는 MySQL 작업과는 독립적으로 동작하므로, Redis 조회 요청은 지연 없이 처리됩니다. 반환된 Redis 커넥션이 즉시 재사용되어 `getRedis` 요청이 빠르게 완료됩니다.
+3. **`getComposite` 응답 반환**:  
+   MySQL 작업이 완료되면 `getComposite` 응답이 반환됩니다.
+4. **`getRedis` 응답 반환**:  
+   Redis 조회 요청이 완료된 후 응답이 반환됩니다. Redis 작업이 MySQL 작업의 지연과 상관없이 즉시 처리되었기 때문에 빠른 응답 시간을 유지합니다.
 
-- **`getComposite` 호출 중 Redis 커넥션의 상태**:  
-  Redis 조회는 10ms 내에 응답을 완료하고 커넥션을 반환합니다. 이후 MySQL 작업은 커넥션과 관계없이 진행되므로, Redis 요청에 사용된 커넥션은 `getRedis` 요청에 재사용될 수 있습니다.
+#### 논블로킹의 장점
 
-- **`getRedis` 요청의 응답 시간**:  
-  MySQL 조회 요청으로 인해 `getComposite`의 전체 작업이 완료되지 않았더라도 Redis는 커넥션 반환 후 새로운 요청을 처리할 수 있기 때문에, `getRedis` 호출이 지연 없이 응답되었습니다.
+테스트 결과를 통해 Lettuce가 비동기적이고 논블로킹 방식으로 동작한다는 것을 확인할 수 있었습니다. Redis 조회는 10ms 만에 응답을 완료하고 커넥션을 즉시 반환하므로, MySQL 작업이 진행 중이라도 Redis 커넥션이 점유된 상태로 남아있지 않습니다. 결과적으로, 추가적인 Redis 요청(`getRedis`)은 MySQL의 작업 지연과 관계없이 빠르게 처리됩니다.
 
-이를 통해 지연이 없는 것을 볼 때, Lettuce 커넥션 풀은 스레드를 블록하지 않고, 추가적인 요청에 대해 빠르게 응답할 수 있음을 확인할 수 있습니다. 이는 MySQL의 Hikari 커넥션 풀이 스레드를 블록하여 대기 시간이 발생하는 것과 대비됩니다. Hikari에서는 커넥션이 반환될 때까지 대기해야 하므로 지연이 발생할 수 있지만, Lettuce는 이러한 지연 없이 추가 요청에 신속하게 응답할 수 있습니다.
+이는 MySQL의 Hikari Connection Pool이 스레드를 블록하여 대기 시간을 유발하는 방식과 대비됩니다. Hikari에서는 커넥션이 반환될 때까지 다른 요청이 대기 상태에 놓이지만, Lettuce는 커넥션 반환이 즉시 이루어져 이러한 지연 없이 요청을 처리할 수 있습니다.
+
+Redis의 비동기 I/O와 Lettuce의 설계가 결합되어 높은 동시성 환경에서도 안정적인 성능을 유지할 수 있음을 보여주는 사례라 할 수 있습니다. 이러한 특성은 Redis와 같이 빠른 응답성을 요구하는 환경에서 Lettuce가 얼마나 효율적인지를 잘 보여줍니다.
 
 ### Hikari와 Lettuce의 차이점 정리
 
