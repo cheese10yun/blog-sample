@@ -258,7 +258,7 @@ Redis의 비동기 I/O와 Lettuce의 설계가 결합되어 높은 동시성 환
     - Hikari의 경우 **스레드 블로킹**이 빈번히 발생하는 반면, Lettuce는 넌블로킹으로 **추가적인 스레드 리소스를 사용하지 않고도** 더 많은 요청을 처리할 수 있는 장점이 있습니다.
     - 이는 특히 **IO 작업이 많은 환경**에서 Lettuce가 더 효율적으로 동작하도록 만듭니다. 반면, Hikari는 **동기적 처리**로 인해 CPU 자원을 더 많이 사용하게 되며, 이는 고비용의 대기 시간이 발생할 가능성을 증가시킵니다.
 
-## Lettuce Connection Pool
+## Lettuce Connection Pool 설정과 의미
 
 ### Lettuce Connection Pool Properties
 
