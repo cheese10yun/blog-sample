@@ -169,16 +169,11 @@ sequenceDiagram
 
 Hikari Connection Pool의 동작 방식은 아래와 같습니다.
 
-1. **`getComposite` 호출**:  
-   `Service`는 MySQL A 조회를 요청하고, 사용 가능한 idle 커넥션을 가져옵니다. 이 요청은 2,500ms가 소요되며, 해당 커넥션은 점유된 상태로 유지됩니다.
-2. **`getMySql` 호출**:  
-   `Controller`는 `Service`로 `getMySql` 호출을 보냅니다. 그러나 MySQL A 조회 요청이 아직 진행 중이므로 사용 가능한 커넥션이 없습니다. 이에 따라 요청은 **threadsAwaitingConnection** 상태로 대기하게 됩니다.
-3. **MySQL A 응답 반환**:  
-   MySQL A 조회 요청이 완료되면서 커넥션이 반환됩니다. 반환된 커넥션은 대기 중이던 `getMySql`의 MySQL B 조회 요청에서 다시 사용됩니다.
-4. **MySQL B 조회 요청 및 응답**:  
-   반환된 커넥션을 사용해 MySQL B 조회 요청이 처리됩니다. B 조회는 지연 없이 완료되며, 응답이 반환됩니다.
-5. **최종 응답 반환**:  
-   `getComposite`와 `getMySql` 요청이 순차적으로 완료되며, 최종적으로 각각의 결과가 `Controller`로 반환됩니다.
+1. **`getComposite` 호출**: `Service`는 MySQL A 조회를 요청하고, 사용 가능한 idle 커넥션을 가져옵니다. 이 요청은 2,500ms가 소요되며, 해당 커넥션은 점유된 상태로 유지됩니다.
+2. **`getMySql` 호출**: `Controller`는 `Service`로 `getMySql` 호출을 보냅니다. 그러나 MySQL A 조회 요청이 아직 진행 중이므로 사용 가능한 커넥션이 없습니다. 이에 따라 요청은 **threadsAwaitingConnection** 상태로 대기하게 됩니다.
+3. **MySQL A 응답 반환**: MySQL A 조회 요청이 완료되면서 커넥션이 반환됩니다. 반환된 커넥션은 대기 중이던 `getMySql`의 MySQL B 조회 요청에서 다시 사용됩니다.
+4. **MySQL B 조회 요청 및 응답**: 반환된 커넥션을 사용해 MySQL B 조회 요청이 처리됩니다. B 조회는 지연 없이 완료되며, 응답이 반환됩니다.
+5. **최종 응답 반환**: `getComposite`와 `getMySql` 요청이 순차적으로 완료되며, 최종적으로 각각의 결과가 `Controller`로 반환됩니다.
 
 #### 블로킹 방식의 한계
 
@@ -226,14 +221,10 @@ sequenceDiagram
     Service -->> Controller: getRedis 응답 반환
 ```
 
-1. **`getComposite` 호출**:  
-   `Controller`가 `getComposite` 요청을 보냅니다. `Service`는 먼저 Redis 조회를 수행하며, 이 작업은 10ms 만에 완료되고 커넥션은 즉시 반환됩니다. 이후 MySQL 조회를 시작하며, MySQL 조회 작업은 2,500ms가 소요됩니다.
-2. **`getRedis` 호출**:  
-   MySQL 조회가 진행 중인 상태에서 `Controller`가 `getRedis` 요청을 보냅니다. Redis는 MySQL 작업과는 독립적으로 동작하므로, Redis 조회 요청은 지연 없이 처리됩니다. 반환된 Redis 커넥션이 즉시 재사용되어 `getRedis` 요청이 빠르게 완료됩니다.
-3. **`getComposite` 응답 반환**:  
-   MySQL 작업이 완료되면 `getComposite` 응답이 반환됩니다.
-4. **`getRedis` 응답 반환**:  
-   Redis 조회 요청이 완료된 후 응답이 반환됩니다. Redis 작업이 MySQL 작업의 지연과 상관없이 즉시 처리되었기 때문에 빠른 응답 시간을 유지합니다.
+1. **`getComposite` 호출**: `Controller`가 `getComposite` 요청을 보냅니다. `Service`는 먼저 Redis 조회를 수행하며, 이 작업은 10ms 만에 완료되고 커넥션은 즉시 반환됩니다. 이후 MySQL 조회를 시작하며, MySQL 조회 작업은 2,500ms가 소요됩니다.
+2. **`getRedis` 호출**: MySQL 조회가 진행 중인 상태에서 `Controller`가 `getRedis` 요청을 보냅니다. Redis는 MySQL 작업과는 독립적으로 동작하므로, Redis 조회 요청은 지연 없이 처리됩니다. 반환된 Redis 커넥션이 즉시 재사용되어 `getRedis` 요청이 빠르게 완료됩니다.
+3. **`getComposite` 응답 반환**: MySQL 작업이 완료되면 `getComposite` 응답이 반환됩니다.
+4. **`getRedis` 응답 반환**: Redis 조회 요청이 완료된 후 응답이 반환됩니다. Redis 작업이 MySQL 작업의 지연과 상관없이 즉시 처리되었기 때문에 빠른 응답 시간을 유지합니다.
 
 #### 논블로킹의 장점
 
