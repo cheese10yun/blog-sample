@@ -7,6 +7,7 @@
 
 ## 2024
 
+* 11-17 [Hikari와 비교하며 알아보는 Redis Lettuce 커넥션 풀의 특징](https://cheese10yun.github.io/redis-lettuce-connection/)
 * 11-16 [Mermaid 코드로 그리는 다이어그램](https://cheese10yun.github.io/mermaid/)
 * 11-02 [Kotlin 객체 생성의 안전성과 유효성 강화하기](https://cheese10yun.github.io/kotlin-pattern-2/)
 * 10-26 [HikariCP로 MySQL Connection Pool 최적화하기](https://cheese10yun.github.io/mysql-connection-pool-timeout-1/)
