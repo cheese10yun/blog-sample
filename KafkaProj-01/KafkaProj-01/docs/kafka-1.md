@@ -70,3 +70,9 @@ KafkaProducer 객체의 send() 메소드는 호출 시 마다 하나의 Producer
 * `retry.backoff.ms`는 재 전송 주기 시간을 설정
 * retries = 10, `retry.backoff.ms` = 30, `request.timeout.ms` = 10,000ms 경우에는 `request.timeout.ms` 기다린후 재 전송을하기전 30ms 이후 재전송 시도, 이와 같은 방식으로 재 전송을 10회 retry 해보고 더이상 retry 시도 하지 안흥ㅁ
 * 만약 10회 이내에 `request.timeout.ms`에 도달하면 더 이상 retry 하지 않음
+
+
+## Producer의 max.in.flight.requests.per.connection 파라미터와 배치 메시지의 전송순서 이해
+
+
+

@@ -415,3 +415,68 @@ endlegend
 @endjson
 
 ```
+
+
+```plantuml
+@startuml
+class Person {
+  firstName: "John"
+  lastName: "Smith"
+  isAlive: true
+  age: 28
+}
+
+class Address {
+  streetAddress: "21 2nd Street"
+  city: "New York"
+  state: "NY"
+  postalCode: "10021-3100"
+}
+
+class PhoneNumber {
+  type: "home"
+  number: "212 555-1234"
+}
+
+class PhoneNumber2 {
+  type: "office"
+  number: "646 555-4567"
+}
+
+Person --> Address : has
+Person --> PhoneNumber : has
+Person --> PhoneNumber2 : has
+
+@enduml
+
+```
+
+
+```plantuml
+@startuml
+object Person {
+  firstName = "John"
+  lastName = "Smith"
+  isAlive = true
+  age = 28
+  address = {
+    streetAddress = "21 2nd Street"
+    city = "New York"
+    state = "NY"
+    postalCode = "10021-3100"
+  }
+  phoneNumbers = [
+    {
+      type = "home"
+      number = "212 555-1234"
+    },
+    {
+      type = "office"
+      number = "646 555-4567"
+    }
+  ]
+  children = []
+  spouse = null
+}
+@enduml
+```
