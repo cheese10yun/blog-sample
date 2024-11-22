@@ -71,7 +71,6 @@ KafkaProducer 객체의 send() 메소드는 호출 시 마다 하나의 Producer
 * retries = 10, `retry.backoff.ms` = 30, `request.timeout.ms` = 10,000ms 경우에는 `request.timeout.ms` 기다린후 재 전송을하기전 30ms 이후 재전송 시도, 이와 같은 방식으로 재 전송을 10회 retry 해보고 더이상 retry 시도 하지 안흥ㅁ
 * 만약 10회 이내에 `request.timeout.ms`에 도달하면 더 이상 retry 하지 않음
 
-
 ## Producer의 max.in.flight.requests.per.connection 파라미터와 배치 메시지의 전송순서 이해
 
 ### max.in.flight.requests.per.connection 이해
@@ -79,14 +78,22 @@ KafkaProducer 객체의 send() 메소드는 호출 시 마다 하나의 Producer
 * 브로커 서버의 응답없이 Producerdml sender thread가 한번에 보낼 수 있는 메시지 배치의 개수, default 값은 5 Kafka Producer의 메시지 전송단위는 Batch임
 * 비동기 전송 시 브로커의 응답없이 한꺼번에 보낼 수 있는 Batch의 개수는 max.in.flight.requests.per.connection 값에 의해 결정
 
-
 ![](/images/kafka-04.png)
-
 
 ### Producer 메시지 전송 순서와 Broker 메시지 저장 순서 고찰
 
-![](/images/kafka-05.png)
+![](/images/kafka-06.png)
 
 * B0가 B1보다 먼저 Produce에서 생성된 메시지 배치
 * max.in.flight.requests.per.connection = 2(>1) 에서 B0, B1 2개의 배치 메시지를 전송 시 B1은 성공저긍로 기록되었으나 B0의 경우 Write되지 않고 Ack 전송이 되지 않는 Failure 상황이 된 경우 Producer는 B0를 재전송하여 성공적으로 기록되며 Producer의 원래 메시지 순서와 다르게 Broker에 저장될 수 있음
 
+## 최대 한번전송, 적어도 한번전송, 정확히 한번전송 이해
+
+
+| **전송 순서 유형 (Delivery Mode)**   | **특징**                                          | **장점**                         | **단점**                   | **사용 사례**                         |
+|--------------------------------|-------------------------------------------------|--------------------------------|--------------------------|-----------------------------------|
+| **최대 한 번 전송 (At Most Once)**   | - 메시지가 한 번만 전송되거나, 전송되지 않을 수 있음<br> - 중복 메시지 없음 | - 중복 방지<br> - 빠른 전송            | - 메시지 손실 가능성             | 로깅, 트랜잭션 로그 등 손실이 허용 가능한 작업       |
+| **적어도 한 번 전송 (At Least Once)** | - 메시지가 적어도 한 번 이상 전송됨<br> - 메시지가 중복될 수 있음       | - 메시지 손실 없음<br> - 데이터 완전성 보장   | - 중복 메시지 처리 필요           | 알림 시스템, 결제 트랜잭션 등 데이터 손실이 치명적인 경우 |
+| **정확히 한 번 전송 (Exactly Once)**  | - 메시지가 중복 없이 정확히 한 번만 전송됨                       | - 데이터 완전성 + 중복 방지<br> - 안정적 처리 | - 높은 복잡도<br> - 성능 저하 가능성 | 주문 처리, 결제 시스템 등 정확성이 중요한 작업       |
+
+위 표는 전송 순서 유형의 영문 명칭을 추가하여 한글과 함께 직관적으로 이해할 수 있도록 구성되었습니다.
