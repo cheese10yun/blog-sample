@@ -89,9 +89,78 @@ KafkaProducer 객체의 send() 메소드는 호출 시 마다 하나의 Producer
 
 ## 최대 한번전송, 적어도 한번전송, 정확히 한번전송 이해
 
-
 | **전송 순서 유형 (Delivery Mode)**   | **특징**                                          | **장점**                         | **단점**                   | **사용 사례**                         |
 |--------------------------------|-------------------------------------------------|--------------------------------|--------------------------|-----------------------------------|
 | **최대 한 번 전송 (At Most Once)**   | - 메시지가 한 번만 전송되거나, 전송되지 않을 수 있음<br> - 중복 메시지 없음 | - 중복 방지<br> - 빠른 전송            | - 메시지 손실 가능성             | 로깅, 트랜잭션 로그 등 손실이 허용 가능한 작업       |
 | **적어도 한 번 전송 (At Least Once)** | - 메시지가 적어도 한 번 이상 전송됨<br> - 메시지가 중복될 수 있음       | - 메시지 손실 없음<br> - 데이터 완전성 보장   | - 중복 메시지 처리 필요           | 알림 시스템, 결제 트랜잭션 등 데이터 손실이 치명적인 경우 |
 | **정확히 한 번 전송 (Exactly Once)**  | - 메시지가 중복 없이 정확히 한 번만 전송됨                       | - 데이터 완전성 + 중복 방지<br> - 안정적 처리 | - 높은 복잡도<br> - 성능 저하 가능성 | 주문 처리, 결제 시스템 등 정확성이 중요한 작업       |
+
+### 최대 한번 전송 (at most once)
+
+```mermaid
+sequenceDiagram
+    participant Producer
+    participant Broker
+    Producer ->> Broker: 1. 메시지 A 전송
+    Broker -->> Producer: 2. ACK 메시지 A
+    Producer ->> Broker: 3. 메시지 B 전송
+    Producer -x Broker: 4. ACK 또는 Error 응답 실패 (네트워크 장애 등)
+    Producer ->> Broker: 5. 메시지 C 전송
+
+```
+
+- **acks = 0**: Producer가 브로커로부터 ACK나 에러 메시지 없이 다음 메시지를 연속적으로 보냅니다.
+- 메시지가 정상적으로 브로커에 기록되더라도 Producer는 이를 확인하지 않습니다. 따라서 메시지가 손실될 수 있지만 중복 전송은 일어나지 않습니다.
+
+1. **메시지 A 전송**: Producer가 메시지 A를 브로커로 전송하고, 브로커는 메시지를 정상적으로 기록하고 ACK를 전송합니다.
+2. **ACK**: Producer는 ACK를 기다릴 필요 없이 다음 메시지를 계속 전송합니다.
+3. **메시지 B 전송**: 메시지 B가 브로커에 정상적으로 기록되지 못하거나 네트워크 장애 등으로 ACK가 전송되지 않을 수 있습니다.
+4. **메시지 C 전송**: 메시지 B의 상태를 확인하지 않고, 메시지 C를 전송합니다. 이로 인해 **메시지 B는 손실될 수 있습니다**.
+
+### 적어도 한 번 전송 (At Least Once)
+
+```mermaid
+sequenceDiagram
+    participant Producer
+    participant Broker
+    Producer ->> Broker: 1. 메시지 A 전송
+    Broker -->> Producer: 2. ACK 메시지 A
+    Producer ->> Broker: 3. 메시지 B 전송
+    Producer -x Broker: 4. ACK 응답 실패 (네트워크 장애 등)
+    Producer ->> Broker: 5. 메시지 B 재전송
+    Broker -->> Producer: 6. ACK 메시지 B
+    Producer ->> Broker: 7. 메시지 C 전송
+```
+
+- **acks = all (or 1)**: Producer는 브로커로부터 메시지에 대한 ACK를 반드시 받아야만 다음 메시지를 보냅니다.
+- 네트워크 장애나 브로커 장애가 발생하여 ACK를 받지 못하면 Producer는 해당 메시지를 재전송합니다.
+- 이 과정에서 메시지가 중복되어 브로커에 기록될 수 있습니다.
+
+1. **메시지 A 전송**: Producer가 메시지 A를 브로커로 전송하고, 브로커는 정상적으로 메시지를 기록하고 ACK를 전송합니다.
+2. **ACK**: Producer는 ACK를 받아 다음 메시지를 보낼 준비를 합니다.
+3. **메시지 B 전송**: 메시지 B가 전송되었지만 네트워크 장애로 인해 ACK를 받지 못할 수 있습니다.
+4. **메시지 B 재전송**: ACK를 받지 못했기 때문에 Producer는 메시지 B를 다시 전송합니다.
+5. **중복 가능성**: 이로 인해 브로커에 메시지 B가 중복으로 기록될 가능성이 있습니다.
+
+### 정확히 한 번 전송 (Exactly Once)
+
+```mermaid
+sequenceDiagram
+    participant Producer
+    participant Broker
+    Producer ->> Broker: 1. 메시지 A 전송
+    Broker -->> Producer: 2. ACK 메시지 A
+    Producer ->> Broker: 3. 메시지 B 전송 (트랜잭션 시작)
+    Broker -->> Producer: 4. 메시지 B 기록 및 ACK (트랜잭션 커밋)
+    Producer ->> Broker: 5. 메시지 C 전송 (트랜잭션 시작)
+    Broker -->> Producer: 6. 메시지 C 기록 및 ACK
+```
+
+- **acks = all**와 **idempotent 설정**: Producer와 Broker는 메시지가 정확히 한 번만 처리되도록 보장합니다.
+- 트랜잭션을 활용해 메시지 전송과 기록이 원자적으로 이루어집니다.
+- 네트워크 장애나 시스템 장애가 발생해도 중복 메시지가 기록되지 않도록 브로커가 상태를 관리합니다.
+
+1. **메시지 A 전송**: Producer가 메시지 A를 브로커로 전송하고, 브로커는 ACK를 전송합니다.
+2. **메시지 B 전송 (트랜잭션 시작)**: 메시지 B가 브로커에 전송되고, 이때 트랜잭션이 시작됩니다.
+3. **트랜잭션 커밋**: 브로커는 메시지를 기록하고, Producer에게 ACK를 전송합니다. 메시지는 정확히 한 번만 기록됩니다.
+4. **메시지 C 전송**: 이후 메시지 C도 동일한 방식으로 전송 및 기록됩니다.
