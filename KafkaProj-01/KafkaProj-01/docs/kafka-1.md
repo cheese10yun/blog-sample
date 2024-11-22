@@ -74,5 +74,19 @@ KafkaProducer 객체의 send() 메소드는 호출 시 마다 하나의 Producer
 
 ## Producer의 max.in.flight.requests.per.connection 파라미터와 배치 메시지의 전송순서 이해
 
+### max.in.flight.requests.per.connection 이해
 
+* 브로커 서버의 응답없이 Producerdml sender thread가 한번에 보낼 수 있는 메시지 배치의 개수, default 값은 5 Kafka Producer의 메시지 전송단위는 Batch임
+* 비동기 전송 시 브로커의 응답없이 한꺼번에 보낼 수 있는 Batch의 개수는 max.in.flight.requests.per.connection 값에 의해 결정
+
+
+![](/images/kafka-04.png)
+
+
+### Producer 메시지 전송 순서와 Broker 메시지 저장 순서 고찰
+
+![](/images/kafka-05.png)
+
+* B0가 B1보다 먼저 Produce에서 생성된 메시지 배치
+* max.in.flight.requests.per.connection = 2(>1) 에서 B0, B1 2개의 배치 메시지를 전송 시 B1은 성공저긍로 기록되었으나 B0의 경우 Write되지 않고 Ack 전송이 되지 않는 Failure 상황이 된 경우 Producer는 B0를 재전송하여 성공적으로 기록되며 Producer의 원래 메시지 순서와 다르게 Broker에 저장될 수 있음
 
