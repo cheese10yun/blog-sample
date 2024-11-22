@@ -31,16 +31,6 @@ flowchart TD
     C -->|Three| F[fa:fa-car Car]
 ```
 
-Mermaid 코드 (Flowchart):
-```text
-flowchart TD
-    A[Christmas] -->|Get money| B(Go shopping)
-    B --> C{Let me think}
-    C -->|One| D[Laptop]
-    C -->|Two| E[iPhone]
-    C -->|Three| F[fa:fa-car Car]
-```
-
 ### Class Diagram
 
 객체지향 프로그램의 클래스 구조를 표현할 수 있습니다.
@@ -69,159 +59,95 @@ classDiagram
     }
 ```
 
-Mermaid 코드 (Class Diagram):
-```text
-classDiagram
-    Animal <|-- Duck
-    Animal <|-- Fish
-    Animal <|-- Zebra
-    Animal : +int age
-    Animal : +String gender
-    Animal: +isMammal()
-    Animal: +mate()
-    class Duck{
-      +String beakColor
-      +swim()
-      +quack()
-    }
-    class Fish{
-      -int sizeInFeet
-      -canEat()
-    }
-    class Zebra{
-      +bool is_wild
-      +run()
-    }
-```
+### Sequence Diagram
 
-### Sequence Diagram (Zenuml)
-
-Zenuml을 사용하여 시퀀스 다이어그램을 쉽게 표현할 수 있습니다.
+시퀀스 다이어그램은 시스템의 상호작용을 시각화하는 데 유용합니다.
 
 ```mermaid
-zenuml
-    title Order Service
-    @Actor Client #FFEBE6
-    @Boundary OrderController #0747A6
-    @EC2 <<BFF>> OrderService #E3FCEF
-    group BusinessService {
-      @Lambda PurchaseService
-      @AzureFunction InvoiceService
-    }
-    
-    @Starter(Client)
-    // `POST /orders`
-    OrderController.post(payload) {
-      OrderService.create(payload) {
-        order = new Order(payload)
-        if(order != null) {
-          par {
-            PurchaseService.createPO(order)
-            InvoiceService.createInvoice(order)      
-          }      
+sequenceDiagram
+    Alice ->> Bob: Hello Bob, how are you?
+    Bob-->>John: How about you John?
+    Bob--x Alice: I am good thanks!
+    Bob-x John: I am good thanks!
+    Note right of John: Bob thinks a long<br/>long time, so long<br/>that the text does<br/>not fit on a row.
+    Bob-->Alice: Checking with John...
+    Alice->John: Yes... John, how are you?
+```
+
+### Graph Diagram
+
+그래프 다이어그램은 다양한 형태의 노드와 관계를 표현하는 데 사용됩니다.
+
+```mermaid
+graph TB
+    sq[Square shape] --> ci((Circle shape))
+
+    subgraph A
+        od>Odd shape]-- Two line<br/>edge comment --> ro
+        di{Diamond with <br/> line break} -.-> ro(Rounded<br>square<br>shape)
+        di==>ro2(Rounded square shape)
+    end
+
+    %% Notice that no text in shape are added here instead that is appended further down
+    e --> od3>Really long text with linebreak<br>in an Odd shape]
+
+    %% Comments after double percent signs
+    e((Inner / circle<br>and some odd <br>special characters)) --> f(,.?!+-*ز)
+
+    cyr[Cyrillic]-->cyr2((Circle shape Начало));
+
+    classDef green fill:#9f6,stroke:#333,stroke-width:2px;
+    classDef orange fill:#f96,stroke:#333,stroke-width:4px;
+    class sq,e green
+    class di orange
+```
+
+### System Context Diagram (C4 Model)
+
+시스템의 전반적인 컨텍스트를 나타내는 데 유용합니다.
+
+```mermaid
+C4Context
+    title System Context diagram for Internet Banking System
+    Enterprise_Boundary(b0, "BankBoundary0") {
+        Person(customerA, "Banking Customer A", "A customer of the bank, with personal bank accounts.")
+        Person(customerB, "Banking Customer B")
+        Person_Ext(customerC, "Banking Customer C", "desc")
+
+        Person(customerD, "Banking Customer D", "A customer of the bank, <br/> with personal bank accounts.")
+
+        System(SystemAA, "Internet Banking System", "Allows customers to view information about their bank accounts, and make payments.")
+
+        Enterprise_Boundary(b1, "BankBoundary") {
+            SystemDb_Ext(SystemE, "Mainframe Banking System", "Stores all of the core banking information about customers, accounts, transactions, etc.")
+            System_Boundary(b2, "BankBoundary2") {
+                System(SystemA, "Banking System A")
+                System(SystemB, "Banking System B", "A system of the bank, with personal bank accounts. next line.")
+            }
+
+            System_Ext(SystemC, "E-mail system", "The internal Microsoft Exchange e-mail system.")
+            SystemDb(SystemD, "Banking System D Database", "A system of the bank, with personal bank accounts.")
+
+            Boundary(b3, "BankBoundary3", "boundary") {
+                SystemQueue(SystemF, "Banking System F Queue", "A system of the bank.")
+                SystemQueue_Ext(SystemG, "Banking System G Queue", "A system of the bank, with personal bank accounts.")
+            }
         }
-      }
     }
+
+    BiRel(customerA, SystemAA, "Uses")
+    BiRel(SystemAA, SystemE, "Uses")
+    Rel(SystemAA, SystemC, "Sends e-mails", "SMTP")
+    Rel(SystemC, customerA, "Sends e-mails to")
+
+    UpdateElementStyle(customerA, $fontColor="red", $bgColor="grey", $borderColor="red")
+    UpdateRelStyle(customerA, SystemAA, $textColor="blue", $lineColor="blue", $offsetX="5")
+    UpdateRelStyle(SystemAA, SystemE, $textColor="blue", $lineColor="blue", $offsetY="-10")
+    UpdateRelStyle(SystemAA, SystemC, $textColor="blue", $lineColor="blue", $offsetY="-40", $offsetX="-50")
+    UpdateRelStyle(SystemC, customerA, $textColor="red", $lineColor="red", $offsetX="-50", $offsetY="20")
+
+    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
-
-Zenuml 코드 (Sequence Diagram):
-```text
-title Order Service
-@Actor Client #FFEBE6
-@Boundary OrderController #0747A6
-@EC2 <<BFF>> OrderService #E3FCEF
-group BusinessService {
-  @Lambda PurchaseService
-  @AzureFunction InvoiceService
-}
-
-@Starter(Client)
-// `POST /orders`
-OrderController.post(payload) {
-  OrderService.create(payload) {
-    order = new Order(payload)
-    if(order != null) {
-      par {
-        PurchaseService.createPO(order)
-        InvoiceService.createInvoice(order)      
-      }      
-    }
-  }
-}
-```
-
-### XYChart
-
-XYChart를 사용하여 매출 데이터를 시각화할 수 있습니다.
-
-```mermaid
-xychart-beta
-title "Sales Revenue"
-x-axis [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
-y-axis "Revenue (in $)" 4000 --> 11000
-bar [5000, 6000, 7500, 8200, 9500, 10500, 11000, 10200, 9200, 8500, 7000, 6000]
-line [5000, 6000, 7500, 8200, 9500, 10500, 11000, 10200, 9200, 8500, 7000, 6000]
-```
-
-XYChart 코드:
-```text
-xychart-beta
-title "Sales Revenue"
-x-axis [jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec]
-y-axis "Revenue (in $)" 4000 --> 11000
-bar [5000, 6000, 7500, 8200, 9500, 10500, 11000, 10200, 9200, 8500, 7000, 6000]
-line [5000, 6000, 7500, 8200, 9500, 10500, 11000, 10200, 9200, 8500, 7000, 6000]
-```
-
-### Block Diagram
-
-여러 블록을 사용하여 시스템의 구성 요소를 표현할 수 있습니다.
-
-```mermaid
-block-beta
-    columns 3
-    doc>"Document"]:3
-    space down1<[" "]>(down) space
-
-    block:e:3
-        l["left"]
-        m("A wide one in the middle")
-        r["right"]
-    end
-    space down2<[" "]>(down) space
-    db[("DB")]:3
-    space:3
-    D space C
-    db --> D
-    C --> db
-    D --> C
-    style m fill:#d6d,stroke:#333,stroke-width:4px
-
-```
-
-Block Diagram 코드:
-```text
-block-beta
-    columns 3
-    doc>"Document"]:3
-    space down1<[" "](down) space
-    
-    block:e:3
-          l["left"]
-          m("A wide one in the middle")
-          r["right"]
-    end
-    space down2<[" "](down) space
-    db[("DB")]:3
-    space:3
-    D space C
-    db --> D
-    C --> db
-    D --> C
-    style m fill:#d6d,stroke:#333,stroke-width:4px
-```
-
-이 외에도 **시퀀스 다이어그램**, **상태도**, **피에조 차트** 등 다양한 다이어그램을 제공하여 개발뿐 아니라 프로젝트 관리, 사용자 경험 디자인까지 다양한 분야에서 활용할 수 있습니다.
 
 ## Mermaid Live: 실시간 다이어그램 작성
 
@@ -236,3 +162,4 @@ Mermaid는 코드 기반의 다이어그램 도구로서, 유지보수성, 수�
 ## 출처
 
 * [Mermaid Live Editor](https://mermaid.live/)
+* [Mermaid Documentation](https://mermaid.js.org/intro/)

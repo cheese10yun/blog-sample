@@ -24,7 +24,7 @@ class KotlinStudy {
 
 @Entity(name = "user")
 @Table(name = "user")
-class User private  constructor(
+data class User private constructor(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
@@ -33,7 +33,6 @@ class User private  constructor(
     @Enumerated(EnumType.STRING)
     var stats: UserStats
 ) {
-
 
     companion object {
         operator fun invoke(
@@ -44,15 +43,23 @@ class User private  constructor(
                 name = name.trim(),
                 email = email.trim(),
                 id = null,
-                stats =  UserStats.NORMAL
+                stats = UserStats.NORMAL
+            )
+        }
+
+        fun of(form: UserRegistrationForm): User {
+            return User(
+                name = form.name,
+                email = form.email
             )
         }
     }
-
-    override fun toString(): String {
-        return "User(name='$name', email='$email')"
-    }
 }
+
+data class UserRegistrationForm(
+    val name: String,
+    val email: String,
+)
 
 enum class UserStats {
     NORMAL,
@@ -63,10 +70,26 @@ enum class UserStats {
 class UserTest {
 
     @Test
-    fun asdasdasdsad() {
-        User(
+    fun `test`() {
+        val user = User(
             name = " asd ",
             email = " asdas ",
         )
+
+
+        println(user)
+    }
+
+    @Test
+    fun `of test`() {
+        val form = UserRegistrationForm(
+            name = " asd ",
+            email = " asdas ",
+        )
+
+        val of = User.of(form)
+
+
+        println(of)
     }
 }
