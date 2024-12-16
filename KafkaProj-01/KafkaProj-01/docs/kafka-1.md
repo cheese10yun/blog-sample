@@ -164,3 +164,16 @@ sequenceDiagram
 2. **메시지 B 전송 (트랜잭션 시작)**: 메시지 B가 브로커에 전송되고, 이때 트랜잭션이 시작됩니다.
 3. **트랜잭션 커밋**: 브로커는 메시지를 기록하고, Producer에게 ACK를 전송합니다. 메시지는 정확히 한 번만 기록됩니다.
 4. **메시지 C 전송**: 이후 메시지 C도 동일한 방식으로 전송 및 기록됩니다.
+
+## 커스텀 파티셔너(Custom Partitioner) 구현하기 - 01
+
+### Producer의 메시지 파티셔닝
+
+* KafkaProducer는 기본적으로 DefaultPartitioner 클래스를 이용하여 메시지 전송 시 도착할 Partition을 지정
+* DefaultPartitioner는 키를 가지는 메시지의 경우 키 값을 Hasing하여 키 값에 따라 파티션 별로 균일하게 전송
+
+### Producer의 메시지 Key값에 기반한 Custom 파티셔닝
+
+## 커스텀 파티셔너(Custom Partitioner) 구현하기 - 02
+
+## 커스텀 파티셔너(Custom Partitioner) 구현하기 - 03
