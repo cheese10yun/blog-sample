@@ -33,8 +33,7 @@ interface DiffInfoRepository : MongoRepository<DiffInfo, ObjectId>, DiffInfoCust
 
 interface DiffInfoCustomRepository
 
-
-class DiffValue<out A, out B>(
+data class DiffValue<out A, out B>(
     @Field(name = "origin")
     val origin: A,
     @Field(name = "new")
