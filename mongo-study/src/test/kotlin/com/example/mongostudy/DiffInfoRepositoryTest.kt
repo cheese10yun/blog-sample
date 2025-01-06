@@ -1,5 +1,6 @@
 package com.example.mongostudy
 
+import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 
 class DiffInfoRepositoryTest(
@@ -8,6 +9,7 @@ class DiffInfoRepositoryTest(
 
     @Test
     fun `calculateDifferences test`() {
+        // given
         val originDiffInfo = diffInfoRepository.save(
             DiffInfo(
                 key = "1",
@@ -15,7 +17,6 @@ class DiffInfoRepositoryTest(
                 email = "email_1",
             )
         )
-
         val newDiffInfo = originDiffInfo.copy(
             key = "1",
             name = "name_2",
@@ -24,14 +25,18 @@ class DiffInfoRepositoryTest(
         )
         val originItems = listOf(originDiffInfo)
         val newItems = listOf(newDiffInfo)
+
+        // when
         val calculateDifferences = DiffManager.calculateDifferences(
             originItems = originItems,
             newItems = newItems,
             associateByKey = DiffInfo::key,
             groupByKey = DiffInfo::key
         )
-
+        // then
         originDiffInfo.diff = calculateDifferences[originDiffInfo.key]!!
-        diffInfoRepository.save(originDiffInfo)
+        val save = diffInfoRepository.save(originDiffInfo)
+
+        then(save.diff).isEqualTo(calculateDifferences[originDiffInfo.key]!!)
     }
 }
