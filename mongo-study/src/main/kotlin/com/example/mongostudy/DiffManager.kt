@@ -27,7 +27,7 @@ object DiffManager {
         newItems: List<T>,
         associateByKey: (T) -> K,
         groupByKey: (T) -> S
-    ): Map<S, Map<String, DiffValue<String, String>>> {
+    ): Map<S, DiffValueType> {
         val originalAssociate = originItems.associateBy(associateByKey)
         val newAssociate = newItems.associateBy(associateByKey)
         val changes = newAssociate.flatMap { (id, newItem) ->
