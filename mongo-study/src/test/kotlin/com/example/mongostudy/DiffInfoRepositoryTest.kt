@@ -6,7 +6,6 @@ class DiffInfoRepositoryTest(
     private val diffInfoRepository: DiffInfoRepository
 ) : MongoStudyApplicationTests() {
 
-
     @Test
     fun `calculateDifferences test`() {
         val diffInfo = diffInfoRepository.save(

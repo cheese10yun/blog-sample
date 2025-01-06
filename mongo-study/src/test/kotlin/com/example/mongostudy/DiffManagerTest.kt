@@ -6,7 +6,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.assertj.core.api.BDDAssertions.then
 import org.bson.types.ObjectId
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class DiffManagerTest {

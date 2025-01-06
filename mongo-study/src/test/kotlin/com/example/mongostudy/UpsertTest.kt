@@ -14,7 +14,6 @@ class UpsertTest : MongoStudyApplicationTests() {
 
     @Test
     fun `saveAll Test`() {
-
         val stopWatch = StopWatch()
         val members = (1..50).map {
             Member(
@@ -34,10 +33,7 @@ class UpsertTest : MongoStudyApplicationTests() {
 
         mongoTemplate.insertAll(members)
         stopWatch.start()
-
         stopWatch.stop()
-
         stopWatch.prettyPrint()
-
     }
 }
