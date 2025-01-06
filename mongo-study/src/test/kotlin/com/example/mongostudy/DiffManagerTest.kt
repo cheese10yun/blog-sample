@@ -114,7 +114,6 @@ class DiffManagerTest {
         val differences = result["ORD123456"]
         then(differences).isNotNull
         then(differences!!.size).isEqualTo(3)
-
         then(differences).allSatisfy { key, value ->
             when (key) {
                 "customer/contact/address/street" -> {
