@@ -21,7 +21,7 @@ data class DiffInfo(
 
     @ValueConverter(DiffConverter::class)
     @Field(name = "diff")
-    var diff: Map<String, DiffValue<String, String>> = emptyMap()
+    var diff: DiffValueType = emptyMap()
 
 ) {
     @Id

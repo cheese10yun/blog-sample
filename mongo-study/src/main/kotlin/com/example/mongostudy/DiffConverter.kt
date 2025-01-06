@@ -4,6 +4,8 @@ import org.bson.Document
 import org.springframework.data.convert.PropertyValueConverter
 import org.springframework.data.convert.ValueConversionContext
 
+typealias DiffValueType = Map<String, DiffValue<String, String>>
+
 class DiffConverter : PropertyValueConverter<Map<String, DiffValue<String, String>>, Document, ValueConversionContext<*>> {
 
     companion object {
