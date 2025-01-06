@@ -1,0 +1,36 @@
+{
+  "order_id": "ORD123456",
+  "customer": {
+    "customer_id": "CUST7890",
+    "name": "홍길동",
+    "contact": {
+      "email": "hong@example.com",
+      "phone": "010-1234-5678",
+      "address": {
+        "street": "서울특별시 강남구",
+        "city": "서울",
+        "zip_code": "03000",
+        "country": "KR"
+      }
+    }
+  },
+  "items": [
+    {
+      "product": {
+        "product_id": "PROD001",
+        "product_name": "노트북",
+        "category": {
+          "main_category": "전자제품",
+          "sub_category": "컴퓨터"
+        }
+      },
+      "quantity": 1,
+      "price": 1400000
+    }
+  ],
+  "payment": {
+    "method": "신용카드",
+    "transaction_id": "TXN987654322",
+    "status": "완료"
+  }
+}

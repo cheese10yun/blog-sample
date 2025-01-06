@@ -3,13 +3,21 @@ package com.example.mongostudy
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.flipkart.zjsonpatch.JsonDiff
 import org.bson.types.ObjectId
 
-class DiffManager {
+object DiffManager {
+
+    private val diffMapper = jacksonObjectMapper().apply {
+        registerModules(SimpleModule().apply {
+            propertyNamingStrategy = PropertyNamingStrategies.SNAKE_CASE
+            addSerializer(ObjectId::class.java, ObjectIdSerializer())
+        })
+    }
 
     fun <T, K, S> calculateDifferences(
         originItems: List<T>,
@@ -17,9 +25,6 @@ class DiffManager {
         associateByKey: (T) -> K,
         groupByKey: (T) -> S
     ): Map<S, Map<String, DiffValue<String, String>>> {
-        val diffMapper = jacksonObjectMapper().apply {
-            registerModules(SimpleModule().apply { addSerializer(ObjectId::class.java, ObjectIdSerializer()) })
-        }
         val originalAssociate = originItems.associateBy(associateByKey)
         val newAssociate = newItems.associateBy(associateByKey)
         val changes = newAssociate.flatMap { (id, newItem) ->
@@ -39,7 +44,7 @@ class DiffManager {
 
                                 Triple(
                                     first = groupByKey(newItem),
-                                    second = path.replace("/", "."),
+                                    second = path,
                                     third = DiffValue(origin = originValue, new = newValue)
                                 )
                             }
