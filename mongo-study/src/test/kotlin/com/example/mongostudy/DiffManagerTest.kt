@@ -68,10 +68,7 @@ class DiffManagerTest {
             groupByKey = Product::productId
         )
 
-
         then(results).hasSize(2)
-
-
         then(results).allSatisfy { associateByKey, diff ->
             when (associateByKey) {
                 "PROD001" -> {

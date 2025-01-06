@@ -12,12 +12,15 @@ import org.bson.types.ObjectId
 
 object DiffManager {
 
-    private val diffMapper = jacksonObjectMapper().apply {
-        registerModules(SimpleModule().apply {
-            propertyNamingStrategy = PropertyNamingStrategies.SNAKE_CASE
-            addSerializer(ObjectId::class.java, ObjectIdSerializer())
-        })
-    }
+    private val diffMapper = jacksonObjectMapper()
+        .apply {
+            registerModules(
+                SimpleModule().apply {
+                    propertyNamingStrategy = PropertyNamingStrategies.SNAKE_CASE
+                    addSerializer(ObjectId::class.java, ObjectIdSerializer())
+                }
+            )
+        }
 
     fun <T, K, S> calculateDifferences(
         originItems: List<T>,
