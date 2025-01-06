@@ -8,7 +8,7 @@ class DiffInfoRepositoryTest(
 
     @Test
     fun `calculateDifferences test`() {
-        val diffInfo = diffInfoRepository.save(
+        val originDiffInfo = diffInfoRepository.save(
             DiffInfo(
                 key = "1",
                 name = "name_1",
@@ -16,14 +16,14 @@ class DiffInfoRepositoryTest(
             )
         )
 
-        val copy = diffInfo.copy(
+        val newDiffInfo = originDiffInfo.copy(
             key = "1",
             name = "name_2",
             email = "name_2"
 
         )
-        val originItems = listOf(diffInfo)
-        val newItems = listOf(copy)
+        val originItems = listOf(originDiffInfo)
+        val newItems = listOf(newDiffInfo)
         val calculateDifferences = DiffManager.calculateDifferences(
             originItems = originItems,
             newItems = newItems,
@@ -31,7 +31,7 @@ class DiffInfoRepositoryTest(
             groupByKey = DiffInfo::key
         )
 
-        diffInfo.diff = calculateDifferences[diffInfo.key]!!
-        diffInfoRepository.save(diffInfo)
+        originDiffInfo.diff = calculateDifferences[originDiffInfo.key]!!
+        diffInfoRepository.save(originDiffInfo)
     }
 }
