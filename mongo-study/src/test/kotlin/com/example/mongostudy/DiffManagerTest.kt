@@ -7,9 +7,10 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import org.assertj.core.api.BDDAssertions.then
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
+import org.springframework.core.io.ClassPathResource
 
 class DiffManagerTest {
-
+    private fun readFile(path: String): String = String(ClassPathResource(path).inputStream.readBytes())
     private val diffMapper = jacksonObjectMapper()
         .apply {
             propertyNamingStrategy = PropertyNamingStrategies.SNAKE_CASE
@@ -19,88 +20,8 @@ class DiffManagerTest {
     @Test
     fun `주문 데이터의 필드 변경을 확인한다`() {
         // Given
-        val originalOrderJson = """
-            {
-              "order_id": "ORD123456",
-              "customer": {
-                "customer_id": "CUST7890",
-                "name": "홍길동",
-                "contact": {
-                  "email": "hong@example.com",
-                  "phone": "010-1234-5678",
-                  "address": {
-                    "street": "서울특별시 종로구",
-                    "city": "서울",
-                    "zip_code": "03000",
-                    "country": "KR"
-                  }
-                }
-              },
-              "items": [
-                {
-                  "product": {
-                    "product_id": "PROD001",
-                    "product_name": "노트북",
-                    "category": {
-                      "main_category": "전자제품",
-                      "sub_category": "컴퓨터"
-                    }
-                  },
-                  "quantity": 1,
-                  "price": 1500000
-                }
-              ],
-              "payment": {
-                "method": "신용카드",
-                "transaction_id": "TXN987654321",
-                "status": "완료"
-              }
-            }
-
-        """.trimIndent()
-
-        val newOrderJson = """
-            {
-              "order_id": "ORD123456",
-              "customer": {
-                "customer_id": "CUST7890",
-                "name": "홍길동",
-                "contact": {
-                  "email": "hong@example.com",
-                  "phone": "010-1234-5678",
-                  "address": {
-                    "street": "서울특별시 강남구",
-                    "city": "서울",
-                    "zip_code": "03000",
-                    "country": "KR"
-                  }
-                }
-              },
-              "items": [
-                {
-                  "product": {
-                    "product_id": "PROD001",
-                    "product_name": "노트북",
-                    "category": {
-                      "main_category": "전자제품",
-                      "sub_category": "컴퓨터"
-                    }
-                  },
-                  "quantity": 1,
-                  "price": 1400000
-                }
-              ],
-              "payment": {
-                "method": "신용카드",
-                "transaction_id": "TXN987654322",
-                "status": "완료"
-              }
-            }
-
-        """.trimIndent()
-
-        val originalOrder: Order = diffMapper.readValue(originalOrderJson)
-        val newOrder: Order = diffMapper.readValue(newOrderJson)
+        val originalOrder: Order = diffMapper.readValue(readFile("/diff-origin.json"))
+        val newOrder: Order = diffMapper.readValue(readFile("/diff-new.json"))
 
         // When
         val result = DiffManager.calculateDifferences(
