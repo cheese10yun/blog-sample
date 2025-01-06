@@ -53,6 +53,55 @@ class DiffManagerTest {
             }
         }
     }
+
+    @Test
+    fun `diff test`() {
+        // Given
+        val originProducts: List<Product> = diffMapper.readValue(readFile("/diff-array-origin.json"))
+        val newProducts: List<Product> = diffMapper.readValue(readFile("/diff-array-new.json"))
+
+        // When
+        val results = DiffManager.calculateDifferences(
+            originItems = originProducts,
+            newItems = newProducts,
+            associateByKey = Product::productId,
+            groupByKey = Product::productId
+        )
+
+
+        then(results).hasSize(2)
+
+
+        then(results).allSatisfy { associateByKey, diff ->
+            when (associateByKey) {
+                "PROD001" -> {
+                    then(diff).allSatisfy { groupByKey, value ->
+                        when (groupByKey) {
+                            "product_name" -> {
+                                then(value.origin).isEqualTo("노트북")
+                                then(value.new).isEqualTo("울트라 노트북")
+                            }
+                            else -> throw IllegalStateException("검증 되지 않은 값이 들어왔습니다. 신규 데이터 or 로직 변경에 따른 테스트 코드를 보강해주세요")
+                        }
+                    }
+                }
+                "PROD002" -> {
+                    then(diff).allSatisfy { groupByKey, value ->
+                        when (groupByKey) {
+                            "product_name" -> {
+                                then(value.origin).isEqualTo("노트북")
+                                then(value.new).isEqualTo("울트라 노트북")
+                            }
+                            else -> throw IllegalStateException("검증 되지 않은 값이 들어왔습니다. 신규 데이터 or 로직 변경에 따른 테스트 코드를 보강해주세요")
+                        }
+                    }
+                }
+                else -> throw IllegalStateException("검증 되지 않은 값이 들어왔습니다. 신규 데이터 or 로직 변경에 따른 테스트 코드를 보강해주세요")
+            }
+        }
+
+
+    }
 }
 
 
