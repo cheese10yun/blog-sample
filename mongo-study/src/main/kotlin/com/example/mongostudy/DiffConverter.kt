@@ -15,16 +15,15 @@ class DiffConverter : PropertyValueConverter<Map<String, DiffValue<String, Strin
         value: Document,
         context: ValueConversionContext<*>
     ): Map<String, DiffValue<String, String>> {
-        return value.map {
-            val diffValue = it.value as Document
-            val key = it.key!!
-
-            val pair = key to DiffValue(
-                origin = diffValue[ORIGIN].toString(),
-                new = diffValue[NEW].toString(),
-            )
-            pair
-        }
+        return value
+            .map {
+                val diffValue = it.value as Document
+                val key = it.key!!
+                key to DiffValue(
+                    origin = diffValue[ORIGIN].toString(),
+                    new = diffValue[NEW].toString(),
+                )
+            }
             .toMap()
     }
 
