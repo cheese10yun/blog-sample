@@ -10,6 +10,9 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.flipkart.zjsonpatch.JsonDiff
 import org.bson.types.ObjectId
 
+typealias DiffValueTracker = Map<String, DiffValue<String, String>>
+typealias DiffTriple = Triple<String, String, String>
+
 object DiffManager {
 
     private val diffMapper = jacksonObjectMapper()
@@ -27,7 +30,7 @@ object DiffManager {
         newItems: List<T>,
         associateByKey: (T) -> K,
         groupByKey: (T) -> S
-    ): Map<S, DiffValueType> {
+    ): Map<S, DiffValueTracker> {
         val originalAssociate = originItems.associateBy(associateByKey)
         val newAssociate = newItems.associateBy(associateByKey)
         val changes = newAssociate.flatMap { (id, newItem) ->
@@ -41,9 +44,7 @@ object DiffManager {
                     when {
                         diffNode.size() > 0 -> {
                             diffNode.mapNotNull { node ->
-                                val path = node.get("path").asText().removePrefix("/")
-                                val originValue = originalNode.at("/$path").asText()
-                                val newValue = newNode.at("/$path").asText()
+                                val (path, originValue, newValue) = extractDiffValue(node, originalNode, newNode)
 
                                 Triple(
                                     first = groupByKey(newItem),
@@ -64,6 +65,36 @@ object DiffManager {
             .groupBy({ it.first }, { it.second to it.third })
             .mapValues { (_, value) -> value.toMap() }
     }
+
+    fun <T> calculateDifference(
+        originItem: T,
+        newItem: T
+    ): DiffValueTracker {
+        val originalNode = diffMapper.valueToTree<JsonNode>(originItem)
+        val newNode = diffMapper.valueToTree<JsonNode>(newItem)
+        val diff = JsonDiff.asJson(originalNode, newNode)
+        return when {
+            diff.size() > 0 -> {
+                diff.mapNotNull { diffNode ->
+                    val (path, originValue, newValue) = extractDiffValue(diffNode, originalNode, newNode)
+                    Pair(
+                        first = path,
+                        second = DiffValue(originValue, newValue)
+                    )
+                }
+                    .toMap()
+            }
+            else -> emptyMap()
+        }
+    }
+
+    private fun extractDiffValue(node: JsonNode, originalNode: JsonNode, newNode: JsonNode): DiffTriple {
+        val path = node.get("path").asText().removePrefix("/")
+        val originValue = originalNode.at("/$path").asText()
+        val newValue = newNode.at("/$path").asText()
+        return DiffTriple(path, originValue, newValue)
+    }
+
 }
 
 class ObjectIdSerializer : JsonSerializer<ObjectId>() {

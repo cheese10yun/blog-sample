@@ -4,9 +4,7 @@ import org.bson.Document
 import org.springframework.data.convert.PropertyValueConverter
 import org.springframework.data.convert.ValueConversionContext
 
-typealias DiffValueType = Map<String, DiffValue<String, String>>
-
-class DiffConverter : PropertyValueConverter<DiffValueType, Document, ValueConversionContext<*>> {
+class DiffConverter : PropertyValueConverter<DiffValueTracker, Document, ValueConversionContext<*>> {
 
     companion object {
         private val ORIGIN = "origin"
@@ -16,7 +14,7 @@ class DiffConverter : PropertyValueConverter<DiffValueType, Document, ValueConve
     override fun read(
         value: Document,
         context: ValueConversionContext<*>
-    ): DiffValueType {
+    ): DiffValueTracker {
         return value
             .map {
                 val diffValue = it.value as Document
@@ -30,7 +28,7 @@ class DiffConverter : PropertyValueConverter<DiffValueType, Document, ValueConve
     }
 
     override fun write(
-        value: DiffValueType,
+        value: DiffValueTracker,
         context: ValueConversionContext<*>
     ): Document {
         val mapValues = value.mapValues { (key, value) ->
