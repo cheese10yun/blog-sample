@@ -13,7 +13,7 @@ import org.bson.types.ObjectId
 typealias DiffValueTracker = Map<String, DiffValue<String, String>>
 typealias DiffTriple = Triple<String, String, String>
 
-object DiffManager {
+object DiffComparisonManager {
 
     private val diffMapper = jacksonObjectMapper()
         .apply {

@@ -27,7 +27,7 @@ class DiffInfoRepositoryTest(
         val newItems = listOf(newDiffInfo)
 
         // when
-        val calculateDifferences = DiffManager.calculateDifferences(
+        val calculateDifferences = DiffComparisonManager.calculateDifferences(
             originItems = originItems,
             newItems = newItems,
             associateByKey = DiffInfo::key,

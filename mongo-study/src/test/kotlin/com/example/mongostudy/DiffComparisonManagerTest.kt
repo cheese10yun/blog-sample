@@ -9,7 +9,7 @@ import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
 import org.springframework.core.io.ClassPathResource
 
-class DiffManagerTest {
+class DiffComparisonManagerTest {
     private fun readFile(path: String): String = String(ClassPathResource(path).inputStream.readBytes())
     private val diffMapper = jacksonObjectMapper()
         .apply {
@@ -24,7 +24,7 @@ class DiffManagerTest {
         val newOrder: Order = diffMapper.readValue(readFile("/diff-new.json"))
 
         // When
-        val result = DiffManager.calculateDifferences(
+        val result = DiffComparisonManager.calculateDifferences(
             originItems = listOf(originalOrder),
             newItems = listOf(newOrder),
             associateByKey = { it.orderId },
@@ -61,7 +61,7 @@ class DiffManagerTest {
         val newProducts: List<Product> = diffMapper.readValue(readFile("/diff-array-new.json"))
 
         // When
-        val results = DiffManager.calculateDifferences(
+        val results = DiffComparisonManager.calculateDifferences(
             originItems = originProducts,
             newItems = newProducts,
             associateByKey = Product::productId,
