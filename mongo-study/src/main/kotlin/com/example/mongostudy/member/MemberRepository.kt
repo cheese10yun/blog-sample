@@ -110,7 +110,10 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         )
     }
 
-    override fun updateName(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode) {
+    override fun updateName(
+        listOf: List<Pair<() -> Query, () -> Update>>,
+        bulkMode: BulkOperations.BulkMode
+    ) {
         bulkUpdate(listOf, bulkMode)
     }
 
