@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.mapping.div
-import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
@@ -24,19 +23,22 @@ import java.util.*
 interface MemberRepository : MongoRepository<Member, ObjectId>, MemberCustomRepository
 
 interface MemberCustomRepository {
+    // find
     fun findByName(name: String): List<Member>
+    fun findBy(addressDetail: String): List<Member>
     fun findByEmail(email: String): List<Member>
     fun findActiveMembers(): List<Member>
     fun findMembersWithPointsOver(points: BigDecimal): List<Member>
     fun findPageBy(pageable: Pageable, name: String?, email: String?, dateJoinedFrom: LocalDateTime?, dateJoinedTo: LocalDateTime?, memberStatus: MemberStatus?): Page<Member>
     fun findSlice(pageable: Pageable, name: String?, email: String?): Slice<Member>
 
-    //    fun updateName(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode)
+    // update
     fun updateName(targets: List<MemberQueryForm.UpdateName>)
-    fun bulkInsert(members: List<Member>)
     fun update(id: ObjectId): UpdateResult
-    fun findBy(addressDetail: String): List<Member>
     fun updateFirst(id: ObjectId): UpdateResult
+
+    // insert
+    fun insertMany(members: List<Member>)
 }
 
 class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRepository, MongoCustomRepositorySupport<Member>(Member::class.java, mongoTemplate) {
@@ -112,10 +114,7 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         )
     }
 
-    override fun updateName(
-        targets: List<MemberQueryForm.UpdateName>
-    ) {
-
+    override fun updateName(targets: List<MemberQueryForm.UpdateName>) {
         bulkUpdate(
             targets.map {
                 Pair(
@@ -126,8 +125,8 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         )
     }
 
-    override fun bulkInsert(members: List<Member>) {
-        insertMany(members)
+    override fun insertMany(members: List<Member>) {
+        insertAll(members)
     }
 
     override fun update(id: ObjectId): UpdateResult {

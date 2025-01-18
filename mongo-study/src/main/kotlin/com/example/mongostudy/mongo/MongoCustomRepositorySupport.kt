@@ -132,7 +132,7 @@ abstract class MongoCustomRepositorySupport<T>(
      *
      * @param entities 삽입할 도메인 객체들의 목록.
      */
-    fun insertMany(entities: List<T>) {
+    fun insertAll(entities: List<T>) {
         mongoTemplate.insertAll(entities)
     }
 
