@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef
 @Document(collection = "members")
 class Member(
     @Field(name = "name")
-    var name: String,
+    val name: String,
 
     @Field(name = "address")
     val address: Address,
