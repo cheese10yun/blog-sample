@@ -53,8 +53,6 @@ userRepository.save(user)
 - 업데이트 후: `{ "_id": "123", "name": "John Doe", "age": 25, "email": "alice@example.com" }`
 - 변경 사항: `name` 필드만 업데이트, 나머지 필드는 유지됨.
 
----
-
 ### mongoTemplate.updateOne
 
 MongoDB의 **`updateOne`** 명령어를 실행하여 **단일 문서를 부분 업데이트**합니다.
