@@ -66,7 +66,7 @@ abstract class MongoCustomRepositorySupport<T>(
 
     protected fun bulkUpdate(
         operations: List<Pair<() -> Query, () -> Update>>, // Query와 Update 생성자를 위한 람다 리스트
-        bulkMode: BulkOperations.BulkMode
+        bulkMode: BulkOperations.BulkMode = BulkOperations.BulkMode.UNORDERED,
     ): BulkWriteResult {
         // BulkOperations 객체를 생성합니다.
         val bulkOps = mongoTemplate.bulkOps(bulkMode, documentClass)

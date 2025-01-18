@@ -30,7 +30,9 @@ interface MemberCustomRepository {
     fun findMembersWithPointsOver(points: BigDecimal): List<Member>
     fun findPageBy(pageable: Pageable, name: String?, email: String?, dateJoinedFrom: LocalDateTime?, dateJoinedTo: LocalDateTime?, memberStatus: MemberStatus?): Page<Member>
     fun findSlice(pageable: Pageable, name: String?, email: String?): Slice<Member>
-    fun updateName(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode)
+
+    //    fun updateName(listOf: List<Pair<() -> Query, () -> Update>>, bulkMode: BulkOperations.BulkMode)
+    fun updateName(targets: List<MemberQueryForm.UpdateName>)
     fun bulkInsert(members: List<Member>)
     fun update(id: ObjectId): UpdateResult
     fun findBy(addressDetail: String): List<Member>
@@ -111,10 +113,17 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
     }
 
     override fun updateName(
-        listOf: List<Pair<() -> Query, () -> Update>>,
-        bulkMode: BulkOperations.BulkMode
+        targets: List<MemberQueryForm.UpdateName>
     ) {
-        bulkUpdate(listOf, bulkMode)
+
+        bulkUpdate(
+            targets.map {
+                Pair(
+                    { Query(Criteria.where("id").`is`(it.id)) },
+                    { Update().set("name", it.name) }
+                )
+            }
+        )
     }
 
     override fun bulkInsert(members: List<Member>) {
