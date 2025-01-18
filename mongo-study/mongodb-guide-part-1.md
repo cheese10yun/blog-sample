@@ -4,7 +4,7 @@ Spring Data MongoDB를 활용하여 애플리케이션을 개발하면서 다양
 
 ## Update Guide
 
-Spring Data MongoDB에서 `repository.save`, `mongoTemplate.save`, `mongoTemplate.updateOne`의 동작 방식을 상세히 비교하면 다음과 같습니다. 각 메서드는 문서를 업데이트하거나 저장하는 방식에서 차이를 보이며, 특정 시나리오에 적합합니다.
+Spring Data MongoDB에서 `mongoRepository.save`, `mongoTemplate.save`, `mongoTemplate.updateOne`의 동작 방식을 상세히 비교하면 다음과 같습니다. 각 메서드는 문서를 업데이트하거나 저장하는 방식에서 차이를 보이며, 특정 시나리오에 적합합니다.
 
 ### mongoTemplate.save
 
@@ -30,7 +30,7 @@ mongoTemplate.save(user)
 - 업데이트 후: `{ "_id": "123", "name": "John Doe", "age": 30 }`
 - 변경 사항: `email` 필드가 삭제됨.
 
-### repository.save
+### mongoRepository.save
 
 문서의 일부 필드만 업데이트(Partial Update)를 수행합니다.
 
@@ -80,12 +80,15 @@ mongoTemplate.updateOne(query, update, User::class.java)
 
 ### 주요 차이점 비교
 
-| **특징**             | **repository.save** | **mongoTemplate.save** | **mongoTemplate.updateOne** |
-|--------------------|---------------------|------------------------|-----------------------------|
-| **작업 대상**          | 단일 문서               | 단일 문서                  | 단일 문서                       |
-| **저장 방식**          | 변경된 필드만 업데이트        | 전체 문서 교체               | 변경된 필드만 업데이트                |
-| **문서가 없을 경우**      | 새로 삽입               | 새로 삽입                  | 기본적으로 아무 작업도 수행하지 않음        |
-| **업데이트 범위**        | 필드 단위               | 전체 문서                  | 필드 단위                       |
-| **조건 지정**          | `_id` 기준            | `_id` 기준               | 사용자 정의 쿼리                   |
-| **Spring Data 통합** | 페이징, 정렬 등 지원        | 미지원                    | 미지원                         |
-| **적합한 상황**         | 간단한 CRUD 작업         | 전체 문서 교체 또는 삽입         | 조건에 맞는 단일 문서 필드 수정          |
+| **특징**             | **mongoRepository.save** | **mongoTemplate.save** | **mongoTemplate.updateOne** |
+|--------------------|--------------------------|------------------------|-----------------------------|
+| **작업 대상**          | 단일 문서                    | 단일 문서                  | 단일 문서                       |
+| **저장 방식**          | 변경된 필드만 업데이트             | 전체 문서 교체               | 변경된 필드만 업데이트                |
+| **문서가 없을 경우**      | 새로 삽입                    | 새로 삽입                  | 기본적으로 아무 작업도 수행하지 않음        |
+| **업데이트 범위**        | 필드 단위                    | 전체 문서                  | 필드 단위                       |
+| **조건 지정**          | `_id` 기준                 | `_id` 기준               | 사용자 정의 쿼리                   |
+| **Spring Data 통합** | 페이징, 정렬 등 지원             | 미지원                    | 미지원                         |
+| **적합한 상황**         | 간단한 CRUD 작업              | 전체 문서 교체 또는 삽입         | 조건에 맞는 단일 문서 필드 수정          |
+
+## 적절한 방법 선택
+
