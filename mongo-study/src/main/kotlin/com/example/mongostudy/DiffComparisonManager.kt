@@ -103,3 +103,25 @@ class ObjectIdSerializer : JsonSerializer<ObjectId>() {
     }
 }
 
+fun DiffValueTracker.notation() {
+
+    this.map {
+        it.key
+
+        if (it.key.endsWith("cid")) {
+
+        }
+
+        if (it.key.endsWith("_date")) {
+
+        }
+    }
+}
+
+
+enum class MemberStatus(
+    val title: String
+) {
+    ACTIVE("활성"),
+    INACTIVE("비활성")
+}
