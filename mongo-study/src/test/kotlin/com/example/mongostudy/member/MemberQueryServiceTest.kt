@@ -9,6 +9,7 @@ import java.util.function.Consumer
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
 import org.springframework.data.mongodb.core.findAll
+import org.springframework.util.StopWatch
 
 @MongoTestSupport
 class MemberRepositoryTest(
@@ -66,5 +67,66 @@ class MemberRepositoryTest(
                 then(it.name).isEqualTo("newName")
             }
         )
+    }
+
+    @Test
+    fun `insertAll`() {
+        // given
+        val map = (1..100_000).map {
+            Member(
+                name = "name",
+                address = Address(
+                    address = "address",
+                    addressDetail = "addressDetail",
+                    zipCode = "zipCode",
+                ),
+                memberId = "memberId",
+                email = "asd@asd.com",
+                status = MemberStatus.ACTIVE,
+                pointsAccumulated = BigDecimal.ONE,
+                dateJoined = LocalDateTime.now()
+            )
+        }
+
+        val stopWatch = StopWatch()
+
+        stopWatch.start()
+        memberRepository.insertMany(map)
+        stopWatch.stop()
+
+
+        println("${map.size}: ${stopWatch.totalTimeMillis}")
+
+//        println(stopWatch.prettyPrint())
+    }
+
+    @Test
+    fun `saveAll`() {
+        // given
+        val map = (1..100_000).map {
+            Member(
+                name = "name",
+                address = Address(
+                    address = "address",
+                    addressDetail = "addressDetail",
+                    zipCode = "zipCode",
+                ),
+                memberId = "memberId",
+                email = "asd@asd.com",
+                status = MemberStatus.ACTIVE,
+                pointsAccumulated = BigDecimal.ONE,
+                dateJoined = LocalDateTime.now()
+            )
+        }
+
+        val stopWatch = StopWatch()
+
+        stopWatch.start()
+        memberRepository.saveAll(map)
+        stopWatch.stop()
+
+        println("${map.size}: ${stopWatch.totalTimeMillis}")
+
+//        println(stopWatch.prettyPrint())
     }
 }

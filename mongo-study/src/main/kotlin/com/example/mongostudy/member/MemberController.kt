@@ -128,7 +128,7 @@ class MemberController(
 
         val map = (1..loop).map {
             members.forEach {
-                it.name = UUID.randomUUID().toString()
+//                it.name = UUID.randomUUID().toString()
             }
             members
         }
@@ -165,7 +165,7 @@ class MemberController(
 
         val map = (1..loop).map {
             members.forEach {
-                it.name = UUID.randomUUID().toString()
+//                it.name = UUID.randomUUID().toString()
             }
             members
         }

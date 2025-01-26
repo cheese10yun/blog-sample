@@ -2,23 +2,29 @@
 
 MongoDB와 연동하여 데이터를 저장할 때, Spring Data MongoDB는 **`MongoRepository`**와 **`MongoTemplate`**이라는 두 가지 주요 방식을 제공합니다. 특히 대량 데이터를 저장할 때, 이 두 방식의 차이는 성능과 의도 전달 측면에서 큰 영향을 미칩니다. 이번 글에서는 **`MongoRepository.saveAll`**과 **`MongoTemplate.insertAll`**의 동작 방식과 성능 차이를 분석하고, 어떤 상황에서 `insertAll`을 사용하는 것이 더 적합한지 설명합니다.
 
----
+| rows    | saveAll  | insertAll |
+|---------|----------|-----------|
+| 100     |          | 181 ms    |
+| 200     |          | 206 ms    |
+| 500     |          | 273 ms    |
+| 1,000   |          | 295 ms    |
+| 2,000   |          | 351 ms    |
+| 5,000   |          | 469 ms    |
+| 10,000  |          | 660 ms    |
+| 50,000  | 1,683 ms | 1,510 ms  |
+| 100,000 | 1,683 ms | 2,444 ms  |
 
 ## `saveAll`의 동작 방식
 
-Spring Data MongoDB의 `MongoRepository.saveAll`은 이름 그대로 대량 저장을 위한 메서드처럼 보이지만, 실제로는 **저장(Insert)과 업데이트(Update)**를 모두 처리할 수 있는 다목적 메서드입니다. 그러나, 내부적으로 동작 방식은 다음과 같습니다:
+Spring Data MongoDB의 `MongoRepository.saveAll`은 이름 그대로 대량 저장을 위한 메서드처럼 보이지만, 실제로는 **저장(Insert)과 업데이트(Update)**를 모두 처리할 수 있는 다목적 메서드입니다 내부적으로 동작 방식은 다음과 같습니다:
 
-1. **Insert 또는 Update 결정**:  
-   각 객체의 `_id` 필드를 기준으로, MongoDB에 해당 `_id`가 이미 존재하면 업데이트(Update), 존재하지 않으면 삽입(Insert)을 수행합니다.
-
-2. **개별 요청 처리**:  
-   `saveAll`은 내부적으로 각 객체에 대해 **`save` 메서드를 호출**하여 MongoDB와 **개별 I/O 통신**을 수행합니다. 즉, 하나의 대량 저장 요청이 여러 개의 개별 저장 요청으로 변환됩니다.
-
+1. **Insert 또는 Update 결정**: 각 객체의 `_id` 필드를 기준으로, MongoDB에 해당 `_id`가 이미 존재하면 업데이트(Update), 존재하지 않으면 삽입(Insert)을 수행합니다.
+2. **개별 요청 처리**: `saveAll`은 내부적으로 각 객체에 대해 **`save` 메서드를 호출**하여 MongoDB와 **개별 I/O 통신**을 수행합니다. 즉, 하나의 대량 저장 요청이 여러 개의 개별 저장 요청으로 변환됩니다.
 3. **부가적인 기능 제공**:
     - Insert와 Update를 함께 처리할 수 있습니다.
     - Entity 변환 및 리턴 타입 처리 등의 부가적인 기능이 추가됩니다.
 
-### **`saveAll`의 단점**
+### `saveAll`의 단점
 
 - **I/O 요청의 비효율성**:  
   객체 하나하나를 개별적으로 MongoDB에 저장하므로, 대량 데이터 저장 시 성능이 급격히 저하됩니다.
@@ -33,10 +39,8 @@ Spring Data MongoDB의 `MongoRepository.saveAll`은 이름 그대로 대량 저�
 
 1. **Batch Insert**:  
    `insertAll`은 여러 객체를 **한 번의 I/O 요청으로 MongoDB에 전달**하여 Batch Insert를 수행합니다.
-
 2. **Insert 전용**:  
    `insertAll`은 존재하지 않는 데이터를 삽입만 수행하며, 이미 존재하는 `_id`가 있는 데이터에 대해 에러를 발생시킵니다.
-
 3. **Entity 변환 지원**:  
    `insertAll`은 엔티티 리스트를 MongoDB 문서로 변환하여 한 번에 저장합니다.
 

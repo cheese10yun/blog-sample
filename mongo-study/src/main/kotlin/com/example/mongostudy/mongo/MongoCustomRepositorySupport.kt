@@ -133,6 +133,4 @@ abstract class MongoCustomRepositorySupport<T>(
     fun insertAll(entities: List<T>) {
         mongoTemplate.insertAll(entities)
     }
-
-
 }
