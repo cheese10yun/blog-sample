@@ -29,7 +29,7 @@ interface MemberCustomRepository {
     fun findByEmail(email: String): List<Member>
     fun findActiveMembers(): List<Member>
     fun findMembersWithPointsOver(points: BigDecimal): List<Member>
-    fun findPageBy(pageable: Pageable, name: String?, email: String?, dateJoinedFrom: LocalDateTime?, dateJoinedTo: LocalDateTime?, memberStatus: MemberStatus?): Page<Member>
+    fun findPageBy(pageable: Pageable, name: String?, email: String?, dateJoinedFrom: LocalDateTime?, dateJoinedTo: LocalDateTime, memberStatus: MemberStatus?): Page<Member>
     fun findSlice(pageable: Pageable, name: String?, email: String?): Slice<Member>
 
     // update
@@ -74,10 +74,9 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         name: String?,
         email: String?,
         dateJoinedFrom: LocalDateTime?,
-        dateJoinedTo: LocalDateTime?,
+        dateJoinedTo: LocalDateTime,
         memberStatus: MemberStatus?
     ): Page<Member> {
-
         val queryBuilder: (Query) -> Query = { query ->
             query.addCriteria(
                 Criteria()
