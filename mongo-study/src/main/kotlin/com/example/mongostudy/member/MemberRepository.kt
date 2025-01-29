@@ -2,14 +2,10 @@ package com.example.mongostudy.member
 
 import com.example.mongostudy.mongo.MongoCount
 import com.example.mongostudy.mongo.MongoCustomRepositorySupport
-import com.example.mongostudy.mongo.dotPath
 import com.example.mongostudy.mongo.eqIfNotNull
 import com.example.mongostudy.mongo.gtIfNotNull
-import com.example.mongostudy.mongo.gteIfNotNull
-import com.example.mongostudy.mongo.lteIfNotNull
 import com.mongodb.client.result.UpdateResult
 import java.math.BigDecimal
-import java.time.LocalDateTime
 import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -112,14 +108,14 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
             .andInclude("name")
             .andInclude("email")
 
-        val baseAggregation = newAggregation(
+        val contentAggregation = newAggregation(
             match,
             projection,
         )
 
         return applyPaginationAggregation(
             pageable = pageable,
-            contentAggregation = baseAggregation,
+            contentAggregation = contentAggregation,
             countAggregation = newAggregation(match),
             contentQuery = {
                 mongoTemplate.aggregate(it, Member.DOCUMENT_NAME, MemberProjection::class.java)
@@ -170,13 +166,13 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
             .andInclude("name")
             .andInclude("email")
 
-        val baseAggregation = newAggregation(
+        val contentAggregation = newAggregation(
             match,
             projection,
         )
         return this.applySliceAggregation(
             pageable = pageable,
-            baseAggregation = baseAggregation,
+            contentAggregation = contentAggregation,
             contentQuery = {
                 mongoTemplate.aggregate(it, Member.DOCUMENT_NAME, MemberProjection::class.java)
             }

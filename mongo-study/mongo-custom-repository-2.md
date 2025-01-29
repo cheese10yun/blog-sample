@@ -7,7 +7,7 @@
 - Page 기반 페이징 처리:
     - 카운트 쿼리와 컨텐츠 쿼리를 **코루틴 기반으로 병렬 실행**하여 성능 최적화
 - Slice 기반 페이징 처리:
-    - `hasNext` 처리를 위임하여 반복적인 `hasNext` 호출 없이 유연한 페이징 처리 제공
+   - `hasNext` 처리를 위임하여 반복적인 코드 없이 페이징 처리 제공
 
 하지만, 해당 방식은 **도큐먼트 객체(`T`) 타입**을 기준으로 하였기 때문에 프로젝션(Projection)을 활용한 데이터 조회에는 사용할 수 없었습니다.  
 이번 포스팅에서는 이 문제를 해결하기 위해 **`MongoTemplate`을 기반으로 `Aggregation`을 활용한 프로젝션 기반의 페이징 처리**를 확장하는 방법을 다룹니다.
@@ -199,16 +199,16 @@ db.members.aggregate([
 ```kotlin
 protected fun <S> applySliceAggregation(
     pageable: Pageable,
-    baseAggregation: Aggregation,
+    contentAggregation: Aggregation,
     contentQuery: (Aggregation) -> AggregationResults<S>
 ): Slice<S> {
     val skip = pageable.pageNumber * pageable.pageSize
     val limit = pageable.pageSize
-    baseAggregation.pipeline.apply {
+   contentAggregation.pipeline.apply {
         this.add(Aggregation.skip(skip.toLong()))
         this.add(Aggregation.limit(limit.toLong()))
     }
-    val results = contentQuery(baseAggregation)
+   val results = contentQuery(contentAggregation)
     val content = results.mappedResults
     val hasNext = content.size >= pageable.pageSize
     return SliceImpl(content, pageable, hasNext)
@@ -217,14 +217,14 @@ protected fun <S> applySliceAggregation(
 
 ### **설명**:
 
-1. **`baseAggregation`**:
-   - **`baseAggregation`** 는 사용자가 제공한 Aggregation 객체입니다. 이 객체에는 `$match`, `$project`와 같은 데이터 변환 및 필터링 로직이 포함됩니다.
-   - `baseAggregation`에 **`skip`** 과 **`limit`** 을 추가하여 페이징을 처리합니다. 이를 통해 주어진 `pageable`에 맞게 데이터를 조회할 수 있습니다.
+1. **`contentAggregation`**:
+   - **`contentAggregation`** 는 사용자가 제공한 Aggregation 객체입니다. 이 객체에는 `$match`, `$project`와 같은 데이터 변환 및 필터링 로직이 포함됩니다.
+   - `contentAggregation`에 **`skip`** 과 **`limit`** 을 추가하여 페이징을 처리합니다. 이를 통해 주어진 `pageable`에 맞게 데이터를 조회할 수 있습니다.
 2. **`contentQuery`**:
-   - `baseAggregation`을 기반으로 데이터를 조회하는 `contentQuery` 함수입니다. 이 함수는 `Aggregation`을 받아서 `mongoTemplate.aggregate`를 사용해 데이터를 가져옵니다.
+   - `contentAggregation`을 기반으로 데이터를 조회하는 `contentQuery` 함수입니다. 이 함수는 `Aggregation`을 받아서 `mongoTemplate.aggregate`를 사용해 데이터를 가져옵니다.
 3. **쿼리 실행**:
-    - `contentQuery(baseAggregation)`를 실행하여 페이징된 결과를 가져옵니다.
-   - `skip`과 `limit`을 포함한 `baseAggregation`을 전달하여 데이터를 필터링합니다.
+   - `contentQuery(contentAggregation)`를 실행하여 페이징된 결과를 가져옵니다.
+   - `skip`과 `limit`을 포함한 `contentAggregation`을 전달하여 데이터를 필터링합니다.
 4. **응답 생성**:
     - **`content`**: 페이징된 결과.
     - **`hasNext`**: `content`의 크기가 `pageable.pageSize`보다 크거나 같으면, 더 많은 데이터가 있다는 뜻으로 `hasNext`를 설정합니다.
@@ -281,7 +281,7 @@ override fun findSliceAggregation(
 
     return this.applySliceAggregation(
         pageable = pageable,
-        baseAggregation = Aggregation.newAggregation(match, projection),
+       contentAggregation = Aggregation.newAggregation(match, projection),
         contentQuery = { mongoTemplate.aggregate(it, Member.DOCUMENT_NAME, MemberProjection::class.java) }
     )
 }

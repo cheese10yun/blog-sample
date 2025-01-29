@@ -83,16 +83,16 @@ abstract class MongoCustomRepositorySupport<T>(
 
     protected fun <S> applySliceAggregation(
         pageable: Pageable,
-        baseAggregation: Aggregation,
+        contentAggregation: Aggregation,
         contentQuery: (Aggregation) -> AggregationResults<S>
     ): Slice<S> {
         val skip = pageable.pageNumber * pageable.pageSize
         val limit = pageable.pageSize
-        baseAggregation.pipeline.apply {
+        contentAggregation.pipeline.apply {
             this.add(Aggregation.skip(skip.toLong()))
             this.add(Aggregation.limit(limit.toLong()))
         }
-        val results = contentQuery(baseAggregation)
+        val results = contentQuery(contentAggregation)
         val content = results.mappedResults
         val hasNext = content.size >= pageable.pageSize
         return SliceImpl(content, pageable, hasNext)
