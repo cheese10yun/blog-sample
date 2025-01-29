@@ -68,7 +68,7 @@ override fun findSlice(
 }
 ```
 
-#### **Page 조회**
+#### Page 조회
 
 ```kotlin
 override fun findPage(
@@ -135,7 +135,7 @@ protected fun <S> applyPaginationAggregation(
 }
 ```
 
-### **설명**:
+### 설명
 
 1. **`contentAggregation`**:
     - 페이지네이션을 적용하기 위해 `skip`과 `limit`을 **`contentAggregation`**에 추가합니다. `skip`은 현재 페이지의 첫 번째 항목부터 건너뛸 수 있도록 하며, `limit`은 페이지당 보여줄 항목의 개수를 설정합니다.
@@ -151,9 +151,9 @@ protected fun <S> applyPaginationAggregation(
     - **`totalCount`**: 전체 항목 수.
     - `PageImpl` 객체를 생성하여 결과를 반환합니다.
 
-### **사용된 MongoDB 쿼리**:
+### 사용된 MongoDB 쿼리
 
-1. **페이징 쿼리**:
+#### 페이징 쿼리
 
 ```json
 db.members.aggregate([
@@ -177,7 +177,7 @@ db.members.aggregate([
 ])
 ```
 
-2. **카운트 쿼리**:
+#### 카운트 쿼리
 
 ```json
 db.members.aggregate([
@@ -218,9 +218,8 @@ protected fun <S> applySliceAggregation(
 ### **설명**:
 
 1. **`baseAggregation`**:
-    - **`baseAggregation`**는 사용자가 제공한 Aggregation 객체입니다. 이 객체에는 **`$match`**, **`$project`**와 같은 데이터 변환 및 필터링 로직이 포함됩니다.
-    - `baseAggregation`에 **`skip`**과 **`limit`**을 추가하여 페이징을 처리합니다. 이를 통해 주어진 `pageable`에 맞게 데이터를 조회할 수 있습니다.
-
+   - **`baseAggregation`** 는 사용자가 제공한 Aggregation 객체입니다. 이 객체에는 **`$match`**, **`$project`**와 같은 데이터 변환 및 필터링 로직이 포함됩니다.
+   - `baseAggregation`에 **`skip`** 과 **`limit`** 을 추가하여 페이징을 처리합니다. 이를 통해 주어진 `pageable`에 맞게 데이터를 조회할 수 있습니다.
 2. **`contentQuery`**:
     - `baseAggregation`을 기반으로 데이터를 조회하는 `contentQuery` 함수입니다. 이 함수는 **`Aggregation`**을 받아서 `mongoTemplate.aggregate`를 사용해 데이터를 가져옵니다.
 3. **쿼리 실행**:
@@ -231,7 +230,7 @@ protected fun <S> applySliceAggregation(
     - **`hasNext`**: `content`의 크기가 `pageable.pageSize`보다 크거나 같으면, 더 많은 데이터가 있다는 뜻으로 `hasNext`를 설정합니다.
     - `SliceImpl` 객체를 생성하여 결과를 반환합니다.
 
-### **사용된 MongoDB 쿼리**:
+### 사용된 MongoDB 쿼리
 
 ```json
 db.members.aggregate([
