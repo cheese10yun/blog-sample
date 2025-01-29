@@ -155,7 +155,7 @@ protected fun <S> applyPaginationAggregation(
 
 #### 페이징 쿼리
 
-```json
+```
 db.members.aggregate([
   {
     "$match": {
@@ -179,7 +179,7 @@ db.members.aggregate([
 
 #### 카운트 쿼리
 
-```json
+```
 db.members.aggregate([
   {
     "$match": {
@@ -232,7 +232,7 @@ protected fun <S> applySliceAggregation(
 
 ### 사용된 MongoDB 쿼리
 
-```json
+```
 db.members.aggregate([
   {
     "$match": {
@@ -267,7 +267,6 @@ override fun findSliceAggregation(
     email: String?,
     memberId: String?
 ): Slice<MemberProjection> {
-
     val match = Aggregation.match(
         Criteria().apply {
             name?.let { this.and("name").`is`(it) }
