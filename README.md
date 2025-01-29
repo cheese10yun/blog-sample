@@ -5,6 +5,11 @@
 
 [Yun Blog](https://cheese10yun.github.io)의 Sample Code 및 기타 학습에 관련된 Code 모음 Repository
 
+## 2025
+
+* 01-30 [Spring Data MongoDB Repository 확장 - Aggregation 기반 페이징 처리](https://cheese10yun.github.io/spring-data-mongo-repository-2/)
+* 01-18 [Spring Data MongoDB에서의 Update 전략과 경험](https://cheese10yun.github.io/spring-data-mongo-update-guide-1/)
+
 ## 2024
 
 * 11-17 [Hikari와 비교하며 알아보는 Redis Lettuce 커넥션 풀의 특징](https://cheese10yun.github.io/redis-lettuce-connection/)
