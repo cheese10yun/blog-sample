@@ -167,9 +167,7 @@ class MemberRepositoryTest(
             pageable = PageRequest.of(1, 10),
             name = null,
             email = null,
-            dateJoinedFrom = null,
-            dateJoinedTo = null,
-            memberStatus = null,
+            memberId = null,
         )
 
         members.content.forEach {
@@ -180,7 +178,7 @@ class MemberRepositoryTest(
     @Test
     fun `findPageAggregation test`() {
         val members = memberRepository.findPageAggregation(
-            pageable = PageRequest.of(1, 10),
+            pageable = PageRequest.of(0, 10),
             name = null,
             email = null,
             memberId = "memberId",

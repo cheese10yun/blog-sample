@@ -35,11 +35,10 @@ interface MemberCustomRepository {
     fun findByEmail(email: String): List<Member>
     fun findActiveMembers(): List<Member>
     fun findMembersWithPointsOver(points: BigDecimal): List<Member>
-    fun findPage(pageable: Pageable, name: String?, email: String?, dateJoinedFrom: LocalDateTime?, dateJoinedTo: LocalDateTime?, memberStatus: MemberStatus?): Page<Member>
+    fun findPage(pageable: Pageable, name: String?, email: String?, memberId: String?): Page<Member>
     fun findPageAggregation(pageable: Pageable, name: String?, email: String?, memberId: String?): Page<MemberProjection>
     fun findSlice(pageable: Pageable, name: String?, email: String?, memberId: String?): Slice<Member>
     fun findSliceAggregation(pageable: Pageable, name: String?, email: String?, memberId: String?): Slice<MemberProjection>
-
 
     // update
     fun updateName(targets: List<MemberQueryForm.UpdateName>)
@@ -74,7 +73,6 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
 
     override fun findMembersWithPointsOver(points: BigDecimal): List<Member> {
         val query = Query(Criteria().gtIfNotNull(Member::pointsAccumulated, points))
-
         return mongoTemplate.find<Member>(query)
     }
 
@@ -82,25 +80,18 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         pageable: Pageable,
         name: String?,
         email: String?,
-        dateJoinedFrom: LocalDateTime?,
-        dateJoinedTo: LocalDateTime?,
-        memberStatus: MemberStatus?
+        memberId: String?
     ): Page<Member> {
-        val queryBuilder: (Query) -> Query = { query ->
-            query.addCriteria(
-                Criteria()
-                    .eqIfNotNull(Member::name, name)
-                    .eqIfNotNull(Member::email, email)
-                    .gteIfNotNull(Member::dateJoined, dateJoinedFrom)
-                    .lteIfNotNull(Member::dateJoined, dateJoinedTo)
-                    .eqIfNotNull(Member::status, memberStatus)
-            )
+        val criteria = Criteria().apply {
+            name?.let { this.and("name").`is`(it) }
+            email?.let { this.and("email").`is`(it) }
+            memberId?.let { this.and("member_id").`is`(it) }
         }
 
         return applyPagination(
             pageable = pageable,
-            contentQuery = { mongoTemplate.find<Member>(queryBuilder(it)) },
-            countQuery = { mongoTemplate.count(queryBuilder(it), documentClass) }
+            contentQuery = { mongoTemplate.find<Member>(it.addCriteria(criteria)) },
+            countQuery = { mongoTemplate.count(it.addCriteria(criteria), documentClass) }
         )
     }
 
@@ -112,9 +103,9 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
     ): Page<MemberProjection> {
         val match = match(
             Criteria().apply {
-                name?.let { this.and(dotPath(Member::name)).`is`(it) }
-                email?.let { this.and(dotPath(Member::email)).`is`(it) }
-                memberId?.let { this.and(dotPath(Member::memberId)).`is`(it) }
+                name?.let { this.and("name").`is`(it) }
+                email?.let { this.and("email").`is`(it) }
+                memberId?.let { this.and("member_id").`is`(it) }
             }
         )
         val projection = project()
@@ -147,16 +138,17 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         memberId: String?
     ): Slice<Member> {
         val criteria = Criteria()
-            .eqIfNotNull(Member::name, name)
-            .eqIfNotNull(Member::email, email)
-            .eqIfNotNull(Member::memberId, memberId)
+            .apply {
+                name?.let { this.and("name").`is`(it) }
+                email?.let { this.and("email").`is`(it) }
+                memberId?.let { this.and("member_id").`is`(it) }
+            }
 
-        val contentQuery: (Query) -> List<Member> = {
-            mongoTemplate.find<Member>(it.addCriteria(criteria))
-        }
         return applySlice(
             pageable = pageable,
-            contentQuery = contentQuery
+            contentQuery = {
+                mongoTemplate.find<Member>(it.addCriteria(criteria))
+            }
         )
     }
 
@@ -169,9 +161,9 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
     ): Slice<MemberProjection> {
         val match = match(
             Criteria().apply {
-                name?.let { this.and(dotPath(Member::name)).`is`(it) }
-                email?.let { this.and(dotPath(Member::email)).`is`(it) }
-                memberId?.let { this.and(dotPath(Member::memberId)).`is`(it) }
+                name?.let { this.and("name").`is`(it) }
+                email?.let { this.and("email").`is`(it) }
+                memberId?.let { this.and("member_id").`is`(it) }
             }
         )
         val projection = project()
