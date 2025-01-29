@@ -1,16 +1,16 @@
 ### Spring Data MongoDB Repository 확장 - Projection과 Pagination을 고려한 설계
 
-기존 [Spring Data MongoDB Repository 확장](https://cheese10yun.github.io/spring-data-mongo-repository/) 포스팅에서는 복잡한 쿼리 로직을 분리하여 상위 레벨에서는 구현 디테일을 신경 쓰지 않고, 데이터 접근 로직을 단순화할 수 있도록 하는 방법을 다루었습니다.
+기존 [Spring Data MongoDB Repository 확장](https://cheese10yun.github.io/spring-data-mongo-repository/) 포스팅에서는 복잡한 쿼리 로직을 분리하여 상위 레벨에서는 구현 디테일을 신경 쓰지 않고, 데이터 접근 로직을 단순화할 수 있는 방법을 다루었습니다.
 
-특히, **Slice 기반 및 Page 기반의 페이징 처리**를 적용하면서 다음과 같은 장점을 얻을 수 있었습니다.
+특히, **Slice 기반 및 Page 기반의 페이징 처리**를 적용하여 다음과 같은 장점을 얻을 수 있었습니다:
 
-- Page 기반 페이징 처리:
-    - 카운트 쿼리와 컨텐츠 쿼리를 **코루틴 기반으로 병렬 실행**하여 성능 최적화
-- Slice 기반 페이징 처리:
-   - `hasNext` 처리를 위임하여 반복적인 코드 없이 페이징 처리 제공
+- **Page 기반 페이징 처리**:
+   - 카운트 쿼리와 컨텐츠 쿼리를 **병렬로 실행**하여 성능 최적화
+- **Slice 기반 페이징 처리**:
+   - `hasNext` 처리를 위임하여 반복적인 코드 없이 페이징을 처리
 
-하지만, 해당 방식은 **도큐먼트 객체(`T`) 타입**을 기준으로 하였기 때문에 프로젝션(Projection)을 활용한 데이터 조회에는 사용할 수 없었습니다.  
-이번 포스팅에서는 이 문제를 해결하기 위해 **`MongoTemplate`을 기반으로 `Aggregation`을 활용한 프로젝션 기반의 페이징 처리**를 확장하는 방법을 다룹니다.
+그러나 이러한 방식은 **단순히 도큐먼트 객체(`T`) 타입**을 기준으로 설계되어, **복잡한 데이터 변환**, **조인**, **그룹화** 등 다양한 데이터 처리 작업을 다루는 데 한계가 있었습니다. 특히, **프로젝션(Projection)**을 활용한 **데이터 조회**나 **복잡한 쿼리**는 `Aggregation`을 사용하여 해결해야 하기 때문에, **`Aggregation`을 기반으로 하는 페이징 처리**가 필요합니다.  
+따라서, 이번 포스팅에서는 **`MongoTemplate`을 기반으로 `Aggregation`을 활용한 페이징 처리** 방법을 확장하여 이 문제를 해결하는 방법을 다루겠습니다.
 
 ## 기존 Query 기반 Pagination과 Slice 처리
 
@@ -95,8 +95,7 @@ override fun findPage(
 
 ## Aggregation을 활용한 Projection 및 Pagination 확장
 
-MongoDB에서는 Aggregation을 활용하여 특정 필드만 선택하거나, 특정 데이터 변환을 수행하는 Projection을 사용할 수 있습니다.  
-이를 활용하여 기존 `Query` 기반 페이징 방식과 유사한 `Aggregation` 기반 페이징을 확장할 수 있습니다.
+MongoDB에서는 **Aggregation**을 활용하여 특정 필드만 선택하거나, 데이터를 변환하는 **프로젝션(Projection)** 외에도, **조인(`$lookup`)**, **그룹화(`$group`)**, **집계(`$count`)**, **정렬(`$sort`)** 등 다양한 작업을 수행할 수 있습니다. 이러한 복잡한 데이터 처리 작업을 효율적으로 다루기 위해서는 **Aggregation** 기반의 페이징을 활용하는 것이 필요합니다. 이 방식은 기존 `Query` 기반 페이징 처리 방식에 비해 더 유연하고 강력한 쿼리 작성이 가능하며, 복잡한 데이터 변환 및 집계도 손쉽게 처리할 수 있습니다.
 
 ### Aggregation 기반 Pagination 및 Slice 추상화 코드 설명
 
