@@ -138,7 +138,7 @@ protected fun <S> applyPaginationAggregation(
 ### 설명
 
 1. **`contentAggregation`**:
-   - 페이지네이션을 적용하기 위해 `skip`과 `limit`을 **`contentAggregation`** 에 추가합니다. `skip`은 현재 페이지의 첫 번째 항목부터 건너뛸 수 있도록 하며, `limit`은 페이지당 보여줄 항목의 개수를 설정합니다.
+   - 페이지네이션을 적용하기 위해 `skip`과 `limit`을 **`contentAggregation`**에 추가합니다. `skip`은 현재 페이지의 첫 번째 항목부터 건너뛸 수 있도록 하며, `limit`은 페이지당 보여줄 항목의 개수를 설정합니다.
 2. **`countAggregation`**:
     - 카운트 쿼리를 처리하기 위해 `countAggregation`에서 **`$count`**를 사용하여 총 항목 수를 계산합니다. 이 단계에서는 `skip`과 `limit`을 적용하지 않고, 전체 항목 수만 계산합니다.
 3. **`runBlocking`**:
