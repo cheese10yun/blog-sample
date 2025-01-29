@@ -8,6 +8,7 @@ import java.time.LocalDateTime
 import java.util.function.Consumer
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.mongodb.core.findAll
 import org.springframework.util.StopWatch
 
@@ -103,16 +104,16 @@ class MemberRepositoryTest(
     @Test
     fun `saveAll`() {
         // given
-        val map = (1..100_000).map {
+        val map = (1..100).map {
             Member(
-                name = "name",
+                name = "$it-name",
                 address = Address(
                     address = "address",
                     addressDetail = "addressDetail",
                     zipCode = "zipCode",
                 ),
                 memberId = "memberId",
-                email = "asd@asd.com",
+                email = "$it-asd@asd.com",
                 status = MemberStatus.ACTIVE,
                 pointsAccumulated = BigDecimal.ONE,
                 dateJoined = LocalDateTime.now()
@@ -128,5 +129,70 @@ class MemberRepositoryTest(
         println("${map.size}: ${stopWatch.totalTimeMillis}")
 
 //        println(stopWatch.prettyPrint())
+    }
+
+    @Test
+    fun `applyPagination test`() {
+
+        val members = memberRepository.findSlice(
+            pageable = PageRequest.of(1, 10),
+            name = null,
+            email = null,
+            memberId = "memberId"
+        )
+
+        members.content.forEach {
+            println(it.name)
+        }
+    }
+
+    @Test
+    fun `findSlicePAggregation test`() {
+        memberRepository.findSliceAggregation(
+            pageable = PageRequest.of(0, 10),
+//            name = null,
+            name = "11-name",
+//            email = null,
+            email = "11-asd@asd.com",
+//            memberId = "memberId",
+            memberId = "memberId",
+        ).content.forEach {
+            println(it)
+        }
+    }
+
+    @Test
+    fun `findPage test`() {
+        val members = memberRepository.findPage(
+            pageable = PageRequest.of(1, 10),
+            name = null,
+            email = null,
+            dateJoinedFrom = null,
+            dateJoinedTo = null,
+            memberStatus = null,
+        )
+
+        members.content.forEach {
+            println(it.name)
+        }
+    }
+
+    @Test
+    fun `findPageAggregation test`() {
+        val members = memberRepository.findPageAggregation(
+            pageable = PageRequest.of(1, 10),
+            name = null,
+            email = null,
+            memberId = "memberId",
+        )
+
+        println("number: ${members.number}")
+        println("size: ${members.size}")
+        println("totalPages: ${members.totalPages}")
+        println("totalElements: ${members.totalElements}")
+
+        members.content.forEach {
+            println(it.name)
+        }
     }
 }

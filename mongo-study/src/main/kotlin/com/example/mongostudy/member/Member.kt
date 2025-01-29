@@ -36,7 +36,12 @@ class Member(
 
     @Field(name = "date_joined")
     val dateJoined: LocalDateTime,
-) : Auditable()
+) : Auditable() {
+
+    companion object {
+        val DOCUMENT_NAME = "members"
+    }
+}
 
 data class Content(
     @Field(name = "content")
