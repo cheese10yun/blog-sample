@@ -4,12 +4,12 @@
 
 특히, **Slice 기반 및 Page 기반의 페이징 처리**를 적용하면서 다음과 같은 장점을 얻을 수 있었습니다.
 
-- **Page 기반 페이징 처리**:
+- Page 기반 페이징 처리:
     - 카운트 쿼리와 컨텐츠 쿼리를 **코루틴 기반으로 병렬 실행**하여 성능 최적화
-- **Slice 기반 페이징 처리**:
+- Slice 기반 페이징 처리:
     - `hasNext` 처리를 위임하여 반복적인 `hasNext` 호출 없이 유연한 페이징 처리 제공
 
-하지만, 해당 방식은 **도큐먼트 객체(`T`) 타입**을 기준으로 하였기 때문에 **프로젝션(Projection)**을 활용한 데이터 조회에는 사용할 수 없었습니다.  
+하지만, 해당 방식은 **도큐먼트 객체(`T`) 타입**을 기준으로 하였기 때문에 프로젝션(Projection)을 활용한 데이터 조회에는 사용할 수 없었습니다.  
 이번 포스팅에서는 이 문제를 해결하기 위해 **`MongoTemplate`을 기반으로 `Aggregation`을 활용한 프로젝션 기반의 페이징 처리**를 확장하는 방법을 다룹니다.
 
 ## 기존 Query 기반 Pagination과 Slice 처리
@@ -91,16 +91,16 @@ override fun findPage(
 }
 ```
 
-이 방식은 **기본적인 도큐먼트(`T`) 조회에는 적합**하지만, **프로젝션을 활용한 데이터 조회에는 적용할 수 없는 한계**가 있습니다.
+이 방식은 기본적인 도큐먼트(`T`) 조회에는 적합 하지만, 프로젝션을 활용한 데이터 조회에는 적용할 수 없는 한계가 있습니다.
 
 ## Aggregation을 활용한 Projection 및 Pagination 확장
 
-MongoDB에서는 **Aggregation**을 활용하여 특정 필드만 선택하거나, 특정 데이터 변환을 수행하는 **Projection**을 사용할 수 있습니다.  
+MongoDB에서는 Aggregation을 활용하여 특정 필드만 선택하거나, 특정 데이터 변환을 수행하는 Projection을 사용할 수 있습니다.  
 이를 활용하여 기존 `Query` 기반 페이징 방식과 유사한 `Aggregation` 기반 페이징을 확장할 수 있습니다.
 
 ### Aggregation 기반 Pagination 및 Slice 추상화 코드 설명
 
-이 두 메서드는 MongoDB에서 **Aggregation**을 사용하여 페이징 처리 및 **Slice** 또는 **Page** 결과를 반환하는 기능을 제공합니다. 각 메서드는 **Aggregation의 파이프라인**을 동적으로 수정하고, **`skip`**과 **`limit`**을 추가하여 페이지네이션을 처리합니다.
+이 두 메서드는 MongoDB에서 **Aggregation**을 사용하여 페이징 처리 및 Slice 또는 Page 결과를 반환하는 기능을 제공합니다. 각 메서드는 **Aggregation의 파이프라인**을 동적으로 수정하고, `skip`과 `limit`을 추가하여 페이지네이션을 처리합니다.
 
 ### applyPaginationAggregation 메서드
 
@@ -138,11 +138,11 @@ protected fun <S> applyPaginationAggregation(
 ### 설명
 
 1. **`contentAggregation`**:
-   - 페이지네이션을 적용하기 위해 `skip`과 `limit`을 **`contentAggregation`**에 추가합니다. `skip`은 현재 페이지의 첫 번째 항목부터 건너뛸 수 있도록 하며, `limit`은 페이지당 보여줄 항목의 개수를 설정합니다.
+   - 페이지네이션을 적용하기 위해 `skip`과 `limit`을 `contentAggregation`에 추가합니다. `skip`은 현재 페이지의 첫 번째 항목부터 건너뛸 수 있도록 하며, `limit`은 페이지당 보여줄 항목의 개수를 설정합니다.
 2. **`countAggregation`**:
-    - 카운트 쿼리를 처리하기 위해 `countAggregation`에서 **`$count`**를 사용하여 총 항목 수를 계산합니다. 이 단계에서는 `skip`과 `limit`을 적용하지 않고, 전체 항목 수만 계산합니다.
+   - 카운트 쿼리를 처리하기 위해 `countAggregation`에서 `$count`를 사용하여 총 항목 수를 계산합니다. 이 단계에서는 `skip`과 `limit`을 적용하지 않고, 전체 항목 수만 계산합니다.
 3. **`runBlocking`**:
-    - 비동기 처리를 위해 **`runBlocking`**을 사용하여 `contentQuery`와 `countQuery`를 동시에 실행합니다. 이렇게 함으로써 **페이징 처리 쿼리**와 **카운트 쿼리**를 병렬로 실행하여 성능을 최적화합니다.
+   - 비동기 처리를 위해 `runBlocking`을 사용하여 `contentQuery`와 `countQuery`를 동시에 실행합니다. 이렇게 함으로써 **페이징 처리 쿼리**와 **카운트 쿼리**를 병렬로 실행하여 성능을 최적화합니다.
 4. **쿼리 실행**:
     - **`contentQuery(contentAggregation)`**: `contentAggregation`을 기반으로 데이터를 조회합니다.
     - **`countQuery(countAggregation)`**: `countAggregation`을 기반으로 총 개수를 조회합니다.
@@ -192,7 +192,7 @@ db.members.aggregate([
 ])
 ```
 
-이 두 쿼리는 각각 **페이징 처리된 결과**와 **전체 항목 수**를 계산하는 쿼리입니다. `contentAggregation`에서는 `skip`과 `limit`을 적용하여 데이터를 제한하고, `countAggregation`에서는 총 항목 수를 계산합니다.
+이 두 쿼리는 각각 페이징 처리된 결과와 전체 항목 수를 계산하는 쿼리입니다. `contentAggregation`에서는 `skip`과 `limit`을 적용하여 데이터를 제한하고, `countAggregation`에서는 총 항목 수를 계산합니다.
 
 ### applySliceAggregation 메서드
 
@@ -218,13 +218,13 @@ protected fun <S> applySliceAggregation(
 ### **설명**:
 
 1. **`baseAggregation`**:
-   - **`baseAggregation`** 는 사용자가 제공한 Aggregation 객체입니다. 이 객체에는 **`$match`**, **`$project`**와 같은 데이터 변환 및 필터링 로직이 포함됩니다.
+   - **`baseAggregation`** 는 사용자가 제공한 Aggregation 객체입니다. 이 객체에는 `$match`, `$project`와 같은 데이터 변환 및 필터링 로직이 포함됩니다.
    - `baseAggregation`에 **`skip`** 과 **`limit`** 을 추가하여 페이징을 처리합니다. 이를 통해 주어진 `pageable`에 맞게 데이터를 조회할 수 있습니다.
 2. **`contentQuery`**:
-    - `baseAggregation`을 기반으로 데이터를 조회하는 `contentQuery` 함수입니다. 이 함수는 **`Aggregation`**을 받아서 `mongoTemplate.aggregate`를 사용해 데이터를 가져옵니다.
+   - `baseAggregation`을 기반으로 데이터를 조회하는 `contentQuery` 함수입니다. 이 함수는 `Aggregation`을 받아서 `mongoTemplate.aggregate`를 사용해 데이터를 가져옵니다.
 3. **쿼리 실행**:
     - `contentQuery(baseAggregation)`를 실행하여 페이징된 결과를 가져옵니다.
-    - **`skip`**과 **`limit`**을 포함한 **`baseAggregation`**을 전달하여 데이터를 필터링합니다.
+   - `skip`과 `limit`을 포함한 `baseAggregation`을 전달하여 데이터를 필터링합니다.
 4. **응답 생성**:
     - **`content`**: 페이징된 결과.
     - **`hasNext`**: `content`의 크기가 `pageable.pageSize`보다 크거나 같으면, 더 많은 데이터가 있다는 뜻으로 `hasNext`를 설정합니다.
