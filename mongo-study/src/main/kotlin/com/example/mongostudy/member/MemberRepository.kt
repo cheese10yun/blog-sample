@@ -21,8 +21,6 @@ import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.*
-import org.springframework.data.domain.PageImpl
-import org.springframework.data.mongodb.core.aggregation.Aggregation
 import org.springframework.data.mongodb.core.aggregation.Aggregation.match
 import org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation
 import org.springframework.data.mongodb.core.aggregation.Aggregation.project
@@ -128,16 +126,10 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
             projection,
         )
 
-        val count = Aggregation.count().`as`("count")
-
-        val countAggregation = newAggregation(
-            match,
-            count,
-        )
-
         return applyPaginationAggregation(
             pageable = pageable,
-            baseAggregation = baseAggregation,
+            contentAggregation = baseAggregation,
+            countAggregation = newAggregation(match),
             contentQuery = {
                 mongoTemplate.aggregate(it, Member.DOCUMENT_NAME, MemberProjection::class.java)
             },

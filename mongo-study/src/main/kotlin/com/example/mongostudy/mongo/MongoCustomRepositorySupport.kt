@@ -5,7 +5,6 @@ import com.mongodb.bulk.BulkWriteResult
 import com.mongodb.client.result.UpdateResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import org.bson.Document
 import org.bson.types.ObjectId
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -17,8 +16,6 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.core.aggregation.Aggregation
-import org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation
 import org.springframework.data.mongodb.core.aggregation.AggregationResults
 
 abstract class MongoCustomRepositorySupport<T>(
@@ -48,28 +45,30 @@ abstract class MongoCustomRepositorySupport<T>(
 
     protected fun <S> applyPaginationAggregation(
         pageable: Pageable,
-        baseAggregation: Aggregation,
+        contentAggregation: Aggregation,
+        countAggregation: Aggregation,
         contentQuery: (Aggregation) -> AggregationResults<S>,
         countQuery: (Aggregation) -> AggregationResults<MongoCount>
     ): PageImpl<S> = runBlocking {
         val skip = pageable.pageNumber * pageable.pageSize
         val limit = pageable.pageSize
 
-        // Build aggregation for content query with pagination
-        baseAggregation.pipeline.apply {
+        contentAggregation.pipeline.apply {
             this.add(Aggregation.skip(skip.toLong()))
             this.add(Aggregation.limit(limit.toLong()))
         }
 
-        // Perform queries asynchronously
-        val contentDeferred = async { contentQuery(baseAggregation) }
-        val countDeferred = async { countQuery(baseAggregation) }
+        countAggregation.pipeline.apply {
+            this.add(Aggregation.count().`as`("count"))
+        }
 
-        // Retrieve results
+        // Perform queries asynchronously
+        val contentDeferred = async { contentQuery(contentAggregation) }
+        val countDeferred = async { countQuery(countAggregation) }
+
         val content = contentDeferred.await().mappedResults
         val totalCount = countDeferred.await().uniqueMappedResult?.count ?: 0L
 
-        // Return PageImpl
         PageImpl(content, pageable, totalCount)
     }
 
