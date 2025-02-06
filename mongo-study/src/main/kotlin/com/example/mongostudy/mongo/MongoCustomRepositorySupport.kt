@@ -16,7 +16,9 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.core.aggregation.Aggregation
+import org.springframework.data.mongodb.core.aggregation.Aggregation.sort
 import org.springframework.data.mongodb.core.aggregation.AggregationResults
+import org.springframework.data.mongodb.core.aggregation.SortOperation
 
 abstract class MongoCustomRepositorySupport<T>(
     protected val documentClass: Class<T>,
@@ -50,13 +52,7 @@ abstract class MongoCustomRepositorySupport<T>(
         contentQuery: (Aggregation) -> AggregationResults<S>,
         countQuery: (Aggregation) -> AggregationResults<MongoCount>
     ): PageImpl<S> = runBlocking {
-        val skip = pageable.pageNumber * pageable.pageSize
-        val limit = pageable.pageSize
-
-        contentAggregation.pipeline.apply {
-            this.add(Aggregation.skip(skip.toLong()))
-            this.add(Aggregation.limit(limit.toLong()))
-        }
+        addAggregationPageAndSort(pageable, contentAggregation)
 
         countAggregation.pipeline.apply {
             this.add(Aggregation.count().`as`("count"))
@@ -86,12 +82,7 @@ abstract class MongoCustomRepositorySupport<T>(
         contentAggregation: Aggregation,
         contentQuery: (Aggregation) -> AggregationResults<S>
     ): Slice<S> {
-        val skip = pageable.pageNumber * pageable.pageSize
-        val limit = pageable.pageSize
-        contentAggregation.pipeline.apply {
-            this.add(Aggregation.skip(skip.toLong()))
-            this.add(Aggregation.limit(limit.toLong()))
-        }
+        addAggregationPageAndSort(pageable, contentAggregation)
         val results = contentQuery(contentAggregation)
         val content = results.mappedResults
         val hasNext = content.size >= pageable.pageSize
@@ -165,7 +156,7 @@ abstract class MongoCustomRepositorySupport<T>(
      * @param update 업데이트할 내용을 지정하는 Update 객체.
      * @return 업데이트된 문서 수
      */
-    fun updateMany(criteria: Criteria, update: Update): Long {
+    protected fun updateMany(criteria: Criteria, update: Update): Long {
         val query = Query(criteria)
         val result = mongoTemplate.updateMulti(query, update, documentClass)
         return result.modifiedCount
@@ -176,9 +167,25 @@ abstract class MongoCustomRepositorySupport<T>(
      *
      * @param entities 삽입할 도메인 객체들의 목록.
      */
-    fun insertAll(entities: List<T>) {
+    protected fun insertAll(entities: List<T>) {
         mongoTemplate.insertAll(entities)
     }
+
+    private fun addAggregationPageAndSort(pageable: Pageable, aggregation: Aggregation) {
+        val skip = pageable.pageNumber * pageable.pageSize
+        val limit = pageable.pageSize
+        val hasSort = hasSortOperation(aggregation)
+
+        aggregation.pipeline.apply {
+            if (hasSort.not() && pageable.sort.isEmpty.not()) {
+                this.add(sort(pageable.sort))
+            }
+            this.add(Aggregation.skip(skip.toLong()))
+            this.add(Aggregation.limit(limit.toLong()))
+        }
+    }
+
+    private fun hasSortOperation(aggregation: Aggregation) = aggregation.pipeline.operations.any { it is SortOperation }
 }
 
 data class MongoCount(
