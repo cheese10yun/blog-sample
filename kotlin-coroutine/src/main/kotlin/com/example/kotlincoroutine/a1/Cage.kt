@@ -1,21 +1,21 @@
 package com.example.kotlincoroutine.a1
 
-fun main() {
-
-//    val cage = Cage()
-//    val first: Crap = cage.getFirst() as? Crap ?:throw IllegalArgumentException()
+//fun main() {
 //
-//    val cage2 = Cage2<Crap>()
-//    cage2.put(Crap("잉어"))
-//    val crap: Crap = cage2.getFirst()
-
-
-    val goldFishCage = Cage2<GoldFish>()
-    goldFishCage.put(GoldFish("금붕어"))
-
-    val fishCage = Cage2<Fish>()
-//    fishCage.moveForm(goldFishCage)
-}
+////    val cage = Cage()
+////    val first: Crap = cage.getFirst() as? Crap ?:throw IllegalArgumentException()
+////
+////    val cage2 = Cage2<Crap>()
+////    cage2.put(Crap("잉어"))
+////    val crap: Crap = cage2.getFirst()
+//
+//
+//    val goldFishCage = Cage2<GoldFish>()
+//    goldFishCage.put(GoldFish("금붕어"))
+//
+//    val fishCage = Cage2<Fish>()
+////    fishCage.moveForm(goldFishCage)
+//}
 
 class Cage {
 
