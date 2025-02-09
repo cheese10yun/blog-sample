@@ -16,6 +16,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     api(project(":io"))
+    api(project(":domain"))
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 

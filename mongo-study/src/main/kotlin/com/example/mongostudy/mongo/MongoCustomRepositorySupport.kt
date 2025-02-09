@@ -172,16 +172,13 @@ abstract class MongoCustomRepositorySupport<T>(
     }
 
     private fun addAggregationPageAndSort(pageable: Pageable, aggregation: Aggregation) {
-        val skip = pageable.pageNumber * pageable.pageSize
-        val limit = pageable.pageSize
         val hasSort = hasSortOperation(aggregation)
-
         aggregation.pipeline.apply {
             if (hasSort.not() && pageable.sort.isEmpty.not()) {
                 this.add(sort(pageable.sort))
             }
-            this.add(Aggregation.skip(skip.toLong()))
-            this.add(Aggregation.limit(limit.toLong()))
+            this.add(Aggregation.skip((pageable.pageNumber * pageable.pageSize).toLong()))
+            this.add(Aggregation.limit(pageable.pageSize.toLong()))
         }
     }
 
