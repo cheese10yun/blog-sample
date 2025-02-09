@@ -324,23 +324,9 @@ fun `product, productHistory 연관 테스트`() {
 
 ### 모듈 분리로 인한 테스트 코드 재사용 지옥 벗어나기
 
-Gradle 멀티 모듈 프로젝트에서는 각 모듈마다 중복되는 테스트 데이터 생성 코드를 줄이고, 테스트 코드의 가독성과 유지보수성을 높이기 위해 테스트 전용 코드를 재사용할 필요가 있습니다. 예를 들어, 프로젝트 구조가 아래와 같이 구성되어 있다고 가정해봅니다.
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/docs/image/image-2.png)
 
-```
-module-domain
-    - src/main
-    - src/test
-    - src/testFixtures
-module-service
-    - src/main
-    - src/test
-module-api
-module-batch
-```
-
-일반적으로, module-domain 모듈의 **src/test** 디렉터리에 작성한 DomainFixture 객체를 다른 모듈(module-service, module-api, module-batch)에서 참조하고 싶을 때, 테스트 의존성으로는 **src/test** 코드를 가져올 수 없으므로 재사용에 한계가 있습니다.
-
-이 문제를 해결하기 위해 **java-test-fixtures** 라이브러리를 사용합니다. module-domain 모듈의 build.gradle.kts 파일에 아래와 같이 플러그인을 추가하면:
+`java-test-fixtures` 라이브러리를 사용하면 모듈 간 테스트 코드를 효과적으로 공유할 수 있습니다. 테스트 전용 코드를 작성할 모듈에 아래와 같이 플러그인을 추가하면:
 
 ```kotlin
 plugins {
@@ -348,17 +334,14 @@ plugins {
 }
 ```
 
-이렇게 하면 module-domain 모듈에 **src/testFixtures** 디렉터리가 생성되며, 이곳에 테스트 전용 코드와 데이터를 작성할 수 있습니다. 예를 들어, DomainFixture 객체를 **src/testFixtures**에 작성하여, 다른 모듈에서 재사용할 수 있게 합니다.
-
-그 후, module-service 모듈의 build.gradle.kts 파일에 다음과 같이 의존성을 추가합니다:
+이렇게 하면 `src/testFixtures` 디렉터리가 생성되며, 예를 들어 domain 모듈에 이 플러그인을 추가한 경우, DomainFixture 객체를 작성하여 Given 절을 보다 편리하게 구성할 수 있습니다. domain 모듈 내부에서는 `src/testFixtures`에 바로 접근할 수 있지만, 외부 모듈에서 해당 코드를 사용하려면, 해당 모듈의 `build.gradle.kts` 파일에 아래와 같이 의존성을 추가해야 합니다.
 
 ```kotlin
-testApi(testFixtures(project(":module-domain")))
+testApi(testFixtures(project(":domain")))
 ```
 
-이 설정을 통해 module-service 모듈에서는 module-domain의 **src/testFixtures**에 위치한 DomainFixture를 재사용할 수 있게 됩니다. 이를 통해 각 모듈에서 중복되는 테스트 데이터 생성 코드를 줄이고, 테스트 코드의 가독성과 유지보수성을 크게 향상시킬 수 있습니다.
+이 설정을 통해 외부 모듈에서는 domain 모듈의 `src/testFixtures`에 위치한 DomainFixture를 참조할 수 있게 됩니다. **이를 통해 각 모듈에서 중복되는 테스트 데이터 생성 코드를 줄이고, 각 모듈이 자체적으로 필요한 기능만 구현함으로써 외부 모듈의 부담을 덜 수 있습니다.** 한 번 작성된 테스트 데이터 생성 코드를 여러 모듈에서 재사용할 수 있으므로, 테스트 코드 작성이 크게 간편해집니다.
 
-결과적으로, java-test-fixtures를 활용하면 모듈 간 테스트 전용 코드를 효과적으로 공유할 수 있으며, 이는 모듈 분리로 인해 발생하는 테스트 코드 재사용의 한계를 극복하는 효율적인 방법입니다.
 
 ### 외부 인프라 의존으로 인한 Mocking 지옥 벗어나기
 
