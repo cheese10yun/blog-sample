@@ -26,6 +26,17 @@ class ShopLatestUpdateServiceTest(
     }
 
     @Test
+    fun `폐업 사업자 상태 변경 product을 판매 중지를 시킨다`() {
+        //given
+        val brn = "000-00-0000"
+        given(mockPartnerClient.getPartnerStatus(brn))
+            .willReturn(PartnerStatusResponse(PartnerStatus.OUT_OF_BUSINESS, LocalDate.of(2023, 12, 12)))
+
+        // 해당 상태를 가진 사업자의 상품을 조회한다.
+        // .. 기타 로직
+    }
+
+    @Test
     fun `폐업 사업자의 경우 xxx`() {
         //given
         val brn = "000-00-0000"

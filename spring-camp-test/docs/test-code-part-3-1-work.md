@@ -242,9 +242,224 @@ fun `기존 히스토리종료 신규히스토리생성 정상동작 테스트`(
 
 ### 파라미터 지옥 벗어 나기
 
+테스트 코드 작성 시, Given 절에 많은 파라미터를 모두 지정해야 하는 번거로움이 존재합니다. 이를 해결하기 위해 DomainFixture 클래스를 활용하여, default 값을 가진 헬퍼 메서드를 제공함으로써 테스트 코드의 Given 절을 간결하게 작성할 수 있습니다. 예를 들어, DomainFixture의 productHistory 메서드는 실제 값과 유사한 기본값들을 지정해두어, 테스트의 주요 관심사인 기존 히스토리 종료와 신규 히스토리 시작에 해당하는 파라미터만 명시적으로 지정하고 나머지는 default 값으로 처리할 수 있습니다. 이렇게 하면 테스트 코드의 가독성이 높아지고 작성이 훨씬 편리해집니다.
+
+```kotlin
+object DomainFixture {
+
+    fun productHistory(
+        productId: Long = 1L,
+        productName: String = "Sample Product",
+        category: String = "Electronics",
+        brand: String = "Acme",
+        price: BigDecimal = 1_000.toBigDecimal(),
+        discountRate: BigDecimal = 0.toBigDecimal(),
+        effectiveStartDate: LocalDate = LocalDate.of(2024, 1, 1),
+        effectiveEndDate: LocalDate = LocalDate.of(2025, 1, 1),
+        currency: String = "KRW",
+        isActive: Boolean = false,
+        region: String = "North America",
+        description: String? = "Initial price record for Sample Product",
+        cost: BigDecimal? = BigDecimal("250.00"),
+        supplier: String? = "Acme Supplier",
+        taxRate: BigDecimal? = BigDecimal("0.08"),
+        unit: String = "piece",
+        additionalFee: BigDecimal = 10.toBigDecimal(),
+    ): ProductHistory {
+        return ProductHistory(
+            productId = productId,
+            productName = productName,
+            category = category,
+            brand = brand,
+            price = price,
+            discountRate = discountRate,
+            effectiveStartDate = effectiveStartDate,
+            effectiveEndDate = effectiveEndDate,
+            currency = currency,
+            isActive = isActive,
+            region = region,
+            description = description,
+            cost = cost,
+            supplier = supplier,
+            taxRate = taxRate,
+            unit = unit,
+            additionalFee = additionalFee,
+        )
+    }
+}
+```
+
+예를 들어, 기존 히스토리 종료와 신규 히스토리 생성이 주요 관심사인 테스트에서는 아래와 같이 필요한 파라미터만 오버라이드하여 간결하게 작성할 수 있습니다.
+
+```kotlin
+@Test
+fun `기존 히스토리종료 신규히스토리생성 정상동작 테스트`() {
+    // given
+    val productHistory = DomainFixture.productHistory(
+        effectiveStartDate = LocalDate.of(2024, 1, 1),
+        effectiveEndDate = LocalDate.of(2025, 1, 1),
+    )
+    persist(productHistory) // DB에 저장
+    
+    // when
+    // 기존 히스토리를 종료시키고, 새로운 히스토리를 생성한다.
+    productReservationService.renewReservationRecord(
+        id = productHistory.id!!,
+        effectiveStartDate = LocalDate.of(2024, 5, 1),
+        effectiveEndDate = LocalDate.of(2025, 1, 1),
+    )
+
+    // then
+    // DB에서 조회하여, 기존 히스토리 종료 검증
+    // DB에서 조회하여, 새로운 히스토리 생성 검증
+}
+```
+
+또한, 객체 간 연관 관계가 있는 경우에도 DomainFixture 클래스를 통해 쉽게 설정할 수 있습니다. 예를 들어, product와 productHistory 간의 연관 테스트에서는 product를 영속화한 후 해당 product의 ID만 지정하고, 나머지 필드는 기본값을 사용하여 테스트 코드를 간결하게 유지할 수 있습니다.
+
+만약 product와 productHistory 간의 연관 테스트가 필요하고, product 객체 자체의 상세 정보보다는 단순 연결만 확인하면 된다면, default 값을 활용하여 Given 절을 간결하게 작성할 수 있습니다. 이 방법을 사용하면 연관 객체가 있는 경우에도 DomainFixture 클래스를 통해 손쉽게 객체를 생성할 수 있으며, 대부분의 연관 관계가 있는 객체 셋업에 있어서 복잡한 코드를 줄여 핵심 테스트 로직에 집중할 수 있습니다. 실제로, 복잡한 객체 셋업 없이 간단하게 default 값으로 필요한 부분만 오버라이드하여 사용하면, 전체 테스트 코드의 가독성이 높아지고 유지보수가 훨씬 효율적이게 됩니다.
+
+예를 들어, 아래와 같이 작성할 수 있습니다:
+
+```kotlin
+@Test
+fun `product, productHistory 연관 테스트`() {
+    // given
+    val product = persist(DomainFixture.product()) // product DB에 저장
+    val productHistory = DomainFixture.productHistory(
+        productId = product.id!!, // product 연결
+        effectiveStartDate = LocalDate.of(2024, 1, 1),
+        effectiveEndDate = LocalDate.of(2025, 1, 1),
+    )
+    persist(productHistory) // DB에 저장
+
+    // 기타 테스트 코드...
+}
+```
+
+이 방식은 **연관 객체가 있는 경우라도 쉽게 생성할 수 있으며**, 별도의 복잡한 셋업 없이 단순 연결만 필요한 경우에는 default 값을 활용해 효율적으로 테스트 Given 절을 작성할 수 있습니다. 결과적으로, 이러한 방식은 복잡한 객체 셋업으로 인해 테스트 코드가 흐려지는 문제를 해결하고, 테스트의 주요 관심사에 집중할 수 있도록 도와줍니다.
+
 ### 모듈간 지옥 벗어 나기
 
-### Mocking 지옥
+
+### 외부 인프라 의존으로 인한 Mocking 지옥 벗어나기
+
+기존 테스트 코드에서는 외부 서버에 이메일 전송을 위한 HTTP POST 요청을 보내야 하므로, ProductChangeNotificationRequest 객체에 ProductHistory의 필드와 겹치는 부분이 12개 이상 포함되어 매번 모든 필드를 채워 넣어야 합니다. 이로 인해 테스트 코드가 지나치게 복잡해지고, 실제로 테스트하고자 하는 핵심 관심사(예: 기존 히스토리 종료 및 신규 히스토리 생성)가 묻혀 버리는 문제가 발생합니다.
+
+이 문제를 해결하기 위해, DomainFixture에서 생성한 ProductHistory 객체를 기반으로 겹치는 필드를 자동으로 채우고, 이메일 전송에 필요한 필드만 별도로 지정할 수 있도록 DomainIoFixture의 productChangeNotificationRequest 메서드를 사용할 수 있습니다. 이렇게 하면 테스트 코드에서 불필요한 파라미터 작성이 줄어들어, 실제 값과 동일하게 작성된 상태로 Mockito 기반 목킹을 진행할 수 있어 테스트 실패 위험도 줄일 수 있습니다.
+
+```kotlin
+object DomainIoFixture {
+
+    fun productChangeNotificationRequest(
+        mailSubject: String = "제품 변경 알림",
+        mailBody: String = "제품 정보가 변경되었습니다.",
+        recipientEmail: String = "test@test.com",
+        productHistory: ProductHistory
+    ): ProductChangeNotificationRequest {
+        return ProductChangeNotificationRequest(
+            effectiveStartDate = productHistory.effectiveStartDate,
+            effectiveEndDate = productHistory.effectiveEndDate,
+            productId = productHistory.productId,
+            productName = productHistory.productName,
+            category = productHistory.category,
+            brand = productHistory.brand,
+            price = productHistory.price,
+            discountRate = productHistory.discountRate,
+            currency = productHistory.currency,
+            region = productHistory.region,
+            cost = productHistory.cost,
+            supplier = productHistory.supplier,
+            mailSubject = mailSubject,
+            mailBody = mailBody,
+            recipientEmail = recipientEmail,
+        )
+    }
+}
+
+@Test
+fun `기존 히스토리종료 신규히스토리생성 정상동작 테스트`() {
+    // given
+    val productHistory = DomainFixture.productHistory(
+        effectiveStartDate = LocalDate.of(2024, 1, 1),
+        effectiveEndDate = LocalDate.of(2025, 1, 1),
+    )
+    persist(productHistory) // DB에 저장
+
+    given(
+        emailSender.sendProductChangeNotificationEmail(
+            DomainIoFixture.productChangeNotificationRequest(
+                productHistory = productHistory,
+                mailSubject = "Price Change Notification ...",
+                mailBody = "Price of the product has been changed ...",
+                recipientEmail = ""
+            )
+        )
+    ).willReturn(true)
+
+    // when
+    // 기존 히스토리를 종료시키고, 새로운 히스토리를 생성한다.
+    productReservationService.renewReservationRecord(
+        id = productHistory.id!!,
+        effectiveStartDate = LocalDate.of(2024, 5, 1),
+        effectiveEndDate = LocalDate.of(2025, 1, 1),
+    )
+
+    // then
+    // DB에서 조회하여, 기존 히스토리 종료 검증
+    // DB에서 조회하여, 새로운 히스토리 생성 검증
+}
+```
+
+또한, 외부 통신을 하는 모듈이 여러 곳에서 재사용될 경우, 실제 Mock HTTP 서버를 띄우는 것보다 java-test-fixtures를 활용하여 테스트 전용 Mock Bean을 제공하는 방식이 훨씬 편리합니다. 예를 들어, 가맹점 정보를 조회하는 HTTP PartnerClient 클라이언트는 서비스 모듈, API 모듈, 배치 모듈 등에서 사용되기 때문에, 이를 재사용성을 극대화하여 제공하는 것이 좋습니다. 아래는 PartnerClient를 Mock 객체로 제공하는 예제입니다.
+
+```kotlin
+@TestConfiguration
+class ClientTestConfiguration {
+
+    @Bean
+    @Primary
+    fun mockPartnerClient() = mock(PartnerClient::class.java)!!
+}
+```
+
+그리고 외부 모듈에서 해당 testFixtures 의존성을 추가하면, `/src/testFixtures/resources/META-INF/spring.factories` 파일에 다음과 같이 등록하여 자동으로 Bean이 주입되도록 할 수 있습니다.
+
+```
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.spring.camp.io.ClientTestConfiguration
+```
+
+이와 같이 구성하면 PartnerClient와 같이 여러 로직에 직간접적으로 의존하는 외부 통신 클라이언트를 보다 쉽게 Mocking하여 사용할 수 있습니다. 예를 들어, 다음과 같이 작성할 수 있습니다.
+
+```kotlin
+class XXXTest(
+    private val mockPartnerClient: PartnerClient,
+) : TestSupport() {
+
+    @BeforeEach
+    fun resetMock() {
+        Mockito.reset(mockPartnerClient)
+    }
+
+    @Test
+    fun `폐업 사업자 상태 변경 product을 판매 중지를 시킨다`() {
+        // given
+        val brn = "000-00-0000"
+        given(mockPartnerClient.getPartnerStatus(brn))
+            .willReturn(PartnerStatusResponse(PartnerStatus.OUT_OF_BUSINESS, LocalDate.of(2023, 12, 12)))
+
+        // 해당 상태를 가진 사업자의 상품을 조회한다.
+        // .. 기타 로직
+    }
+}
+```
+
+실제 Mock HTTP 서버를 띄우는 것보다, 이렇게 Mock 객체를 Bean으로 제공하는 방식이 훨씬 편리하며 테스트 코드를 작성하기 쉽게 만들어 줍니다. 이와 같이 테스트 코드 작성이 용이해지면, 다양한 케이스에 대한 테스트를 폭넓게 작성할 수 있어 전체 테스트 커버리지를 향상시킬 수 있습니다.
+
+요약하면, DomainIoFixture를 통해 ProductHistory와 겹치는 필드를 자동으로 채워 Given 절을 간결하게 작성하고, java-test-fixtures를 활용하여 외부 통신 모듈의 Mock 객체를 재사용하면, 복잡한 HTTP 요청 설정과 불필요한 Mocking 코드로 인한 번거로움(즉, Mocking 지옥)에서 벗어나 효율적인 테스트 코드 작성이 가능합니다.
+
+
 
 ## 스노우 볼을 굴려라
 
