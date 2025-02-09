@@ -182,7 +182,7 @@ fun `기존 히스토리종료 신규히스토리생성 정상동작 테스트`(
                 // ... 기타 필드 생략 (총 15개 이상의 필드 존재)
                 mailSubject = "Price Change Notification ...",
                 mailBody = "Price of the product has been changed ...",
-                recipientEmail = ""
+                recipientEmail = "sample@sample.test"
             )
         )
     ).willReturn(true)
@@ -345,9 +345,9 @@ testApi(testFixtures(project(":domain")))
 
 ### 외부 인프라 의존으로 인한 Mocking 지옥 벗어나기
 
-기존 테스트 코드에서는 외부 서버에 이메일 전송을 위한 HTTP POST 요청을 보내야 하므로, ProductChangeNotificationRequest 객체에 ProductHistory의 필드와 겹치는 부분이 12개 이상 포함되어 매번 모든 필드를 채워 넣어야 합니다. 이로 인해 테스트 코드가 지나치게 복잡해지고, 실제로 테스트하고자 하는 핵심 관심사(예: 기존 히스토리 종료 및 신규 히스토리 생성)가 묻혀 버리는 문제가 발생합니다.
+기존 테스트 코드에서 외부 서버에 이메일 전송을 위한 HTTP POST 요청을 Mocking 해야 하므로, ProductChangeNotificationRequest 객체에 ProductHistory의 필드와 겹치는 부분이 12개 이상 포함되어 매번 모든 필드를 채워 넣어야 합니다. 이로 인해 테스트 코드가 지나치게 복잡해지고, 실제로 테스트하고자 하는 핵심 관심사(예: 기존 히스토리 종료 및 신규 히스토리 생성)가 묻혀 버리는 문제가 발생합니다.
 
-이 문제를 해결하기 위해, DomainFixture에서 생성한 ProductHistory 객체를 기반으로 겹치는 필드를 자동으로 채우고, 이메일 전송에 필요한 필드만 별도로 지정할 수 있도록 DomainIoFixture의 productChangeNotificationRequest 메서드를 사용할 수 있습니다. 이렇게 하면 테스트 코드에서 불필요한 파라미터 작성이 줄어들어, 실제 값과 동일하게 작성된 상태로 Mockito 기반 목킹을 진행할 수 있어 테스트 실패 위험도 줄일 수 있습니다.
+이 문제를 해결하기 위해, DomainFixture에서 생성한 ProductHistory 객체를 기반으로 겹치는 필드를 자동으로 채우고, 이메일 전송에 필요한 필드만 별도로 지정할 수 있도록 DomainIoFixture의 productChangeNotificationRequest 메서드를 사용할 수 있습니다.
 
 ```kotlin
 object DomainIoFixture {
@@ -377,7 +377,11 @@ object DomainIoFixture {
         )
     }
 }
+```
 
+`productChangeNotificationRequest` 기반으로 테스트 코드를 작성하면 아래와 같이 간결하게 작성할 수 있습니다. 
+
+```kotlin
 @Test
 fun `기존 히스토리종료 신규히스토리생성 정상동작 테스트`() {
     // given
@@ -386,17 +390,13 @@ fun `기존 히스토리종료 신규히스토리생성 정상동작 테스트`(
         effectiveEndDate = LocalDate.of(2025, 1, 1),
     )
     persist(productHistory) // DB에 저장
-
-    given(
-        emailSender.sendProductChangeNotificationEmail(
-            DomainIoFixture.productChangeNotificationRequest(
-                productHistory = productHistory,
-                mailSubject = "Price Change Notification ...",
-                mailBody = "Price of the product has been changed ...",
-                recipientEmail = ""
-            )
-        )
-    ).willReturn(true)
+    val request = DomainIoFixture.productChangeNotificationRequest(
+        productHistory = productHistory,
+        mailSubject = "Price Change Notification ...",
+        mailBody = "Price of the product has been changed ...",
+        recipientEmail = "sample@sample.test"
+    )
+    given(emailSender.sendProductChangeNotificationEmail(request)).willReturn(true)
 
     // when
     // 기존 히스토리를 종료시키고, 새로운 히스토리를 생성한다.
@@ -412,7 +412,14 @@ fun `기존 히스토리종료 신규히스토리생성 정상동작 테스트`(
 }
 ```
 
-또한, 외부 통신을 하는 모듈이 여러 곳에서 재사용될 경우, 실제 Mock HTTP 서버를 띄우는 것보다 java-test-fixtures를 활용하여 테스트 전용 Mock Bean을 제공하는 방식이 훨씬 편리합니다. 예를 들어, 가맹점 정보를 조회하는 HTTP PartnerClient 클라이언트는 서비스 모듈, API 모듈, 배치 모듈 등에서 사용되기 때문에, 이를 재사용성을 극대화하여 제공하는 것이 좋습니다. 아래는 PartnerClient를 Mock 객체로 제공하는 예제입니다.
+이런 식으로 테스트 코드를 작성하면 불필요한 파라미터가 현저하게 줄어들며, 실제 요청 값과 동일한 값으로 Mocking 되기 때문에 테스트 실패 위험도를 줄일 수 있습니다. 그외에 필요한 필드만 명시적으로 지정합니다.
+
+또한, 외부 통신 모율을 여러 모듈에서 직간 접적으로 의존하게 되는 경우가 빈번하게 발생합니다. 서비스 모듈의 특정 기능이 외부 서버와 통신해야 하는 경우 그 서비스 모듈을 의존하는 API 모듈, 배치 모듈들도 결국 외부 통신 모듈을 간접적으로 의존하게 됩니다. 즉, API 모듈의 테스트 코드, 배치 모듈의 테스트 코드에서도 외부 서버와의 통신을 Mocking 해야 하는 경우가 발생하는데, 이때  java-test-fixtures를 활용하여 테스트 전용 Mock Bean을 제공해주면 외뷰 모듈에서도 손쉽게 테스트 코드를 작성할 수 있습니다. 
+
+
+
+
+예를 들어, 가맹점 정보를 조회하는 HTTP PartnerClient 클라이언트는 서비스 모듈, API 모듈, 배치 모듈 등에서 사용되기 때문에, 이를 재사용성을 극대화하여 제공하는 것이 좋습니다. 아래는 PartnerClient를 Mock 객체로 제공하는 예제입니다.
 
 ```kotlin
 @TestConfiguration

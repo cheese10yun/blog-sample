@@ -23,7 +23,7 @@ object IoFixture {
             supplier = "커피농장",
             mailSubject = "제품 변경 알림",
             mailBody = "제품 정보가 변경되었습니다.",
-            recipientEmail = ""
+            recipientEmail = "sample@sample.test"
         )
     }
 

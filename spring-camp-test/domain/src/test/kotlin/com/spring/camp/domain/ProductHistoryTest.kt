@@ -101,7 +101,7 @@ class ProductHistoryTest(
                     supplier = productHistory.supplier,
                     mailSubject = "Price Change Notification ...",
                     mailBody = "Price of the product has been changed ...",
-                    recipientEmail = ""
+                    recipientEmail = "sample@sample.test"
                 )
             )
         ).willReturn(true)
@@ -184,7 +184,7 @@ class ProductHistoryTest(
                     supplier = productHistory.supplier,
                     mailSubject = "Price Change Notification ...",
                     mailBody = "Price of the product has been changed ...",
-                    recipientEmail = ""
+                    recipientEmail = "sample@sample.test"
                 )
             )
         ).willReturn(true)
@@ -211,17 +211,13 @@ class ProductHistoryTest(
             effectiveEndDate = LocalDate.of(2025, 1, 1),
         )
         persist(productHistory) // DB에 저장
-
-        given(
-            emailSender.sendProductChangeNotificationEmail(
-                DomainIoFixture.productChangeNotificationRequest(
-                    productHistory = productHistory,
-                    mailSubject = "Price Change Notification ...",
-                    mailBody = "Price of the product has been changed ...",
-                    recipientEmail = ""
-                )
-            )
-        ).willReturn(true)
+        val request = DomainIoFixture.productChangeNotificationRequest(
+            productHistory = productHistory,
+            mailSubject = "Price Change Notification ...",
+            mailBody = "Price of the product has been changed ...",
+            recipientEmail = "sample@sample.test"
+        )
+        given(emailSender.sendProductChangeNotificationEmail(request)).willReturn(true)
 
         // when
         // 기존 히스토리를 종료 시키고, 새로운 히스토리를 생성한다.
