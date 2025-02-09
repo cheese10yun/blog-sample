@@ -117,7 +117,7 @@ fun givenProductHistory(
 
 그러나 이러한 방식은 멀티 모듈 구조에서 한계가 있습니다.
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/6755c920d5a6a8e048bf2525cf31952a542a97ae/spring-camp-test/docs/image/image-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/docs/image/image-1.png)
 
 
 Gradle 멀티 모듈 프로젝트에서는 domain 모듈의 `src/test`에 작성된 테스트 전용 코드를 다른 모듈에서 참조할 수 없으므로, 동일한 테스트 데이터 생성 코드를 각 모듈마다 복사해야 하는 상황이 발생합니다. 이로 인해 테스트 코드의 재사용성이 떨어지고, 작성이 번거로워지며, 가독성과 유지보수성이 크게 저하됩니다.
@@ -214,31 +214,15 @@ fun `기존 히스토리종료 신규히스토리생성 정상동작 테스트`(
 이를 극복하기 위해서는 테스트 코드의 재사용성을 높여 Given 절을 최소화하고, 핵심 테스트 로직에 집중할 수 있는 방법을 도입해야 합니다.
 
 
-### java-test-fixtures 라이브러리
+### java-test-fixtures를 통한 테스트 코드 공유
 
-**java-test-fixtures** 라이브러리는 테스트 전용 코드와 데이터를 별도의 소스셋인 **src/testFixtures**에 작성하여, 이를 여러 모듈 간에 공유할 수 있도록 도와줍니다.  
-즉, **src/testFixtures**에 위치한 테스트 헬퍼 클래스나 데이터를 통해, 기존 **src/test**에 있는 DomainFixture 객체와 달리 외부 모듈에서도 쉽게 참조하고 재사용할 수 있게 됩니다.
+`java-test-fixtures` 라이브러리는 테스트 코드 작성 시 반복적으로 필요한 객체 생성이나 데이터 초기화 작업을 손쉽게 처리할 수 있도록 도와주는 도구입니다.
 
-예를 들어, 아래와 같은 디렉터리 구조에서 **src/testFixtures**는 모든 모듈에서 공통으로 사용할 수 있는 테스트 데이터를 제공합니다.
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/docs/image/image-2.png)
 
-```
-└── src
-    ├── main
-    │   └── kotlin
-    │       └── com/spring/camp/http/PartnerClient.kt
-    ├── test
-    │   └── kotlin
-    │       └── com/spring/camp/http/DomainFixture.kt
-    └── testFixtures
-        ├── kotlin
-        │   └── com/spring/camp/http/SharedDomainFixture.kt
-        └── resources
-            └── META-INF/spring.factories
-```
+이 라이브러리를 활용해 `src/testFixtures` 디렉터리에 테스트 전용 코드를 작성하면, 다른 모듈에서도 해당 코드를 손쉽게 참조할 수 있습니다. 이를 통해 모듈 간 테스트 코드를 효과적으로 공유하고, 테스트 데이터 생성 코드를 재사용할 수 있게 됩니다. 이러한 전략을 활용하여 Given 지옥에서 벗어나는 방법에 대해 구체적으로 살펴보겠습니다.
 
-**참고:** 이 포스팅에서는 **java-test-fixtures** 라이브러리에 대한 간단한 소개만 진행하며, 구체적인 사용 방법은 다루지 않습니다.
-
-이 방식을 통해, Given 절 작성에서 발생하는 불필요한 중복 코드와 복잡성을 해소하여, 보다 간결하고 유지보수하기 쉬운 테스트 코드를 작성할 수 있습니다.
+**참고:** 본 포스팅에서는 `java-test-fixtures` 라이브러리에 대한 간단한 소개만 진행하며, 구체적인 사용 방법은 다루지 않습니다.
 
 ### 파라미터 지옥 벗어 나기
 
