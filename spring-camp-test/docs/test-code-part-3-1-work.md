@@ -417,9 +417,11 @@ fun `기존 히스토리종료 신규히스토리생성 정상동작 테스트`(
 또한, 외부 통신 모율을 여러 모듈에서 직간 접적으로 의존하게 되는 경우가 빈번하게 발생합니다. 서비스 모듈의 특정 기능이 외부 서버와 통신해야 하는 경우 그 서비스 모듈을 의존하는 API 모듈, 배치 모듈들도 결국 외부 통신 모듈을 간접적으로 의존하게 됩니다. 즉, API 모듈의 테스트 코드, 배치 모듈의 테스트 코드에서도 외부 서버와의 통신을 Mocking 해야 하는 경우가 발생하는데, 이때  java-test-fixtures를 활용하여 테스트 전용 Mock Bean을 제공해주면 외뷰 모듈에서도 손쉽게 테스트 코드를 작성할 수 있습니다. 
 
 
+예를 들어, 가맹점 정보를 조회하는 HTTP PartnerClient 클라이언트는 서비스 모듈, API 모듈, 배치 모듈 등에서 사용되기 때문에, 이를 재사용성을 극대화하여 제공하는 것이 좋습니다. 
 
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/spring-camp-test/docs/image/image-3.png)
 
-예를 들어, 가맹점 정보를 조회하는 HTTP PartnerClient 클라이언트는 서비스 모듈, API 모듈, 배치 모듈 등에서 사용되기 때문에, 이를 재사용성을 극대화하여 제공하는 것이 좋습니다. 아래는 PartnerClient를 Mock 객체로 제공하는 예제입니다.
+아래는 PartnerClient를 Mock 객체로 제공하는 예제입니다.
 
 ```kotlin
 @TestConfiguration
@@ -438,7 +440,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.spring.camp.io.ClientTestConfiguration
 ```
 
-이와 같이 구성하면 PartnerClient와 같이 여러 로직에 직간접적으로 의존하는 외부 통신 클라이언트를 보다 쉽게 Mocking하여 사용할 수 있습니다. 예를 들어, 다음과 같이 작성할 수 있습니다.
+이와 같이 구성하면 `testApi(testFixtures(project(":http-client")))` 설정을 통해 외부 모듈에서도 Bean으로 등록된 Mock 객체를 의존성 주입받아 사용할 수 있습니다. 이를 통해, PartnerClient와 같이 여러 로직에 직간접적으로 의존하는 외부 통신 클라이언트를 보다 쉽게 Mocking하여 사용할 수 있습니다. 예를 들어, 다음과 같이 작성할 수 있습니다.
 
 ```kotlin
 class XXXTest(
