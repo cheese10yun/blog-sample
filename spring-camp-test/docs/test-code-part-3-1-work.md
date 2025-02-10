@@ -442,9 +442,11 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 이와 같이 구성하면 `testApi(testFixtures(project(":http-client")))` 설정을 통해 외부 모듈에서도 Bean으로 등록된 Mock 객체를 의존성 주입받아 사용할 수 있습니다. 이를 통해, PartnerClient와 같이 여러 로직에 직간접적으로 의존하는 외부 통신 클라이언트를 보다 쉽게 Mocking하여 사용할 수 있습니다. 예를 들어, 다음과 같이 작성할 수 있습니다.
 
 ```kotlin
+@SpringBootTest
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class XXXTest(
-    private val mockPartnerClient: PartnerClient,
-) : TestSupport() {
+    private val mockPartnerClient: PartnerClient
+) {
 
     @BeforeEach
     fun resetMock() {
