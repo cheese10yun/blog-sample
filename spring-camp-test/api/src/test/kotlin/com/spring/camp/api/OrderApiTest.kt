@@ -1,8 +1,17 @@
 package com.spring.camp.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.spring.camp.io.PartnerClient
+import com.spring.camp.io.PartnerStatus
+import com.spring.camp.io.PartnerStatusResponse
+import java.time.LocalDate
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.BDDMockito.given
+import org.mockito.Mockito
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
@@ -90,4 +99,38 @@ class OrderApiTest(
 //            print()
 //        }
 //    }
+}
+
+@SpringBootTest
+@AutoConfigureMockMvc
+class xxxControllerTest(
+    private val mockMvc: MockMvc,
+    private val mockPartnerClient: PartnerClient,
+) {
+
+    @BeforeEach
+    fun resetMock() {
+        Mockito.reset(mockPartnerClient)
+    }
+
+    @Test
+    internal fun `xx 등록 API 테스트`() {
+        //given
+        val brn = "000-00-0000"
+        given(mockPartnerClient.getPartnerStatus(brn))
+            .willReturn(
+                PartnerStatusResponse(
+                    status = PartnerStatus.OPEN,
+                    closeBusinessDate = null
+                )
+            )
+
+        //when & then
+        mockMvc.post("/v1/xxx") {
+            contentType = MediaType.APPLICATION_JSON
+            content = "..."
+        }.andExpect {
+            status { isOk() }
+        }
+    }
 }

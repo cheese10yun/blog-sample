@@ -454,7 +454,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 ```kotlin
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-class XXXTest(
+class XXXServiceTest(
     private val mockPartnerClient: PartnerClient
 ) {
 
@@ -468,7 +468,7 @@ class XXXTest(
         // given
         val brn = "000-00-0000"
         given(mockPartnerClient.getPartnerStatus(brn))
-            .willReturn(PartnerStatusResponse(PartnerStatus.OUT_OF_BUSINESS, LocalDate.of(2023, 12, 12)))
+            .willReturn(PartnerStatusResponse(status = PartnerStatus.OPEN, closeBusinessDate = null))
 
         // 해당 상태를 가진 사업자의 상품을 조회한다.
         // .. 기타 로직
@@ -478,7 +478,48 @@ class XXXTest(
 
 실제 Mock HTTP 서버를 띄우는 것보다, Mock 객체를 Bean으로 제공하는 방식이 훨씬 편리하며 테스트 코드를 작성하기 쉽게 만들어 줍니다. 이처럼 테스트 코드 작성이 용이해지면, 사업자가 휴업인 경우, 폐업인 경우, 일반인인 경우 등 다양한 케이스에 대한 테스트를 폭넓게 작성할 수 있어 전체 테스트 커버리지가 향상됩니다. 각각의 케이스에 대해 HTTP Mock 서버를 직접 띄우는 것은 번거로운 작업이지만, Mock 객체를 Bean으로 제공하는 방식을 사용하면 테스트 데이터 셋업이 간편해져 개발자가 다양한 상황에 대해 손쉽게 테스트 코드를 작성할 수 있습니다.
 
-요약하면, DomainIoFixture를 통해 `ProductHistory`와 중복되는 필드를 자동으로 채워 Given 절을 간결하게 작성하고, `java-test-fixtures`를 활용하여 외부 통신 모듈의 Mock 객체를 재사용하면, 복잡한 HTTP 요청 설정과 불필요한 목킹 코드로 인한 번거로움(즉, Mocking 지옥)에서 벗어나 효율적인 테스트 코드 작성이 가능합니다.
+또한, 해당 서비스를 의존하는 web 모듈의 테스트 코드에서도 동일한 Mock 객체를 의존성 주입받아 사용할 수 있습니다. 예를 들어, 아래와 같이 작성할 수 있습니다.
+
+```Kotlin
+@SpringBootTest
+@AutoConfigureMockMvc
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+class XXXControllerTest(
+    private val mockMvc: MockMvc,
+    private val mockPartnerClient: PartnerClient,
+) {
+
+    @BeforeEach
+    fun resetMock() {
+        Mockito.reset(mockPartnerClient)
+    }
+
+    @Test
+    internal fun `xx 등록 API 테스트`() {
+        //given
+        val brn = "000-00-0000"
+        given(mockPartnerClient.getPartnerStatus(brn))
+            .willReturn(
+                PartnerStatusResponse(
+                    status = PartnerStatus.OPEN,
+                    closeBusinessDate = null
+                )
+            )
+
+        //when & then
+        mockMvc.post("/v1/xxx") {
+            contentType = MediaType.APPLICATION_JSON
+            content = "..."
+        }.andExpect {
+            status { isOk() }
+        }
+    }
+}
+```
+
+이처럼 `java-test-fixtures`를 활용하면 외부 통신 모듈의 Mock 객체를 여러 모듈에서 테스트 리소스로 공유하여 효율적으로 재사용할 수 있으며, 그 결과 테스트 코드 작성이 크게 간편해집니다.
+
+요약하면, `DomainIoFixture`를 통해 `ProductHistory`와 중복되는 필드를 자동으로 채워 Given 절을 간결하게 구성하고, `java-test-fixtures`를 활용하여 외부 통신 모듈의 Mock 객체를 재사용하면, 복잡한 HTTP 요청 설정과 불필요한 목킹 코드로 인한 번거로움, 즉 Mocking 지옥에서 벗어나 효율적인 테스트 코드 작성이 가능합니다. 또한, `java-test-fixtures`를 통해 여러 모듈에서 테스트 리소스를 공유할 수 있으므로, 중복된 테스트 데이터 생성 코드 작성 부담이 줄어들고 각 모듈의 유지보수성이 크게 향상되는 이점도 누릴 수 있습니다.
 
 > 이전 포스팅 "[테스트 코드의 피드백을 통한 Mock Server 테스트의 필요성 확인](https://tech.kakaopay.com/post/mock-test-code-part-2/#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%BD%94%EB%93%9C%EC%9D%98-%ED%94%BC%EB%93%9C%EB%B0%B1%EC%9D%84-%ED%86%B5%ED%95%9C-mock-server-%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%9D%98-%ED%95%84%EC%9A%94%EC%84%B1-%ED%99%95%EC%9D%B8)"에서는 HTTP Mock 서버 테스트와 행위 기반 Mocking 테스트의 관점에 대해 보다 자세히 다루었습니다.
 
