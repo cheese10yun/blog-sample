@@ -230,7 +230,7 @@ fun `기존 히스토리종료 신규히스토리생성 정상동작 테스트`(
 
 이 라이브러리를 활용해 `src/testFixtures` 디렉터리에 테스트 전용 코드를 작성하면, 다른 모듈에서도 해당 코드를 손쉽게 참조할 수 있습니다. 이를 통해 모듈 간 테스트 코드를 효과적으로 공유하고, 테스트 데이터 생성 코드를 재사용할 수 있게 됩니다. 이러한 전략을 활용하여 Given 지옥에서 벗어나는 방법에 대해 구체적으로 살펴보겠습니다.
 
-> [실무에서 적용하는 테스트 코드 작성 방법과 노하우 Part 1: 효율적인 Mock Test java-test-fixtures 기반 테스트 의존성 제공](https://tech.kakaopay.com/post/mock-test-code/#java-test-fixtures-%EA%B8%B0%EB%B0%98-%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%9D%98%EC%A1%B4%EC%84%B1-%EC%A0%9C%EA%B3%B5) 포스팅을 참고하시면 더 자세한 내용을 확인하실 수 있습니다.
+> [이전 포스팅 - java-test-fixtures 기반 테스트 의존성 제공](https://tech.kakaopay.com/post/mock-test-code/#java-test-fixtures-%EA%B8%B0%EB%B0%98-%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%9D%98%EC%A1%B4%EC%84%B1-%EC%A0%9C%EA%B3%B5) 포스팅을 참고하시면 더 자세한 내용을 확인하실 수 있습니다.
 
 ### 파라미터 지옥 벗어 나기
 
@@ -478,7 +478,10 @@ class XXXTest(
 
 실제 Mock HTTP 서버를 띄우는 것보다, Mock 객체를 Bean으로 제공하는 방식이 훨씬 편리하며 테스트 코드를 작성하기 쉽게 만들어 줍니다. 이처럼 테스트 코드 작성이 용이해지면, 사업자가 휴업인 경우, 폐업인 경우, 일반인인 경우 등 다양한 케이스에 대한 테스트를 폭넓게 작성할 수 있어 전체 테스트 커버리지가 향상됩니다. 각각의 케이스에 대해 HTTP Mock 서버를 직접 띄우는 것은 번거로운 작업이지만, Mock 객체를 Bean으로 제공하는 방식을 사용하면 테스트 데이터 셋업이 간편해져 개발자가 다양한 상황에 대해 손쉽게 테스트 코드를 작성할 수 있습니다.
 
-요약하면, DomainIoFixture를 통해 `ProductHistory`와 중복되는 필드를 자동으로 채워 Given 절을 간결하게 작성하고, java-test-fixtures를 활용하여 외부 통신 모듈의 Mock 객체를 재사용하면, 복잡한 HTTP 요청 설정과 불필요한 목킹 코드로 인한 번거로움(즉, Mocking 지옥)에서 벗어나 효율적인 테스트 코드 작성이 가능합니다.
+요약하면, DomainIoFixture를 통해 `ProductHistory`와 중복되는 필드를 자동으로 채워 Given 절을 간결하게 작성하고, `java-test-fixtures`를 활용하여 외부 통신 모듈의 Mock 객체를 재사용하면, 복잡한 HTTP 요청 설정과 불필요한 목킹 코드로 인한 번거로움(즉, Mocking 지옥)에서 벗어나 효율적인 테스트 코드 작성이 가능합니다.
+
+> 이전 포스팅 "[테스트 코드의 피드백을 통한 Mock Server 테스트의 필요성 확인](https://tech.kakaopay.com/post/mock-test-code-part-2/#%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%BD%94%EB%93%9C%EC%9D%98-%ED%94%BC%EB%93%9C%EB%B0%B1%EC%9D%84-%ED%86%B5%ED%95%9C-mock-server-%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%9D%98-%ED%95%84%EC%9A%94%EC%84%B1-%ED%99%95%EC%9D%B8)"에서는 HTTP Mock 서버 테스트와 행위 기반 Mocking 테스트의 관점에 대해 보다 자세히 다루었습니다.
+
 
 ## 스노우 볼을 굴려라
 
