@@ -40,6 +40,7 @@ dependencies {
     testImplementation("org.testcontainers:mongodb")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("com.flipkart.zjsonpatch:zjsonpatch:0.4.16")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
 }
 
 kotlin {
