@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.repository.MongoRepository
 class OrderItem(
     @Field(name = "items", targetType = FieldType.ARRAY)
     val items: List<Item> = emptyList()
-) : Auditable(){
+) : Auditable() {
 
     override fun toString(): String {
         return "OrderItem(items=$items)"
@@ -37,7 +37,7 @@ data class Item(
 interface OrderItemRepository : MongoRepository<OrderItem, ObjectId>, OrderItemCustomRepository
 
 interface OrderItemCustomRepository {
-    fun updateItems(id: ObjectId)
+    fun updateItems(ids: List<ObjectId>)
 }
 
 class OrderItemCustomRepositoryImpl(mongoTemplate: MongoTemplate) : OrderItemCustomRepository, MongoCustomRepositorySupport<OrderItem>(
@@ -45,20 +45,24 @@ class OrderItemCustomRepositoryImpl(mongoTemplate: MongoTemplate) : OrderItemCus
     mongoTemplate
 ) {
 
-    override fun updateItems(id: ObjectId) {
-        // _id로 업데이트할 문서 선택
-        val query = Query(Criteria.where("_id").`is`(id))
-
-        // Update 객체 생성 후 배열 요소의 price 값을 업데이트하고,
-        // filterArray 메서드를 사용해 arrayFilters 조건을 추가
-        val update = Update()
-            .set("items.\$[elem1].price", 123.toBigDecimal())
-            .set("items.\$[elem2].price", 456.toBigDecimal())
-            .filterArray("elem1.name", "item1")
-            .filterArray("elem2.name", "item2")
+    override fun updateItems(ids: List<ObjectId>) {
 
 
         // 업데이트 실행 (컬렉션명 "yourCollection"은 실제 컬렉션명으로 변경)
-        mongoTemplate.updateFirst(query, update, documentClass)
+
+        bulkUpdate(
+            ids.map {
+                Pair(
+                    { Query(Criteria.where("_id").`is`(it)) },
+                    {
+                        Update()
+                            .set("items.\$[elem1].price", 123.toBigDecimal())
+                            .set("items.\$[elem2].price", 456.toBigDecimal())
+                            .filterArray("elem1.name", "item1")
+                            .filterArray("elem2.name", "item2")
+                    }
+                )
+            }
+        )
     }
 }
