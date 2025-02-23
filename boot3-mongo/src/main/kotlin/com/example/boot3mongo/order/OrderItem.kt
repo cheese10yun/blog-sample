@@ -24,7 +24,6 @@ class OrderItem(
     }
 }
 
-
 data class Item(
     @Field(name = "name", targetType = FieldType.STRING)
     val name: String,
@@ -37,7 +36,7 @@ data class Item(
 interface OrderItemRepository : MongoRepository<OrderItem, ObjectId>, OrderItemCustomRepository
 
 interface OrderItemCustomRepository {
-    fun updateItems(ids: List<ObjectId>)
+    fun updateItems(forms: List<OrderItemQueryForm.UpdateItem>)
 }
 
 class OrderItemCustomRepositoryImpl(mongoTemplate: MongoTemplate) : OrderItemCustomRepository, MongoCustomRepositorySupport<OrderItem>(
@@ -45,24 +44,36 @@ class OrderItemCustomRepositoryImpl(mongoTemplate: MongoTemplate) : OrderItemCus
     mongoTemplate
 ) {
 
-    override fun updateItems(ids: List<ObjectId>) {
-
-
+    override fun updateItems(forms: List<OrderItemQueryForm.UpdateItem>) {
         // 업데이트 실행 (컬렉션명 "yourCollection"은 실제 컬렉션명으로 변경)
-
         bulkUpdate(
-            ids.map {
+            forms.map { form ->
                 Pair(
-                    { Query(Criteria.where("_id").`is`(it)) },
-                    {
-                        Update()
-                            .set("items.\$[elem1].price", 123.toBigDecimal())
-                            .set("items.\$[elem2].price", 456.toBigDecimal())
-                            .filterArray("elem1.name", "item1")
-                            .filterArray("elem2.name", "item2")
+                    first = { Query(Criteria.where("_id").`is`(form.orderItem)) },
+                    second = {
+                        val update = Update()
+                        form.items.forEachIndexed { index, item ->
+                            update
+                                .set("items.\$[elem${index}].price", item.price)
+                                .filterArray("elem${index}.name", item.name)
+                        }
+                        update
                     }
                 )
             }
         )
     }
+}
+
+object OrderItemQueryForm {
+    data class UpdateItem(
+        val orderItem: ObjectId,
+        val items: List<UpdateItemForm>
+
+    )
+
+    data class UpdateItemForm(
+        val name: String,
+        val price: BigDecimal
+    )
 }

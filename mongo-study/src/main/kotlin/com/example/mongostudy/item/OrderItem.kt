@@ -15,40 +15,67 @@ import org.springframework.data.mongodb.repository.MongoRepository
 
 @Document(collection = "order_item")
 class OrderItem(
+    @Field(name = "items", targetType = FieldType.ARRAY)
     val items: List<Item> = emptyList()
-) : Auditable()
+) : Auditable() {
 
+    override fun toString(): String {
+        return "OrderItem(items=$items)"
+    }
+}
 
 data class Item(
     @Field(name = "name", targetType = FieldType.STRING)
     val name: String,
 
+//    @Field(name = "price")
     @Field(name = "price", targetType = FieldType.DECIMAL128)
     val price: BigDecimal,
 )
 
 interface OrderItemRepository : MongoRepository<OrderItem, ObjectId>, OrderItemCustomRepository
 
-interface OrderItemCustomRepository
+interface OrderItemCustomRepository {
+    fun updateItems(forms: List<OrderItemQueryForm.UpdateItem>)
+}
 
-class OrderItemCustomRepositoryIml(mongoTemplate: MongoTemplate) : OrderItemCustomRepository, MongoCustomRepositorySupport<OrderItem>(
+class OrderItemCustomRepositoryImpl(mongoTemplate: MongoTemplate) : OrderItemCustomRepository, MongoCustomRepositorySupport<OrderItem>(
     OrderItem::class.java,
     mongoTemplate
-){
+) {
 
-    fun updateItems(id: ObjectId) {
-        // _id로 업데이트할 문서 선택
-        val query = Query(Criteria.where("_id").`is`(id))
-
-        // Update 객체 생성 후 배열 요소의 price 값을 업데이트하고,
-        // filterArray 메서드를 사용해 arrayFilters 조건을 추가
-        val update = Update()
-            .set("items.\$[elem1].price", 300)
-            .set("items.\$[elem2].price", 400)
-            .filterArray("elem1.name", "item1")
-            .filterArray("elem2.name", "item2")
-
+    override fun updateItems(forms: List<OrderItemQueryForm.UpdateItem>) {
         // 업데이트 실행 (컬렉션명 "yourCollection"은 실제 컬렉션명으로 변경)
-        mongoTemplate.updateFirst(query, update, "yourCollection")
+        bulkUpdate(
+            forms.map {
+                Pair(
+                    { Query(Criteria.where("_id").`is`(it.orderItem)) },
+                    {
+                        val update = Update()
+                        forms.map {
+                            it.items.forEachIndexed { index, item ->
+                                update
+                                    .set("items.\$[elem${index}].price", item.price)
+                                    .filterArray("elem${index}.name", item.name)
+                            }
+                        }
+                        update
+                    }
+                )
+            }
+        )
     }
+}
+
+object OrderItemQueryForm {
+    data class UpdateItem(
+        val orderItem: ObjectId,
+        val items: List<UpdateItemForm>
+
+    )
+
+    data class UpdateItemForm(
+        val name: String,
+        val price: BigDecimal
+    )
 }
