@@ -21,6 +21,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation.match
 import org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation
 import org.springframework.data.mongodb.core.aggregation.Aggregation.project
 import org.springframework.data.mongodb.core.find
+import org.springframework.data.mongodb.core.mapping.Document
 
 interface MemberRepository : MongoRepository<Member, ObjectId>, MemberCustomRepository
 
@@ -209,6 +210,23 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
             Update().set("name", UUID.randomUUID().toString()),
             Member::class.java
         )
+    }
+
+    fun update() {
+        // _id 기준으로 업데이트할 문서를 조회하는 쿼리 생성
+        val query = Query(Criteria.where("_id").`is`(ObjectId(documentId)))
+
+        val update = Update()
+            .set("items.\$[elem1].price", 300)
+            .set("items.\$[elem2].price", 400)
+            .filterArray("elem1.name", "item1")
+            .filterArray("elem2.name", "item2")
+
+        // arrayFilters에 조건 추가 (Update#getArrayFilters()를 이용)
+
+
+        // 컬렉션 이름("yourCollection")은 실제 사용 중인 컬렉션명으로 변경
+        mongoTemplate.updateFirst(query, update, "yourCollection")
     }
 }
 

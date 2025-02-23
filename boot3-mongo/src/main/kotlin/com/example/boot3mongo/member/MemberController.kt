@@ -94,7 +94,7 @@ class MemberController(
         (1..loop).forEachIndexed { index, _ ->
             val stopWatch = StopWatch()
             stopWatch.start()
-            memberQueryService.updateBulkTest(map[index], BulkOperations.BulkMode.UNORDERED)
+//            memberQueryService.updateBulkTest(map[index], BulkOperations.BulkMode.UNORDERED)
             stopWatch.stop()
             val element = stopWatch.totalTimeMillis
 //            println("============")

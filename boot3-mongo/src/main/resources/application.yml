@@ -1,0 +1,26 @@
+spring:
+    application:
+        name: boot3-mongo
+    data:
+        mongodb:
+            uri: mongodb://root:example@localhost:27017/mongo_study?authSource=admin
+
+logging:
+    level:
+        root: info
+        org.mongodb.driver: TRACE
+        org.mongodb.driver.connection: DEBUG
+        org.mongodb.driver.cluster: DEBUG
+        org.mongodb.driver.protocol.command: DEBUG
+        org.mongodb.driver.management: DEBUG
+        org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+#        com.example.mongostudy.mongo.MongoCustomRepositorySupport: DEBUG
+
+management:
+    endpoint:
+        health:
+            show-details: always
+    endpoints:
+        web:
+            exposure:
+                include: "*"

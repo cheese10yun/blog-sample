@@ -156,6 +156,22 @@ abstract class MongoCustomRepositorySupport<T>(
         mongoTemplate.insertAll(entities)
     }
 
+    fun updateItems(mongoTemplate: MongoTemplate, documentId: String) {
+        val query = Query(Criteria.where("_id").`is`(ObjectId(documentId)))
+
+        val update = Update()
+            .set("items.\$[elem1].price", 300)
+            .set("items.\$[elem2].price", 400)
+            .filterArray("elem1.name", "item1")
+            .filterArray("elem2.name", "item2")
+
+        // arrayFilters에 조건 추가 (Update#getArrayFilters()를 이용)
+
+
+        mongoTemplate.updateFirst(query, update, "yourCollection")
+    }
+
+
     private fun addAggregationPageAndSort(pageable: Pageable, aggregation: Aggregation) {
         val hasSort = hasSortOperation(aggregation)
         aggregation.pipeline.apply {

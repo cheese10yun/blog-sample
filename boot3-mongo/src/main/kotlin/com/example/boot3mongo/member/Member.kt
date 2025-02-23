@@ -1,8 +1,7 @@
 package com.example.boot3mongo.member
 
 import com.example.boot3mongo.mongo.Auditable
-import com.example.mongostudy.mongo.Auditable
-import com.example.mongostudy.order.Order
+import com.example.boot3mongo.order.Order
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Document
