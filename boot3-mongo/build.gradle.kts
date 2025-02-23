@@ -39,6 +39,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mongodb")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation("com.flipkart.zjsonpatch:zjsonpatch:0.4.16")
 }
 
 kotlin {
