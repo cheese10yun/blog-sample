@@ -119,9 +119,22 @@ fun DiffValueTracker.notation() {
 }
 
 
-enum class MemberStatus(
+sealed class MemberStatus(
     val title: String
 ) {
-    ACTIVE("활성"),
-    INACTIVE("비활성")
+    object ACTIVE : MemberStatus("활성")
+    object INACTIVE : MemberStatus("비활성")
+    companion object {
+        fun values(): Array<MemberStatus> {
+            return arrayOf(ACTIVE, INACTIVE)
+        }
+
+        fun valueOf(value: String): MemberStatus {
+            return when (value) {
+                "ACTIVE" -> ACTIVE
+                "INACTIVE" -> INACTIVE
+                else -> throw IllegalArgumentException("No object com.example.mongostudy.MemberStatus.$value")
+            }
+        }
+    }
 }
