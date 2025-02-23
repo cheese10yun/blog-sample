@@ -16,11 +16,11 @@ class OrderItemTest(
                 items = listOf(
                     Item(
                         name = "item1",
-                        price = 300.toBigDecimal(),
+                        price = 100.01.toBigDecimal(),
                     ),
                     Item(
                         name = "item2",
-                        price = 400.toBigDecimal(),
+                        price = 100.02.toBigDecimal(),
                     )
                 )
             )
@@ -35,7 +35,9 @@ class OrderItemTest(
 
         // then
         val findAll = mongoTemplate.findAll<OrderItem>()
-        println("")
+
+
+        println(findAll)
 
 
     }
