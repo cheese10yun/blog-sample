@@ -1,4 +1,4 @@
-package com.example.mongostudy.item
+package com.example.mongostudy.order
 
 import com.example.mongostudy.mongo.MongoCustomRepositorySupport
 import org.bson.Document

@@ -3,9 +3,7 @@ package com.example.boot3mongo.order
 import com.example.boot3mongo.Boot3MongoApplicationTest
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.Test
-import org.springframework.data.mongodb.core.findAll
 import org.springframework.data.mongodb.core.findOne
-import org.springframework.data.mongodb.core.insert
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 
@@ -51,7 +49,7 @@ class OrderItemTest(
             )
         )
         // when
-        orderItemRepository.updateItems2(forms.first())
+        orderItemRepository.updateItems2(forms)
 //        orderItemRepository.updateItems(forms)
 
         // then

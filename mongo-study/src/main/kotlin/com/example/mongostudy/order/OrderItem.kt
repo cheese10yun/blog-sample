@@ -1,16 +1,11 @@
-package com.example.mongostudy.item
+package com.example.mongostudy.order
 
 import com.example.mongostudy.mongo.Auditable
-import com.example.mongostudy.mongo.MongoCustomRepositorySupport
 import java.math.BigDecimal
 import org.bson.types.ObjectId
-import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 import org.springframework.data.mongodb.core.mapping.FieldType
-import org.springframework.data.mongodb.core.query.Criteria
-import org.springframework.data.mongodb.core.query.Query
-import org.springframework.data.mongodb.core.query.Update
 
 @Document(collection = "order_item")
 class OrderItem(

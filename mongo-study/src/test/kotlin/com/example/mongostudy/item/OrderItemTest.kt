@@ -1,6 +1,10 @@
 package com.example.mongostudy.item
 
 import com.example.mongostudy.MongoStudyApplicationTests
+import com.example.mongostudy.order.Item
+import com.example.mongostudy.order.OrderItem
+import com.example.mongostudy.order.OrderItemQueryForm
+import com.example.mongostudy.order.OrderItemRepository
 import org.junit.jupiter.api.Test
 import org.springframework.data.mongodb.core.findAll
 
