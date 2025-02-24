@@ -1,6 +1,7 @@
 # Spring Data MongoDB로 배열의 특정 요소 업데이트하기
 
-Spring Data MongoDB를 활용해 한 도큐먼트(한 row)의 특정 배열 요소만 선택적으로 업데이트하는 방법을 알아보겠습니다.  
+Spring Data MongoDB를 활용해 한 도큐먼트(한 row)의 특정 배열 요소만 선택적으로 업데이트하는 방법을 알아보겠습니다.
+
 일반적으로 find로 데이터를 조회한 후 save로 업데이트하는 방식은 편리하지만, **대량 데이터를 처리할 때는 updateOne 또는 updateMany를 이용한 벌크 업데이트가 성능 면에서 큰 이점을 제공합니다.**  
 이번 포스팅에서는 MongoDB의 arrayFilters 옵션과 Spring Data MongoDB를 사용해 배열의 특정 요소만 업데이트하는 방법을 살펴봅니다.
 
@@ -345,7 +346,8 @@ fun `updateItems`() {
 
 ## 마무리
 
-Spring Data MongoDB에서 배열의 특정 요소만 업데이트하기 위해서는 updateOne/updateMany와 arrayFilters 옵션을 활용하는 것이 성능 면에서 매우 유리합니다.  
-특히, 배열 요소를 복합 조건(예: name과 category)으로 필터링해야 하는 경우, 단순한 filterArray 호출로는 원하는 결과를 얻기 어려우므로 커스텀 UpdateDefinition(예: UpdateWithArrayFilters)을 활용하여 업데이트 문서와 arrayFilters 옵션을 분리해 전달하는 방법을 사용할 수 있습니다.  
-본 포스팅에서는 MongoDB 업데이트 쿼리와 이를 Spring Data MongoDB에서 구현하는 방법을 살펴보았으며, 실제 테스트 코드까지 확인해 보았습니다.  
-대량 데이터 처리나 업데이트가 빈번한 애플리케이션에서는 find 후 save 방식 대신 벌크 업데이트를 적극 활용하여 성능 최적화를 고려해 보시기 바랍니다.
+Spring Data MongoDB에서 배열의 특정 요소만 업데이트하기 위해서는 updateOne/updateMany와 arrayFilters 옵션을 활용하는 것이 성능 면에서 매우 유리합니다.
+
+특히, 배열 요소를 복합 조건(예: name과 category)으로 필터링해야 하는 경우, 단순한 filterArray 호출로는 원하는 결과를 얻기 어려우므로 커스텀 UpdateDefinition(예: UpdateWithArrayFilters)을 활용하여 업데이트 문서와 arrayFilters 옵션을 분리해 전달하는 방법을 사용할 수 있습니다.
+
+본 포스팅에서는 MongoDB 업데이트 쿼리와 이를 Spring Data MongoDB에서 구현하는 방법을 살펴보았으며, 실제 테스트 코드까지 확인해 보았습니다. 대량 데이터 처리나 업데이트가 빈번한 애플리케이션에서는 find 후 save 방식 대신 벌크 업데이트를 적극 활용하여 성능 최적화를 고려해 보시기 바랍니다.
