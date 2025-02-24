@@ -51,7 +51,8 @@ class OrderItemTest(
             )
         )
         // when
-        orderItemRepository.updateItems(forms)
+        orderItemRepository.updateItems2(forms.first())
+//        orderItemRepository.updateItems(forms)
 
         // then
         val result = mongoTemplate.findOne<OrderItem>(Query(Criteria.where("_id").`is`(orderItem.id)))!!
