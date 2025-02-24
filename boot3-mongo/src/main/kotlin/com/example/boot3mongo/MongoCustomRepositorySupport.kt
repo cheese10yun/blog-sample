@@ -129,20 +129,6 @@ abstract class MongoCustomRepositorySupport<T>(
         return bulkOps.execute()
     }
 
-//    protected fun bulkUpdate(
-//        operations: List<Pair<() -> Query, () -> Update>>, // Query와 Update 생성자를 위한 람다 리스트
-//        bulkMode: BulkOperations.BulkMode = BulkOperations.BulkMode.UNORDERED,
-//    ): BulkWriteResult {
-//        // BulkOperations 객체를 생성합니다.
-//        val bulkOps = mongoTemplate.bulkOps(bulkMode, documentClass)
-//        // 제공된 리스트를 반복하면서 bulk 연산에 각 update를 추가합니다.
-//        operations.forEach { (queryCreator, updateCreator) ->
-//            bulkOps.updateOne(queryCreator.invoke(), updateCreator.invoke())
-//        }
-//        // 모든 업데이트를 실행합니다.
-//        return bulkOps.execute()
-//    }
-
     protected fun bulkDelete(
         query: Query,
         bulkMode: BulkOperations.BulkMode
