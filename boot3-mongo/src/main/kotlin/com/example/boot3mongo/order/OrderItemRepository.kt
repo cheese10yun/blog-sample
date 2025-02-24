@@ -15,6 +15,8 @@ interface OrderItemRepository : MongoRepository<OrderItem, ObjectId>, OrderItemC
 interface OrderItemCustomRepository {
     fun updateItems(forms: List<OrderItemQueryForm.UpdateItem>)
     fun updateItems2(forms: List<OrderItemQueryForm.UpdateItem>)
+    fun updateItems3(form: OrderItemQueryForm.UpdateItem)
+    fun updateItems4(form: OrderItemQueryForm.UpdateItem)
 }
 
 class OrderItemCustomRepositoryImpl(mongoTemplate: MongoTemplate) : OrderItemCustomRepository, MongoCustomRepositorySupport<OrderItem>(
@@ -68,6 +70,46 @@ class OrderItemCustomRepositoryImpl(mongoTemplate: MongoTemplate) : OrderItemCus
                     }
                 )
             }
+        )
+    }
+
+    override fun updateItems3(form: OrderItemQueryForm.UpdateItem) {
+        val query = Query(Criteria.where("_id").`is`(form.orderItem))
+        val update = Update()
+
+        // 각 항목마다 자리표현자(elem0, elem1, …)를 생성하여 업데이트 및 조건 Document 구성
+        form.items.forEachIndexed { index, item ->
+            update
+                .set("items.\$[elem${index}].price", item.price)
+                .filterArray("elem${index}.name", item.name)
+//                .filterArray("elem${index}.category", item.category)
+        }
+
+        mongoTemplate.updateFirst(query, update, documentClass)
+    }
+
+    override fun updateItems4(form: OrderItemQueryForm.UpdateItem) {
+        val query = Query(Criteria.where("_id").`is`(form.orderItem))
+        val update = Update()
+        val arrayFilters = mutableListOf<Document>()
+
+        // 각 항목마다 자리표현자(elem0, elem1, …)를 생성하여 업데이트 및 조건 Document 구성
+        form.items.forEachIndexed { index, item ->
+            // 예: "items.$[elem0].price": item.price
+            update.set("items.\$[elem$index].price", item.price)
+            // 원하는 조건 Document: { "elem0.name": "item1", "elem0.category": "신발" }
+            arrayFilters.add(
+                Document("elem${index}.name", item.name)
+                    .append("elem${index}.category", item.category)
+            )
+        }
+
+        // 커스텀 UpdateDefinition 생성
+        val updateApplyArrayFilters = UpdateWithArrayFilters(update, arrayFilters.toList())
+        mongoTemplate.updateFirst(
+            query,
+            updateApplyArrayFilters,
+            documentClass
         )
     }
 }
