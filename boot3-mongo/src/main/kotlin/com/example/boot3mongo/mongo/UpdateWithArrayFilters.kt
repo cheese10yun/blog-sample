@@ -10,11 +10,7 @@ class UpdateWithArrayFilters(
 ) : UpdateDefinition {
     override fun isIsolated(): Boolean = update.isIsolated
 
-    override fun getUpdateObject(): Document {
-        val updateObject = update.updateObject
-        updateObject["arrayFilters"] = arrayFilters
-        return updateObject
-    }
+    override fun getUpdateObject(): Document = update.updateObject
 
     override fun modifies(key: String): Boolean = update.modifies(key)
 
@@ -22,7 +18,7 @@ class UpdateWithArrayFilters(
         update.inc(key)
     }
 
-    // UpdateDefinition.ArrayFilter는 단순 람다로 구현할 수 있음
+    // getArrayFilters()에서 arrayFilters를 UpdateDefinition.ArrayFilter 타입으로 변환하여 반환
     override fun getArrayFilters(): List<UpdateDefinition.ArrayFilter> {
         return arrayFilters
             .map { doc -> UpdateDefinition.ArrayFilter { doc } }
