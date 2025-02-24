@@ -16,10 +16,12 @@ class OrderItemTest(
                 items = listOf(
                     Item(
                         name = "item1",
+                        category = "신발",
                         price = 100.01.toBigDecimal(),
                     ),
                     Item(
                         name = "item2",
+                        category = "상의",
                         price = 100.02.toBigDecimal(),
                     )
                 )
@@ -33,10 +35,12 @@ class OrderItemTest(
                 items = listOf(
                     OrderItemQueryForm.UpdateItemForm(
                         name = "item1",
+                        category = "신발",
                         price = 222.01.toBigDecimal(),
                     ),
                     OrderItemQueryForm.UpdateItemForm(
                         name = "item2",
+                        category = "상의",
                         price = 333.02.toBigDecimal(),
                     )
                 )
