@@ -2,14 +2,13 @@ package com.example.boot3mongo.member
 
 import com.example.boot3mongo.mongo.Auditable
 import com.example.boot3mongo.order.Order
+import java.math.BigDecimal
+import java.time.LocalDateTime
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
+import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.LocalDateTime
-import org.springframework.data.mongodb.core.mapping.DBRef
 
 @CompoundIndexes(
     CompoundIndex(name = "email_status", def = "{'email' : 1, 'status': 1}", unique = true)
