@@ -4,23 +4,28 @@ import com.example.boot3mongo.MongoCustomRepositorySupport
 import com.example.boot3mongo.mongo.Auditable
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 import org.springframework.data.mongodb.core.mapping.FieldType
 import org.springframework.data.mongodb.repository.MongoRepository
 
-@Document(collection = "author")
-class Author(
+@Document(collection = "post")
+data class Post(
     @Field(name = "name", targetType = FieldType.STRING)
-    val name: String
+    val title: String,
+    @Field(name = "name", targetType = FieldType.STRING)
+    val content: String,
+//    @DBRef(lazy = true)
+    @DBRef(lazy = false)
+    val author: Author
 ) : Auditable()
 
-interface AuthorRepository : MongoRepository<Author, ObjectId>, AuthorCustomRepository
+interface PostRepository : MongoRepository<Post, ObjectId>, PostCustomRepository
 
-interface AuthorCustomRepository
+interface PostCustomRepository
 
-class AuthorCustomRepositoryImpl(mongoTemplate: MongoTemplate) : AuthorCustomRepository, MongoCustomRepositorySupport<Author>(
-    Author::class.java,
+class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomRepository, MongoCustomRepositorySupport<Post>(
+    Post::class.java,
     mongoTemplate
 )
-
