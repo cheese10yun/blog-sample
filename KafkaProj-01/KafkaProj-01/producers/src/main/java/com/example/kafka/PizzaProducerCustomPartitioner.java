@@ -99,7 +99,7 @@ public class PizzaProducerCustomPartitioner {
     }
 
     public static void main(String[] args) {
-        String topicName = "pizza-topic";
+        String topicName = "pizza-topic-partitioner";
 
         //KafkaProducer configuration setting
         // null, "hello world"
@@ -108,6 +108,13 @@ public class PizzaProducerCustomPartitioner {
         props.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.0.99:9092");
         props.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         props.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+
+        props.setProperty("custom.specialKey", "P001");
+//        props.setProperty("partitioner.class", "CustomPartitioner");
+        props.setProperty(ProducerConfig.PARTITIONER_CLASS_CONFIG, "com.example.kafka.CustomPartitioner");
+
+
+
         //props.setProperty(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, "50000");
         //props.setProperty(ProducerConfig.ACKS_CONFIG, "0");
 //        props.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, "32000");
