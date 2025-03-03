@@ -6,6 +6,13 @@ GET http://localhost:8080/posts?page=1
 #
 GET http://localhost:8080/posts/lookup
 
+###
+
+#
+GET http://localhost:8080/posts/find
+
+###
+
 
 
 ###

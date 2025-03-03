@@ -25,6 +25,9 @@ class PostController(
     @GetMapping("/lookup")
     fun getPostsLookUp() = postRepository.findLookUp()
 
+    @GetMapping("/find")
+    fun getPostsFind() = postRepository.find()
+
     @GetMapping("/insert")
     fun insert() {
         (1..1000).map {
