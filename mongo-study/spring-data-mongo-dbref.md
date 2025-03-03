@@ -142,26 +142,15 @@ data class AuthorProjection(
 }
 ```
 
-아래 코드는 두 개의 엔드포인트(`/post`, `/post-with-author`)를 통해 **서로 다른 Projection**을 사용해 Post 정보를 반환하는 예시입니다.
+위 코드에서 `Post` 클래스의 `@DBRef(lazy = true) val author: Author` 부분을 `lazy = false`로 바꾸어 보면서, `PostProjection`(author 필드 미참조)과 `PostProjectionLookup`(author 필드 참조)을 각각 호출해 보면, 실제 쿼리가 발생하는 시점과 방식이 어떻게 달라지는지를 확인할 수 있으며, 이를 통해 Lazy 로딩과 Eager 로딩의 차이점을 직관적으로 살펴볼 수 있습니다.
 
-- **`GET /posts/post`**
-  - `PostProjection`을 사용하며, `author` 필드를 전혀 참조하지 않습니다.
-  - `@DBRef(lazy = true)`일 때, `author`에 접근하지 않으므로 **추가 쿼리 없이** Post만 조회됩니다.
-  - `@DBRef(lazy = false)`일 경우, Eager 로딩이므로 `author` 필드 접근 여부와 무관하게 **항상 Author를 로딩**하는 쿼리가 발생합니다.
-
-- **`GET /posts/post-with-author`**
-  - `PostProjectionLookup`을 사용해 `author` 필드를 참조합니다.
-  - `@DBRef(lazy = true)`나 `@DBRef(lazy = false)` 모두, `author`를 사용하므로 **추가 쿼리가 발생**합니다. (단, Lazy 로딩은 필드 접근 시점에, Eager 로딩은 Post를 조회하는 시점에 쿼리가 실행)
-
-이처럼 Projection을 어떻게 구성하느냐에 따라, Lazy 로딩과 Eager 로딩이 **쿼리를 실행하는 시점**이 달라집니다. Lazy 로딩은 필드를 실제로 참조하기 전까지 쿼리가 없지만, 예상치 못한 시점에 쿼리가 발생할 수 있습니다. Eager 로딩은 Post를 가져올 때 Author까지 즉시 조회하여 N+1 문제가 쉽게 드러날 수 있다는 차이가 있습니다.
-
-### Eager 로딩
+### Eager 로딩, @DBRef(lazy = false)
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-3.png)
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-4.png)
 
-### Lazy 로딩
+### Lazy 로딩, @DBRef(lazy = true)
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-1.png)
 
@@ -188,6 +177,8 @@ allOpen {
 
 - `org.jetbrains.kotlin.plugin.spring`: Spring 관련 애노테이션(`@Component`, `@Configuration` 등)에 대해 자동으로 `open`을 적용해 줍니다.
 - `allOpen` 블록에서 **`@Document`** 애노테이션을 추가로 지정하면, MongoDB 엔티티 클래스가 **final**이 아닌 **open** 상태가 되어 CGLIB 프록시 생성이 가능합니다.
+
+이처럼 Projection을 어떻게 구성하느냐에 따라, Lazy 로딩과 Eager 로딩이 **쿼리를 실행하는 시점**이 달라집니다. Lazy 로딩은 필드를 실제로 참조하기 전까지 쿼리가 없지만, 예상치 못한 시점에 쿼리가 발생할 수 있습니다. Eager 로딩은 Post를 가져올 때 Author까지 즉시 조회하여 N+1 문제가 쉽게 드러날 수 있다는 차이가 있습니다.
 
 ## ObjectId 직접 참조 방식
 
