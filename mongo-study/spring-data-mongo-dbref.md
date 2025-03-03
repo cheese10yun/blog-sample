@@ -7,8 +7,6 @@ MongoDB에서 **문서 간의 연관관계(relationship)를** 표현하는 방�
 
 이 글에서는 Spring Data MongoDB 환경에서 두 방식의 장단점과, 실제 데이터 구조 및 업데이트 쿼리 차이를 살펴보겠습니다.
 
----
-
 ## 소개
 
 MongoDB는 RDBMS와 달리 테이블 간의 조인(join) 개념이 제한적으로 제공됩니다. 대신,
