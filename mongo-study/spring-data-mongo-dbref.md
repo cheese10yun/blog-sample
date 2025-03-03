@@ -7,7 +7,7 @@ MongoDB에서 **문서 간의 연관관계(relationship)를** 표현하는 방�
 
 이 글에서는 Spring Data MongoDB 환경에서 두 방식의 장단점과, 실제 데이터 구조 및 업데이트 쿼리 차이를 살펴보겠습니다.
 
-## 소개
+## DBRef vs. ObjectId: 왜, 어떻게 쓰는가?
 
 MongoDB는 RDBMS와 달리 테이블 간의 조인(join) 개념이 제한적으로 제공됩니다. 대신,
 
@@ -62,32 +62,21 @@ MongoDB에 저장된 **Post** 문서는 다음과 같은 형태를 갖습니다.
 - `"$ref"` 필드에 참조할 컬렉션 이름(`author`),
 - `"$id"` 필드에 참조 대상 문서의 `_id`를 저장합니다.
 
-### Lazy 로딩 vs. Eager 로딩
-
-- **`@DBRef(lazy = false)`**:
-    - Post 문서를 조회할 때, Author 문서도 **즉시 로딩**됩니다.
-    - 한 번에 여러 Post를 조회할 경우, 각 Post마다 Author를 조회하므로 **N+1 문제**가 발생할 수 있습니다.
-
-- **`@DBRef(lazy = true)`**:
-    - Post 문서를 조회해도 `author` 필드는 아직 DB에서 가져오지 않습니다.
-    - 실제로 `author` 필드에 접근하는 순간 별도의 쿼리가 실행됩니다.
-    - 처음에는 빠르게 응답할 수 있으나, 접근 시점마다 추가 쿼리가 발생할 수 있어, 예측이 어렵다는 단점이 있습니다.
-
 ### DBRef 업데이트 쿼리 예시
 
 DBRef 필드 값을 업데이트하려면, `$ref`와 `$id`를 지정해 줍니다.
 
 ```javascript
 db.post.update(
-    {_id: ObjectId("post_id")},
-    {
-        $set: {
+        {_id: ObjectId("post_id")},
+        {
+          $set: {
             author: {
-                $ref: "author",
-                $id: ObjectId("new_author_id")
+              $ref: "author",
+              $id: ObjectId("new_author_id")
             }
+          }
         }
-    }
 )
 ```
 
@@ -101,12 +90,12 @@ db.post.update(
 ```kotlin
 @Document(collection = "post")
 class Post(
-    @Field(name = "title")
-    val title: String,
-    @Field(name = "content")
-    val content: String,
-    @Field(name = "author_id")
-    val authorId: ObjectId
+  @Field(name = "title")
+  val title: String,
+  @Field(name = "content")
+  val content: String,
+  @Field(name = "author_id")
+  val authorId: ObjectId
 )
 ```
 
@@ -133,17 +122,89 @@ MongoDB에 저장된 **Post** 문서는 다음과 같습니다:
 
 ```javascript
 db.post.update(
-    {_id: ObjectId("post_id")},
-    {
-        $set: {
+        {_id: ObjectId("post_id")},
+        {
+          $set: {
             author_id: ObjectId("new_author_id")
+          }
         }
-    }
 )
 ```
 
 - DBRef보다 쿼리가 단순합니다.
 - 인덱싱, 조회, `$lookup` 활용 등이 모두 ObjectId 필드 기준으로 이뤄집니다.
+
+### Lazy 로딩 vs. Eager 로딩
+
+
+- **`@DBRef(lazy = true)`**:
+    - Post 문서를 조회해도 `author` 필드는 아직 DB에서 가져오지 않습니다.
+    - 실제로 `author` 필드에 접근하는 순간 별도의 쿼리가 실행됩니다.
+    - 처음에는 빠르게 응답할 수 있으나, 접근 시점마다 추가 쿼리가 발생할 수 있어, 예측이 어렵다는 단점이 있습니다.
+
+- **`@DBRef(lazy = false)`**:
+  - Post 문서를 조회할 때, Author 문서도 **즉시 로딩**됩니다.
+  - 한 번에 여러 Post를 조회할 경우, 각 Post마다 Author를 조회하므로 **N+1 문제**가 발생할 수 있습니다.
+
+```kotlin
+@RestController
+@RequestMapping("/posts")
+class PostController(
+  private val postRepository: PostRepository,
+) {
+  @GetMapping("/find-lazy-true")
+  fun getPostsFindLazyTrue() = PostProjection(postRepository.findOne())
+
+  @GetMapping("/find-lazy-false")
+  fun getPostsFindLazyFalse() = postRepository.findOne()
+}
+
+data class PostProjection(
+  val title: String,
+  val content: String,
+) {
+  constructor(post: Post) : this(
+    title = post.title,
+    content = post.content,
+  )
+}
+
+data class PostProjectionLookup(
+    val title: String,
+    val content: String,
+    val author: AuthorProjection,
+) {
+  constructor(post: Post) : this(
+    title = post.title,
+    content = post.content,
+    author = AuthorProjection(post.author),
+  )
+}
+
+data class AuthorProjection(
+  val name: String,
+) {
+  constructor(author: Author) : this(
+    name = author.name,
+  )
+}
+```
+
+![](/images/m-mong-1.png)
+
+- `@DBRef(lazy = true)`로 설정한 경우, `PostProjection`을 사용하면 `author` 필드에 접근이 없어 추가 쿼리 안나감
+
+![](/images/m-mong-2.png)
+
+- `@DBRef(lazy = true)`로 설정한 경우, `PostProjectionLookup`을 사용하여 `author` 필드에 접근 시 추가 쿼리가 발생, N+1 문제 발견 가능성
+- 해당 객체를 `Post` 객체 그대로 사용 하는 경우 Json 으로 Serialize를 진행하기 떄문에 `author` 필드에 접근 하게 되고 추가 쿼리 발생, 이 처럼 추가 쿼리 발생에 대한 예상이 어려운 부분이 있음
+
+
+- @DBRef(lazy = true) 경우 `PostProjectionLookup`은 당연히 `author` 필드에 접근 시 추가 쿼리가 발생 하며  `PostProjection`을 사용 하여 `author` 필드에 접근이 없는 경우라도 쿼리가 발생하며, N+1 문제 발견 가능성
+
+![](/images/m-mong-3.png)
+
+![](/images/m-mong-4.png)
 
 ## 구조적 차이 요약
 

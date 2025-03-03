@@ -9,6 +9,16 @@ GET http://localhost:8080/posts/lookup
 ###
 
 #
+GET http://localhost:8080/posts/find-lazy-true
+
+###
+
+#
+GET http://localhost:8080/posts/find-lazy-false
+
+###
+
+#
 GET http://localhost:8080/posts/find
 
 ###

@@ -3,11 +3,18 @@ import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 
 plugins {
     id("org.springframework.boot") version "2.7.14"
+//    id("org.jetbrains.kotlin.plugin.spring") version "1.6.21"
     id("io.spring.dependency-management") version "1.0.15.RELEASE"
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.6.21"
     kotlin("kapt") version "1.6.21"
 }
+
+allOpen {
+    // Spring Data MongoDB에서 사용되는 @Document를 열어줌
+    annotation("org.springframework.data.mongodb.core.mapping.Document")
+}
+
 
 group = "com.example"
 version = "0.0.1-SNAPSHOT"

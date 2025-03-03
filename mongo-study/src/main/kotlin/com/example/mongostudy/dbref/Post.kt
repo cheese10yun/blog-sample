@@ -6,10 +6,12 @@ import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.aggregation.Aggregation
 import org.springframework.data.mongodb.core.findAll
+import org.springframework.data.mongodb.core.findOne
 import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 import org.springframework.data.mongodb.core.mapping.FieldType
+import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.repository.MongoRepository
 
 @Document(collection = "post")
@@ -36,6 +38,7 @@ interface PostRepository : MongoRepository<Post, ObjectId>, PostCustomRepository
 interface PostCustomRepository {
     fun findLookUp(): List<PostProjection>
     fun find(): List<Post>
+    fun findOne(): Post
 }
 
 class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomRepository, MongoCustomRepositorySupport<Post>(
@@ -45,6 +48,10 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 
     override fun find(): List<Post> {
         return mongoTemplate.findAll<Post>()
+    }
+
+    override fun findOne(): Post {
+        return mongoTemplate.findOne<Post>(Query())!!
     }
 
     override fun findLookUp(): List<PostProjection> {
