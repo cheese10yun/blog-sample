@@ -190,11 +190,11 @@ data class AuthorProjection(
 }
 ```
 
-![](/images/m-mong-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-1.png)
 
 - `@DBRef(lazy = true)`로 설정한 경우, `PostProjection`을 사용하면 `author` 필드에 접근이 없어 추가 쿼리 안나감
 
-![](/images/m-mong-2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-2.png)
 
 - `@DBRef(lazy = true)`로 설정한 경우, `PostProjectionLookup`을 사용하여 `author` 필드에 접근 시 추가 쿼리가 발생, N+1 문제 발견 가능성
 - 해당 객체를 `Post` 객체 그대로 사용 하는 경우 Json 으로 Serialize를 진행하기 떄문에 `author` 필드에 접근 하게 되고 추가 쿼리 발생, 이 처럼 추가 쿼리 발생에 대한 예상이 어려운 부분이 있음
@@ -202,9 +202,9 @@ data class AuthorProjection(
 
 - @DBRef(lazy = true) 경우 `PostProjectionLookup`은 당연히 `author` 필드에 접근 시 추가 쿼리가 발생 하며  `PostProjection`을 사용 하여 `author` 필드에 접근이 없는 경우라도 쿼리가 발생하며, N+1 문제 발견 가능성
 
-![](/images/m-mong-3.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-3.png)
 
-![](/images/m-mong-4.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-4.png)
 
 ## 구조적 차이 요약
 
