@@ -41,7 +41,7 @@ class Author(
 - `@DBRef(lazy = false)`는 Post를 조회할 때 Author를 즉시(eager) 로딩합니다.
 - `@Document(collection = "post")` / `@Document(collection = "author")`로 컬렉션을 지정했습니다.
 
-### DBRef 문서 구조
+### 문서 구조
 
 MongoDB에 저장된 **Post** 문서는 다음과 같은 형태를 갖습니다.
 
@@ -62,7 +62,7 @@ MongoDB에 저장된 **Post** 문서는 다음과 같은 형태를 갖습니다.
 - `"$ref"` 필드에 참조할 컬렉션 이름(`author`),
 - `"$id"` 필드에 참조 대상 문서의 `_id`를 저장합니다.
 
-### DBRef 업데이트 쿼리 예시
+### 업데이트 쿼리 예시
 
 DBRef 필드 값을 업데이트하려면, `$ref`와 `$id`를 지정해 줍니다.
 
@@ -83,9 +83,115 @@ db.post.update(
 - `"$ref"`: 참조할 컬렉션 이름(예: `"author"`)
 - `"$id"`: 새 Author의 ObjectId
 
+## Lazy 로딩 vs. Eager 로딩
+
+- **`@DBRef(lazy = true)`**
+  - Post 문서를 가져와도 `author` 필드는 즉시 조회되지 않습니다.
+  - 실제로 `author` 필드에 **접근**하는 순간, CGLIB 프록시가 동작해 별도의 쿼리를 실행합니다.
+  - 초기 응답은 빠를 수 있으나, **접근 시점마다 추가 쿼리**가 발생하여 예측이 어렵습니다.
+
+- **`@DBRef(lazy = false)`**
+  - Post 문서를 조회할 때, Author 문서도 **즉시 로딩**(eager loading)합니다.
+  - 여러 Post를 한 번에 가져오면, 각각의 Author를 자동으로 해제하므로 **N+1 문제**가 발생할 가능성이 높습니다.
+
+### 코드 예시
+
+아래 코드는 Spring MVC 컨트롤러에서 Post 하나를 조회한 뒤, Projection을 통해 응답을 내려주는 예시입니다.
+
+```kotlin
+@RestController
+@RequestMapping("/posts")
+class PostController(
+  private val postRepository: PostRepository,
+) {
+  @GetMapping("/post")
+  fun getPost() = PostProjection(postRepository.findOne())
+
+  @GetMapping("/post-with-author")
+  fun getPostWithAuthor() = PostProjectionLookup(postRepository.findOne())
+}
+
+data class PostProjection(
+  val title: String,
+  val content: String,
+) {
+  constructor(post: Post) : this(
+    title = post.title,
+    content = post.content,
+  )
+}
+
+data class PostProjectionLookup(
+  val title: String,
+  val content: String,
+  val author: AuthorProjection,
+) {
+  constructor(post: Post) : this(
+    title = post.title,
+    content = post.content,
+    author = AuthorProjection(post.author),
+  )
+}
+
+data class AuthorProjection(
+  val name: String,
+) {
+  constructor(author: Author) : this(
+    name = author.name,
+  )
+}
+```
+
+아래 코드는 두 개의 엔드포인트(`/post`, `/post-with-author`)를 통해 **서로 다른 Projection**을 사용해 Post 정보를 반환하는 예시입니다.
+
+- **`GET /posts/post`**
+  - `PostProjection`을 사용하며, `author` 필드를 전혀 참조하지 않습니다.
+  - `@DBRef(lazy = true)`일 때, `author`에 접근하지 않으므로 **추가 쿼리 없이** Post만 조회됩니다.
+  - `@DBRef(lazy = false)`일 경우, Eager 로딩이므로 `author` 필드 접근 여부와 무관하게 **항상 Author를 로딩**하는 쿼리가 발생합니다.
+
+- **`GET /posts/post-with-author`**
+  - `PostProjectionLookup`을 사용해 `author` 필드를 참조합니다.
+  - `@DBRef(lazy = true)`나 `@DBRef(lazy = false)` 모두, `author`를 사용하므로 **추가 쿼리가 발생**합니다. (단, Lazy 로딩은 필드 접근 시점에, Eager 로딩은 Post를 조회하는 시점에 쿼리가 실행)
+
+이처럼 Projection을 어떻게 구성하느냐에 따라, Lazy 로딩과 Eager 로딩이 **쿼리를 실행하는 시점**이 달라집니다. Lazy 로딩은 필드를 실제로 참조하기 전까지 쿼리가 없지만, 예상치 못한 시점에 쿼리가 발생할 수 있습니다. Eager 로딩은 Post를 가져올 때 Author까지 즉시 조회하여 N+1 문제가 쉽게 드러날 수 있다는 차이가 있습니다.
+
+### Eager 로딩
+
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-3.png)
+
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-4.png)
+
+### Lazy 로딩
+
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-1.png)
+
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-2.png)
+
+#### 프록시(CGLIB)로 인한 all-open 설정 (Kotlin)
+
+**`@DBRef(lazy = true)`**를 사용하면, Spring Data MongoDB가 **CGLIB 프록시**를 생성해 지연 로딩을 구현합니다. 하지만 Kotlin에서는 클래스가 기본적으로 `final`이라, 프록시 생성이 불가능할 수 있습니다. (예: `Cannot subclass final class ...` 오류)
+
+이를 해결하려면 **all-open** 또는 **kotlin-spring** 플러그인을 사용해, `@Document` 클래스들을 자동으로 `open` 처리해야 합니다.
+
+#### 예시: build.gradle.kts
+
+```kotlin
+plugins {
+  id("org.jetbrains.kotlin.plugin.spring") version "1.6.21"
+  // 또는 id("org.jetbrains.kotlin.plugin.allopen") ...
+}
+
+allOpen {
+  annotation("org.springframework.data.mongodb.core.mapping.Document")
+}
+```
+
+- `org.jetbrains.kotlin.plugin.spring`: Spring 관련 애노테이션(`@Component`, `@Configuration` 등)에 대해 자동으로 `open`을 적용해 줍니다.
+- `allOpen` 블록에서 **`@Document`** 애노테이션을 추가로 지정하면, MongoDB 엔티티 클래스가 **final**이 아닌 **open** 상태가 되어 CGLIB 프록시 생성이 가능합니다.
+
 ## ObjectId 직접 참조 방식
 
-### 예시 코드
+### 기본 예시 코드
 
 ```kotlin
 @Document(collection = "post")
@@ -118,7 +224,7 @@ MongoDB에 저장된 **Post** 문서는 다음과 같습니다:
 - `author_id`는 단순히 **ObjectId** 값을 담고 있습니다.
 - 어떤 컬렉션을 참조하는지 메타정보(`$ref`)는 없으므로, 애플리케이션 로직에서 `"authors"` 컬렉션을 참조해야 합니다.
 
-### ObjectId 업데이트 쿼리 예시
+### 업데이트 쿼리 예시
 
 ```javascript
 db.post.update(
@@ -133,78 +239,6 @@ db.post.update(
 
 - DBRef보다 쿼리가 단순합니다.
 - 인덱싱, 조회, `$lookup` 활용 등이 모두 ObjectId 필드 기준으로 이뤄집니다.
-
-### Lazy 로딩 vs. Eager 로딩
-
-
-- **`@DBRef(lazy = true)`**:
-    - Post 문서를 조회해도 `author` 필드는 아직 DB에서 가져오지 않습니다.
-    - 실제로 `author` 필드에 접근하는 순간 별도의 쿼리가 실행됩니다.
-    - 처음에는 빠르게 응답할 수 있으나, 접근 시점마다 추가 쿼리가 발생할 수 있어, 예측이 어렵다는 단점이 있습니다.
-
-- **`@DBRef(lazy = false)`**:
-  - Post 문서를 조회할 때, Author 문서도 **즉시 로딩**됩니다.
-  - 한 번에 여러 Post를 조회할 경우, 각 Post마다 Author를 조회하므로 **N+1 문제**가 발생할 수 있습니다.
-
-```kotlin
-@RestController
-@RequestMapping("/posts")
-class PostController(
-  private val postRepository: PostRepository,
-) {
-  @GetMapping("/find-lazy-true")
-  fun getPostsFindLazyTrue() = PostProjection(postRepository.findOne())
-
-  @GetMapping("/find-lazy-false")
-  fun getPostsFindLazyFalse() = postRepository.findOne()
-}
-
-data class PostProjection(
-  val title: String,
-  val content: String,
-) {
-  constructor(post: Post) : this(
-    title = post.title,
-    content = post.content,
-  )
-}
-
-data class PostProjectionLookup(
-    val title: String,
-    val content: String,
-    val author: AuthorProjection,
-) {
-  constructor(post: Post) : this(
-    title = post.title,
-    content = post.content,
-    author = AuthorProjection(post.author),
-  )
-}
-
-data class AuthorProjection(
-  val name: String,
-) {
-  constructor(author: Author) : this(
-    name = author.name,
-  )
-}
-```
-
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-1.png)
-
-- `@DBRef(lazy = true)`로 설정한 경우, `PostProjection`을 사용하면 `author` 필드에 접근이 없어 추가 쿼리 안나감
-
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-2.png)
-
-- `@DBRef(lazy = true)`로 설정한 경우, `PostProjectionLookup`을 사용하여 `author` 필드에 접근 시 추가 쿼리가 발생, N+1 문제 발견 가능성
-- 해당 객체를 `Post` 객체 그대로 사용 하는 경우 Json 으로 Serialize를 진행하기 떄문에 `author` 필드에 접근 하게 되고 추가 쿼리 발생, 이 처럼 추가 쿼리 발생에 대한 예상이 어려운 부분이 있음
-
-
-- @DBRef(lazy = true) 경우 `PostProjectionLookup`은 당연히 `author` 필드에 접근 시 추가 쿼리가 발생 하며  `PostProjection`을 사용 하여 `author` 필드에 접근이 없는 경우라도 쿼리가 발생하며, N+1 문제 발견 가능성
-
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-3.png)
-
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-4.png)
 
 ## 구조적 차이 요약
 

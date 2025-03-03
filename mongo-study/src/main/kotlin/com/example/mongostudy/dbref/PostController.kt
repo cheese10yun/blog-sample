@@ -23,11 +23,11 @@ class PostController(
     @GetMapping("/find")
     fun getPostsFind() = postRepository.find()
 
-    @GetMapping("/find-lazy-false")
-    fun getPostsFindLazyFalse() = PostProjectionLookup(postRepository.findOne())
+    @GetMapping("/post")
+    fun getPost() = PostProjection(postRepository.findOne())
 
-    @GetMapping("/find-lazy-true")
-    fun getPostsFindLazyTrue() = PostProjectionLookup(postRepository.findOne())
+    @GetMapping("/post-with-author")
+    fun getPostWithAuthor() = PostProjectionLookup(postRepository.findOne())
 
     @GetMapping("/insert")
     fun insert() {
