@@ -11,8 +11,6 @@ class PostTest(
 
     @Test
     fun `updateItems`() {
-
-
         (1..5).map {
             Post(
                 title = "title-$it",
