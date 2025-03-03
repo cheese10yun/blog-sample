@@ -21,7 +21,7 @@ class Post(
     @Field(name = "content", targetType = FieldType.STRING)
     val content: String,
 
-    @DBRef(lazy = false)
+    @DBRef(lazy = true)
     val author: Author,
 
 //    @Field(name = "author_id")
@@ -36,7 +36,7 @@ class Post(
 interface PostRepository : MongoRepository<Post, ObjectId>, PostCustomRepository
 
 interface PostCustomRepository {
-    fun findLookUp(): List<PostProjection>
+    fun findLookUp(): List<Post>
     fun find(): List<Post>
     fun findOne(): Post
 }
@@ -54,7 +54,7 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
         return mongoTemplate.findOne<Post>(Query())!!
     }
 
-    override fun findLookUp(): List<PostProjection> {
+    override fun findLookUp(): List<Post> {
         // 1) $lookup
         val lookupStage = Aggregation.lookup(
             "author",        // from: 실제 컬렉션 이름
@@ -69,8 +69,8 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
             .andInclude("title")
             .andInclude("content")
             .andInclude("author")
-//            .andInclude("updated_at")
-//            .andInclude("created_at")
+            .andInclude("updated_at")
+            .andInclude("created_at")
 
 //        val limit = Aggregation.limit(1000)
 
@@ -88,7 +88,7 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
         return mongoTemplate.aggregate(
             aggregation,
             Post.DOCUMENT_NAME,               // 컬렉션 이름
-            PostProjection::class.java
+            Post::class.java
         ).mappedResults
     }
 }
