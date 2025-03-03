@@ -3,7 +3,9 @@ package com.example.mongostudy.mongo
 import com.example.mongostudy.logger
 import com.mongodb.bulk.BulkWriteResult
 import com.mongodb.client.result.UpdateResult
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.bson.types.ObjectId
 import org.springframework.data.domain.PageImpl
@@ -41,8 +43,8 @@ abstract class MongoCustomRepositorySupport<T>(
         contentQuery: (Query) -> List<S>,
         countQuery: (Query) -> Long
     ) = runBlocking {
-        val content = async { contentQuery(Query().with(pageable)) }
-        val totalCount = async { countQuery(Query()) }
+        val content = async(Dispatchers.IO) { contentQuery(Query().with(pageable)) }
+        val totalCount = async(Dispatchers.IO) { countQuery(Query()) }
         PageImpl(content.await(), pageable, totalCount.await())
     }
 

@@ -5,6 +5,7 @@ import com.querydsl.core.types.Expression
 import com.querydsl.jpa.impl.JPAQuery
 import com.querydsl.jpa.impl.JPAQueryFactory
 import kotlin.properties.Delegates
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.springframework.data.domain.Page
@@ -45,8 +46,8 @@ abstract class QuerydslCustomRepositorySupport(domainClass: Class<*>) : Querydsl
         countQuery: Function<JPAQueryFactory, JPAQuery<Long>>
     ): Page<T> = runBlocking {
         val jpaContentQuery = contentQuery.apply(queryFactory)
-        val content = async { querydsl!!.applyPagination(pageable, jpaContentQuery).fetch() as List<T> }
-        val count = async { countQuery.apply(queryFactory).fetchFirst() }
+        val content = async(Dispatchers.IO) { querydsl!!.applyPagination(pageable, jpaContentQuery).fetch() as List<T> }
+        val count = async(Dispatchers.IO) { countQuery.apply(queryFactory).fetchFirst() }
 
         PageImpl(content.await(), pageable, count.await())
     }

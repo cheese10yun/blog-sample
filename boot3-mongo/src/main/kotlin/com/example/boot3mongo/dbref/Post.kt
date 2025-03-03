@@ -11,10 +11,10 @@ import org.springframework.data.mongodb.core.mapping.FieldType
 import org.springframework.data.mongodb.repository.MongoRepository
 
 @Document(collection = "post")
-data class Post(
-    @Field(name = "name", targetType = FieldType.STRING)
+class Post(
+    @Field(name = "title", targetType = FieldType.STRING)
     val title: String,
-    @Field(name = "name", targetType = FieldType.STRING)
+    @Field(name = "content", targetType = FieldType.STRING)
     val content: String,
 //    @DBRef(lazy = true)
     @DBRef(lazy = false)

@@ -15,8 +15,7 @@ data class Payment(
     @Column(name = "amount", nullable = false)
     var amount: BigDecimal
 
-) : EntityAuditing() {
-}
+) : EntityAuditing()
 
 @Service
 class PaymentService(

@@ -5,14 +5,26 @@ spring:
         mongodb:
             uri: mongodb://root:example@localhost:27017/mongo_study?authSource=admin
 
+
+    jpa:
+        database: mysql
+        generate-ddl: true
+        hibernate:
+            ddl-auto: create
+        show-sql: true
+    datasource:
+        url: jdbc:mysql://localhost:3366/jpa_study?useSSL=false&serverTimezone=UTC&autoReconnect=true&rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=false&maxQuerySizeToLog=100000
+        username: root
+        password:
+        driver-class-name: com.mysql.cj.jdbc.Driver
 logging:
     level:
         root: info
-        org.mongodb.driver: TRACE
-        org.mongodb.driver.connection: DEBUG
-        org.mongodb.driver.cluster: DEBUG
-        org.mongodb.driver.protocol.command: DEBUG
-        org.mongodb.driver.management: DEBUG
+#        org.mongodb.driver: TRACE
+#        org.mongodb.driver.connection: DEBUG
+#        org.mongodb.driver.cluster: DEBUG
+#        org.mongodb.driver.protocol.command: DEBUG
+#        org.mongodb.driver.management: DEBUG
         org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 #        com.example.mongostudy.mongo.MongoCustomRepositorySupport: DEBUG
 

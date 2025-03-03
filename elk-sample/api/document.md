@@ -7,3 +7,9 @@
 
 
 /Users/yun/yun/blog-sample/elk-sample/api/elastic-apm-agent-1.29.0.jar
+
+
+curl -L -O https://artifacts.elastic.co/downloads/downloads/beats/elastic-agent/elastic-agent-8.17.2-amd64.deb 
+sudo dpkg -i elastic-agent-8.17.2-amd64.deb 
+sudo systemctl enable elastic-agent 
+sudo systemctl start elastic-agent

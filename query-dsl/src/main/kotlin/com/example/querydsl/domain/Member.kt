@@ -13,7 +13,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "member")
-@Where(clause = "status = 'NORMAL'")
+//@Where(clause = "status = 'NORMAL'")
 data class Member(
     @Column(name = "username", nullable = false)
     var username: String,

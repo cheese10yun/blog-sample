@@ -2,6 +2,7 @@ package com.example.boot3mongo
 
 import com.mongodb.bulk.BulkWriteResult
 import com.mongodb.client.result.UpdateResult
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.bson.types.ObjectId
@@ -40,8 +41,8 @@ abstract class MongoCustomRepositorySupport<T>(
         contentQuery: (Query) -> List<S>,
         countQuery: (Query) -> Long
     ) = runBlocking {
-        val content = async { contentQuery(Query().with(pageable)) }
-        val totalCount = async { countQuery(Query()) }
+        val content = async(Dispatchers.IO) { contentQuery(Query().with(pageable)) }
+        val totalCount = async(Dispatchers.IO) { countQuery(Query()) }
         PageImpl(content.await(), pageable, totalCount.await())
     }
 
@@ -59,8 +60,8 @@ abstract class MongoCustomRepositorySupport<T>(
         }
 
         // Perform queries asynchronously
-        val contentDeferred = async { contentQuery(contentAggregation) }
-        val countDeferred = async { countQuery(countAggregation) }
+        val contentDeferred = async(Dispatchers.IO) { contentQuery(contentAggregation) }
+        val countDeferred = async(Dispatchers.IO) { countQuery(countAggregation) }
 
         val content = contentDeferred.await().mappedResults
         val totalCount = countDeferred.await().uniqueMappedResult?.count ?: 0L
