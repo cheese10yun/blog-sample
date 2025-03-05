@@ -9,17 +9,17 @@ import kotlinx.coroutines.runBlocking
 class AAA {
 
     @Test
-    fun `asdasdasd`() {
+    fun `동시성 테스트`() {
         runBlocking {
             println("Main 시작 - 실행 스레드: ${Thread.currentThread().name}")
 
             // async() 기본 컨텍스트 사용: runBlocking의 컨텍스트를 상속받으므로 같은 스레드(main)에서 실행됩니다.
-            val deferredDefault = async() {
+            val deferredDefault = async(Dispatchers.IO) {
                 contentQuery("Default")
             }
 
             // async(Dispatchers.IO): I/O 전용 스레드 풀에서 실행됩니다.
-            val deferredIO = async() {
+            val deferredIO = async(Dispatchers.IO) {
                 contentQuery("IO")
             }
 
