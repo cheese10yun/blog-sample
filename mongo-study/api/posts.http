@@ -1,5 +1,5 @@
 #
-GET http://localhost:8080/posts?page=1
+GET http://localhost:8080/posts?page=1000&size=100
 
 ###
 
@@ -26,4 +26,6 @@ GET http://localhost:8080/posts/find
 
 
 ###
+
+
 GET http://localhost:8080/posts/insert

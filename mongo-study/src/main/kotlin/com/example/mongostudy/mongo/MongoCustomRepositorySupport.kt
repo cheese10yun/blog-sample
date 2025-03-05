@@ -42,13 +42,13 @@ abstract class MongoCustomRepositorySupport<T>(
         contentQuery: (Query) -> List<S>,
         countQuery: (Query) -> Long
     ) = runBlocking {
-//        val content = async(Dispatchers.IO) { contentQuery(Query().with(pageable)) }
-//        val totalCount = async(Dispatchers.IO) { countQuery(Query()) }
-//        PageImpl(content.await(), pageable, totalCount.await())
+        val content = async(Dispatchers.IO) { contentQuery(Query().with(pageable)) }
+        val totalCount = async(Dispatchers.IO) { countQuery(Query()) }
+        PageImpl(content.await(), pageable, totalCount.await())
 
-        val content = contentQuery(Query().with(pageable))
-        val totalCount = countQuery(Query())
-        PageImpl(content, pageable, totalCount)
+//        val content = contentQuery(Query().with(pageable))
+//        val totalCount = countQuery(Query())
+//        PageImpl(content, pageable, totalCount)
     }
 
     protected fun <S> applyPaginationAggregation(
@@ -65,8 +65,8 @@ abstract class MongoCustomRepositorySupport<T>(
         }
 
         // Perform queries asynchronously
-        val contentDeferred = async { contentQuery(contentAggregation) }
-        val countDeferred = async { countQuery(countAggregation) }
+        val contentDeferred = async(Dispatchers.IO) { contentQuery(contentAggregation) }
+        val countDeferred = async(Dispatchers.IO) { countQuery(countAggregation) }
 
         val content = contentDeferred.await().mappedResults
         val totalCount = countDeferred.await().uniqueMappedResult?.count ?: 0L

@@ -1,6 +1,9 @@
 package com.example.mongostudy.dbref
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -13,9 +16,18 @@ class PostController(
 ) {
 
     @GetMapping
-    fun getPosts(): List<Post> {
-        return postRepository.findAll()
+    fun getPosts(
+        @PageableDefault pageable: Pageable
+    ): Page<Post> {
+        return postRepository.findAll(pageable)
     }
+
+//    @GetMapping
+//    fun getPosts(
+//        @PageableDefault pageable: Pageable
+//    ): Page<Post> {
+//        return postRepository.findAll(pageable)
+//    }
 
     @GetMapping("/lookup")
     fun getPostsLookUp() = postRepository.findLookUp()
