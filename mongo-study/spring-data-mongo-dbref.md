@@ -1,11 +1,20 @@
-# Spring Data MongoDB @DBRef vs. ObjectId 직접 참조
+# Spring Data MongoDB에서 N+1 문제 다루기: 성능 이슈와 최적화 전략
 
-MongoDB에서 **문서 간의 연관관계(relationship)를** 표현하는 방법에는 크게 두 가지가 있습니다.
+MongoDB에서 문서 간 연관관계를 처리할 때, **N+1 문제**가 발생할 수 있습니다. 이는 주로 **다대일(One-to-Many) 구조**에서, 한 번에 여러 문서를 조회한 뒤 각 문서마다 또 다른 문서를 개별 쿼리로 가져올 때 발생합니다. 예컨대, `Post` 문서 N개를 조회한 후, 각 `Post`마다 연관된 `Author` 문서를 별도 쿼리로 로딩한다면 **총 N+1개의 쿼리**가 실행되어 성능 저하가 발생하게 됩니다.
 
-1. **@DBRef**를 이용해 객체 간의 연관관계를 직접 맺는 방식
-2. **ObjectId**를 필드로 저장해, 필요 시 해당 ID를 기준으로 다른 문서를 조회하는 방식
+본 글에서는 아래와 같은 내용을 다룹니다.
 
-이 글에서는 Spring Data MongoDB 환경에서 두 방식의 장단점과, 실제 데이터 구조 및 업데이트 쿼리 차이를 살펴보겠습니다.
+1. **DBRef vs. ObjectId**
+    - MongoDB에서 연관관계를 표현하는 대표적인 두 방식(DBRef, ObjectId 직접 참조)과 그 차이점
+    - DBRef의 Lazy/Eager 로딩이 N+1 문제에 어떤 영향을 미치는지
+2. **N+1 문제 발생 원리**
+    - DBRef(Eager) 사용 시, 여러 문서를 한 번에 불러오면 각 문서마다 참조 문서를 추가 조회
+    - DBRef(Lazy) 사용 시, 참조 필드에 실제 접근하는 시점마다 쿼리가 발생하여 예측이 어려움
+3. **실제 성능 측정 결과**
+    - DBRef(Eager), DBRef(Lazy), `$lookup` 등을 비교한 벤치마크
+    - 대량의 문서를 조회할 때 어떤 방식이 유리한지, 실제 숫자로 확인
+
+이를 통해, Spring Data MongoDB 환경에서 **N+1 문제**를 어떻게 측정하고, 어떤 방식으로 최적화할 수 있는지 구체적인 예시와 함께 살펴보겠습니다. 이후 본문에서는 DBRef와 ObjectId 방식을 비교하고, 실제로 N+1 문제를 유발하는 시나리오와 성능 테스트 결과, 그리고 이를 개선하기 위한 다양한 방법들을 단계별로 소개합니다.
 
 ## DBRef vs. ObjectId: 왜, 어떻게 쓰는가?
 
@@ -68,15 +77,15 @@ DBRef 필드 값을 업데이트하려면, `$ref`와 `$id`를 지정해 줍니�
 
 ```javascript
 db.post.update(
-        {_id: ObjectId("post_id")},
-        {
-          $set: {
+    {_id: ObjectId("post_id")},
+    {
+        $set: {
             author: {
-              $ref: "author",
-              $id: ObjectId("new_author_id")
+                $ref: "author",
+                $id: ObjectId("new_author_id")
             }
-          }
         }
+    }
 )
 ```
 
@@ -86,13 +95,13 @@ db.post.update(
 ### Lazy 로딩 vs. Eager 로딩
 
 - **`@DBRef(lazy = true)`**
-  - Post 문서를 가져와도 `author` 필드는 즉시 조회되지 않습니다.
-  - 실제로 `author` 필드에 **접근**하는 순간, CGLIB 프록시가 동작해 별도의 쿼리를 실행합니다.
-  - 초기 응답은 빠를 수 있으나, **접근 시점마다 추가 쿼리**가 발생하여 예측이 어렵습니다.
+    - Post 문서를 가져와도 `author` 필드는 즉시 조회되지 않습니다.
+    - 실제로 `author` 필드에 **접근**하는 순간, CGLIB 프록시가 동작해 별도의 쿼리를 실행합니다.
+    - 초기 응답은 빠를 수 있으나, **접근 시점마다 추가 쿼리**가 발생하여 예측이 어렵습니다.
 
 - **`@DBRef(lazy = false)`**
-  - Post 문서를 조회할 때, Author 문서도 **즉시 로딩**(eager loading)합니다.
-  - 여러 Post를 한 번에 가져오면, 각각의 Author를 자동으로 해제하므로 **N+1 문제**가 발생할 가능성이 높습니다.
+    - Post 문서를 조회할 때, Author 문서도 **즉시 로딩**(eager loading)합니다.
+    - 여러 Post를 한 번에 가져오면, 각각의 Author를 자동으로 해제하므로 **N+1 문제**가 발생할 가능성이 높습니다.
 
 #### 코드 예시
 
@@ -102,43 +111,43 @@ db.post.update(
 @RestController
 @RequestMapping("/posts")
 class PostController(
-  private val postRepository: PostRepository,
+    private val postRepository: PostRepository,
 ) {
-  @GetMapping("/post")
-  fun getPost() = PostProjection(postRepository.findOne())
+    @GetMapping("/post")
+    fun getPost() = PostProjection(postRepository.findOne())
 
-  @GetMapping("/post-with-author")
-  fun getPostWithAuthor() = PostProjectionLookup(postRepository.findOne())
+    @GetMapping("/post-with-author")
+    fun getPostWithAuthor() = PostProjectionLookup(postRepository.findOne())
 }
 
 data class PostProjection(
-  val title: String,
-  val content: String,
+    val title: String,
+    val content: String,
 ) {
-  constructor(post: Post) : this(
-    title = post.title,
-    content = post.content,
-  )
+    constructor(post: Post) : this(
+        title = post.title,
+        content = post.content,
+    )
 }
 
 data class PostProjectionLookup(
-  val title: String,
-  val content: String,
-  val author: AuthorProjection,
+    val title: String,
+    val content: String,
+    val author: AuthorProjection,
 ) {
-  constructor(post: Post) : this(
-    title = post.title,
-    content = post.content,
-    author = AuthorProjection(post.author),
-  )
+    constructor(post: Post) : this(
+        title = post.title,
+        content = post.content,
+        author = AuthorProjection(post.author),
+    )
 }
 
 data class AuthorProjection(
-  val name: String,
+    val name: String,
 ) {
-  constructor(author: Author) : this(
-    name = author.name,
-  )
+    constructor(author: Author) : this(
+        name = author.name,
+    )
 }
 ```
 
@@ -166,12 +175,12 @@ data class AuthorProjection(
 
 ```kotlin
 plugins {
-  id("org.jetbrains.kotlin.plugin.spring") version "1.6.21"
-  // 또는 id("org.jetbrains.kotlin.plugin.allopen") ...
+    id("org.jetbrains.kotlin.plugin.spring") version "1.6.21"
+    // 또는 id("org.jetbrains.kotlin.plugin.allopen") ...
 }
 
 allOpen {
-  annotation("org.springframework.data.mongodb.core.mapping.Document")
+    annotation("org.springframework.data.mongodb.core.mapping.Document")
 }
 ```
 
@@ -180,19 +189,19 @@ allOpen {
 
 이처럼 Projection을 어떻게 구성하느냐에 따라, Lazy 로딩과 Eager 로딩이 **쿼리를 실행하는 시점**이 달라집니다. Lazy 로딩은 필드를 실제로 참조하기 전까지 쿼리가 없지만, 예상치 못한 시점에 쿼리가 발생할 수 있습니다. Eager 로딩은 Post를 가져올 때 Author까지 즉시 조회하여 N+1 문제가 쉽게 드러날 수 있다는 차이가 있습니다.
 
-## ObjectId 직접 참조 방식
+## ObjectId 참조 방식
 
 ### 기본 예시 코드
 
 ```kotlin
 @Document(collection = "post")
 class Post(
-  @Field(name = "title")
-  val title: String,
-  @Field(name = "content")
-  val content: String,
-  @Field(name = "author_id")
-  val authorId: ObjectId
+    @Field(name = "title")
+    val title: String,
+    @Field(name = "content")
+    val content: String,
+    @Field(name = "author_id")
+    val authorId: ObjectId
 )
 ```
 
@@ -219,12 +228,12 @@ MongoDB에 저장된 **Post** 문서는 다음과 같습니다:
 
 ```javascript
 db.post.update(
-        {_id: ObjectId("post_id")},
-        {
-          $set: {
+    {_id: ObjectId("post_id")},
+    {
+        $set: {
             author_id: ObjectId("new_author_id")
-          }
         }
+    }
 )
 ```
 
@@ -244,6 +253,14 @@ db.post.update(
 ## 성능 테스트 (Performance Test)
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-5.png)
+
+| rows  | LookUp | DBRef lazy false | DBRef lazy true(author 접근) | DBRef lazy true(author 미접근) |
+|-------|--------|:-----------------|:---------------------------|:----------------------------|
+| 1     | 9.2ms  | 9.6ms            | 9.3ms                      | 8.5ms                       |
+| 50    | 11.6ms | 69.7ms           | 69.4ms                     | 8.9ms                       |
+| 100   | 16.2ms | 130.1ms          | 133.5ms                    | 11.5ms                      |
+| 500   | 42.2ms | 574.2ms          | 575.9ms                    | 23.5ms                      |
+| 1,000 | 69.5ms | 1167.4ms         | 1178.3ms                   | 41.9ms                      |
 
 **테스트 시나리오**
 
