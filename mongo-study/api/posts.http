@@ -20,6 +20,20 @@ GET http://localhost:8080/posts/post-only?limit=1
 ###
 
 #
+GET http://localhost:8080/posts/post-only-one
+
+
+###
+
+#
+GET http://localhost:8080/posts/post-with-author-one
+
+###
+
+
+
+
+#
 GET http://localhost:8080/posts/find-lazy-true
 
 ###

@@ -2,12 +2,13 @@ spring:
     data:
         mongodb:
             uri: mongodb://root:example@localhost:27017/mongo_study?authSource=admin
+            field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
 
 
 logging:
     level:
         root: info
-#        org.mongodb.driver: TRACE
+        org.mongodb.driver: TRACE
 #        org.mongodb.driver.connection: DEBUG
 #        org.mongodb.driver.cluster: DEBUG
 #        org.mongodb.driver.protocol.command: DEBUG

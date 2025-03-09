@@ -15,7 +15,7 @@ class PostTest {
     @Test
     fun `performance lookup test`() {
         val responseTimes = mutableListOf<Long>()
-        val limit = 1000
+        val limit = 500
 
         for (i in 1..11) {
             val time = runBlocking {

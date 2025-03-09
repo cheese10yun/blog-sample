@@ -5,6 +5,8 @@ import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.mapping.Field
+import org.springframework.data.mongodb.core.mapping.FieldType
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -43,7 +45,10 @@ class PostController(
     @GetMapping("/post-only")
     fun getPostOnly(@RequestParam(name = "limit") limit: Int) = postRepository.find(limit).map { PostProjection(it) }
 
-    @GetMapping("/post")
+    @GetMapping("/post-only-one")
+    fun getPostOnlyOne() = postRepository.findOne()
+
+    @GetMapping("/post-with-author-one")
     fun getPost() = PostProjection(postRepository.findOne())
 
 //    @GetMapping("/post-with-author")
@@ -63,39 +68,55 @@ class PostController(
             }
     }
 
-    data class PostProjection(
-        val id: ObjectId,
-        val title: String,
-        val content: String,
-        val createdAt: LocalDateTime,
-        val updatedAt: LocalDateTime
-    ) {
-        constructor(post: Post) : this(
-            id = post.id!!,
-            title = post.title,
-            content = post.content,
-            createdAt = post.createdAt,
-            updatedAt = post.updatedAt,
-        )
-    }
 
-    data class AuthorProjection(
-        val name: String,
-    ) {
-        constructor(author: Author) : this(
-            name = author.name,
-        )
-    }
+}
 
-    data class PostProjectionLookup(
-        val title: String,
-        val content: String,
-        val author: AuthorProjection,
-    ) {
-        constructor(post: Post) : this(
-            title = post.title,
-            content = post.content,
-            author = AuthorProjection(post.author),
-        )
-    }
+data class PostProjection(
+    val id: ObjectId,
+    val title: String,
+    val content: String,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
+) {
+    constructor(post: Post) : this(
+        id = post.id!!,
+        title = post.title,
+        content = post.content,
+        createdAt = post.createdAt,
+        updatedAt = post.updatedAt,
+    )
+}
+
+data class AuthorProjection(
+    val id: ObjectId,
+    val name: String,
+//    val createdAt: LocalDateTime,
+//    val updatedAt: LocalDateTime
+) {
+    constructor(author: Author) : this(
+        id = author.id!!,
+        name = author.name,
+//        createdAt = author.createdAt,
+//        updatedAt = author.updatedAt,
+    )
+}
+
+data class PostProjectionLookup(
+    val id: ObjectId,
+    val title: String,
+    val content: String,
+    val author: AuthorProjection,
+//    @Field(name = "created_at")
+    val createdAt: LocalDateTime,
+//    @Field(name = "updated_at")
+    val updatedAt: LocalDateTime
+) {
+    constructor(post: Post) : this(
+        id = post.id!!,
+        title = post.title,
+        content = post.content,
+        author = AuthorProjection(post.author),
+        createdAt = post.createdAt,
+        updatedAt = post.updatedAt,
+    )
 }

@@ -113,22 +113,34 @@ db.post.update(
 class PostController(
     private val postRepository: PostRepository,
 ) {
-    @GetMapping("/post")
-    fun getPost() = PostProjection(postRepository.findOne())
+    @GetMapping("/lookup")
+    fun getPostsLookUp(
+        @RequestParam(name = "limit") limit: Int,
+    ) = postRepository.findLookUp(limit)
 
     @GetMapping("/post-with-author")
-    fun getPostWithAuthor() = PostProjectionLookup(postRepository.findOne())
+    fun getPostWithAuthor(@RequestParam(name = "limit") limit: Int) = postRepository.find(limit)
+
+    @GetMapping("/post-only")
+    fun getPostOnly(@RequestParam(name = "limit") limit: Int) = postRepository.find(limit).map { PostProjection(it) }
 }
 
 data class PostProjection(
+    val id: ObjectId,
     val title: String,
     val content: String,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
 ) {
     constructor(post: Post) : this(
+        id = post.id!!,
         title = post.title,
         content = post.content,
+        createdAt = post.createdAt,
+        updatedAt = post.updatedAt,
     )
 }
+
 
 data class PostProjectionLookup(
     val title: String,
@@ -167,7 +179,7 @@ data class AuthorProjection(
 
 ##### 프록시(CGLIB)로 인한 all-open 설정 (Kotlin)
 
-**`@DBRef(lazy = true)`**를 사용하면, Spring Data MongoDB가 **CGLIB 프록시**를 생성해 지연 로딩을 구현합니다. 하지만 Kotlin에서는 클래스가 기본적으로 `final`이라, 프록시 생성이 불가능할 수 있습니다. (예: `Cannot subclass final class ...` 오류)
+`@DBRef(lazy = true)`를 사용하면, Spring Data MongoDB가 **CGLIB 프록시**를 생성해 지연 로딩을 구현합니다. 하지만 Kotlin에서는 클래스가 기본적으로 `final`이라, 프록시 생성이 불가능할 수 있습니다. (예: `Cannot subclass final class ...` 오류)
 
 이를 해결하려면 **all-open** 또는 **kotlin-spring** 플러그인을 사용해, `@Document` 클래스들을 자동으로 `open` 처리해야 합니다.
 

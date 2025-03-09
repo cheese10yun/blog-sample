@@ -21,7 +21,7 @@ class Post(
     @Field(name = "content", targetType = FieldType.STRING)
     val content: String,
 
-    @DBRef(lazy = false)
+    @DBRef(lazy = true)
     val author: Author,
 
 //    @Field(name = "author_id")
@@ -36,7 +36,7 @@ class Post(
 interface PostRepository : MongoRepository<Post, ObjectId>, PostCustomRepository
 
 interface PostCustomRepository {
-    fun findLookUp(limit: Int): List<Post>
+    fun findLookUp(limit: Int): List<PostProjectionLookup>
     fun find(limit: Int): List<Post>
     fun findOne(): Post
 }
@@ -54,7 +54,7 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
         return mongoTemplate.findOne<Post>(Query())!!
     }
 
-    override fun findLookUp(limit: Int): List<Post> {
+    override fun findLookUp(limit: Int): List<PostProjectionLookup> {
         // 1) $lookup
         val lookupStage = Aggregation.lookup(
             "author",        // from: 실제 컬렉션 이름
@@ -79,35 +79,20 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 //            .cursorBatchSize(2000) // 여기서 batchSize를 지정
 //            .build()
 
-
         // 4) Limit 단계 추가 (예: 100개로 제한)
         val limitStage = Aggregation.limit(limit.toLong())
 
         // 3) Aggregation 파이프라인 구성
         val aggregation = Aggregation
             .newAggregation(lookupStage, unwindStage, projection, limitStage)
-
-//            .withOptions(options)
-
         // 4) post 컬렉션에서 PostWithAuthor 타입으로 매핑
         return mongoTemplate
             .aggregate(
                 aggregation,
                 Post.DOCUMENT_NAME,               // 컬렉션 이름
-                Post::class.java,
-
-                )
+                PostProjectionLookup::class.java,
+            )
             .mappedResults
 
     }
 }
-
-class PostProjection(
-    val title: String,
-    val content: String,
-    val author: Author
-)
-
-class AuthorProjection(
-    val name: String
-)
