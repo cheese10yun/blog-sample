@@ -83,7 +83,7 @@ db.post.update(
 - `"$ref"`: 참조할 컬렉션 이름(예: `"author"`)
 - `"$id"`: 새 Author의 ObjectId
 
-## Lazy 로딩 vs. Eager 로딩
+### Lazy 로딩 vs. Eager 로딩
 
 - **`@DBRef(lazy = true)`**
   - Post 문서를 가져와도 `author` 필드는 즉시 조회되지 않습니다.
@@ -94,7 +94,7 @@ db.post.update(
   - Post 문서를 조회할 때, Author 문서도 **즉시 로딩**(eager loading)합니다.
   - 여러 Post를 한 번에 가져오면, 각각의 Author를 자동으로 해제하므로 **N+1 문제**가 발생할 가능성이 높습니다.
 
-### 코드 예시
+#### 코드 예시
 
 아래 코드는 Spring MVC 컨트롤러에서 Post 하나를 조회한 뒤, Projection을 통해 응답을 내려주는 예시입니다.
 
@@ -144,25 +144,25 @@ data class AuthorProjection(
 
 위 코드에서 `Post` 클래스의 `@DBRef(lazy = true) val author: Author` 부분을 `lazy = false`로 바꾸어 보면서, `PostProjection`(author 필드 미참조)과 `PostProjectionLookup`(author 필드 참조)을 각각 호출해 보면, 실제 쿼리가 발생하는 시점과 방식이 어떻게 달라지는지를 확인할 수 있으며, 이를 통해 Lazy 로딩과 Eager 로딩의 차이점을 직관적으로 살펴볼 수 있습니다.
 
-### Eager 로딩, @DBRef(lazy = false)
+#### Eager 로딩, @DBRef(lazy = false)
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-3.png)
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-4.png)
 
-### Lazy 로딩, @DBRef(lazy = true)
+#### Lazy 로딩, @DBRef(lazy = true)
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-1.png)
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-2.png)
 
-#### 프록시(CGLIB)로 인한 all-open 설정 (Kotlin)
+##### 프록시(CGLIB)로 인한 all-open 설정 (Kotlin)
 
 **`@DBRef(lazy = true)`**를 사용하면, Spring Data MongoDB가 **CGLIB 프록시**를 생성해 지연 로딩을 구현합니다. 하지만 Kotlin에서는 클래스가 기본적으로 `final`이라, 프록시 생성이 불가능할 수 있습니다. (예: `Cannot subclass final class ...` 오류)
 
 이를 해결하려면 **all-open** 또는 **kotlin-spring** 플러그인을 사용해, `@Document` 클래스들을 자동으로 `open` 처리해야 합니다.
 
-#### 예시: build.gradle.kts
+##### 예시: build.gradle.kts
 
 ```kotlin
 plugins {
@@ -242,6 +242,8 @@ db.post.update(
 | **성능**        | Lazy/Eager 모두 자동 참조 해제 시 N+1 문제<br>대규모 환경 비효율 가능         | 필요 시 `$lookup` 또는 추가 쿼리로 조인<br>성능상 유연 |
 
 ## 성능 테스트 (Performance Test)
+
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-5.png)
 
 **테스트 시나리오**
 
