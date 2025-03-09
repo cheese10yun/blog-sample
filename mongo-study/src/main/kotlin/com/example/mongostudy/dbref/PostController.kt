@@ -5,8 +5,6 @@ import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.data.mongodb.core.mapping.Field
-import org.springframework.data.mongodb.core.mapping.FieldType
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
