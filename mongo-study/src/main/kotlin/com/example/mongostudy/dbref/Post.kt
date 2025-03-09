@@ -5,7 +5,7 @@ import com.example.mongostudy.mongo.MongoCustomRepositorySupport
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.aggregation.Aggregation
-import org.springframework.data.mongodb.core.findAll
+import org.springframework.data.mongodb.core.find
 import org.springframework.data.mongodb.core.findOne
 import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
@@ -21,7 +21,7 @@ class Post(
     @Field(name = "content", targetType = FieldType.STRING)
     val content: String,
 
-    @DBRef(lazy = true)
+    @DBRef(lazy = false)
     val author: Author,
 
 //    @Field(name = "author_id")
@@ -36,8 +36,8 @@ class Post(
 interface PostRepository : MongoRepository<Post, ObjectId>, PostCustomRepository
 
 interface PostCustomRepository {
-    fun findLookUp(): List<Post>
-    fun find(): List<Post>
+    fun findLookUp(limit: Int): List<Post>
+    fun find(limit: Int): List<Post>
     fun findOne(): Post
 }
 
@@ -46,15 +46,15 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
     mongoTemplate
 ) {
 
-    override fun find(): List<Post> {
-        return mongoTemplate.findAll<Post>()
+    override fun find(limit: Int): List<Post> {
+        return mongoTemplate.find(Query().limit(limit))
     }
 
     override fun findOne(): Post {
         return mongoTemplate.findOne<Post>(Query())!!
     }
 
-    override fun findLookUp(): List<Post> {
+    override fun findLookUp(limit: Int): List<Post> {
         // 1) $lookup
         val lookupStage = Aggregation.lookup(
             "author",        // from: 실제 컬렉션 이름
@@ -79,17 +79,26 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 //            .cursorBatchSize(2000) // 여기서 batchSize를 지정
 //            .build()
 
+
+        // 4) Limit 단계 추가 (예: 100개로 제한)
+        val limitStage = Aggregation.limit(limit.toLong())
+
         // 3) Aggregation 파이프라인 구성
         val aggregation = Aggregation
-            .newAggregation(lookupStage, unwindStage, projection)
+            .newAggregation(lookupStage, unwindStage, projection, limitStage)
+
 //            .withOptions(options)
 
         // 4) post 컬렉션에서 PostWithAuthor 타입으로 매핑
-        return mongoTemplate.aggregate(
-            aggregation,
-            Post.DOCUMENT_NAME,               // 컬렉션 이름
-            Post::class.java
-        ).mappedResults
+        return mongoTemplate
+            .aggregate(
+                aggregation,
+                Post.DOCUMENT_NAME,               // 컬렉션 이름
+                Post::class.java,
+
+                )
+            .mappedResults
+
     }
 }
 

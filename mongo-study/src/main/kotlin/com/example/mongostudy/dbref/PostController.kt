@@ -1,11 +1,14 @@
 package com.example.mongostudy.dbref
 
+import java.time.LocalDateTime
+import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -30,16 +33,21 @@ class PostController(
 //    }
 
     @GetMapping("/lookup")
-    fun getPostsLookUp() = postRepository.findLookUp()
+    fun getPostsLookUp(
+        @RequestParam(name = "limit") limit: Int,
+    ) = postRepository.findLookUp(limit)
 
-    @GetMapping("/find")
-    fun getPostsFind() = postRepository.find()
+    @GetMapping("/post-with-author")
+    fun getPostWithAuthor(@RequestParam(name = "limit") limit: Int) = postRepository.find(limit)
+
+    @GetMapping("/post-only")
+    fun getPostOnly(@RequestParam(name = "limit") limit: Int) = postRepository.find(limit).map { PostProjection(it) }
 
     @GetMapping("/post")
     fun getPost() = PostProjection(postRepository.findOne())
 
-    @GetMapping("/post-with-author")
-    fun getPostWithAuthor() = PostProjectionLookup(postRepository.findOne())
+//    @GetMapping("/post-with-author")
+//    fun getPostWithAuthor() = PostProjectionLookup(postRepository.findOne())
 
     @GetMapping("/insert")
     fun insert() {
@@ -56,12 +64,18 @@ class PostController(
     }
 
     data class PostProjection(
+        val id: ObjectId,
         val title: String,
         val content: String,
+        val createdAt: LocalDateTime,
+        val updatedAt: LocalDateTime
     ) {
         constructor(post: Post) : this(
+            id = post.id!!,
             title = post.title,
             content = post.content,
+            createdAt = post.createdAt,
+            updatedAt = post.updatedAt,
         )
     }
 

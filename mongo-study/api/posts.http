@@ -4,7 +4,18 @@ GET http://localhost:8080/posts?page=1000&size=100
 ###
 
 #
-GET http://localhost:8080/posts/lookup
+GET http://localhost:8080/posts/lookup?limit=1
+
+###
+
+#
+GET http://localhost:8080/posts/post-with-author?limit=1
+
+###
+
+
+#
+GET http://localhost:8080/posts/post-only?limit=1
 
 ###
 
@@ -29,3 +40,8 @@ GET http://localhost:8080/posts/find
 
 
 GET http://localhost:8080/posts/insert
+
+
+#asdasdaasd
+#asdasd
+#asdsa

@@ -59,6 +59,19 @@ dependencies {
 //    testImplementation("io.kotest:kotest-assertions-core:5.4.2")
 //    testImplementation("io.kotest:kotest-framework-engine:5.4.2")
 //    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test"))
+
+
+    implementation("io.ktor:ktor-client-core:2.2.4")
+    // 기본적으로 사용하는 클라이언트 엔진 (여기서는 CIO 엔진 예시)
+    implementation("io.ktor:ktor-client-cio:2.2.4")
+
+    // (선택 사항) JSON 직렬화 및 콘텐츠 협상 기능 사용 시
+    implementation("io.ktor:ktor-client-content-negotiation:2.2.4")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.4")
+
+    // (선택 사항) 디버깅이나 로깅을 위한 모듈
+    implementation("io.ktor:ktor-client-logging:2.2.4")
 }
 
 dependencyManagement {
