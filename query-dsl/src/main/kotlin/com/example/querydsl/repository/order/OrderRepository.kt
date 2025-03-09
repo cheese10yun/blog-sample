@@ -22,6 +22,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
+import kotlinx.coroutines.Dispatchers
 
 
 @Entity
@@ -46,8 +47,7 @@ interface OrderRepository : JpaRepository<Order, Long>, OrderCustomRepository
 interface OrderCustomRepository {
     fun find(pageable: Pageable): Page<Order>
     fun findPagingBy(pageable: Pageable, address: String): Page<Order>
-    fun findPaging1(pageable: Pageable, address: String): Page<Order>
-
+    fun findPaging1(pageable: Pageable): Page<Order>
     fun findSliceBy(pageable: Pageable, address: String): Slice<Order>
     fun findPaging2By(pageable: Pageable, address: String): Page<Order>
     fun findSliceBy2(pageable: Pageable, address: String): Slice<Order>
@@ -69,10 +69,7 @@ class OrderCustomRepositoryImpl : QuerydslCustomRepositorySupport(Order::class.j
     }
 
 
-    override fun findPaging1(
-        pageable: Pageable,
-        address: String
-    ): Page<Order> {
+    override fun findPaging1(pageable: Pageable): Page<Order> {
         return applyPagination(
             pageable = pageable,
             contentQuery = { selectFrom(order).where(order.userId.isNotNull) },
@@ -109,9 +106,10 @@ class OrderCustomRepositoryImpl : QuerydslCustomRepositorySupport(Order::class.j
 
     override fun findPaging3By(pageable: Pageable, address: String): Page<Order> = runBlocking {
         log.info("findPagingBy thread : ${Thread.currentThread()}")
-        val content: Deferred<List<Order>> = async {
+        val content: Deferred<List<Order>> = async(Dispatchers.IO) {
             log.info("content thread : ${Thread.currentThread()}")
-            delay(1_000)
+//            delay(1_000)
+            Thread.sleep(1_000)
             from(order)
                 .select(order)
                 .innerJoin(user).on(order.userId.eq(user.id))
@@ -121,9 +119,10 @@ class OrderCustomRepositoryImpl : QuerydslCustomRepositorySupport(Order::class.j
                     querydsl!!.applyPagination(pageable, this).fetch()
                 }
         }
-        val totalCount: Deferred<Long> = async {
+        val totalCount: Deferred<Long> = async(Dispatchers.IO) {
             log.info("count thread : ${Thread.currentThread()}")
-            delay(500)
+//            delay(500)
+            Thread.sleep(500)
             from(order)
                 .select(order.count())
                 .where(order.address.eq(address))

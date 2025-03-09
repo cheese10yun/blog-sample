@@ -16,7 +16,7 @@ internal class OrderCustomRepositoryImplTest(
 ) : SpringBootTestSupport() {
 
     @Test
-    fun `count 1,000ms, content 500ms delay test`() = runBlocking {
+    fun `count 1,000ms, content 500ms Thread sleep test`() = runBlocking {
         val time = measureTimeMillis {
             orderRepository.findPaging3By(
                 pageable = PageRequest.of(0, 10),

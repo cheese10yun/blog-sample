@@ -29,13 +29,13 @@ class OrderCustomRepositoryImpl : QuerydslRepositorySupport(Order::class.java), 
 
 ```sql
 select order0_.id           as id1_4_,
-    ...
-    order0_.address      as address4_4_,
-    order0_.created_at   as created_2_4_,
-    order0_.updated_at   as updated_3_4_,
+       ...
+       order0_.address      as address4_4_,
+       order0_.created_at   as created_2_4_,
+       order0_.updated_at   as updated_3_4_,
 from orders order0_
 where order0_.address = ?
-    limit ?, ?
+limit ?, ?
 
 select count(order0_.id) as col_0_0_
 from orders order0_
@@ -207,68 +207,101 @@ Count 쿼리가 1,000ms가 소요되고, 이후 Content 쿼리가 500ms 소요�
 
 Count 쿼리와 Content 쿼리를 병렬로 처리하면 Count 쿼리가 소요 시간이 더 길더라도 1,000ms에 작업을 완료할 수 있습니다. 병렬 처리를 코루틴을 활용하여 구현해 보겠습니다.
 
-#### 코루틴을 이용한 Count 쿼리와 Content 쿼리 병렬 처리
+### 코루틴을 이용한 Count 쿼리와 Content 쿼리 병렬 처리
+
+아래 코드는 `findPagingBy` 메서드 내에서 코루틴의 `async`를 사용하여 Content 조회 쿼리와 Count 쿼리를 동시에 실행하는 예제입니다.  
+이때, 병렬 처리를 위해 두 작업 모두 `Dispatchers.IO`를 사용하여 별도의 I/O 전용 스레드에서 실행됩니다.
 
 ```kotlin
-class OrderCustomRepositoryImpl : QuerydslRepositorySupport(Order::class.java), OrderCustomRepository {
-    override fun findPagingBy(pageable: Pageable, address: String): Page<Order> = runBlocking {
-        log.info("findPagingBy thread : ${Thread.currentThread()}")
-        val content: Deferred<List<Order>> = async {
-            log.info("content thread : ${Thread.currentThread()}")
-            from(order)
-                .select(order)
-                .innerJoin(user).on(order.userId.eq(user.id))
-                .leftJoin(coupon).on(order.couponId.eq(coupon.id))
-                .where(order.address.eq(address))
-                .run {
-                    querydsl.applyPagination(pageable, this).fetch()
-                }
-        }
-        val totalCount: Deferred<Long> = async {
-            log.info("count thread : ${Thread.currentThread()}")
-            from(order)
-                .select(order.count())
-                .where(order.address.eq(address))
-                .fetchFirst()
-        }
-
-        PageImpl(content.await(), pageable, totalCount.await())
+override fun findPagingBy(pageable: Pageable, address: String): Page<Order> = runBlocking {
+    log.info("findPagingBy thread : ${Thread.currentThread()}")
+    val content: Deferred<List<Order>> = async(Dispatchers.IO) {
+        log.info("content thread : ${Thread.currentThread()}")
+        from(order)
+            .select(order)
+            .innerJoin(user).on(order.userId.eq(user.id))
+            .leftJoin(coupon).on(order.couponId.eq(coupon.id))
+            .where(order.address.eq(address))
+            .run {
+                querydsl.applyPagination(pageable, this).fetch()
+            }
     }
+    val totalCount: Deferred<Long> = async(Dispatchers.IO) {
+        log.info("count thread : ${Thread.currentThread()}")
+        from(order)
+            .select(order.count())
+            .where(order.address.eq(address))
+            .fetchFirst()
+    }
+    PageImpl(content.await(), pageable, totalCount.await())
 }
 ```
-코루틴의 `async`와 `await`를 활용하여 Content 쿼리와 Count 쿼리를 병렬로 처리하였습니다. 이 과정에서 스레드 정보를 확인하기 위해 `Thread.currentThread()`를 사용하여 현재 스레드 정보를 출력합니다.
+
+#### 로그 예시 및 상세 설명
 
 ```
-INFO [nio-8080-exec-1] repository.order.OrderApi  : thread api : Thread[http-nio-8080-exec-1,5,main]
-INFO [-1 @coroutine#1] OrderCustomRepositoryImpl  : findPagingBy thread : Thread[http-nio-8080-exec-1 @coroutine#1,5,main]
-INFO [-1 @coroutine#2] OrderCustomRepositoryImpl  : content thread : Thread[http-nio-8080-exec-1 @coroutine#2,5,main]
-INFO [-1 @coroutine#3] OrderCustomRepositoryImpl  : count thread : Thread[http-nio-8080-exec-1 @coroutine#3,5,main]
+INFO [nio-8080-exec-2] OrderApi: thread api : Thread[http-nio-8080-exec-2,5,main]
+INFO [-2 @coroutine#4] OrderCustomRepositoryImpl: findPagingBy thread : Thread[http-nio-8080-exec-2 @coroutine#4,5,main]
+INFO [-1 @coroutine#5] OrderCustomRepositoryImpl: content thread : Thread[DefaultDispatcher-worker-1 @coroutine#5,5,main]
+INFO [-3 @coroutine#6] OrderCustomRepositoryImpl: count thread : Thread[DefaultDispatcher-worker-3 @coroutine#6,5,main]
 ```
 
-OrderApi의 `exec-1` 요청 스레드를 기준으로 `findPagingBy`, `content`, `count` 스레드가 동일한 스레드를 사용하는 것을 확인할 수 있습니다. 이것은 `@coroutine#` 주석에서 볼 수 있듯이 한 스레드 내에서 여러 코루틴을 실행할 수 있는 구조를 의미합니다.
+- **요청 스레드와 findPagingBy 스레드**
+    - **OrderApi**는 HTTP 요청을 처리하는 스레드인 `http-nio-8080-exec-2`에서 실행됩니다.
+    - `findPagingBy` 메서드 역시 요청 스레드(`http-nio-8080-exec-2`)에서 시작되어, 코루틴 생성 전 초기 처리를 수행합니다.
+
+- **content 쿼리와 count 쿼리 실행 스레드**
+    - 두 작업은 `async(Dispatchers.IO)`를 사용하여 실행되므로, 각각 별도의 I/O 전용 스레드(예: "DefaultDispatcher-worker-1"과 "DefaultDispatcher-worker-3")에서 병렬로 처리됩니다.
+
+#### JDBC 드라이버의 블로킹 방식과 병렬 처리
+
+이러한 병렬 처리 방식이 중요한 이유는 **JDBC 드라이버가 기본적으로 동기적이고 블로킹 방식으로 동작하기 때문입니다.**
+
+- **블로킹 I/O:**  
+  JDBC 드라이버는 쿼리 실행 시 호출한 스레드를 블로킹하여 결과를 기다립니다.  
+  만약 기본 async()를 사용하여 runBlocking의 컨텍스트(주로 HTTP 요청 스레드)에서 실행하면, 한 작업이 완료될 때까지 해당 스레드가 점유되어 순차적으로 작업이 진행됩니다.
+
+- **Dispatchers.IO의 역할:**  
+  async(Dispatchers.IO)를 사용하면, 블로킹 작업을 별도의 I/O 전용 스레드 풀에서 실행하게 됩니다.  
+  이로 인해 JDBC 드라이버의 블로킹 작업이 실행되더라도, 서로 다른 스레드에서 동시에 수행되어 전체 응답 시간을 단축하고 병렬성을 확보할 수 있습니다.
+
+즉, 요청 처리 스레드와 실제 데이터 조회 작업을 수행하는 스레드를 분리하여 병렬로 실행하는 방식은 JDBC 드라이버가 블로킹 방식으로 동작하기 때문에 필요한 대응책입니다.
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/query-dsl/docs/images/004.png)
 
 VM Option에 `-Dkotlinx.coroutines.debug`을 추가하면 실행 중인 코루틴이 어떤 스레드에서 실행되는지를 확인할 수 있습니다.
 
 
-#### 코루틴을 이용한 Count 쿼리와 Content 쿼리 병렬 처리 테스트
+### 코루틴을 이용한 Count 쿼리와 Content 쿼리 병렬 처리 테스트
 
-Count 쿼리에는 `delay(1_000)`을 지정하여 1초 동안 대기하고, Content 쿼리에는 `delay(500)`을 지정하여 0.5초 동안 대기하며 테스트를 진행합니다.
+아래 테스트 코드는 Count 쿼리와 Content 쿼리를 병렬 처리하는 방식의 성능을 검증합니다.  
+여기서 Count 쿼리는 1,000ms, Content 쿼리는 500ms의 지연을 발생시키도록 구현되어 있습니다.  
+두 작업이 병렬로 실행될 경우, 전체 소요 시간은 약 1,000ms 내외(오버헤드를 포함하여 약 1,037ms) 정도로 측정됩니다.
 
 ```kotlin
 @Test
-fun `count 1,000ms, content 500ms delay test`() = runBlocking {
-        val time = measureTimeMillis {
-            orderRepository.findPagingBy(
-                pageable = PageRequest.of(0, 10),
-                address = "address"
-            )
-        }
-        println("${time}ms") // 1,037ms
+fun `count 1,000ms, content 500ms Thread sleep test`() = runBlocking {
+    val time = measureTimeMillis {
+        orderRepository.findPaging3By(
+            pageable = PageRequest.of(0, 10),
+            address = "address"
+        )
     }
+    println("${time}ms") // 1037ms
+}
 ```
-소요 시간은 1,037ms으로 정상적으로 병렬 처리가 되는 것을 확인할 수 있습니다.
+
+위 테스트에서는 `findPaging3By` 메서드가 내부적으로 두 개의 블로킹 작업(Count 쿼리와 Content 쿼리)을 `async(Dispatchers.IO)`를 사용해 별도의 I/O 전용 스레드에서 병렬로 실행합니다.  
+이 방식은 JDBC 드라이버와 같이 기본적으로 동기적이고 블로킹 방식으로 동작하는 쿼리 실행을, 별도의 스레드에서 실행하여 전체 작업의 소요 시간을 단축시킵니다.
+
+- **병렬 처리 효과:**  
+  두 작업이 순차적으로 실행된다면 1,000ms + 500ms = 1,500ms가 소요되어야 하지만, 병렬 실행 덕분에 전체 소요 시간은 약 1,000ms 내외(실제 테스트 결과 1,037ms)로 줄어듭니다.
+
+- **블로킹 방식과 Dispatchers.IO:**  
+  JDBC 드라이버가 블로킹 방식으로 쿼리를 실행하기 때문에, 기본 컨텍스트(동일 스레드)에서 실행하면 한 작업이 완료될 때까지 다른 작업이 대기하게 됩니다.  
+  그러나 `Dispatchers.IO`를 사용하면 각 작업이 별도의 I/O 스레드에서 실행되어, 블로킹 작업이라도 동시에 진행될 수 있습니다.
+
+이 테스트 결과를 통해, 코루틴을 활용한 병렬 처리 기법이 JDBC와 같이 블로킹 I/O를 수행하는 환경에서도 효과적으로 동시성을 확보하여 전체 처리 시간을 줄일 수 있음을 확인할 수 있습니다.
 
 
 ## Support 객체를 통한 Querydsl 페이징 로직 개선
@@ -304,8 +337,8 @@ abstract class QuerydslCustomRepositorySupport(domainClass: Class<*>) : Querydsl
         countQuery: Function<JPAQueryFactory, JPAQuery<Long>>
     ): Page<T> = runBlocking {
         val jpaContentQuery = contentQuery.apply(queryFactory)
-        val content = async { querydsl!!.applyPagination(pageable, jpaContentQuery).fetch() as List<T> }
-        val count = async { countQuery.apply(queryFactory).fetchFirst() }
+        val content = async(Dispatchers.IO) { querydsl!!.applyPagination(pageable, jpaContentQuery).fetch() as List<T> }
+        val count = async(Dispatchers.IO) { countQuery.apply(queryFactory).fetchFirst() }
 
         PageImpl(content.await(), pageable, count.await())
     }
@@ -357,7 +390,7 @@ class OrderCustomRepositoryImpl : QuerydslCustomRepositorySupport(Order::class.j
         pageable: Pageable,
         address: String
     ): Page<Order> = runBlocking {
-        val content: Deferred<List<Order>> = async {
+        val content: Deferred<List<Order>> = async(Dispatchers.IO) {
             from(order)
                 .select(order)
                 .innerJoin(user).on(order.userId.eq(user.id))
@@ -367,7 +400,7 @@ class OrderCustomRepositoryImpl : QuerydslCustomRepositorySupport(Order::class.j
                     querydsl!!.applyPagination(pageable, this).fetch()
                 }
         }
-        val totalCount: Deferred<Long> = async {
+        val totalCount: Deferred<Long> = async(Dispatchers.IO) {
             from(order)
                 .select(order.count())
                 .where(order.address.eq(address))

@@ -21,12 +21,11 @@ class OrderApi(
     fun getOrder(
         @PageableDefault pageable: Pageable,
         @RequestParam(name = "address") address: String
-
     ): Page<Order> {
         log.info("thread api : ${Thread.currentThread()}")
-//        return orderRepository.findPaging1(pageable)
+        return orderRepository.findPaging3By(pageable, address)
 //        return orderRepository.findPaging2By(pageable, address)
-        return orderRepository.findPagingBy(pageable, address)
+//        return orderRepository.findPagingBy(pageable, address)
     }
 
     @GetMapping("/slice")
