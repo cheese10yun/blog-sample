@@ -262,18 +262,9 @@ db.post.update(
 | 500   | 42.2ms | 574.2ms          | 575.9ms                    | 23.5ms                      |
 | 1,000 | 69.5ms | 1167.4ms         | 1178.3ms                   | 41.9ms                      |
 
-**테스트 시나리오**
+아래 표는 각 **rows** 값(1, 50, 100, 500, 1,000)에 대해 **10번씩 호출**하여 **평균 응답 시간**을 측정한 결과입니다. **LookUp**은 MongoDB의 `\$lookup` 단계를 사용하여 **Post**와 **Author**를 한 번의 쿼리로 조인한 방식이며, **DBRef lazy false**는 `@DBRef(lazy = false)` 설정을 통해 Post 조회 시 즉시 Author 문서를 로딩합니다.
 
-- 예: 다량의 `Post` 문서를 조회하며 `Author` 정보도 함께 로딩하는 상황
-- 각각 DBRef(Lazy/Eager)와 ObjectId(별도 `$lookup` 또는 애플리케이션 레벨 조인) 방식으로 테스트
-  **테스트 환경/도구**
-- 예: Locust, JMeter, Gatling 등 부하 테스트 도구
-- 테스트 시 사용자 수, RPS, 타임라인 등 설정
-  **결과 분석**
-- DBRef(Eager) 시 N+1 문제 발생 여부, DBRef(Lazy) 시 지연 로딩 쿼리 횟수, ObjectId 직접 참조 시 `$lookup` 쿼리 한 번에 가져오는지
-- 응답 시간, CPU/메모리 사용량, MongoDB 쿼리 로그 등
-  **요약**
-- 어떤 방식이 트래픽이 많을 때 더 유리했는지, DBRef가 성능적으로 부담이 되지는 않았는지 결과 공유
+한편, **DBRef lazy true(author 접근)는** `@DBRef(lazy = true)` 상태에서 Author 필드에 실제 접근할 때마다 추가 쿼리가 실행되는 구조이고, **DBRef lazy true(author 미접근)는** 같은 `@DBRef(lazy = true)`지만 Author 필드를 전혀 사용하지 않아 추가 쿼리가 발생하지 않는 상황을 의미합니다.
 
 ## 결론
 

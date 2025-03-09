@@ -42,3 +42,5 @@ MongoDB에서 문서 간 연관관계를 처리할 때, **N+1 문제**가 발생
     - Slice, 병렬 처리 등으로 N+1을 완화하는 다양한 전략
 
 이를 통해, Spring Data MongoDB 환경에서 **N+1 문제**를 어떻게 측정하고, 어떤 방식으로 최적화할 수 있는지 구체적인 예시와 함께 살펴보겠습니다. 이후 본문에서는 DBRef와 ObjectId 방식을 비교하고, 실제로 N+1 문제를 유발하는 시나리오와 성능 테스트 결과, 그리고 이를 개선하기 위한 다양한 방법들을 단계별로 소개합니다.
+
+아래 표는 각 **rows** 값(1, 50, 100, 500, 1,000)에 대해 **10번씩 호출**하여 **평균 응답 시간**을 측정한 결과입니다. **LookUp**은 MongoDB의 `\$lookup` 단계를 사용하여 **Post**와 **Author**를 한 번의 쿼리로 조인한 방식이며, **DBRef lazy false**는 `@DBRef(lazy = false)` 설정을 통해 Post 조회 시 즉시 Author 문서를 로딩합니다. 한편, **DBRef lazy true(author 접근)는** `@DBRef(lazy = true)` 상태에서 Author 필드에 실제 접근할 때마다 추가 쿼리가 실행되는 구조이고, **DBRef lazy true(author 미접근)는** 같은 `@DBRef(lazy = true)`지만 Author 필드를 전혀 사용하지 않아 추가 쿼리가 발생하지 않는 상황을 의미합니다.
