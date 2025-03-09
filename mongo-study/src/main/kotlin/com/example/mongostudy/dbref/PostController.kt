@@ -67,8 +67,6 @@ class PostController(
                 mongoTemplate.insertAll(it)
             }
     }
-
-
 }
 
 data class PostProjection(
@@ -90,14 +88,14 @@ data class PostProjection(
 data class AuthorProjection(
     val id: ObjectId,
     val name: String,
-//    val createdAt: LocalDateTime,
-//    val updatedAt: LocalDateTime
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
 ) {
     constructor(author: Author) : this(
         id = author.id!!,
         name = author.name,
-//        createdAt = author.createdAt,
-//        updatedAt = author.updatedAt,
+        createdAt = author.createdAt,
+        updatedAt = author.updatedAt,
     )
 }
 
@@ -106,9 +104,7 @@ data class PostProjectionLookup(
     val title: String,
     val content: String,
     val author: AuthorProjection,
-//    @Field(name = "created_at")
     val createdAt: LocalDateTime,
-//    @Field(name = "updated_at")
     val updatedAt: LocalDateTime
 ) {
     constructor(post: Post) : this(

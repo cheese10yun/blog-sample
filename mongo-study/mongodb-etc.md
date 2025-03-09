@@ -21,3 +21,13 @@
   위 예시에서는 `items` 필드(배열)를 펼치면서, `null`이나 빈 배열인 경우에도 문서를 유지하며, 펼쳐진 배열 요소의 인덱스를 `itemIndex`라는 필드에 저장합니다.
 
 이처럼 **\$unwind** 스테이지는 배열 필드를 펼쳐서 여러 문서로 분할할 때 유용하며, 옵션을 통해 빈 배열/`null` 처리 방식과 인덱스 정보를 유연하게 관리할 수 있습니다.
+
+## field-naming-strategy
+
+```yaml
+spring:
+  data:
+    mongodb:
+      uri: mongodb://root:example@localhost:27017/mongo_study?authSource=admin
+      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
+```

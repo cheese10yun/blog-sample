@@ -141,26 +141,28 @@ data class PostProjection(
     )
 }
 
+data class AuthorProjection(
+    val id: ObjectId,
+    val name: String,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
+) {
+    constructor(author: Author) : this(
+        id = author.id!!,
+        name = author.name,
+        createdAt = author.createdAt,
+        updatedAt = author.updatedAt,
+    )
+}
 
 data class PostProjectionLookup(
+    val id: ObjectId,
     val title: String,
     val content: String,
     val author: AuthorProjection,
-) {
-    constructor(post: Post) : this(
-        title = post.title,
-        content = post.content,
-        author = AuthorProjection(post.author),
-    )
-}
-
-data class AuthorProjection(
-    val name: String,
-) {
-    constructor(author: Author) : this(
-        name = author.name,
-    )
-}
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
+)
 ```
 
 위 코드에서 `Post` 클래스의 `@DBRef(lazy = true) val author: Author` 부분을 `lazy = false`로 바꾸어 보면서, `PostProjection`(author 필드 미참조)과 `PostProjectionLookup`(author 필드 참조)을 각각 호출해 보면, 실제 쿼리가 발생하는 시점과 방식이 어떻게 달라지는지를 확인할 수 있으며, 이를 통해 Lazy 로딩과 Eager 로딩의 차이점을 직관적으로 살펴볼 수 있습니다.
