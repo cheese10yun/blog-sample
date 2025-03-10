@@ -47,8 +47,10 @@ class Author(
 ) : Auditable()
 ```
 
-- `@DBRef(lazy = false)`는 Post를 조회할 때 Author를 즉시(eager) 로딩합니다.
-- `@Document(collection = "post")` / `@Document(collection = "author")`로 컬렉션을 지정했습니다.
+**추가 설명:**
+
+- **`@DBRef` 애노테이션**은 MongoDB에서 다른 컬렉션의 문서를 참조할 때 사용됩니다. 위 예제에서는 `Post` 클래스에 포함된 `author` 필드가 **DBRef**로 선언되어, Post를 조회할 때 자동으로 관련 Author 문서를 로딩할 수 있습니다.
+- `lazy = false`로 설정하면, Post를 조회하는 순간 즉시 Author 문서를 함께 로딩합니다. 이는 코드 작성 시 편리하지만, 한 번에 많은 Post를 불러올 때 **N+1 문제**를 야기할 수 있습니다.
 
 ### 문서 구조
 
@@ -68,12 +70,14 @@ MongoDB에 저장된 **Post** 문서는 다음과 같은 형태를 갖습니다.
 }
 ```
 
-- `"$ref"` 필드에 참조할 컬렉션 이름(`author`),
-- `"$id"` 필드에 참조 대상 문서의 `_id`를 저장합니다.
+**추가 설명:**
+
+- `"$ref"` 필드에는 참조할 컬렉션의 이름(예: "author")이 명시되며, `"$id"`에는 실제 참조 대상 문서의 ID가 저장됩니다.
+- 이 구조는 DBRef가 참조 대상 컬렉션과 연결된 메타 정보를 포함한다는 점에서, 단순한 ObjectId 참조와 차별화됩니다.
 
 ### 업데이트 쿼리 예시
 
-DBRef 필드 값을 업데이트하려면, `$ref`와 `$id`를 지정해 줍니다.
+DBRef 필드 값을 업데이트하려면, `$ref`와 `$id`를 명시해야 합니다.
 
 ```javascript
 db.post.update(
@@ -89,8 +93,10 @@ db.post.update(
 )
 ```
 
-- `"$ref"`: 참조할 컬렉션 이름(예: `"author"`)
-- `"$id"`: 새 Author의 ObjectId
+**추가 설명:**
+
+- 이 쿼리는 특정 Post 문서의 `author` 필드를 업데이트합니다.
+- DBRef의 경우, 단순히 ObjectId만 변경하는 것이 아니라 참조 정보(`$ref` 값)까지 업데이트해야 하므로 쿼리가 조금 더 복잡해질 수 있습니다.
 
 ### 연관 객체 조회 쿼리 예시
 
@@ -105,16 +111,23 @@ db.author.find(
     .limit(1)
 ```
 
+**추가 설명:**
+
+- Post를 조회한 후, 별도의 쿼리로 Author 문서를 조회하는 과정을 보여줍니다.
+- 만약 Post 여러 건을 조회한다면 각 Post마다 별도의 Author 조회 쿼리가 발생하게 되어, N+1 문제의 원인이 됩니다.
+
 ### 연관 객체 조회 방법: Lazy 로딩 vs. Eager 로딩
 
 - **`@DBRef(lazy = true)`**
-    - Post 문서를 가져와도 `author` 필드는 즉시 조회되지 않습니다.
-    - 실제로 `author` 필드에 **접근**하는 순간, CGLIB 프록시가 동작해 별도의 쿼리를 실행합니다.
-    - 초기 응답은 빠를 수 있으나, **접근 시점마다 추가 쿼리**가 발생하여 예측이 어렵습니다.
+    - **Lazy 로딩**은 Post를 가져올 때 `author` 필드를 즉시 로딩하지 않습니다.
+    - 실제로 `author` 필드에 접근하는 시점에서 CGLIB 프록시가 동작하여, 별도의 쿼리가 실행됩니다.
+    - **장점:** 초기 Post 조회 시 불필요한 데이터를 로딩하지 않아 빠른 응답을 기대할 수 있음
+    - **단점:** 실제 필드 접근 시마다 추가 쿼리가 발생하여, 예상치 못한 시점에 성능 저하가 발생할 수 있음
 
 - **`@DBRef(lazy = false)`**
-    - Post 문서를 조회할 때, Author 문서도 **즉시 로딩**(eager loading)합니다.
-    - 여러 Post를 한 번에 가져오면, 각각의 Author를 자동으로 해제하므로 **N+1 문제**가 발생할 가능성이 높습니다.
+    - **Eager 로딩**은 Post를 조회할 때 Author 문서도 함께 즉시 로딩합니다.
+    - **장점:** 관련 데이터가 한 번의 작업으로 모두 로딩되어 후속 쿼리 발생이 없음
+    - **단점:** Post가 많을 경우, 각 Post마다 Author를 로딩하여 전체 쿼리 수가 많아질 수 있음 (즉, N+1 문제)
 
 #### 코드 예시
 
@@ -149,59 +162,43 @@ data class PostProjection(
         updatedAt = post.updatedAt,
     )
 }
-
-data class AuthorProjection(
-    val id: ObjectId,
-    val name: String,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
-) {
-    constructor(author: Author) : this(
-        id = author.id!!,
-        name = author.name,
-        createdAt = author.createdAt,
-        updatedAt = author.updatedAt,
-    )
-}
-
-interface PostCustomRepository {
-    fun find(limit: Int): List<Post>
-}
-
-class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomRepository, MongoCustomRepositorySupport<Post>(
-    Post::class.java,
-    mongoTemplate
-) {
-
-    override fun find(limit: Int): List<Post> {
-        return mongoTemplate.find(Query().limit(limit))
-    }
-}
 ```
 
-위 코드에서 `Post` 클래스의 `@DBRef(lazy = true) val author: Author` 부분을 `lazy = false`로 바꾸어 보면서, `PostProjection`(author 필드 미참조)과 `PostProjectionLookup`(author 필드 참조)을 각각 호출해 보면, 실제 쿼리가 발생하는 시점과 방식이 어떻게 달라지는지를 확인할 수 있으며, 이를 통해 Lazy 로딩과 Eager 로딩의 차이점을 직관적으로 살펴볼 수 있습니다.
+**추가 설명:**
+
+- **Projection 패턴**을 활용하여, 응답 시 실제 Author 정보는 사용하지 않고 Post의 핵심 데이터만 반환하는 경우와, 필요한 경우 Author 정보를 포함하는 방식(추후 PostProjectionLookup 등)으로 나누어 처리할 수 있습니다.
+- 이를 통해 실제로 `author` 필드에 접근하는 경우와 접근하지 않는 경우의 쿼리 발생 차이를 쉽게 비교할 수 있습니다.
 
 #### Eager 로딩, @DBRef(lazy = false)
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-3.png)
 
+**이미지 설명:**
+
+- 해당 이미지는 Eager 로딩 방식으로 Post를 조회할 때, Author 문서까지 함께 로딩되는 쿼리 흐름을 보여줍니다.
+- 쿼리 로그 상에서 Post와 Author에 대해 별도의 쿼리가 발생하는 것을 확인할 수 있으며, 여러 Post 조회 시 N+1 문제가 명확하게 드러납니다.
+
 #### Lazy 로딩, @DBRef(lazy = true)
 
-##### post-with-author
+##### author lazy로 접근
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-1.png)
 
-##### post-only
+**이미지 설명:**
+
+- 이 이미지는 Lazy 로딩 방식에서 Post 조회 후, Author 필드에 접근할 때 발생하는 추가 쿼리를 보여줍니다.
+- Post를 먼저 조회한 후, 실제 Author 정보가 필요한 순간에 별도의 쿼리가 실행되는 과정을 확인할 수 있습니다.
+
+##### author lazy로 미접근
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-2.png)
 
+**이미지 설명:**
+
+- 이 이미지는 Post 조회 시 Author 필드에 접근하지 않았을 때의 쿼리 실행 로그를 나타냅니다.
+- Lazy 로딩 덕분에 불필요한 Author 조회 쿼리가 발생하지 않아, 훨씬 짧은 응답 시간을 기록하는 것을 확인할 수 있습니다.
+
 ##### 프록시(CGLIB)로 인한 all-open 설정 (Kotlin)
-
-`@DBRef(lazy = true)`를 사용하면, Spring Data MongoDB가 **CGLIB 프록시**를 생성해 지연 로딩을 구현합니다. 하지만 Kotlin에서는 클래스가 기본적으로 `final`이라, 프록시 생성이 불가능할 수 있습니다. (예: `Cannot subclass final class ...` 오류)
-
-이를 해결하려면 **all-open** 또는 **kotlin-spring** 플러그인을 사용해, `@Document` 클래스들을 자동으로 `open` 처리해야 합니다.
-
-##### 예시: build.gradle.kts
 
 ```kotlin
 plugins {
@@ -214,10 +211,11 @@ allOpen {
 }
 ```
 
-- `org.jetbrains.kotlin.plugin.spring`: Spring 관련 애노테이션(`@Component`, `@Configuration` 등)에 대해 자동으로 `open`을 적용해 줍니다.
-- `allOpen` 블록에서 **`@Document`** 애노테이션을 추가로 지정하면, MongoDB 엔티티 클래스가 **final**이 아닌 **open** 상태가 되어 CGLIB 프록시 생성이 가능합니다.
+**추가 설명:**
 
-이처럼 Projection을 어떻게 구성하느냐에 따라, Lazy 로딩과 Eager 로딩이 **쿼리를 실행하는 시점**이 달라집니다. Lazy 로딩은 필드를 실제로 참조하기 전까지 쿼리가 없지만, 예상치 못한 시점에 쿼리가 발생할 수 있습니다. Eager 로딩은 Post를 가져올 때 Author까지 즉시 조회하여 N+1 문제가 쉽게 드러날 수 있다는 차이가 있습니다.
+- Kotlin은 기본적으로 클래스가 `final`로 선언되기 때문에, Lazy 로딩을 위한 **CGLIB 프록시 생성**이 어렵습니다.
+- 위와 같이 `all-open` 또는 `kotlin-spring` 플러그인을 적용하면, `@Document` 애노테이션이 붙은 클래스들이 자동으로 `open` 처리되어 프록시 생성을 원활하게 할 수 있습니다.
+- 이 설정은 Lazy 로딩을 사용할 때 반드시 고려해야 할 중요한 부분입니다.
 
 ## ObjectId 참조 방식
 
@@ -235,12 +233,12 @@ class Post(
 )
 ```
 
-- `authorId` 필드에 **ObjectId**만 저장합니다.
-- 필요한 경우, 별도의 쿼리나 `$lookup` Aggregation을 통해 Author 문서를 가져올 수 있습니다.
+**추가 설명:**
+
+- 여기서는 단순히 **ObjectId**만 저장하여, Post와 Author 간의 연관관계를 직접 관리합니다.
+- DBRef 방식에 비해 구조가 단순하여, 컬렉션 이름 등의 메타 정보를 관리할 필요 없이 빠르게 조회할 수 있는 장점이 있습니다.
 
 ### 문서 구조
-
-MongoDB에 저장된 **Post** 문서는 다음과 같습니다:
 
 ```json
 {
@@ -251,8 +249,10 @@ MongoDB에 저장된 **Post** 문서는 다음과 같습니다:
 }
 ```
 
-- `author_id`는 단순히 **ObjectId** 값을 담고 있습니다.
-- 어떤 컬렉션을 참조하는지 메타정보(`$ref`)는 없으므로, 애플리케이션 로직에서 `"authors"` 컬렉션을 참조해야 합니다.
+**추가 설명:**
+
+- `author_id` 필드에는 단순히 참조할 Author 문서의 ObjectId 값만 저장됩니다.
+- 이후 애플리케이션 로직이나 `$lookup`을 활용하여 Author 컬렉션과 조인할 수 있습니다.
 
 ### 업데이트 쿼리 예시
 
@@ -267,8 +267,10 @@ db.post.update(
 )
 ```
 
-- DBRef보다 쿼리가 단순합니다.
-- 인덱싱, 조회, `$lookup` 활용 등이 모두 ObjectId 필드 기준으로 이뤄집니다.
+**추가 설명:**
+
+- 업데이트 쿼리가 단순하여, 복잡한 메타 정보를 처리할 필요 없이 ObjectId 값만 변경하면 됩니다.
+- 이로 인해 쿼리의 복잡성이 낮아지고 인덱스 활용도 더 직관적으로 관리할 수 있습니다.
 
 ### 연관 객체 조회 쿼리 예시
 
@@ -305,9 +307,14 @@ db.post.aggregate(
 )
 ```
 
+**추가 설명:**
+
+- `$lookup`을 사용하여 Post와 Author 컬렉션을 조인하는 예제입니다.
+- 이 방식은 단일 Aggregation 파이프라인으로 모든 연관 데이터를 한 번에 가져올 수 있으므로, N+1 문제를 효과적으로 회피할 수 있습니다.
+
 ### 연관 객체 조회 방법: lookup
 
-````kotlin
+```kotlin
 @RestController
 @RequestMapping("/posts")
 class PostController(
@@ -360,7 +367,12 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
             .mappedResults
     }
 }
-````
+```
+
+**추가 설명:**
+
+- 이 코드는 `$lookup`을 통해 Post와 Author 데이터를 조인하여, 단일 Aggregation 쿼리로 필요한 데이터를 한 번에 조회하는 예시입니다.
+- 특히, 대량의 데이터를 조회할 때 DBRef 방식에서 발생하는 N+1 문제를 해결하는 데 유리합니다.
 
 ## 구조적 차이 요약
 
@@ -376,6 +388,11 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-5.png)
 
+**이미지 설명:**
+
+- 위 이미지는 여러 조회 조건(행 수: 1, 50, 100, 500, 1,000, 5,000)에 대해 각각의 방법(Lookup, DBRef lazy false, DBRef lazy true (author 접근/미접근))의 평균 응답 시간을 시각적으로 비교한 벤치마크 결과를 나타냅니다.
+- 특히, DBRef를 사용한 경우 Author 문서의 로딩 방식에 따라 응답 시간이 크게 차이가 나는 것을 확인할 수 있으며, ObjectId 직접 참조 시 `$lookup` 방식이 훨씬 낮은 응답 시간을 보여줍니다.
+
 | rows  | LookUp  | DBRef lazy false | DBRef lazy true(author 접근) | DBRef lazy true(author 미접근) |
 |-------|---------|:-----------------|:---------------------------|:----------------------------|
 | 1     | 9.2ms   | 9.6ms            | 9.3ms                      | 8.5ms                       |
@@ -385,20 +402,20 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 | 1,000 | 69.5ms  | 1167.4ms         | 1178.3ms                   | 41.9ms                      |
 | 5,000 | 257.2ms | 6043.1ms         | 6181.5ms                   | 129.6ms                     |
 
-아래 표는 각 **rows** 값(1, 50, 100, 500, 1,000)에 대해 **10번씩 호출**하여 **평균 응답 시간**을 측정한 결과입니다. **LookUp**은 MongoDB의 `\$lookup` 단계를 사용하여 **Post**와 **Author**를 한 번의 쿼리로 조인한 방식이며, **DBRef lazy false**는 `@DBRef(lazy = false)` 설정을 통해 Post 조회 시 즉시 Author 문서를 로딩합니다.
+**추가 설명:**
 
-한편, **DBRef lazy true(author 접근)는** `@DBRef(lazy = true)` 상태에서 Author 필드에 실제 접근할 때마다 추가 쿼리가 실행되는 구조이고, **DBRef lazy true(author 미접근)는** 같은 `@DBRef(lazy = true)`지만 Author 필드를 전혀 사용하지 않아 추가 쿼리가 발생하지 않는 상황을 의미합니다.
+- 위 표는 각 방식별로 조회한 행 수가 증가할 때 응답 시간이 어떻게 변화하는지를 보여줍니다.
+- 특히, DBRef의 eager/lazy 방식에서는 Author 접근 여부에 따라 성능 차이가 극명하게 나타나며, DBRef lazy true 상태에서 Author 필드를 접근하지 않으면 거의 ObjectId 방식과 유사한 성능을 기록합니다.
+- 이 데이터를 통해, 대량의 데이터 조회 시에는 **ObjectId 직접 참조** 혹은 `$lookup` 방식을 고려하는 것이 바람직함을 알 수 있습니다.
 
 ## 결론
 
 - **DBRef**
-    - **장점**: 참조 컬렉션/DB 정보가 명시적으로 포함되며, Spring Data MongoDB에서 자동으로 객체를 가져오기 편리
-    - **단점**: Lazy/Eager 모두 대규모 조회 시 N+1 문제, 스키마 변경 시 `$ref` 수정 필요
+    - **장점:** 참조 컬렉션/DB 정보가 명시적으로 포함되어 있어, Spring Data MongoDB에서 객체를 자동으로 로딩할 때 편리합니다.
+    - **단점:** Eager/Lazy 방식 모두 대규모 조회 시 N+1 문제를 유발할 가능성이 있으며, 스키마 변경 시 `$ref` 정보를 함께 수정해야 하는 단점이 있습니다.
 
 - **ObjectId 직접 참조**
-    - **장점**: 구조가 단순, 인덱싱과 쿼리가 직관적, `$lookup` 등으로 성능 최적화 가능
-    - **단점**: 참조할 컬렉션 정보를 로직에서 관리해야 하며, 객체 변환에 추가 코드 필요
+    - **장점:** 구조가 단순하여 쿼리 작성과 인덱스 설정이 직관적이며, 필요 시 `$lookup`을 통해 한 번의 쿼리로 조인이 가능하여 성능 최적화에 유리합니다.
+    - **단점:** 참조 대상 컬렉션 정보를 애플리케이션 로직에서 별도로 관리해야 하며, 객체 변환을 위해 추가적인 코드가 필요할 수 있습니다.
 
-**요약하자면**, 소규모 프로젝트나 간단한 PoC라면 DBRef가 편리할 수 있지만, 대규모 트래픽이나 복잡한 조회가 필요한 환경에서는 **ObjectId 직접 참조**가 더 유연하고 성능상 유리할 수 있습니다. 필요 시 `$lookup`을 통해 한 번에 조인하거나, **N+1 문제**를 방지하기 위해 애플리케이션 레벨에서 적절히 쿼리를 조합하면 됩니다.
-
-실제 운영 환경에서는 **테스트(위 섹션 5 참고)**를 통해, 어떤 방식이 요구사항에 부합하는지 확인해보시길 권장합니다.
+**요약하자면**, 소규모 프로젝트나 간단한 PoC에서는 DBRef가 편리할 수 있지만, 대규모 트래픽이나 복잡한 조회가 필요한 환경에서는 **ObjectId 직접 참조** 방식이 더 유연하고 성능상 이점을 가질 수 있습니다. 또한, `$lookup`을 통한 한 번의 조인 처리로 N+1 문제를 효과적으로 회피할 수 있으므로, 실제 운영 환경에서는 사전에 충분한 벤치마크와 테스트를 통해 요구사항에 부합하는 방식을 선택하는 것이 중요합니다.
