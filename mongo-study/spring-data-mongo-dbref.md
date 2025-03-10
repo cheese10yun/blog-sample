@@ -376,7 +376,7 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 - 이 코드는 `$lookup`을 통해 Post와 Author 데이터를 조인하여, 단일 Aggregation 쿼리로 필요한 데이터를 한 번에 조회하는 예시입니다.
 - 특히, 대량의 데이터를 조회할 때 DBRef 방식에서 발생하는 N+1 문제를 해결하는 데 유리합니다.
 
-#### 코드 예시
+#### lookup 응답
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-4.png)
 
