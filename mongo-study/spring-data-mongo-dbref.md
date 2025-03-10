@@ -185,11 +185,13 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-3.png)
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-4.png)
-
 #### Lazy 로딩, @DBRef(lazy = true)
 
+##### post-with-author
+
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-1.png)
+
+##### post-only
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-2.png)
 
@@ -374,13 +376,14 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-5.png)
 
-| rows  | LookUp | DBRef lazy false | DBRef lazy true(author 접근) | DBRef lazy true(author 미접근) |
-|-------|--------|:-----------------|:---------------------------|:----------------------------|
-| 1     | 9.2ms  | 9.6ms            | 9.3ms                      | 8.5ms                       |
-| 50    | 11.6ms | 69.7ms           | 69.4ms                     | 8.9ms                       |
-| 100   | 16.2ms | 130.1ms          | 133.5ms                    | 11.5ms                      |
-| 500   | 42.2ms | 574.2ms          | 575.9ms                    | 23.5ms                      |
-| 1,000 | 69.5ms | 1167.4ms         | 1178.3ms                   | 41.9ms                      |
+| rows  | LookUp  | DBRef lazy false | DBRef lazy true(author 접근) | DBRef lazy true(author 미접근) |
+|-------|---------|:-----------------|:---------------------------|:----------------------------|
+| 1     | 9.2ms   | 9.6ms            | 9.3ms                      | 8.5ms                       |
+| 50    | 11.6ms  | 69.7ms           | 69.4ms                     | 8.9ms                       |
+| 100   | 16.2ms  | 130.1ms          | 133.5ms                    | 11.5ms                      |
+| 500   | 42.2ms  | 574.2ms          | 575.9ms                    | 23.5ms                      |
+| 1,000 | 69.5ms  | 1167.4ms         | 1178.3ms                   | 41.9ms                      |
+| 5,000 | 257.2ms | 6043.1ms         | 6181.5ms                   | 129.6ms                     |
 
 아래 표는 각 **rows** 값(1, 50, 100, 500, 1,000)에 대해 **10번씩 호출**하여 **평균 응답 시간**을 측정한 결과입니다. **LookUp**은 MongoDB의 `\$lookup` 단계를 사용하여 **Post**와 **Author**를 한 번의 쿼리로 조인한 방식이며, **DBRef lazy false**는 `@DBRef(lazy = false)` 설정을 통해 Post 조회 시 즉시 Author 문서를 로딩합니다.
 

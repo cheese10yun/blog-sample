@@ -51,8 +51,8 @@ class PostController(
 //    fun getPostWithAuthor() = PostProjectionLookup(postRepository.findOne())
 
     @GetMapping("/insert")
-    fun insert() {
-        (1..1000).map {
+    fun insert(@RequestParam(name = "limit") limit: Int) {
+        (1..limit).map {
             Post(
                 title = "title-$it",
                 content = "content-$it",

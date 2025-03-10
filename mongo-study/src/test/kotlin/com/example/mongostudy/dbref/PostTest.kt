@@ -15,7 +15,7 @@ class PostTest {
     @Test
     fun `performance lookup test`() {
         val responseTimes = mutableListOf<Long>()
-        val limit = 500
+        val limit = 5000
 
         for (i in 1..11) {
             val time = runBlocking {
@@ -42,7 +42,7 @@ class PostTest {
     @Test
     fun `performance post-with-author test`() {
         val responseTimes = mutableListOf<Long>()
-        val limit = 1_000
+        val limit = 5000
 
         for (i in 1..11) {
             val time = runBlocking {
@@ -69,7 +69,7 @@ class PostTest {
     @Test
     fun `performance post-only test`() {
         val responseTimes = mutableListOf<Long>()
-        val limit = 1000
+        val limit = 5000
 
         for (i in 1..11) {
             val time = runBlocking {

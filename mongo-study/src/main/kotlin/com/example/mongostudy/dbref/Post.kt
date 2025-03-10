@@ -21,7 +21,7 @@ class Post(
     @Field(name = "content", targetType = FieldType.STRING)
     val content: String,
 
-    @DBRef(lazy = false)
+    @DBRef(lazy = true)
     val author: Author,
 
 //    @Field(name = "author_id")

@@ -9,13 +9,13 @@ GET http://localhost:8080/posts/lookup?limit=1
 ###
 
 #
-GET http://localhost:8080/posts/post-with-author?limit=1
+GET http://localhost:8080/posts/post-with-author?limit=1000
 
 ###
 
 
 #
-GET http://localhost:8080/posts/post-only?limit=1
+GET http://localhost:8080/posts/post-only?limit=1000
 
 ###
 
@@ -49,11 +49,9 @@ GET http://localhost:8080/posts/find
 ###
 
 
-
 ###
 
-
-GET http://localhost:8080/posts/insert
+GET http://localhost:8080/posts/insert?limit=4000
 
 
 #asdasdaasd
