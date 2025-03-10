@@ -1,9 +1,12 @@
+
+
 spring:
     application:
         name: boot3-mongo
     data:
         mongodb:
             uri: mongodb://root:example@localhost:27017/mongo_study?authSource=admin
+            field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
 
 
     jpa:
@@ -36,3 +39,6 @@ management:
         web:
             exposure:
                 include: "*"
+server:
+    shutdown: graceful
+

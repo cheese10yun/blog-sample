@@ -92,7 +92,20 @@ db.post.update(
 - `"$ref"`: 참조할 컬렉션 이름(예: `"author"`)
 - `"$id"`: 새 Author의 ObjectId
 
-### Lazy 로딩 vs. Eager 로딩
+### 연관 객체 조회 쿼리 예시
+
+```JavaScript
+db.post.find().limit(1)
+
+db.author.find(
+    {
+        _id: ObjectId("67cd82c3aec68267745dcf85")
+    }
+)
+    .limit(1)
+```
+
+### 연관 객체 조회 방법: Lazy 로딩 vs. Eager 로딩
 
 - **`@DBRef(lazy = true)`**
     - Post 문서를 가져와도 `author` 필드는 즉시 조회되지 않습니다.
@@ -113,10 +126,6 @@ db.post.update(
 class PostController(
     private val postRepository: PostRepository,
 ) {
-    @GetMapping("/lookup")
-    fun getPostsLookUp(
-        @RequestParam(name = "limit") limit: Int,
-    ) = postRepository.findLookUp(limit)
 
     @GetMapping("/post-with-author")
     fun getPostWithAuthor(@RequestParam(name = "limit") limit: Int) = postRepository.find(limit)
@@ -155,14 +164,19 @@ data class AuthorProjection(
     )
 }
 
-data class PostProjectionLookup(
-    val id: ObjectId,
-    val title: String,
-    val content: String,
-    val author: AuthorProjection,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
-)
+interface PostCustomRepository {
+    fun find(limit: Int): List<Post>
+}
+
+class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomRepository, MongoCustomRepositorySupport<Post>(
+    Post::class.java,
+    mongoTemplate
+) {
+
+    override fun find(limit: Int): List<Post> {
+        return mongoTemplate.find(Query().limit(limit))
+    }
+}
 ```
 
 위 코드에서 `Post` 클래스의 `@DBRef(lazy = true) val author: Author` 부분을 `lazy = false`로 바꾸어 보면서, `PostProjection`(author 필드 미참조)과 `PostProjectionLookup`(author 필드 참조)을 각각 호출해 보면, 실제 쿼리가 발생하는 시점과 방식이 어떻게 달라지는지를 확인할 수 있으며, 이를 통해 Lazy 로딩과 Eager 로딩의 차이점을 직관적으로 살펴볼 수 있습니다.
@@ -253,6 +267,98 @@ db.post.update(
 
 - DBRef보다 쿼리가 단순합니다.
 - 인덱싱, 조회, `$lookup` 활용 등이 모두 ObjectId 필드 기준으로 이뤄집니다.
+
+### 연관 객체 조회 쿼리 예시
+
+```javascript
+db.post.aggregate(
+    [
+        {
+            "$lookup": {
+                "from": "author",
+                "localField": "author.$id",
+                "foreignField": "_id",
+                "as": "author"
+            }
+        },
+        {
+            "$unwind": {
+                "path": "$author",
+                "preserveNullAndEmptyArrays": true
+            }
+        },
+        {
+            "$project": {
+                "title": 1.0,
+                "content": 1.0,
+                "author": 1.0,
+                "updated_at": 1.0,
+                "created_at": 1.0
+            }
+        },
+        {
+            "$limit": 500.0
+        }
+    ]
+)
+```
+
+### 연관 객체 조회 방법: lookup
+
+````kotlin
+@RestController
+@RequestMapping("/posts")
+class PostController(
+    private val postRepository: PostRepository
+) {
+    @GetMapping("/lookup")
+    fun getPostsLookUp(@RequestParam(name = "limit") limit: Int) = postRepository.findLookUp(limit)
+}
+
+data class PostProjectionLookup(
+    val id: ObjectId,
+    val title: String,
+    val content: String,
+    val author: AuthorProjection,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
+)
+
+interface PostCustomRepository {
+    fun find(limit: Int): List<Post>
+}
+
+class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomRepository, MongoCustomRepositorySupport<Post>(
+    Post::class.java,
+    mongoTemplate
+) {
+
+    override fun findLookUp(limit: Int): List<PostProjectionLookup> {
+        val lookupStage = Aggregation.lookup(
+            "author",        // from: 실제 컬렉션 이름
+            "author.\$id",    // localField: DBRef에서 _id가 들어있는 위치
+            "_id",            // foreignField: authors 컬렉션의 _id
+            "author"       // as: 결과를 저장할 필드 이름
+        )
+        val unwindStage = Aggregation.unwind("author", true)
+        val projection = Aggregation.project()
+            .andInclude("title")
+            .andInclude("content")
+            .andInclude("author")
+            .andInclude("updated_at")
+            .andInclude("created_at")
+        val limitStage = Aggregation.limit(limit.toLong())
+        val aggregation = Aggregation.newAggregation(lookupStage, unwindStage, projection, limitStage)
+        return mongoTemplate
+            .aggregate(
+                aggregation,
+                Post.DOCUMENT_NAME,               // 컬렉션 이름
+                PostProjectionLookup::class.java,
+            )
+            .mappedResults
+    }
+}
+````
 
 ## 구조적 차이 요약
 

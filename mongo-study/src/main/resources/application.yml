@@ -8,12 +8,12 @@ spring:
 logging:
     level:
         root: info
-        org.mongodb.driver: TRACE
+        #        org.mongodb.driver: TRACE
 #        org.mongodb.driver.connection: DEBUG
 #        org.mongodb.driver.cluster: DEBUG
-#        org.mongodb.driver.protocol.command: DEBUG
+        org.mongodb.driver.protocol.command: DEBUG
 #        org.mongodb.driver.management: DEBUG
-        org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+#        org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 #        com.example.mongostudy.mongo.MongoCustomRepositorySupport: DEBUG
 
 management:
