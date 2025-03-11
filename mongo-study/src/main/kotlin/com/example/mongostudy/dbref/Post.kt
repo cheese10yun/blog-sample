@@ -36,7 +36,7 @@ class Post(
 interface PostRepository : MongoRepository<Post, ObjectId>, PostCustomRepository
 
 interface PostCustomRepository {
-    fun findLookUp(limit: Int): List<PostProjectionLookup>
+    fun findLookUp(limit: Int): List<Post>
     fun find(limit: Int): List<Post>
     fun findOne(): Post
 }
@@ -54,45 +54,29 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
         return mongoTemplate.findOne<Post>(Query())!!
     }
 
-    override fun findLookUp(limit: Int): List<PostProjectionLookup> {
-        // 1) $lookup
+    override fun findLookUp(limit: Int): List<Post> {
         val lookupStage = Aggregation.lookup(
             "author",        // from: 실제 컬렉션 이름
             "author.\$id",    // localField: DBRef에서 _id가 들어있는 위치
             "_id",            // foreignField: authors 컬렉션의 _id
             "author"       // as: 결과를 저장할 필드 이름
         )
-        // 2) $unwind (optional) - authorDoc을 배열 -> 단일 문서로 변환
         val unwindStage = Aggregation.unwind("author", true)
-
         val projection = Aggregation.project()
             .andInclude("title")
             .andInclude("content")
             .andInclude("author")
             .andInclude("updated_at")
             .andInclude("created_at")
-
-//        val limit = Aggregation.limit(1000)
-
-        // 4) AggregationOptions로 batchSize 설정
-//        val options = Aggregation.newAggregationOptions()
-//            .cursorBatchSize(2000) // 여기서 batchSize를 지정
-//            .build()
-
-        // 4) Limit 단계 추가 (예: 100개로 제한)
         val limitStage = Aggregation.limit(limit.toLong())
-
-        // 3) Aggregation 파이프라인 구성
         val aggregation = Aggregation
             .newAggregation(lookupStage, unwindStage, projection, limitStage)
-        // 4) post 컬렉션에서 PostWithAuthor 타입으로 매핑
         return mongoTemplate
             .aggregate(
                 aggregation,
-                Post.DOCUMENT_NAME,               // 컬렉션 이름
-                PostProjectionLookup::class.java,
+                Post.DOCUMENT_NAME,
+                Post::class.java,
             )
             .mappedResults
-
     }
 }

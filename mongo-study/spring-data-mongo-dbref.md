@@ -75,7 +75,7 @@ db.post.update(
 ```javascript
 db.post.find().limit(500)
 
-// limit 번만큼 조회
+// limit 만큼 반복
 db.author.find(
     {
         _id: ObjectId("67cd82c3aec68267745dcf85")
@@ -84,7 +84,7 @@ db.author.find(
     .limit(1)
 ```
 
-Post를 조회한 후 별도의 쿼리로 Author 문서를 조회하는 과정입니다. 만약 여러 개의 Post를 조회할 경우, 각 Post마다 Author 조회 쿼리가 발생하여 N+1 문제가 발생합니다.
+위 예시는 Post를 조회한 후, 별도의 쿼리로 Author 문서를 조회하는 과정을 보여줍니다. 만약 500개의 Post를 조회한다면, **각 Post마다 Author 조회 쿼리가 실행되어 총 500번의 db.author.find 쿼리가 발생하게 됩니다.** 이처럼 Post 조회 결과의 수(limit 값)에 따라 반복적으로 Author 조회 쿼리가 실행되면 **N+1 문제가 발생**하여 성능 저하를 초래할 수 있습니다.
 
 ### 연관 객체 조회 방법: Lazy 로딩 vs. Eager 로딩
 
@@ -267,7 +267,7 @@ data class PostProjectionLookup(
 )
 
 interface PostCustomRepository {
-    fun find(limit: Int): List<Post>
+    fun findLookUp(limit: Int): List<PostProjectionLookup>
 }
 
 class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomRepository, MongoCustomRepositorySupport<Post>(
@@ -320,11 +320,13 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 | **스키마 변경 영향** | 컬렉션 이름 변경 시 DBRef의 `$ref` 정보도 함께 수정해야 함                   | 컬렉션명 변경과 무관하며 로직에서만 참조 해결 가능함             |
 | **성능**        | Lazy/Eager 모두 자동 참조 해제 시 N+1 문제가 발생할 수 있어 대규모 환경에서는 비효율적임 | 필요 시 `$lookup` 또는 추가 쿼리로 조인하여 성능 최적화가 용이함 |
 
-## 성능 테스트 (Performance Test)
+## 성능 테스트
 
-아래 이미지는 여러 조회 조건(행 수: 1, 50, 100, 500, 1,000, 5,000)에 대해 각 방식(Lookup, DBRef lazy false, DBRef lazy true(author 접근/미접근))의 평균 응답 시간을 시각적으로 비교한 벤치마크 결과를 나타냅니다. 이 결과를 보면 DBRef 방식은 Author 문서의 로딩 방식에 따라 응답 시간이 크게 달라지며, DBRef lazy true 상태에서 실제 Author 필드에 접근하지 않을 경우 ObjectId 직접 참조 방식과 유사한 성능을 기록함을 알 수 있습니다.
+아래 이미지는 여러 조회 조건에 대해 평균 응답 시간을 시각적으로 비교한 벤치마크 결과를 보여줍니다. 각 조회 조건마다 10번씩 테스트한 후 그 평균값을 사용하여 성능을 측정했습니다. 결과에서는 MongoDB의 lookup 방식을 사용한 경우, DBRef를 이용하여 즉시 로딩한 경우, 그리고 DBRef의 lazy 로딩을 적용한 경우 중 실제로 author 필드에 접근한 경우와 접근하지 않은 경우의 성능 차이를 비교하고 있습니다.
 
-| rows  | LookUp  | DBRef lazy false | DBRef lazy true(author 접근) | DBRef lazy true(author 미접근) |
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-5.png)
+
+| rows  | Lookup  | DBRef lazy false | DBRef lazy true(author 접근) | DBRef lazy true(author 미접근) |
 |-------|---------|------------------|----------------------------|-----------------------------|
 | 1     | 9.2ms   | 9.6ms            | 9.3ms                      | 8.5ms                       |
 | 50    | 11.6ms  | 69.7ms           | 69.4ms                     | 8.9ms                       |
@@ -333,10 +335,71 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 | 1,000 | 69.5ms  | 1167.4ms         | 1178.3ms                   | 41.9ms                      |
 | 5,000 | 257.2ms | 6043.1ms         | 6181.5ms                   | 129.6ms                     |
 
-이 벤치마크 데이터를 통해 대량 데이터를 조회할 때는 ObjectId 직접 참조 방식 또는 `$lookup` 방식을 고려하는 것이 바람직함을 확인할 수 있습니다.
+성능 테스트 결과를 요약하면, 단일 문서 조회에서는 모든 방식이 거의 동일한 응답 속도를 보입니다.
+
+하지만 조회 대상 문서 수가 늘어나면 각 방식 간의 성능 차이가 더욱 뚜렷하게 나타납니다. 예를 들어, DBRef를 lazy로 설정하고 author 필드에 접근하지 않는 경우는 Post 도큐먼트에 대한 단순 find 쿼리만 실행되므로 가장 빠른 응답 속도를 기록합니다.
+
+반면, DBRef 방식에서 실제로 author 필드에 접근하면, 각 Post마다 추가 쿼리가 실행되어 N+1 문제가 발생합니다.
+
+또한, Lookup 방식은 aggregate 파이프라인을 통한 조인으로 데이터를 한 번에 가져올 수 있어 N+1 문제를 회피할 수 있습니다. 다만, 단순 find 쿼리에 비해 무겁고, 대량 조회 시 응답 속도가 다소 느려지는 단점이 있습니다.
+
+특히, 1,000건을 조회할 때 약 1,000ms 정도의 응답 속도는 너무 느려 실제 서비스에 적용하기 어려울 수 있기 때문에 Lookup 방식이 가장 현실적인 대안으로 평가될 수 있습니다.
+
+## Lookup 방식의 리턴 타입 문제와 개선 방안
+
+기존 구현에서는 Lookup 결과의 리턴 타입을 `PostProjectionLookup`과 같이 별도의 Projection 객체로 지정했습니다. 이 방식은 원래의 `Post` 도큐먼트에 정의된 메서드를 그대로 사용할 수 없다는 단점이 있습니다. 이 문제를 해결하기 위해 리턴 타입을 `Post` 객체로 지정할 수 있습니다.
+
+```kotlin
+class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomRepository, MongoCustomRepositorySupport<Post>(
+    Post::class.java,
+    mongoTemplate
+) {
+    override fun findLookUp(limit: Int): List<Post> {
+        val lookupStage = Aggregation.lookup(
+            "author",        // from: 실제 컬렉션 이름
+            "author.\$id",   // localField: DBRef에서 _id가 들어있는 위치
+            "_id",           // foreignField: authors 컬렉션의 _id
+            "author"         // as: 결과를 저장할 필드 이름
+        )
+        val unwindStage = Aggregation.unwind("author", true)
+        val projection = Aggregation.project()
+            .andInclude("title")
+            .andInclude("content")
+            .andInclude("author")
+            .andInclude("updated_at")
+            .andInclude("created_at")
+        val limitStage = Aggregation.limit(limit.toLong())
+        val aggregation = Aggregation.newAggregation(lookupStage, unwindStage, projection, limitStage)
+        return mongoTemplate
+            .aggregate(
+                aggregation,
+                Post.DOCUMENT_NAME,  // 컬렉션 이름
+                Post::class.java     // 리턴 타입을 Post 객체로 지정
+            )
+            .mappedResults
+    }
+}
+```
+
+매번 Projection 객체를 새로 생성하는 방식은 번거로울 뿐만 아니라, `Post` 도큐먼트에 정의된 도메인 로직을 활용할 수 없게 만듭니다. 또한, 상속을 통해 메서드를 재사용하는 방법도 재사용을 위해 억지로 상속을 적용하는 것이므로 최적의 해결책이라고 보기 어렵습니다. 가장 좋은 방법은 aggregate 결과를 바로 `Post` 객체로 리턴하는 것입니다. 이렇게 하면 도메인 로직을 그대로 유지하면서 Lookup 방식의 장점도 함께 활용할 수 있습니다.
+
+**중요한 것은 포인트는 `Post` 클래스 내에서 author 필드를 다음과 같이 lazy로 설정하는 점입니다.**
+
+```kotlin
+@Document(collection = "post")
+class Post(
+    ...
+    @DBRef(lazy = true
+)
+
+val author: Author,
+) : Auditable()
+```
+
+이렇게 하면 일반적인 find 조회에서는 author에 접근하기 전까지 추가 쿼리가 발생하지 않아 N+1 문제를 회피할 수 있고, 필요할 때는 Lookup을 통해 author 정보도 함께 조회할 수 있습니다.
+
+단, lazy로 설정되어 있기 때문에 find 쿼리 이후 author 객체에 접근하면 추가적인 N+1 문제가 발생할 수 있으므로, 이 방식은 N+1 문제를 원천적으로 해결하는 방법은 아니며 **잠재적인 N+1 문제가 남아 있다는 점을 유념해야 합니다.**
 
 ## 결론
 
-DBRef 방식은 참조 컬렉션과 DB 정보를 명시적으로 포함하여 객체를 자동으로 로딩하는 데 편리하지만, Eager와 Lazy 방식 모두 대규모 조회 시 N+1 문제를 유발할 수 있으며, 스키마 변경 시 `$ref` 정보도 함께 수정해야 하는 단점이 있습니다. 반면, ObjectId 직접 참조 방식은 구조가 단순해 쿼리 작성과 인덱스 설정이 직관적이며, 필요할 경우 `$lookup`을 통해 한 번의 쿼리로 연관 데이터를 조인할 수 있어 성능 최적화에 유리합니다. 소규모 프로젝트나 간단한 PoC에서는 DBRef 방식이 편리할 수 있지만, 대규모 트래픽이나 복잡한 조회가 필요한 환경에서는 ObjectId 직접 참조와 `$lookup` 방식을 통한 접근이 더욱 유연하고 효율적일 수 있습니다.
-
-이처럼 각 방식의 특징과 벤치마크 결과를 충분히 검토한 후, 실제 운영 환경에 적합한 최적의 방법을 선택하는 것이 중요합니다.
+??

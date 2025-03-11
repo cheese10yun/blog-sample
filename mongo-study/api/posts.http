@@ -9,7 +9,7 @@ GET http://localhost:8080/posts/lookup?limit=1000
 ###
 
 #
-GET http://localhost:8080/posts/post-with-author?limit=1000
+GET http://localhost:8080/posts/post-with-author?limit=1
 
 ###
 
