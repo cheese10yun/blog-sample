@@ -1,23 +1,63 @@
-#### Kotlin에서 Lazy 로딩을 위한 프록시 구성 방법
+### $lookup 기반 연관 객체 조회 Code
 
-Kotlin에서는 클래스가 기본적으로 final로 선언됩니다. 즉, 특별한 설정 없이 작성된 클래스는 확장(상속)이 불가능한 상태입니다. Proxy 기반의 Lazy 로딩 기능은 실제 객체 대신 프록시 객체를 생성하여 해당 객체의 속성에 접근할 때 실제 데이터를 로딩하는 방식으로 동작하는데, 이를 위해서는 대상 클래스가 open이어야 합니다. 만약 클래스가 final이라면, 프록시 객체를 생성할 수 없으므로 Lazy 로딩이 제대로 동작하지 않습니다.
-
-이를 해결하기 위해 Kotlin에서는 `all-open` 플러그인 또는 `kotlin-spring` 플러그인을 적용하여, 특정 애노테이션(예: `@Document`)이 붙은 클래스를 자동으로 open으로 변환할 수 있습니다. 아래 예시는 이러한 설정을 적용하는 방법을 보여줍니다.
+아래 코드는 Spring MVC 컨트롤러에서 `$lookup`을 사용하여 Post와 Author 데이터를 한 번의 Aggregation 쿼리로 조회하는 예시입니다. 이 방식은 DBRef 방식에서 발생하는 N+1 문제를 효과적으로 회피합니다.
 
 ```kotlin
-plugins {
-    id("org.jetbrains.kotlin.plugin.spring") version "1.6.21"
-    // 또는 id("org.jetbrains.kotlin.plugin.allopen") ...
+@RestController
+@RequestMapping("/posts")
+class PostController(
+    private val postRepository: PostRepository,
+) {
+
+    @GetMapping("/lookup")
+    fun getPostsLookUp(@RequestParam(name = "limit") limit: Int): List<Post> = postRepository.findLookUp(limit)
 }
 
-allOpen {
-    annotation("org.springframework.data.mongodb.core.mapping.Document")
+data class PostProjectionLookup(
+    val id: ObjectId,
+    val title: String,
+    val content: String,
+    val author: AuthorProjection,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
+)
+
+interface PostCustomRepository {
+    fun findLookUp(limit: Int): List<PostProjectionLookup>
+}
+
+class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomRepository, MongoCustomRepositorySupport<Post>(
+    Post::class.java,
+    mongoTemplate
+) {
+
+    override fun findLookUp(limit: Int): List<PostProjectionLookup> {
+        val lookupStage = Aggregation.lookup(
+            "author",        // from: 실제 컬렉션 이름
+            "author.\$id",   // localField: DBRef에서 _id가 들어있는 위치
+            "_id",           // foreignField: authors 컬렉션의 _id
+            "author"         // as: 결과를 저장할 필드 이름
+        )
+        val unwindStage = Aggregation.unwind("author", true)
+        val projection = Aggregation.project()
+            .andInclude("title")
+            .andInclude("content")
+            .andInclude("author")
+            .andInclude("updated_at")
+            .andInclude("created_at")
+        val limitStage = Aggregation.limit(limit.toLong())
+        val aggregation = Aggregation.newAggregation(lookupStage, unwindStage, projection, limitStage)
+        return mongoTemplate
+            .aggregate(
+                aggregation,
+                Post.DOCUMENT_NAME,               // 컬렉션 이름
+                PostProjectionLookup::class.java,
+            )
+            .mappedResults
+    }
 }
 ```
 
-이 설정을 적용하면, `@Document` 애노테이션이 붙은 클래스들은 자동으로 open으로 처리되어 프록시 객체 생성이 가능해집니다. 즉, Lazy 로딩이 원활하게 동작할 수 있게 됩니다.
+**getPostsLookUp** 메서드는 단일 Aggregation 쿼리를 통해 Post와 Author 데이터를 한 번에 조회합니다. 이 과정에서 `$lookup` 연산자가 두 컬렉션 간의 조인을 수행하고, `$unwind`를 사용해 조인된 Author 데이터를 평탄화합니다. 결과적으로, 모든 연관 데이터를 한 번에 가져오기 때문에 각 Post마다 별도의 Author 조회 쿼리가 실행되는 **N+1 문제가 발생하지 않으며,** 대량의 데이터를 조회하는 상황에서도 성능 저하를 효과적으로 방지할 수 있습니다.
 
-- **allOpen 미적용 시**: 클래스는 기본적으로 final 상태이며, 이로 인해 Proxy 기반의 Lazy 로딩이 불가능합니다.
-- **allOpen 적용 시**: 클래스가 open으로 변환되어 Lazy 로딩을 위한 Proxy 객체 생성이 가능해집니다.
-
-따라서, Spring Data MongoDB에서 Lazy 로딩 기능을 활용하려면 반드시 이러한 설정을 통해 대상 도메인 클래스가 open 상태로 유지되도록 해야 합니다.
+실제 동작이 어떻게 나가는지 본격적으로 살펴보겠습니다.

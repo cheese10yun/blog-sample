@@ -74,6 +74,8 @@ db.post.find({}).limit(500)
 db.author.find({_id: ObjectId("67cd82c3aec68267745dcf85")}).limit(1)
 db.author.find({_id: ObjectId("67cd82c3aec68267745dcf84")}).limit(1)
 db.author.find({_id: ObjectId("67cd82c3aec68267745dcf83")}).limit(1)
+...
+
 ```
 
 위 예시는 Post를 조회한 후, 별도의 쿼리로 Author 문서를 조회하는 과정을 보여줍니다. 만약 500개의 Post를 조회한다면, **각 Post마다 Author 조회 쿼리가 실행되어 총 500번의 `db.author.find` 쿼리가 발생하게 됩니다.** 이처럼 Post 조회 결과의 수에 따라 반복적으로 Author 조회 쿼리가 실행되면 **N+1 문제가 발생**하여 성능 저하를 초래할 수 있습니다.
@@ -181,7 +183,9 @@ allOpen {
 
 ## $lookup 기반 연관 객체 조회
 
-아래 코드는 `$lookup`을 통해 Post와 Author 데이터를 조인하여 단일 Aggregation 쿼리로 필요한 데이터를 한 번에 조회하는 예시입니다. 특히 대량의 데이터를 조회할 때 DBRef 방식에서 발생하는 N+1 문제를 해결하는 데 유리합니다.
+위 조회에서 살펴보았듯이, @DBRef 기반으로 연관 객체를 포함하여 조회하면 **N+1 문제가 발생할 수밖에 없습니다.** 이를 해결하기 위해 MongoDB의 **`$lookup` 연산자**를 활용할 수 있습니다.
+
+`$lookup`은 MongoDB의 Aggregation Pipeline에서 제공되는 연산자로, 두 컬렉션을 조인(join)하는 역할을 합니다. 이는 RDBMS의 Join과 유사하게 동작하여, 한 컬렉션의 데이터를 기준으로 관련된 다른 컬렉션의 데이터를 한 번의 Aggregation 쿼리로 가져올 수 있습니다. 이렇게 하면 각 **Post마다 별도의 Author 조회 쿼리가 발생하는 N+1 문제를 효과적으로 해결할 수 있습니다.**
 
 ### 연관 객체 조회 쿼리
 
@@ -218,18 +222,23 @@ db.post.aggregate(
 )
 ```
 
-이 예제는 `$lookup`을 사용하여 Post와 Author 컬렉션을 조인하는 방법을 보여줍니다. 단일 Aggregation 파이프라인으로 모든 연관 데이터를 한 번에 가져올 수 있어 N+1 문제를 효과적으로 회피할 수 있습니다.
+이 예제는 `$lookup` 연산자를 사용하여 Post와 Author 컬렉션을 조인하는 방법을 보여줍니다.
 
-### 연관 객체 조회 Code
+`$lookup`은 MongoDB의 Aggregation Pipeline 단계 중 하나로, 한 컬렉션의 필드를 기준으로 다른 컬렉션의 관련 데이터를 조인하여 한 번의 쿼리로 가져올 수 있습니다. 이를 통해 단일 Aggregation 파이프라인으로 모든 연관 데이터를 한 번에 조회할 수 있어, **각 Post마다 별도의 Author 조회 쿼리가 발생하는 N+1 문제를 효과적으로 회피할 수 있습니다.**
+
+### $lookup 기반 연관 객체 조회 Code
+
+아래 코드는 Spring MVC 컨트롤러에서 `$lookup`을 사용하여 Post와 Author 데이터를 한 번의 Aggregation 쿼리로 조회하는 예시입니다. 이 방식은 DBRef 방식에서 발생하는 N+1 문제를 효과적으로 회피합니다.
 
 ```kotlin
 @RestController
 @RequestMapping("/posts")
 class PostController(
-    private val postRepository: PostRepository
+  private val postRepository: PostRepository,
 ) {
+
     @GetMapping("/lookup")
-    fun getPostsLookUp(@RequestParam(name = "limit") limit: Int) = postRepository.findLookUp(limit)
+    fun getPostsLookUp(@RequestParam(name = "limit") limit: Int): List<Post> = postRepository.findLookUp(limit)
 }
 
 data class PostProjectionLookup(
@@ -253,9 +262,9 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
     override fun findLookUp(limit: Int): List<PostProjectionLookup> {
         val lookupStage = Aggregation.lookup(
             "author",        // from: 실제 컬렉션 이름
-            "author.\$id",    // localField: DBRef에서 _id가 들어있는 위치
-            "_id",            // foreignField: authors 컬렉션의 _id
-            "author"       // as: 결과를 저장할 필드 이름
+          "author.\$id",   // localField: DBRef에서 _id가 들어있는 위치
+          "_id",           // foreignField: authors 컬렉션의 _id
+          "author"         // as: 결과를 저장할 필드 이름
         )
         val unwindStage = Aggregation.unwind("author", true)
         val projection = Aggregation.project()
@@ -277,13 +286,17 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 }
 ```
 
-이 코드는 `$lookup`을 통해 Post와 Author 데이터를 한 번에 조회하여 단일 Aggregation 쿼리로 연관 데이터를 가져오므로 N+1 문제를 피할 수 있습니다.
+**getPostsLookUp** 메서드는 단일 Aggregation 쿼리를 통해 Post와 Author 데이터를 한 번에 조회합니다. 이 과정에서 `$lookup` 연산자가 두 컬렉션 간의 조인을 수행하고, `$unwind`를 사용해 조인된 Author 데이터를 평탄화합니다. 결과적으로, 모든 연관 데이터를 한 번에 가져오기 때문에 각 Post마다 별도의 Author 조회 쿼리가 실행되는 **N+1 문제가 발생하지 않으며,** 대량의 데이터를 조회하는 상황에서도 성능 저하를 효과적으로 방지할 수 있습니다.
+
+실제 동작이 어떻게 나가는지 본격적으로 살펴보겠습니다.
 
 ### $lookup 결과
 
-아래 이미지는 `$lookup` 방식으로 조회한 결과를 보여줍니다.
+아래 이미지는 `$lookup` 방식을 사용하여 Post와 Author 데이터를 단일 Aggregation 쿼리로 조회한 결과를 보여줍니다. 쿼리 로그를 통해 두 컬렉션 간의 조인과 함께 Author 데이터가 평탄화되어 처리되는 과정을 확인할 수 있으며, **이 방식은 모든 연관 데이터를 한 번에 가져와 N+1 문제를 효과적으로 회피함을 증명합니다.**
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-4.png)
+
+Post와 Author 데이터를 한 번에 조회하는 `db.post.aggregate` 쿼리가 약 76ms 만에 완료된 것을 확인할 수 있습니다.
 
 ## 성능 측정
 
