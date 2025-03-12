@@ -296,11 +296,11 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-4.png)
 
-Post와 Author 데이터를 한 번에 조회하는 `db.post.aggregate` 쿼리가 약 76ms 만에 완료된 것을 확인할 수 있습니다.
+또한, Post와 Author 데이터를 한 번에 조회하는 `db.post.aggregate` 쿼리가 약 76ms 만에 완료된 것을 확인할 수 있으며, 이를 통해 성능이 매우 빨라졌음을 확인할 수 있습니다.
 
 ## 성능 측정
 
-아래 이미지는 여러 조회 조건에 대해 평균 응답 시간을 시각적으로 비교한 벤치마크 결과를 보여줍니다. 각 조회 조건마다 10번씩 테스트한 후 그 평균값을 사용하여 성능을 측정했습니다. 결과에서는 MongoDB의 $lookup 방식을 사용한 경우, DBRef를 이용하여 즉시 로딩한 경우, 그리고 DBRef의 lazy 로딩을 적용한 경우 중 실제로 author 필드에 접근한 경우와 접근하지 않은 경우의 성능 차이를 비교하고 있습니다.
+아래 이미지는 각 조건을 10회씩 테스트한 후 산출된 평균 응답 시간을 비교한 벤치마크 결과를 보여줍니다.
 
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-5.png)
 
@@ -313,13 +313,11 @@ Post와 Author 데이터를 한 번에 조회하는 `db.post.aggregate` 쿼리�
 | 1,000 | 69.5ms  | 1167.4ms         | 1178.3ms                   | 41.9ms                      |
 | 5,000 | 257.2ms | 6043.1ms         | 6181.5ms                   | 129.6ms                     |
 
-성능 테스트 결과를 요약하면, 단일 문서 조회에서는 모든 방식이 거의 동일한 응답 속도를 보입니다.
+테스트 결과를 요약하면, 단일 문서 조회에서는 모든 방식이 거의 동일한 응답 속도를 보입니다. 그러나 조회 대상 문서 수가 증가할수록 각 방식 간의 성능 차이가 뚜렷하게 나타납니다.
 
-하지만 **조회 대상 문서 수가 늘어나면 각 방식 간의 성능 차이가 더욱 뚜렷하게 나타납니다.** 예를 들어, DBRef를 lazy로 설정하고 author 필드에 접근하지 않는 경우는 Post 도큐먼트에 대한 단순 find 쿼리만 실행되므로 가장 빠른 응답 속도를 기록합니다.
+특히, Author 필드에 접근하는 경우, lazy 설정이 true든 false든 상관없이 각 Post마다 추가 쿼리가 실행되어 N+1 문제가 발생합니다. 이로 인해, 예를 들어 1,000건의 Post를 조회하면 약 1,000ms 정도의 응답 속도가 소요되어, 실제 서비스에 적용하기에는 너무 느리게 동작합니다.
 
-반면, DBRef 방식에서 실제로 author 필드에 접근하면, 각 Post마다 추가 쿼리가 실행되어 N+1 문제가 발생합니다. **또한, $lookup 방식은 aggregate 파이프라인을 통한 조인으로 데이터를 한 번에 가져올 수 있어 N+1 문제를 회피할 수 있습니다.**
-
-특히, 1,000건을 조회할 때 약 1,000ms 정도의 응답 속도는 너무 느려 실제 서비스에 적용하기 어려울 수 있기 때문에 **$lookup 방식이 가장 현실적인 대안으로 평가될 수 있습니다.**
+반면, lazy=true 설정에서 Author 필드에 접근하지 않는 경우에는 단순 find 쿼리만 실행되므로 가장 빠른 응답 속도를 기록합니다. 만약 Author 정보에 접근해야 하는 상황이라면, `$lookup` 연산자를 활용해 `db.post.aggregate` 쿼리를 통해 Post와 Author 데이터를 한 번에 조회함으로써 N+1 문제를 효과적으로 회피할 수 있습니다. 이러한 방식은 Author 접근이 필요한 경우에 가장 효율적인 대안으로 평가됩니다.
 
 ## $lookup 방식의 리턴 타입 문제와 개선 방안
 
@@ -366,9 +364,7 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 class Post(
     ...
     @DBRef(lazy = true
-)
-
-val author: Author,
+    val author: Author,
 )
 ```
 

@@ -1,63 +1,24 @@
-### $lookup 기반 연관 객체 조회 Code
+## 성능 측정
 
-아래 코드는 Spring MVC 컨트롤러에서 `$lookup`을 사용하여 Post와 Author 데이터를 한 번의 Aggregation 쿼리로 조회하는 예시입니다. 이 방식은 DBRef 방식에서 발생하는 N+1 문제를 효과적으로 회피합니다.
+아래 이미지는 여러 조회 조건에 대해 평균 응답 시간을 비교한 벤치마크 결과를 보여줍니다. 각 조건은 10회씩 테스트한 후 평균값으로 성능을 측정했습니다.
 
-```kotlin
-@RestController
-@RequestMapping("/posts")
-class PostController(
-    private val postRepository: PostRepository,
-) {
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-5.png)
 
-    @GetMapping("/lookup")
-    fun getPostsLookUp(@RequestParam(name = "limit") limit: Int): List<Post> = postRepository.findLookUp(limit)
-}
+| rows  | $lookup | DBRef lazy false | DBRef lazy true(author 접근) | DBRef lazy true(author 미접근) |
+|-------|---------|------------------|----------------------------|-----------------------------|
+| 1     | 9.2ms   | 9.6ms            | 9.3ms                      | 8.5ms                       |
+| 50    | 11.6ms  | 69.7ms           | 69.4ms                     | 8.9ms                       |
+| 100   | 16.2ms  | 130.1ms          | 133.5ms                    | 11.5ms                      |
+| 500   | 42.2ms  | 574.2ms          | 575.9ms                    | 23.5ms                      |
+| 1,000 | 69.5ms  | 1167.4ms         | 1178.3ms                   | 41.9ms                      |
+| 5,000 | 257.2ms | 6043.1ms         | 6181.5ms                   | 129.6ms                     |
 
-data class PostProjectionLookup(
-    val id: ObjectId,
-    val title: String,
-    val content: String,
-    val author: AuthorProjection,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
-)
+테스트 결과를 요약하면, 단일 문서 조회에서는 모든 방식이 거의 동일한 응답 속도를 보입니다. 그러나 조회 대상 문서 수가 증가할수록 각 방식 간의 성능 차이가 뚜렷하게 나타납니다.
 
-interface PostCustomRepository {
-    fun findLookUp(limit: Int): List<PostProjectionLookup>
-}
+author 접근하는 경우 lazy설정이 false true 여부와 관계 없이 N+1이 발생하기 때문에 조회 대상이 증가할 수록 응답이 점점 더 느려짐, 1,000건을 조회할 때 약 1,000ms 정도의 응답 속도는 실제 서비스에 적용하기에는 너무 느리기 때문
 
-class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomRepository, MongoCustomRepositorySupport<Post>(
-    Post::class.java,
-    mongoTemplate
-) {
+lazy true 이면서 author 미접근 하는 경우 에는 단순 find 쿼리만 나가기 때문에 가장 빠른 응답을 내려주고 있음, author 접근이 필요한 경우 $lookup 통해서 db.post.aggregate 으로 한번에 조회하기 때문에 N+1 문제가 발생하지 않으며 author 접근이 필요한 경우 가장 좋은 대안이 된다.
 
-    override fun findLookUp(limit: Int): List<PostProjectionLookup> {
-        val lookupStage = Aggregation.lookup(
-            "author",        // from: 실제 컬렉션 이름
-            "author.\$id",   // localField: DBRef에서 _id가 들어있는 위치
-            "_id",           // foreignField: authors 컬렉션의 _id
-            "author"         // as: 결과를 저장할 필드 이름
-        )
-        val unwindStage = Aggregation.unwind("author", true)
-        val projection = Aggregation.project()
-            .andInclude("title")
-            .andInclude("content")
-            .andInclude("author")
-            .andInclude("updated_at")
-            .andInclude("created_at")
-        val limitStage = Aggregation.limit(limit.toLong())
-        val aggregation = Aggregation.newAggregation(lookupStage, unwindStage, projection, limitStage)
-        return mongoTemplate
-            .aggregate(
-                aggregation,
-                Post.DOCUMENT_NAME,               // 컬렉션 이름
-                PostProjectionLookup::class.java,
-            )
-            .mappedResults
-    }
-}
-```
+예를 들어, DBRef를 lazy로 설정한 상태에서 Author 필드에 접근하지 않는 경우는 단순히 Post 도큐먼트만을 조회하기 때문에 가장 빠른 응답 속도를 기록합니다. 반면, DBRef 방식에서 실제로 Author 필드에 접근하면, 각 Post마다 별도의 Author 조회 쿼리가 실행되어 N+1 문제가 발생하게 됩니다.
 
-**getPostsLookUp** 메서드는 단일 Aggregation 쿼리를 통해 Post와 Author 데이터를 한 번에 조회합니다. 이 과정에서 `$lookup` 연산자가 두 컬렉션 간의 조인을 수행하고, `$unwind`를 사용해 조인된 Author 데이터를 평탄화합니다. 결과적으로, 모든 연관 데이터를 한 번에 가져오기 때문에 각 Post마다 별도의 Author 조회 쿼리가 실행되는 **N+1 문제가 발생하지 않으며,** 대량의 데이터를 조회하는 상황에서도 성능 저하를 효과적으로 방지할 수 있습니다.
-
-실제 동작이 어떻게 나가는지 본격적으로 살펴보겠습니다.
+또한, `$lookup` 방식은 Aggregation 파이프라인을 통해 모든 연관 데이터를 한 번에 조회함으로써 N+1 문제를 효과적으로 회피할 수 있습니다. 특히, 1,000건을 조회할 때 약 1,000ms 정도의 응답 속도는 실제 서비스에 적용하기에는 너무 느리기 때문에, 이러한 상황에서는 `$lookup` 방식이 가장 현실적인 대안으로 평가됩니다.
