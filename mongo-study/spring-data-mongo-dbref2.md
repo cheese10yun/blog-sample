@@ -1,24 +1,37 @@
-## 성능 측정
+기존 구현에서는 Lookup 결과의 리턴 타입을 `PostProjectionLookup`과 같이 별도의 Projection 객체로 지정했습니다. 그러나 이 방식은 Post 도큐먼트 내에 정의된 비즈니스 로직(DDD 관점에서 핵심 도메인 기능)을 그대로 활용할 수 없다는 단점이 있습니다. 즉, Post 객체가 갖는 도메인 메서드를 이용하여 비즈니스 규칙을 적용할 수 없게 되어, 객체지향 설계 원칙에 위배되는 문제가 발생합니다.
 
-아래 이미지는 여러 조회 조건에 대해 평균 응답 시간을 비교한 벤치마크 결과를 보여줍니다. 각 조건은 10회씩 테스트한 후 평균값으로 성능을 측정했습니다.
+또한, 상속을 통해 메서드를 재사용하는 방법은 재사용을 위해 인위적으로 상속 관계를 도입하는 방식이므로, 이는 최적의 해결책이라고 보기 어렵습니다. 이러한 문제를 해결하기 위해 가장 좋은 방법은 Aggregation 쿼리의 결과를 바로 `Post` 객체로 리턴하는 것입니다. 이렇게 하면 Post 도큐먼트에 정의된 비즈니스 로직을 그대로 유지하면서도, `$lookup` 방식의 장점을 활용하여 N+1 문제를 회피할 수 있습니다.
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-5.png)
+```kotlin
+class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomRepository, MongoCustomRepositorySupport<Post>(
+    Post::class.java,
+    mongoTemplate
+) {
+    override fun findLookUp(limit: Int): List<Post> {
+        val lookupStage = Aggregation.lookup(
+            "author",        // from: 실제 컬렉션 이름
+            "author.\$id",   // localField: DBRef에서 _id가 들어있는 위치
+            "_id",           // foreignField: authors 컬렉션의 _id
+            "author"         // as: 결과를 저장할 필드 이름
+        )
+        val unwindStage = Aggregation.unwind("author", true)
+        val projection = Aggregation.project()
+            .andInclude("title")
+            .andInclude("content")
+            .andInclude("author")
+            .andInclude("updated_at")
+            .andInclude("created_at")
+        val limitStage = Aggregation.limit(limit.toLong())
+        val aggregation = Aggregation.newAggregation(lookupStage, unwindStage, projection, limitStage)
+        return mongoTemplate
+            .aggregate(
+                aggregation,
+                Post.DOCUMENT_NAME,  // 컬렉션 이름
+                Post::class.java     // 리턴 타입을 Post 객체로 지정
+            )
+            .mappedResults
+    }
+}
+```
 
-| rows  | $lookup | DBRef lazy false | DBRef lazy true(author 접근) | DBRef lazy true(author 미접근) |
-|-------|---------|------------------|----------------------------|-----------------------------|
-| 1     | 9.2ms   | 9.6ms            | 9.3ms                      | 8.5ms                       |
-| 50    | 11.6ms  | 69.7ms           | 69.4ms                     | 8.9ms                       |
-| 100   | 16.2ms  | 130.1ms          | 133.5ms                    | 11.5ms                      |
-| 500   | 42.2ms  | 574.2ms          | 575.9ms                    | 23.5ms                      |
-| 1,000 | 69.5ms  | 1167.4ms         | 1178.3ms                   | 41.9ms                      |
-| 5,000 | 257.2ms | 6043.1ms         | 6181.5ms                   | 129.6ms                     |
-
-테스트 결과를 요약하면, 단일 문서 조회에서는 모든 방식이 거의 동일한 응답 속도를 보입니다. 그러나 조회 대상 문서 수가 증가할수록 각 방식 간의 성능 차이가 뚜렷하게 나타납니다.
-
-author 접근하는 경우 lazy설정이 false true 여부와 관계 없이 N+1이 발생하기 때문에 조회 대상이 증가할 수록 응답이 점점 더 느려짐, 1,000건을 조회할 때 약 1,000ms 정도의 응답 속도는 실제 서비스에 적용하기에는 너무 느리기 때문
-
-lazy true 이면서 author 미접근 하는 경우 에는 단순 find 쿼리만 나가기 때문에 가장 빠른 응답을 내려주고 있음, author 접근이 필요한 경우 $lookup 통해서 db.post.aggregate 으로 한번에 조회하기 때문에 N+1 문제가 발생하지 않으며 author 접근이 필요한 경우 가장 좋은 대안이 된다.
-
-예를 들어, DBRef를 lazy로 설정한 상태에서 Author 필드에 접근하지 않는 경우는 단순히 Post 도큐먼트만을 조회하기 때문에 가장 빠른 응답 속도를 기록합니다. 반면, DBRef 방식에서 실제로 Author 필드에 접근하면, 각 Post마다 별도의 Author 조회 쿼리가 실행되어 N+1 문제가 발생하게 됩니다.
-
-또한, `$lookup` 방식은 Aggregation 파이프라인을 통해 모든 연관 데이터를 한 번에 조회함으로써 N+1 문제를 효과적으로 회피할 수 있습니다. 특히, 1,000건을 조회할 때 약 1,000ms 정도의 응답 속도는 실제 서비스에 적용하기에는 너무 느리기 때문에, 이러한 상황에서는 `$lookup` 방식이 가장 현실적인 대안으로 평가됩니다.
+이와 같이 구현하면, Post 객체에 내장된 도메인 로직을 그대로 활용할 수 있으며, 불필요한 상속 관계를 도입하지 않고도 `$lookup` 방식을 통해 연관 데이터를 한 번에 조회할 수 있습니다.
