@@ -33,10 +33,15 @@ class PostController(
 //    }
 
     @GetMapping("/lookup")
-    fun getPostsLookUp(@RequestParam(name = "limit") limit: Int): List<Post> = postRepository.findLookUp(limit)
+    fun getPostsLookUp(@RequestParam(name = "limit") limit: Int): List<Post> {
+        return postRepository.findLookUp(limit)
+    }
 
     @GetMapping("/post-with-author")
-    fun getPostWithAuthor(@RequestParam(name = "limit") limit: Int): List<Post> = postRepository.find(limit)
+    fun getPostWithAuthor(@RequestParam(name = "limit") limit: Int): List<Post> {
+        val find = postRepository.find(limit)
+        return find
+    }
 
     @GetMapping("/post-only")
     fun getPostOnly(@RequestParam(name = "limit") limit: Int): List<PostProjection> = postRepository.find(limit).map { PostProjection(it) }

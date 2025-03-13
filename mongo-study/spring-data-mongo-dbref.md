@@ -168,6 +168,18 @@ allOpen {
 
 따라서, Spring Data MongoDB에서 Lazy 로딩 기능을 활용하려면 반드시 이러한 설정을 통해 대상 도메인 클래스가 open 상태로 유지되도록 해야 합니다.
 
+```
+java.lang.IllegalArgumentException: Cannot subclass final class com.example.mongostudy.dbref.Author
+	at org.springframework.cglib.proxy.Enhancer.generateClass(Enhancer.java:660) ~[spring-core-5.3.29.jar:5.3.29]
+	at org.springframework.cglib.core.DefaultGeneratorStrategy.generate(DefaultGeneratorStrategy.java:25) ~[spring-core-5.3.29.jar:5.3.29]
+	at org.springframework.cglib.core.AbstractClassGenerator.generate(AbstractClassGenerator.java:358) ~[spring-core-5.3.29.jar:5.3.29]
+	at org.springframework.cglib.proxy.Enhancer.generate(Enhancer.java:585) ~[spring-core-5.3.29.jar:5.3.29]
+```
+
+이런 오류 발생 왜 오류가 발생하는지 설명 추가 해야함
+
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-6.png)
+
 ## $lookup 기반 연관 객체 조회
 
 위 조회에서 살펴보았듯이, @DBRef 기반으로 연관 객체를 포함하여 조회하면 **N+1 문제가 발생할 수밖에 없습니다.** 이를 해결하기 위해 MongoDB의 **`$lookup` 연산자**를 활용할 수 있습니다.
