@@ -74,23 +74,23 @@ data class PostProjection(
     val id: ObjectId,
     val title: String,
     val content: String,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+//    val createdAt: LocalDateTime,
+//    val updatedAt: LocalDateTime
 ) {
     constructor(post: Post) : this(
         id = post.id!!,
         title = post.title,
         content = post.content,
-        createdAt = post.createdAt,
-        updatedAt = post.updatedAt,
+//        createdAt = post.createdAt,
+//        updatedAt = post.updatedAt,
     )
 }
 
 data class AuthorProjection(
     val id: ObjectId,
     val name: String,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+//    val createdAt: LocalDateTime,
+//    val updatedAt: LocalDateTime
 )
 
 data class PostProjectionLookup(
@@ -98,6 +98,6 @@ data class PostProjectionLookup(
     val title: String,
     val content: String,
     val author: AuthorProjection,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+//    val createdAt: LocalDateTime,
+//    val updatedAt: LocalDateTime
 )

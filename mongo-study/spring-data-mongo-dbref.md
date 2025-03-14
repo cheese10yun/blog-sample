@@ -27,19 +27,23 @@ DBRef 방식은 Spring Data MongoDB에서 객체 간의 연관관계를 손쉽�
 ```kotlin
 @Document(collection = "post")
 class Post(
+  @Id
+  var id: ObjectId? = null,
     @Field(name = "title")
     val title: String,
     @Field(name = "content")
     val content: String,
     @DBRef(lazy = false)
     val author: Author
-) : Auditable()
+)
 
 @Document(collection = "author")
 class Author(
+  @Id
+  var id: ObjectId? = null,
     @Field(name = "name")
     val name: String
-) : Auditable()
+)
 ```
 
 이 코드에서 `lazy = false`로 설정되어 있기 때문에, Post를 조회할 때 관련 Author 문서가 함께 즉시 로딩됩니다. 그러나 자동 로딩 기능은 각 문서를 조회할 때마다 추가 조회 쿼리를 발생시킬 수 있어, 많은 데이터를 조회하는 경우 N+1 문제가 발생할 위험이 있습니다. 따라서, 상황에 따라 `lazy` 옵션을 적절히 설정하여 불필요한 데이터 로딩을 방지하는 것이 중요합니다.
@@ -86,16 +90,12 @@ class PostController(
 data class PostProjection(
     val id: ObjectId,
     val title: String,
-    val content: String,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val content: String
 ) {
     constructor(post: Post) : this(
         id = post.id!!,
         title = post.title,
         content = post.content,
-        createdAt = post.createdAt,
-        updatedAt = post.updatedAt,
     )
 }
 
@@ -144,7 +144,7 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 
 아래 이미지는 이러한 상황을 보여주며, `db.post.find({}).limit(1000)` 쿼리가 실행되어 약 22.7ms 정도 소요되었고, Author에 대한 접근이 없으므로 추가 쿼리가 발생하지 않은 것을 확인할 수 있습니다.
 
-#### Lazy 로딩을 위한 프록시 구성 방법
+#### Lazy 로딩 활성화를 위한 Proxy 설정 방법
 
 Kotlin에서는 클래스가 기본적으로 final로 선언되기 때문에, 특별한 설정 없이 작성된 클래스는 상속이 불가능합니다. Proxy 기반의 Lazy 로딩은 실제 객체 대신 프록시 객체를 생성하여 해당 객체의 속성에 접근할 때 실제 데이터를 로딩하는 방식으로 동작합니다. 이를 위해서는 대상 클래스가 open이어야 하는데, 만약 클래스가 final이면 프록시 객체를 생성할 수 없으므로 Lazy 로딩이 제대로 동작하지 않습니다.
 
@@ -179,7 +179,7 @@ allOpen {
 
 ## $lookup 기반 연관 객체 조회
 
-위 조회에서 살펴보았듯이, @DBRef 기반으로 연관 객체를 포함하여 조회하면 **N+1 문제가 발생할 수밖에 없습니다.** 이를 해결하기 위해 MongoDB의 **`$lookup` 연산자**를 활용할 수 있습니다.
+위 조회에서 살펴보았듯이, `@DBRef` 기반으로 연관 객체를 포함하여 조회하면 **N+1 문제가 발생할 수밖에 없습니다.** 이를 해결하기 위해 MongoDB의 **`$lookup` 연산자**를 활용할 수 있습니다.
 
 `$lookup`은 MongoDB의 Aggregation Pipeline에서 제공되는 연산자로, 두 컬렉션을 조인(join)하는 역할을 합니다. 이는 RDBMS의 Join과 유사하게 동작하여, 한 컬렉션의 데이터를 기준으로 관련된 다른 컬렉션의 데이터를 한 번의 Aggregation 쿼리로 가져올 수 있습니다. 이렇게 하면 각 **Post마다 별도의 Author 조회 쿼리가 발생하는 N+1 문제를 효과적으로 해결할 수 있습니다.**
 
@@ -206,9 +206,7 @@ db.post.aggregate(
             "$project": {
                 "title": 1.0,
                 "content": 1.0,
-                "author": 1.0,
-                "updated_at": 1.0,
-                "created_at": 1.0
+              "author": 1.0
             }
         },
         {
@@ -222,9 +220,9 @@ db.post.aggregate(
 
 `$lookup`은 MongoDB의 Aggregation Pipeline 단계 중 하나로, 한 컬렉션의 필드를 기준으로 다른 컬렉션의 관련 데이터를 조인하여 한 번의 쿼리로 가져올 수 있습니다. 이를 통해 단일 Aggregation 파이프라인으로 모든 연관 데이터를 한 번에 조회할 수 있어, **각 Post마다 별도의 Author 조회 쿼리가 발생하는 N+1 문제를 효과적으로 회피할 수 있습니다.**
 
-### $lookup 기반 연관 객체 조회 Code
+### 연관 객체 조회 Code
 
-아래 코드는 Spring MVC 컨트롤러에서 `$lookup`을 사용하여 Post와 Author 데이터를 한 번의 Aggregation 쿼리로 조회하는 예시입니다. 이 방식은 DBRef 방식에서 발생하는 N+1 문제를 효과적으로 회피합니다.
+아래 코드는 Spring MVC 컨트롤러에서 `$lookup`을 사용하여 Post와 Author 데이터를 한 번의 Aggregation 쿼리로 조회하는 예시입니다. 이 방식은 기존의 `@DBRef` 방식을 사용하여 발생하는 N+1 문제를 효과적으로 회피합니다.
 
 ```kotlin
 @RestController
@@ -241,9 +239,7 @@ data class PostProjectionLookup(
     val id: ObjectId,
     val title: String,
     val content: String,
-    val author: AuthorProjection,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val author: AuthorProjection
 )
 
 interface PostCustomRepository {
@@ -258,7 +254,7 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
     override fun findLookUp(limit: Int): List<PostProjectionLookup> {
         val lookupStage = Aggregation.lookup(
             "author",        // from: 실제 컬렉션 이름
-          "author.\$id",   // localField: DBRef에서 _id가 들어있는 위치
+          "author.$id",    // localField: DBRef에서 _id가 들어있는 위치
           "_id",           // foreignField: authors 컬렉션의 _id
           "author"         // as: 결과를 저장할 필드 이름
         )
@@ -267,8 +263,6 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
             .andInclude("title")
             .andInclude("content")
             .andInclude("author")
-            .andInclude("updated_at")
-            .andInclude("created_at")
         val limitStage = Aggregation.limit(limit.toLong())
         val aggregation = Aggregation.newAggregation(lookupStage, unwindStage, projection, limitStage)
         return mongoTemplate
@@ -282,7 +276,25 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 }
 ```
 
-**getPostsLookUp** 메서드는 단일 Aggregation 쿼리를 통해 Post와 Author 데이터를 한 번에 조회합니다. 이 과정에서 `$lookup` 연산자가 두 컬렉션 간의 조인을 수행하고, `$unwind`를 사용해 조인된 Author 데이터를 평탄화합니다. 결과적으로, 모든 연관 데이터를 한 번에 가져오기 때문에 각 Post마다 별도의 Author 조회 쿼리가 실행되는 **N+1 문제가 발생하지 않으며,** 대량의 데이터를 조회하는 상황에서도 성능 저하를 효과적으로 방지할 수 있습니다.
+**getPostsLookUp** 메서드는 단일 Aggregation 쿼리를 통해 Post와 Author 데이터를 한 번에 조회합니다. 이 과정에서 `$lookup` 연산자가 두 컬렉션 간의 조인을 수행하고, `$unwind`를 사용해 조인된 Author 데이터를 평탄화합니다. 결과적으로 모든 연관 데이터를 한 번에 가져오기 때문에 각 Post마다 별도의 Author 조회 쿼리가 실행되는 N+1 문제가 발생하지 않으며, 대량의 데이터를 조회하는 상황에서도 성능 저하를 효과적으로 방지할 수 있습니다.
+
+또한, 아래와 같이 단순히 `author_id`만을 저장하는 방식으로 도메인 모델을 구성한 경우에도, `$lookup`을 통해 연관 Author 데이터를 조회할 수 있습니다. 이는 반드시 `@DBRef`로 연관관계를 매핑할 필요 없이, 단순 ID 저장 방식만으로도 연관 데이터를 조인할 수 있음을 보여줍니다.
+
+```kotlin
+@Document(collection = "post")
+class Post(
+  @Id
+  var id: ObjectId? = null,
+  @Field(name = "title", targetType = FieldType.STRING)
+  val title: String,
+  @Field(name = "content", targetType = FieldType.STRING)
+  val content: String,
+  @Field(name = "author_id")
+  val authorId: ObjectId
+)
+```
+
+이와 같이 `$lookup` 기반의 조회 방식은 연관 문서 매핑 없이도 단일 Aggregation 쿼리로 Post와 Author 데이터를 한 번에 가져올 수 있으므로, N+1 문제를 근본적으로 해결할 수 있는 효과적인 대안임을 강조할 수 있습니다.
 
 실제 동작이 어떻게 나가는지 본격적으로 살펴보겠습니다.
 
@@ -327,25 +339,12 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
     mongoTemplate
 ) {
     override fun findLookUp(limit: Int): List<Post> {
-        val lookupStage = Aggregation.lookup(
-            "author",        // from: 실제 컬렉션 이름
-            "author.\$id",   // localField: DBRef에서 _id가 들어있는 위치
-            "_id",           // foreignField: authors 컬렉션의 _id
-            "author"         // as: 결과를 저장할 필드 이름
-        )
-        val unwindStage = Aggregation.unwind("author", true)
-        val projection = Aggregation.project()
-            .andInclude("title")
-            .andInclude("content")
-            .andInclude("author")
-            .andInclude("updated_at")
-            .andInclude("created_at")
-        val limitStage = Aggregation.limit(limit.toLong())
+      ...
         val aggregation = Aggregation.newAggregation(lookupStage, unwindStage, projection, limitStage)
         return mongoTemplate
             .aggregate(
                 aggregation,
-                Post.DOCUMENT_NAME,  // 컬렉션 이름
+              Post.DOCUMENT_NAME,
                 Post::class.java     // 리턴 타입을 Post 객체로 지정
             )
             .mappedResults

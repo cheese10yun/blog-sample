@@ -3,6 +3,7 @@ package com.example.mongostudy.dbref
 import com.example.mongostudy.mongo.Auditable
 import com.example.mongostudy.mongo.MongoCustomRepositorySupport
 import org.bson.types.ObjectId
+import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.aggregation.Aggregation
 import org.springframework.data.mongodb.core.find
@@ -16,18 +17,17 @@ import org.springframework.data.mongodb.repository.MongoRepository
 
 @Document(collection = "post")
 class Post(
+    @Id
+    var id: ObjectId? = null,
     @Field(name = "title", targetType = FieldType.STRING)
     val title: String,
     @Field(name = "content", targetType = FieldType.STRING)
     val content: String,
-
     @DBRef(lazy = true)
     val author: Author,
-
 //    @Field(name = "author_id")
 //    val authorId:  ObjectId
-) : Auditable() {
-
+) {
     companion object {
         const val DOCUMENT_NAME = "post"
     }
@@ -66,8 +66,6 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
             .andInclude("title")
             .andInclude("content")
             .andInclude("author")
-            .andInclude("updated_at")
-            .andInclude("created_at")
         val limitStage = Aggregation.limit(limit.toLong())
         val aggregation = Aggregation
             .newAggregation(lookupStage, unwindStage, projection, limitStage)
