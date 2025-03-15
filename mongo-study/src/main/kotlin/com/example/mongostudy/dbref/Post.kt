@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 import org.springframework.data.mongodb.core.mapping.FieldType
+import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.repository.MongoRepository
 
@@ -39,12 +40,36 @@ interface PostCustomRepository {
     fun findLookUp(limit: Int): List<Post>
     fun find(limit: Int): List<Post>
     fun findOne(): Post
+    fun findByIdOrNull(id: ObjectId): Post?
 }
 
 class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomRepository, MongoCustomRepositorySupport<Post>(
     Post::class.java,
     mongoTemplate
 ) {
+
+    override fun findByIdOrNull(id: ObjectId): Post? {
+        val match = Aggregation.match(Criteria.where("_id").`is`(id))
+        val lookupStage = Aggregation.lookup(
+            "author",        // from: 실제 컬렉션 이름
+            "author.\$id",    // localField: DBRef에서 _id가 들어있는 위치
+            "_id",            // foreignField: authors 컬렉션의 _id
+            "author"       // as: 결과를 저장할 필드 이름
+        )
+        val unwindStage = Aggregation.unwind("author", true)
+        val projection = Aggregation.project()
+            .andInclude("title")
+            .andInclude("content")
+            .andInclude("author")
+        val aggregation = Aggregation.newAggregation(match, lookupStage, unwindStage, projection)
+        return mongoTemplate
+            .aggregate(
+                aggregation,
+                "post",
+                Post::class.java,
+            )
+            .uniqueMappedResult
+    }
 
     override fun find(limit: Int): List<Post> {
         return mongoTemplate.find(Query().limit(limit))

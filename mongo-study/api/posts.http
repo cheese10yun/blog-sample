@@ -1,3 +1,7 @@
+GET http://localhost:8080/posts/lookup-one?id=67cd82c4aec68267745dd371
+
+###
+
 #
 GET http://localhost:8080/posts?page=1000&size=100
 

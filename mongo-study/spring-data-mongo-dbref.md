@@ -27,8 +27,8 @@ DBRef 방식은 Spring Data MongoDB에서 객체 간의 연관관계를 손쉽�
 ```kotlin
 @Document(collection = "post")
 class Post(
-  @Id
-  var id: ObjectId? = null,
+    @Id
+    var id: ObjectId? = null,
     @Field(name = "title")
     val title: String,
     @Field(name = "content")
@@ -39,8 +39,8 @@ class Post(
 
 @Document(collection = "author")
 class Author(
-  @Id
-  var id: ObjectId? = null,
+    @Id
+    var id: ObjectId? = null,
     @Field(name = "name")
     val name: String
 )
@@ -111,12 +111,12 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 ```
 
 * **getPostWithAuthor**:
-  - 리턴 타입이 `List<Post>`이므로, Post 객체를 JSON으로 시리얼라이즈하는 과정에서 Author 필드에 접근하게 됩니다.
-  - 이로 인해 `lazy = false`든 `lazy = true`든 상관없이, 각 Post마다 별도의 `db.author.find` 쿼리가 실행되어 N+1 문제가 반복됩니다.
+    - 리턴 타입이 `List<Post>`이므로, Post 객체를 JSON으로 시리얼라이즈하는 과정에서 Author 필드에 접근하게 됩니다.
+    - 이로 인해 `lazy = false`든 `lazy = true`든 상관없이, 각 Post마다 별도의 `db.author.find` 쿼리가 실행되어 N+1 문제가 반복됩니다.
 
 * **getPostOnly**:
-  - 리턴 타입이 `List<PostProjection>`이므로, 응답에 필요한 핵심 데이터만 반환되고 Author 필드에 직접 접근하지 않습니다.
-  - 따라서, lazy = true인 경우 추가적인 Author 조회 쿼리가 발생하지 않아 N+1 문제를 회피할 수 있습니다.
+    - 리턴 타입이 `List<PostProjection>`이므로, 응답에 필요한 핵심 데이터만 반환되고 Author 필드에 직접 접근하지 않습니다.
+    - 따라서, lazy = true인 경우 추가적인 Author 조회 쿼리가 발생하지 않아 N+1 문제를 회피할 수 있습니다.
 
 실제 동작이 어떻게 나가는지 본격적으로 살펴보겠습니다.
 
@@ -206,7 +206,7 @@ db.post.aggregate(
             "$project": {
                 "title": 1.0,
                 "content": 1.0,
-              "author": 1.0
+                "author": 1.0
             }
         },
         {
@@ -228,7 +228,7 @@ db.post.aggregate(
 @RestController
 @RequestMapping("/posts")
 class PostController(
-  private val postRepository: PostRepository,
+    private val postRepository: PostRepository,
 ) {
 
     @GetMapping("/lookup")
@@ -254,9 +254,9 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
     override fun findLookUp(limit: Int): List<PostProjectionLookup> {
         val lookupStage = Aggregation.lookup(
             "author",        // from: 실제 컬렉션 이름
-          "author.$id",    // localField: DBRef에서 _id가 들어있는 위치
-          "_id",           // foreignField: authors 컬렉션의 _id
-          "author"         // as: 결과를 저장할 필드 이름
+            "author.$id",    // localField: DBRef에서 _id가 들어있는 위치
+            "_id",           // foreignField: authors 컬렉션의 _id
+            "author"         // as: 결과를 저장할 필드 이름
         )
         val unwindStage = Aggregation.unwind("author", true)
         val projection = Aggregation.project()
@@ -268,7 +268,7 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
         return mongoTemplate
             .aggregate(
                 aggregation,
-              "post",
+                "post",
                 PostProjectionLookup::class.java,
             )
             .mappedResults
@@ -283,14 +283,14 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 ```kotlin
 @Document(collection = "post")
 class Post(
-  @Id
-  var id: ObjectId? = null,
-  @Field(name = "title", targetType = FieldType.STRING)
-  val title: String,
-  @Field(name = "content", targetType = FieldType.STRING)
-  val content: String,
-  @Field(name = "author_id")
-  val authorId: ObjectId
+    @Id
+    var id: ObjectId? = null,
+    @Field(name = "title", targetType = FieldType.STRING)
+    val title: String,
+    @Field(name = "content", targetType = FieldType.STRING)
+    val content: String,
+    @Field(name = "author_id")
+    val authorId: ObjectId
 )
 ```
 
@@ -339,13 +339,13 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
     mongoTemplate
 ) {
     override fun findLookUp(limit: Int): List<Post> {
-      // ...
+        // ...
         val aggregation = Aggregation.newAggregation(lookupStage, unwindStage, projection, limitStage)
         return mongoTemplate
             .aggregate(
-              aggregation,
-              "post",
-              Post::class.java     // 리턴 타입을 Post 객체로 지정
+                aggregation,
+                "post",
+                Post::class.java     // 리턴 타입을 Post 객체로 지정
             )
             .mappedResults
     }
@@ -360,7 +360,7 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 @Document(collection = "post")
 class Post(
     // ...
-    @DBRef(lazy = true) 
+    @DBRef(lazy = true)
     val author: Author,
 )
 ```
@@ -376,15 +376,42 @@ class Post(
 ```kotlin
 @Document(collection = "post")
 class Post(
-  // ...
-  @Field(name = "author_id")
-  val authorId: ObjectId
+    // ...
+    @Field(name = "author_id")
+    val authorId: ObjectId
 )
 ```
 
 이 경우, N+1 문제를 원천적으로 해결하기 위해 Post는 단순한 값 객체인 `author_id`만을 저장하고, Author 객체에 접근이 필요한 경우에는 `$lookup`을 통해 두 컬렉션을 조인하여 데이터를 가져올 수 있습니다.
 
 또한, 객체 간 연관관계를 단순히 성능 문제만으로 판단하기보다는, DDD에서 제시하는 에그리거트 경계를 기준으로 도메인 모델을 구성하는 것도 고려해볼 만한 합리적인 접근 방식입니다. 이를 통해 도메인 로직과 성능 최적화를 균형 있게 반영할 수 있습니다.
+
+만약 `@DBRef(lazy = true)`로 연관관계를 설정하는 것을 선택한다면, `MongoRepository`에서 제공해주는 기본 메서드들을 override하여 `$lookup`을 활용해 한 번에 조회하는 방법을 적용할 수도 있습니다. 예를 들어, `findByIdOrNull` 메서드를 사용하면 Lazy 로딩 시 Author 데이터에 접근할 때 N+1 문제가 발생할 수 있으므로, 이를 `$lookup` 기반으로 재정의하여 한 번의 Aggregation 쿼리로 데이터를 조회하도록 구현하는 것도 좋은 선택입니다.
+
+```kotlin
+class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomRepository, MongoCustomRepositorySupport<Post>(
+    Post::class.java,
+    mongoTemplate
+) {
+
+    override fun findByIdOrNull(id: ObjectId): Post? {
+        val match = Aggregation.match(Criteria.where("_id").`is`(id))
+        val lookupStage = Aggregation.lookup(...)
+        val unwindStage = Aggregation.unwind("author", true)
+        val projection = Aggregation.project(...)
+        val aggregation = Aggregation.newAggregation(match, lookupStage, unwindStage, projection)
+        return mongoTemplate
+            .aggregate(
+                aggregation,
+                "post",
+                Post::class.java,
+            )
+            .uniqueMappedResult
+    }
+}
+```
+
+이와 같이 구현하면, `@DBRef(lazy = true)`를 사용하는 경우에도 기본 메서드를 `$lookup` 기반으로 재정의하여 한 번의 Aggregation 쿼리로 연관 데이터를 조회할 수 있습니다. 이를 통해 N+1 문제를 효과적으로 회피할 수 있습니다.
 
 ## 결론
 
@@ -396,6 +423,7 @@ class Post(
 - Lazy 설정(`@DBRef(lazy = true)`)을 적용하더라도, 실제로 Author 필드에 접근하는 시점에서는 추가 쿼리가 발생하게 되어 결국 N+1 문제가 내포되어 있습니다.
 - 이에 대한 효과적인 대안으로, MongoDB의 `$lookup` 연산자를 활용하여 단일 Aggregation 쿼리로 Post와 Author 데이터를 한 번에 조회하는 방법이 있습니다. 이 방식은 모든 연관 데이터를 한 번에 가져오기 때문에 N+1 문제를 효과적으로 회피하며, 대량의 데이터를 조회하는 경우에도 성능 저하를 크게 줄일 수 있습니다.
 - 추가적으로, Post 도큐먼트를 `@DBRef` 대신 단순히 값 객체인 `author_id`를 보유하도록 구성하는 방법도 고려할 수 있습니다. 이 경우, Author에 대한 조회는 `$lookup`을 통해 필요한 시점에 처리할 수 있어, 도메인 모델링과 성능 최적화 측면에서 유연한 접근이 가능합니다.
+- 만약 `@DBRef`를 선택한다면, `MongoRepository`에서 제공하는 기본 메서드들(예: `findByIdOrNull`)을 `$lookup` 기반으로 재정의하여 한 번의 Aggregation 쿼리로 연관 데이터를 조회하도록 구현하는 것도 좋은 선택입니다.
 - 마지막으로, 객체 간의 연관관계를 단순한 성능 문제만으로 판단하기보다는, DDD(도메인 주도 설계)에서 제시하는 에그리거트 경계를 기준으로 도메인 모델을 구성하는 것도 중요한 접근 방식입니다. 이를 통해 도메인 로직과 성능 최적화를 균형 있게 반영할 수 있습니다.
 
 결론적으로, N+1 문제를 최소화하고 도메인 모델의 핵심 비즈니스 로직을 유지하기 위해서는 상황에 맞게 `@DBRef`의 lazy 옵션, `$lookup`을 활용한 Aggregation 쿼리, 그리고 단순 값 객체 기반의 연관관계 모델링을 적절히 조합하는 전략이 가장 효과적임을 강조할 수 있습니다.

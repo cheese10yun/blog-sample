@@ -37,6 +37,11 @@ class PostController(
         return postRepository.findLookUp(limit)
     }
 
+    @GetMapping("/lookup-one")
+    fun getPostsLookUp(@RequestParam(name = "id") id: ObjectId): Post? {
+        return postRepository.findByIdOrNull(id)
+    }
+
     @GetMapping("/post-with-author")
     fun getPostWithAuthor(@RequestParam(name = "limit") limit: Int): List<Post> {
         val find = postRepository.find(limit)
