@@ -64,7 +64,7 @@ db.post.find({}).limit(500)
 db.author.find({_id: ObjectId("67cd82c3aec68267745dcf85")}).limit(1)
 db.author.find({_id: ObjectId("67cd82c3aec68267745dcf84")}).limit(1)
 db.author.find({_id: ObjectId("67cd82c3aec68267745dcf83")}).limit(1)
-...
+// ...
 ```
 
 위 예시는 Post를 조회한 후, 별도의 쿼리로 Author 문서를 조회하는 과정을 보여줍니다. 만약 500개의 Post를 조회한다면, **각 Post마다 Author 조회 쿼리가 실행되어 총 500번의 `db.author.find` 쿼리가 발생하게 됩니다.** 이처럼 Post 조회 결과의 수에 따라 반복적으로 Author 조회 쿼리가 실행되면 **N+1 문제가 발생**하여 성능 저하를 초래할 수 있습니다.
@@ -339,13 +339,13 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
     mongoTemplate
 ) {
     override fun findLookUp(limit: Int): List<Post> {
-      ...
+      // ...
         val aggregation = Aggregation.newAggregation(lookupStage, unwindStage, projection, limitStage)
         return mongoTemplate
             .aggregate(
-                aggregation,
+              aggregation,
               "post",
-                Post::class.java     // 리턴 타입을 Post 객체로 지정
+              Post::class.java     // 리턴 타입을 Post 객체로 지정
             )
             .mappedResults
     }
@@ -359,11 +359,9 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 ```kotlin
 @Document(collection = "post")
 class Post(
-    ...
-    @DBRef(lazy = true
-)
-
-val author: Author,
+    // ...
+    @DBRef(lazy = true) 
+    val author: Author,
 )
 ```
 
@@ -378,7 +376,7 @@ val author: Author,
 ```kotlin
 @Document(collection = "post")
 class Post(
-  ...
+  // ...
   @Field(name = "author_id")
   val authorId: ObjectId
 )
