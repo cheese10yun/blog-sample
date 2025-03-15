@@ -380,6 +380,7 @@ val author: Author,
 class Post(
   ...
   @Field(name = "author_id"
+)
   val authorId: ObjectId
 )
 ```
