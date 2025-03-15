@@ -1,13 +1,15 @@
-기존 구현에서는 `$lookup` Aggregation 쿼리의 결과를 바로 `Post` 객체로 리턴하여, Post 도큐먼트에 정의된 비즈니스 로직을 그대로 활용할 수 있도록 하였습니다. 그러나 한 가지 추가적인 접근 방식으로, Post 도큐먼트에서 연관 객체를 `@DBRef` 대신 단순히 값 객체로서 `author_id`를 보유하는 방법이 있습니다.
+기존 구현에서는 `$lookup` Aggregation 쿼리의 결과를 바로 `Post` 객체로 리턴하여, Post 도큐먼트에 정의된 비즈니스 로직을 그대로 활용할 수 있도록 하였습니다. 또한, 또 다른 접근 방식으로 Post 도큐먼트에서 연관 객체를 `@DBRef` 대신 단순한 값 객체로서 `author_id`를 보유하는 방법도 고려할 수 있습니다.
 
 예를 들어, 아래와 같이 Post 도큐먼트를 구성할 수 있습니다.
 
 ```kotlin
 @Document(collection = "post")
 class Post(
-  ...
-  @Field(name = "author_id")
-  val authorId: ObjectId
+    ...
+    @Field(name = "author_id"
+)
+
+val authorId: ObjectId
 )
 ```
 
