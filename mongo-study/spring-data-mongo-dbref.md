@@ -268,7 +268,7 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
         return mongoTemplate
             .aggregate(
                 aggregation,
-                Post.DOCUMENT_NAME,               // 컬렉션 이름
+              "post",
                 PostProjectionLookup::class.java,
             )
             .mappedResults
@@ -344,7 +344,7 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
         return mongoTemplate
             .aggregate(
                 aggregation,
-              Post.DOCUMENT_NAME,
+              "post",
                 Post::class.java     // 리턴 타입을 Post 객체로 지정
             )
             .mappedResults
