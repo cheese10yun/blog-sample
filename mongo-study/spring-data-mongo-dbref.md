@@ -379,8 +379,7 @@ val author: Author,
 @Document(collection = "post")
 class Post(
   ...
-  @Field(name = "author_id"
-)
+  @Field(name = "author_id")
   val authorId: ObjectId
 )
 ```
