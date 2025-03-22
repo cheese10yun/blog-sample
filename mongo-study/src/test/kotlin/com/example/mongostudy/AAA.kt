@@ -15,12 +15,12 @@ class AAA {
 
             // async() 기본 컨텍스트 사용: runBlocking의 컨텍스트를 상속받으므로 같은 스레드(main)에서 실행됩니다.
             val dispatchers = "Default"
-            val deferred1 = async() {
+            val deferred1 = async(Dispatchers.IO) {
                 contentQuery("${dispatchers}-1")
             }
 
             // async(Dispatchers.IO): I/O 전용 스레드 풀에서 실행됩니다.
-            val deferred2 = async() {
+            val deferred2 = async(Dispatchers.IO) {
                 contentQuery("${dispatchers}-2")
             }
 

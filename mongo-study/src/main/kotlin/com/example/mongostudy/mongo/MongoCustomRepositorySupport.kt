@@ -42,6 +42,7 @@ abstract class MongoCustomRepositorySupport<T>(
         contentQuery: (Query) -> List<S>,
         countQuery: (Query) -> Long
     ) = runBlocking {
+
         val content = async(Dispatchers.IO) { contentQuery(Query().with(pageable)) }
         val totalCount = async(Dispatchers.IO) { countQuery(Query()) }
         PageImpl(content.await(), pageable, totalCount.await())
