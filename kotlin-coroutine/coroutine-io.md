@@ -23,16 +23,7 @@ Dispatchers.IO는 I/O 작업(예: 파일 입출력, 네트워크, JDBC 등) 시 
 
 ## Dispatchers.IO 사용 시나리오
 
-Dispatchers.IO를 도입해야 하는 대표적인 경우는 **스레드가 블록킹될 때**입니다. 예를 들어:
-
-- **JDBC 드라이버:**  
-  JDBC 드라이버는 네트워크 I/O나 DB 쿼리 실행 중 스레드를 블록킹합니다.
-- **파일 입출력:**  
-  파일을 읽거나 쓰는 작업 역시 블록킹 될 수 있습니다.
-- **네트워크 요청:**  
-  동기 방식의 네트워크 호출 역시 블록킹을 유발할 수 있습니다.
-
-이와 같이 블록킹 작업이 발생하면, 동일 스레드에서 순차적으로 실행될 경우 전체 애플리케이션의 성능 저하로 이어질 수 있으므로, Dispatchers.IO를 통해 별도의 스레드 풀에서 작업을 처리하여 동시 실행(parallel execution)을 보장하는 것이 중요합니다.
+Dispatchers.IO를 도입해야 하는 대표적인 경우는 **스레드가 블록킹될 때**입니다. 예를 들어, JDBC 드라이버는 네트워크 I/O나 DB 쿼리 실행 중 스레드를 블록킹할 수 있으며, 파일을 읽거나 쓰는 작업 역시 블록킹 될 수 있고, 동기 방식의 네트워크 호출 역시 스레드를 블록킹하는 원인이 됩니다. 이와 같이 블록킹 작업이 발생하면, 동일 스레드에서 순차적으로 실행될 경우 전체 애플리케이션의 성능 저하로 이어질 수 있으므로, Dispatchers.IO를 통해 별도의 스레드 풀에서 작업을 처리하여 동시 실행(parallel execution)을 보장하는 것이 중요합니다.
 
 ## 코드 예제 분석
 
@@ -74,11 +65,20 @@ fun contentQuery(contentAggregation: String): String {
 }
 ```
 
-위 예제에서는 runBlocking 내부의 컨텍스트를 상속받은 async()를 사용하여 모든 코루틴이 동일한 "Test worker" 스레드에서 실행되므로, 각 작업이 순차적으로 진행되어 전체 동시성이 보장되지 않는 모습을 확인할 수 있습니다.
+이 예제에서는 runBlocking 내부의 컨텍스트를 상속받은 async()를 사용하므로, 모든 코루틴이 동일한 "Test worker" 스레드에서 실행됩니다. 실제 로그는 다음과 같이 출력됩니다.
+
+```
+[Default-1] 시작 - 실행 스레드: Test worker @coroutine#2  
+[Default-1] 완료 - 실행 스레드: Test worker @coroutine#2  
+[Default-2] 시작 - 실행 스레드: Test worker @coroutine#3  
+[Default-2] 완료 - 실행 스레드: Test worker @coroutine#3  
+```
+
+이 로그는 [Default-1]과 [Default-2] 작업이 각각 순차적으로 실행되었음을 보여줍니다. 첫 번째 코루틴([Default-1])은 "Test worker @coroutine#2"에서 시작되어 같은 스레드에서 완료되고, 두 번째 코루틴([Default-2])은 "Test worker @coroutine#3"에서 실행됩니다. 즉, 블록킹 작업으로 인해 한 코루틴이 실행되는 동안 다른 코루틴은 대기하게 되어 전체 동시성이 보장되지 않습니다.
 
 ### async(Dispatchers.IO) 사용 시 동작
 
-동일한 예제에서 async() 호출 시 Dispatchers.IO를 지정하면 I/O 전용 스레드 풀을 사용하여 각 코루틴이 서로 다른 스레드에서 실행됩니다. 예를 들어, 아래와 같이 작성할 수 있습니다.
+동일한 예제에서 async() 호출 시 Dispatchers.IO를 지정하면, I/O 전용 스레드 풀에서 각 코루틴이 서로 다른 스레드에서 실행됩니다. 예를 들어, 아래와 같이 작성할 수 있습니다.
 
 ```kotlin
 val deferredIO1 = async(Dispatchers.IO) {
@@ -90,11 +90,20 @@ val deferredIO2 = async(Dispatchers.IO) {
 }
 ```
 
-이 방식에서는 각 코루틴이 "DefaultDispatcher-worker-1", "DefaultDispatcher-worker-3"과 같이 별도의 스레드에서 실행되므로, 한 스레드가 블록킹되더라도 다른 스레드에서 독립적으로 작업이 수행되어 전체 실행 시간이 단축됩니다.
+이 방식에서 실제 로그는 다음과 같이 출력됩니다.
+
+```
+[IO-2] 시작 - 실행 스레드: DefaultDispatcher-worker-3 @coroutine#3  
+[IO-1] 시작 - 실행 스레드: DefaultDispatcher-worker-1 @coroutine#2  
+[IO-2] 완료 - 실행 스레드: DefaultDispatcher-worker-3 @coroutine#3  
+[IO-1] 완료 - 실행 스레드: DefaultDispatcher-worker-1 @coroutine#2  
+```
+
+이 로그를 통해 각 코루틴이 별도의 스레드(예를 들어 "DefaultDispatcher-worker-1"과 "DefaultDispatcher-worker-3")에서 병렬로 실행됨을 확인할 수 있습니다. 한 코루틴에서 블록킹 작업이 발생하더라도, 다른 코루틴은 별도의 스레드에서 독립적으로 실행되므로 전체 실행 시간이 단축되고 시스템의 반응성이 개선됩니다.
 
 ## 실제 사례: JDBC 드라이버와 블록킹 문제
 
-다음은 JDBC 드라이버를 사용하는 페이징 쿼리 예제입니다. 아래 코드에서는 content와 totalCount 두 쿼리를 동시에 실행하도록 작성되었지만, async()에 별도의 디스패처가 지정되지 않아 runBlocking의 컨텍스트를 상속받아 모든 코루틴이 동일한 "Test worker" 스레드에서 순차적으로 실행됩니다.
+다음은 JDBC 드라이버를 사용하는 페이징 쿼리 예제입니다. 아래 코드에서는 content와 totalCount 두 쿼리를 동시에 실행하도록 작성되었지만, async()에 별도의 디스패처가 지정되지 않아 모든 코루틴이 runBlocking의 컨텍스트를 상속받아 동일한 "Test worker" 스레드에서 순차적으로 실행됩니다.
 
 ```kotlin
 override fun findPagingBy(pageable: Pageable, address: String): Page<Order> = runBlocking {
@@ -126,7 +135,9 @@ override fun findPagingBy(pageable: Pageable, address: String): Page<Order> = ru
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/query-dsl/docs/images/002.png)  
 ![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/query-dsl/docs/images/003.png)
 
-이와 같이 async()에 별도의 디스패처를 지정하지 않으면, 한 쿼리의 블록킹 작업이 완료될 때까지 스레드가 점유되어 JDBC와 같이 블록킹이 발생하는 작업에서는 전체 성능 저하가 발생할 수 있습니다. 반면에, 아래와 같이 Dispatchers.IO를 적용하면 두 쿼리가 I/O 전용 스레드 풀에서 병렬로 실행되어 한 쿼리의 블록킹이 다른 쿼리의 실행에 영향을 미치지 않게 됩니다.
+이와 같이 async()에 별도의 디스패처를 지정하지 않으면, 한 쿼리의 블록킹 작업이 완료될 때까지 스레드가 점유되어 전체 작업이 순차적으로 실행됩니다. 이 경우, [Default-1]과 [Default-2] 로그에서 볼 수 있듯이, 한 작업이 완료된 후 다음 작업이 시작되므로, JDBC와 같이 블록킹이 발생하는 작업에서는 전체 성능 저하가 발생할 수 있습니다.
+
+반면, 아래와 같이 Dispatchers.IO를 적용하면 두 쿼리가 I/O 전용 스레드 풀에서 병렬로 실행됩니다.
 
 ```kotlin
 override fun findPagingBy(pageable: Pageable, address: String): Page<Order> = runBlocking {
@@ -153,8 +164,8 @@ override fun findPagingBy(pageable: Pageable, address: String): Page<Order> = ru
 }
 ```
 
-이처럼 Dispatchers.IO를 사용하면 I/O 작업 중 발생하는 스레드 블록킹 문제를 효과적으로 해결할 수 있으며, 각 쿼리가 별도의 스레드에서 독립적으로 실행되어 전체 시스템의 성능과 반응성을 개선할 수 있습니다.
+이 경우 실제 실행 로그에서는 각 쿼리가 서로 다른 스레드(예: "DefaultDispatcher-worker-1"과 "DefaultDispatcher-worker-3")에서 실행되어, 한 쿼리의 블록킹이 다른 쿼리의 실행에 영향을 주지 않음을 보여줍니다. 이를 통해 전체 시스템의 성능과 반응성이 크게 개선됨을 확인할 수 있습니다.
 
 ## 결론
 
-Kotlin 코루틴의 Dispatchers.IO는 I/O 작업에서 스레드 블록킹 문제를 효과적으로 해결할 수 있는 강력한 도구입니다. 각 디스패처는 용도와 실행 방식에서 차이가 있으며, 특히 블록킹 작업이 빈번한 경우에는 Dispatchers.IO를 사용하는 것이 바람직합니다. Dispatchers.IO는 동적 스레드 풀을 활용하여 블록킹 작업이 발생하더라도 다른 코루틴의 실행에 영향을 주지 않고, JDBC와 같이 스레드가 블록킹되는 작업에서도 독립적인 스레드에서 병렬로 처리할 수 있게 해줍니다. 이와 같이 Dispatchers.IO를 적절히 활용하면, 비동기 I/O 작업에서 발생할 수 있는 문제들을 극복하고 보다 효율적이며 반응성이 뛰어난 애플리케이션을 구현할 수 있을 것입니다.
+Kotlin 코루틴의 Dispatchers.IO는 I/O 작업에서 발생하는 스레드 블록킹 문제를 효과적으로 해결할 수 있는 강력한 도구입니다. 각 디스패처는 용도와 실행 방식에서 차이가 있으며, 특히 블록킹 작업이 빈번한 경우에는 Dispatchers.IO를 활용하는 것이 바람직합니다. Dispatchers.IO는 동적 스레드 풀을 사용하여 블록킹 작업이 발생하더라도 다른 코루틴의 실행에 영향을 주지 않고, JDBC와 같이 스레드 블록킹이 발생하는 작업에서도 각 쿼리를 별도의 스레드에서 병렬로 처리할 수 있게 해줍니다. 이와 같이 Dispatchers.IO를 적절히 활용하면, 비동기 I/O 작업에서 발생할 수 있는 문제들을 극복하고 보다 효율적이며 반응성이 뛰어난 애플리케이션을 구현할 수 있을 것입니다.
