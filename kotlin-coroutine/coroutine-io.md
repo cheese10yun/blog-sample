@@ -214,34 +214,38 @@ Test worker 으로 메인 스레드가 시작하는 것을 확인할 수 있고 
 
 ```kotlin
 override fun findPagingBy(pageable: Pageable, address: String): Page<Order> = runBlocking {
-  log.info("findPagingBy thread : ${Thread.currentThread()}")
-  val content: Deferred<List<Order>> = async() {
-    log.info("content thread : ${Thread.currentThread()}")
-    from(order)
-      .select(order)
-      .innerJoin(user).on(order.userId.eq(user.id))
-      .leftJoin(coupon).on(order.couponId.eq(coupon.id))
-      .where(order.address.eq(address))
-      .run {
-        querydsl.applyPagination(pageable, this).fetch()
-      }
-  }
-  val totalCount: Deferred<Long> = async() {
-    log.info("count thread : ${Thread.currentThread()}")
-    from(order)
-      .select(order.count())
-      .where(order.address.eq(address))
-      .fetchFirst()
-  }
-  PageImpl(content.await(), pageable, totalCount.await())
+    log.info("findPagingBy thread : ${Thread.currentThread()}")
+    val content: Deferred<List<Order>> = async() {
+        log.info("content thread : ${Thread.currentThread()}")
+        from(order)
+            .select(order)
+            .innerJoin(user).on(order.userId.eq(user.id))
+            .leftJoin(coupon).on(order.couponId.eq(coupon.id))
+            .where(order.address.eq(address))
+            .run {
+                querydsl.applyPagination(pageable, this).fetch()
+            }
+    }
+    val totalCount: Deferred<Long> = async() {
+        log.info("count thread : ${Thread.currentThread()}")
+        from(order)
+            .select(order.count())
+            .where(order.address.eq(address))
+            .fetchFirst()
+    }
+    PageImpl(content.await(), pageable, totalCount.await())
 }
 ```
 
 아래 이미지는 위 코드가 실행되었을 때의 로그를 보여줍니다.
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/query-dsl/docs/images/002.png)  
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/query-dsl/docs/images/003.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/refs/heads/master/kotlin-coroutine/images/00001.png)
 
 여기서 특히 강조해야 할 점은, JDBC 드라이버가 기본적으로 블록킹 I/O를 수행한다는 것입니다. JDBC 드라이버는 데이터베이스와의 통신 과정에서 네트워크 I/O 및 쿼리 실행을 진행하는 동안 스레드를 블록킹하므로, 동일한 스레드에서 쿼리가 순차적으로 실행되면 한 쿼리의 블록킹이 다른 쿼리의 실행까지 지연시키게 됩니다. 위 예제에서는 async()에 별도의 디스패처를 지정하지 않아, content와 totalCount 쿼리가 모두 runBlocking의 컨텍스트인 동일한 "Test worker" 스레드에서 실행되고, 그 결과 한 쿼리의 작업이 완료되어야만 다음 쿼리가 시작되므로 전체 성능 저하와 응답성 저하가 발생할 수 있습니다.
+
+```kotlin
+val content: Deferred<List<Order>> = async(Dispatchers.IO) { ... }
+val totalCount: Deferred<Long> = async(Dispatchers.IO) { ... }
+```
 
 이를 해결하기 위해서는 async() 호출 시 Dispatchers.IO와 같이 I/O 전용 스레드 풀을 사용하도록 지정하여, 각 코루틴이 독립된 별도의 스레드에서 실행되도록 해야 합니다. 이렇게 하면, JDBC 드라이버의 블록킹으로 인해 한 쿼리가 실행되는 동안에도 다른 쿼리는 다른 스레드에서 동시에 실행되어 전체적인 성능 개선과 병렬 처리가 가능해집니다.
