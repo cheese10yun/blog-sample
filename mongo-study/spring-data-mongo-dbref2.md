@@ -425,8 +425,7 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 
 ## 마치며
 
-이번 글에서는 Spring Data MongoDB에서 `@DBRef`를 활용한 객체 간의 연관관계 설정, 이로 인한 N+1 문제, 그리고 이를 해결하기 위한 다양한 최적화 전략을 살펴보았습니다.  
-핵심 요약은 다음과 같습니다.
+이번 글에서는 Spring Data MongoDB에서 `@DBRef`를 활용한 객체 간의 연관관계 설정, 이로 인한 N+1 문제, 그리고 이를 해결하기 위한 다양한 최적화 전략을 살펴보았습니다. 핵심 요약은 다음과 같습니다.
 
 - **@DBRef 방식의 한계:**  
   `@DBRef`를 사용하면 연관 문서를 로딩할 수 있지만, Post를 조회할 때마다 별도의 Author 조회 쿼리가 발생하여 N+1 문제가 발생할 위험이 있습니다.
