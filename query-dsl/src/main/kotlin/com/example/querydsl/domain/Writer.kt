@@ -1,12 +1,9 @@
 package com.example.querydsl.domain
 
 import com.example.querydsl.repository.support.QuerydslCustomRepositorySupport
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.util.StopWatch
 import java.time.LocalDateTime
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -14,6 +11,8 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 import com.example.querydsl.domain.QWriter.writer as qWriter
 
 @Entity
@@ -31,12 +30,12 @@ class Writer(
         internal set
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     lateinit var createdAt: LocalDateTime
         internal set
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     lateinit var updatedAt: LocalDateTime
         internal set
 }

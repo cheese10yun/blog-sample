@@ -22,11 +22,6 @@ class PaymentService(
     private val paymentRepository: PaymentRepository
 ) {
 
-    fun aaaa() {
-
-        bbbb()
-    }
-
     @Transactional
     fun bbbb() {
         (1..10).map {

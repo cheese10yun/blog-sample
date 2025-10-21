@@ -44,9 +44,11 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
+    implementation("com.querydsl:querydsl-sql:5.1.0")
 
 //    implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
+
 
 //    runtimeOnly("com.h2database:h2")
     runtimeOnly("com.mysql:mysql-connector-j")
