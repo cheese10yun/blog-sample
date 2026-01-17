@@ -17,11 +17,13 @@ import com.querydsl.core.types.dsl.NumberPath
 import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.sql.Configuration
 import javax.sql.DataSource
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.util.StopWatch // StopWatch import 추가
 
 @Service
 class BatchInsertService(
     private val jpaQueryFactory: JPAQueryFactory,
+    private val jdbcTemplate: JdbcTemplate,
     private val dataSource: DataSource // Inject DataSource
 ) {
 
