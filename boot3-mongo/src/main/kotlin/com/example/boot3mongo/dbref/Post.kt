@@ -13,12 +13,12 @@ import org.springframework.data.mongodb.repository.MongoRepository
 @Document(collection = "post")
 class Post(
     @Field(name = "title", targetType = FieldType.STRING)
-    val title: String,
+    var title: String,
     @Field(name = "content", targetType = FieldType.STRING)
     val content: String,
 //    @DBRef(lazy = true)
-    @DBRef(lazy = false)
-    val author: Author
+//    val author: Author
+    val authorId: ObjectId
 ) : Auditable()
 
 interface PostRepository : MongoRepository<Post, ObjectId>, PostCustomRepository

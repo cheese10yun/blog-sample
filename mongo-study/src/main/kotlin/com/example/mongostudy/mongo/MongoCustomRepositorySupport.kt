@@ -46,10 +46,6 @@ abstract class MongoCustomRepositorySupport<T>(
         val content = async(Dispatchers.IO) { contentQuery(Query().with(pageable)) }
         val totalCount = async(Dispatchers.IO) { countQuery(Query()) }
         PageImpl(content.await(), pageable, totalCount.await())
-
-//        val content = contentQuery(Query().with(pageable))
-//        val totalCount = countQuery(Query())
-//        PageImpl(content, pageable, totalCount)
     }
 
     protected fun <S> applyPaginationAggregation(

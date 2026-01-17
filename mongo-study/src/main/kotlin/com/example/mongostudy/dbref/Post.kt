@@ -26,8 +26,6 @@ class Post(
     val content: String,
     @DBRef(lazy = true)
     val author: Author,
-//    @Field(name = "author_id")
-//    val authorId:  ObjectId
 ) {
     companion object {
         const val DOCUMENT_NAME = "post"
@@ -91,7 +89,8 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
             .andInclude("title")
             .andInclude("content")
             .andInclude("author")
-        val limitStage = Aggregation.limit(limit.toLong())
+        val limitStage = Aggregation
+            .limit(limit.toLong())
         val aggregation = Aggregation
             .newAggregation(lookupStage, unwindStage, projection, limitStage)
         return mongoTemplate

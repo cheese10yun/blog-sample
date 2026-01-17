@@ -4,6 +4,7 @@ import com.example.querydsl.domain.Member
 import com.example.querydsl.domain.QMember
 import com.example.querydsl.domain.Writer
 import com.example.querydsl.domain.QWriter
+import com.example.querydsl.domain.SWriter
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,6 +15,7 @@ import com.querydsl.sql.RelationalPathBase
 import com.querydsl.core.types.dsl.StringPath
 import com.querydsl.core.types.dsl.NumberPath
 import com.querydsl.core.types.dsl.Expressions
+import com.querydsl.sql.Configuration
 import javax.sql.DataSource
 import org.springframework.util.StopWatch // StopWatch import 추가
 
@@ -68,20 +70,33 @@ class BatchInsertService(
     @Transactional
     fun executeBulkInsertWritersWithSql(writers: List<Writer>): Long {
         val writerTable = RelationalPathBase(Writer::class.java, "writer", null, "writer")
-
-        val name = Expressions.stringPath(writerTable, "name")
-        val email = Expressions.stringPath(writerTable, "email")
-
-        val sqlQueryFactory = SQLQueryFactory(com.querydsl.sql.Configuration(MySQLTemplates()), dataSource)
-
+        val sqlQueryFactory = SQLQueryFactory(Configuration(MySQLTemplates()), dataSource)
         val insert = sqlQueryFactory.insert(writerTable)
-
         for (writer in writers) {
-            insert.set(name, writer.name)
-            insert.set(email, writer.email)
+            insert.set(QWriter.writer.name, writer.name)
+            insert.set(QWriter.writer.email, writer.email)
+            insert.set(QWriter.writer.score, 1)
+            insert.set(QWriter.writer.reputation, 1.toDouble())
+            insert.set(QWriter.writer.active, true)
             insert.addBatch()
         }
         return insert.execute()
     }
 
+//    fun bulkInsertWriters(writers: List<Writer>, ): Long {
+//        val sqlQueryFactory = SQLQueryFactory(
+//            Configuration(MySQLTemplates()),
+//            dataSource
+//        )
+//        val insert = sqlQueryFactory.insert(SWriter)
+//        writers.forEach {
+//            insert.set(SWriter.name, it.name)
+//                .set(SWriter.email, it.email)
+//                .set(SWriter.score, 1)
+//                .set(SWriter.reputation, 1.0)
+//                .set(SWriter.active, true)
+//                .addBatch()
+//        }
+//        return insert.execute()
+//    }
 }

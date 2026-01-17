@@ -108,12 +108,10 @@ class MemberCustomRepositoryImpl(mongoTemplate: MongoTemplate) : MemberCustomRep
         val projection = project()
             .andInclude("name")
             .andInclude("email")
-
         val contentAggregation = newAggregation(
             match,
             projection,
         )
-
         return applyPaginationAggregation(
             pageable = pageable,
             contentAggregation = contentAggregation,

@@ -4,6 +4,7 @@ import com.example.querydsl.SpringBootTestSupport
 import com.example.querydsl.domain.Writer
 import com.example.querydsl.domain.WriterCustomRepository
 import com.example.querydsl.domain.WriterRepository
+import com.example.querydsl.domain.WriterType
 import jakarta.persistence.EntityManager
 import org.junit.jupiter.api.Test
 import org.springframework.util.StopWatch
@@ -36,10 +37,10 @@ class BatchInsertServiceTest(
             100,
             200,
             500,
-            1_000,
-            2_000,
-            5_000,
-            10_000,
+//            1_000,
+//            2_000,
+//            5_000,
+//            10_000,
         )
 
         val iterations = 5
@@ -51,8 +52,14 @@ class BatchInsertServiceTest(
                 val uniqueWriters = (1..rows).map {
                     Writer(
                         name = "name-$i-$it",
-                        email = "email-$i-$it"
-                    )
+                        email = "email-$i-$it",
+                        score = it,
+                        reputation = 0.0,
+                        active = false,
+//                        lastLogin = null,
+//                        writerType = WriterType.ROOKIE,
+
+                        )
                 }
 
                 val stopWatch = StopWatch()
@@ -84,10 +91,10 @@ class BatchInsertServiceTest(
             100,
             200,
             500,
-            1_000,
-            2_000,
-            5_000,
-            10_000,
+//            1_000,
+//            2_000,
+//            5_000,
+//            10_000,
         )
 
         val iterations = 5

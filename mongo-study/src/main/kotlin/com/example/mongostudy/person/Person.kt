@@ -49,7 +49,6 @@ class PersonCustomRepositoryImpl(
         pageable: Pageable
     ): Page<Person> {
         val criteria = Criteria.where("lastName").`is`(lastName)
-
         return applyPagination(
             pageable = pageable,
             contentQuery = { query: Query ->

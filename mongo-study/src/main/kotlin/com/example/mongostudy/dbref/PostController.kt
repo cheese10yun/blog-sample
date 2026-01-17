@@ -1,6 +1,5 @@
 package com.example.mongostudy.dbref
 
-import java.time.LocalDateTime
 import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -44,8 +43,7 @@ class PostController(
 
     @GetMapping("/post-with-author")
     fun getPostWithAuthor(@RequestParam(name = "limit") limit: Int): List<Post> {
-        val find = postRepository.find(limit)
-        return find
+        return postRepository.find(limit)
     }
 
     @GetMapping("/post-only")
@@ -79,15 +77,11 @@ data class PostProjection(
     val id: ObjectId,
     val title: String,
     val content: String,
-//    val createdAt: LocalDateTime,
-//    val updatedAt: LocalDateTime
 ) {
     constructor(post: Post) : this(
         id = post.id!!,
         title = post.title,
         content = post.content,
-//        createdAt = post.createdAt,
-//        updatedAt = post.updatedAt,
     )
 }
 
