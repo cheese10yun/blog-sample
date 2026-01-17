@@ -15,7 +15,7 @@ import org.assertj.core.api.Assertions.assertThat
 class BatchInsertServiceTest(
     private val batchInsertService: BatchInsertService,
     private val writerRepository: WriterRepository,
-    ) : SpringBootTestSupport() {
+) : SpringBootTestSupport() {
     /**
      *
      * rows	saveAll (B)	add batch (C)	성능 개선율 (D)
@@ -53,7 +53,7 @@ class BatchInsertServiceTest(
                         score = it,
                         reputation = 0.0,
                         active = false,
-                        )
+                    )
                 }
 
                 val stopWatch = StopWatch()
