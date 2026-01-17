@@ -13,10 +13,8 @@ import org.assertj.core.api.Assertions.assertThat
 
 //@Transactional
 class BatchInsertServiceTest(
-    private val em: EntityManager,
     private val batchInsertService: BatchInsertService,
     private val writerRepository: WriterRepository,
-
     ) : SpringBootTestSupport() {
     /**
      *
@@ -32,21 +30,20 @@ class BatchInsertServiceTest(
      */
     @Test
     fun `saveAll test`() {
-
         val rowsList = listOf(
             100,
             200,
             500,
-//            1_000,
-//            2_000,
-//            5_000,
-//            10_000,
+            1_000,
+            2_000,
+            5_000,
+            10_000,
         )
 
         val iterations = 5
         rowsList.forEach { rows ->
             var totalTimeMillis = 0.0
-            println("--- executeBulkInsertWritersWithSql 성능 측정 시작 (${iterations}회 반복, 첫 회 제외) ---")
+            println("--- saveAll test 성능 측정 시작 (${iterations}회 반복, 첫 회 제외) ---")
             for (i in 1..iterations) {
                 // 각 반복마다 새로운 writer 리스트를 생성하여 동일한 데이터로 인한 PK 충돌 방지
                 val uniqueWriters = (1..rows).map {
@@ -56,9 +53,6 @@ class BatchInsertServiceTest(
                         score = it,
                         reputation = 0.0,
                         active = false,
-//                        lastLogin = null,
-//                        writerType = WriterType.ROOKIE,
-
                         )
                 }
 
@@ -91,10 +85,10 @@ class BatchInsertServiceTest(
             100,
             200,
             500,
-//            1_000,
-//            2_000,
-//            5_000,
-//            10_000,
+            1_000,
+            2_000,
+            5_000,
+            10_000,
         )
 
         val iterations = 5
@@ -130,6 +124,5 @@ class BatchInsertServiceTest(
             println("--- 측정 완료 ---")
             println("첫 회를 제외한 $rows 평균 실행 시간: ${averageTimeMillis} ms")
         }
-
     }
 }

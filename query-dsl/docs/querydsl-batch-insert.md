@@ -2,6 +2,7 @@
 
 JPA를 사용하다 보면 대량의 데이터를 삽입해야 하는 상황에서 `saveAll`의 성능 한계에 부딪히게 됩니다. 이번 포스팅에서는 JPA `saveAll`의 성능 이슈를 살펴보고, QueryDSL의 `SQLQueryFactory`를 활용한 Batch Insert로 성능을 획기적으로 개선하는 방법을 소개합니다.
 
+---
 
 ## 개요
 
@@ -11,12 +12,22 @@ JPA를 사용하다 보면 대량의 데이터를 삽입해야 하는 상황에�
 
 JPA(Hibernate)는 엔티티의 ID 생성 전략이 `@GeneratedValue(strategy = GenerationType.IDENTITY)`로 설정되어 있을 때, JDBC 레벨의 Batch Insert를 비활성화합니다. 이는 영속성 컨텍스트가 엔티티를 관리하기 위해 Insert 즉시 ID 값을 알아야 하기 때문입니다. 결과적으로 1,000개의 데이터를 저장하면 1,000번의 Insert 쿼리가 데이터베이스로 전송되어 성능 저하의 주원인이 됩니다.
 
+일반적인 JPA의 `saveAll` 사용 코드는 다음과 같습니다.
+
+```kotlin
+@Transactional
+fun saveAllWriters(writers: List<Writer>) {
+    writerRepository.saveAll(writers)
+}
+```
+
+위 코드는 사용하기 매우 편리하지만, 대량의 데이터를 처리할 때는 각 엔티티마다 개별적인 Insert 쿼리가 발생하여 네트워크 오버헤드와 데이터베이스 처리 비용이 증가하게 됩니다.
+
 ## QueryDSL Batch Insert 구현
 
 QueryDSL-SQL 모듈을 사용하면 JPA 엔티티가 아닌 JDBC 레벨에서 직접 SQL을 구성하여 실행할 수 있습니다. 이를 통해 `addBatch` 기능을 활용한 Bulk Insert를 구현할 수 있습니다.
 
 ### 의존성 설정
-
 먼저 `querydsl-sql` 관련 의존성이 필요합니다.
 
 ### 구현 코드 예시
@@ -61,7 +72,70 @@ class BatchInsertService(
 
 ## 성능 비교
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/query-dsl/docs/images/Insert-Performance.png)
+### 성능 측정 코드
+
+정확한 성능 측정을 위해 `saveAll`과 QueryDSL `addBatch`의 실행 시간을 각각 측정했습니다.
+
+```kotlin
+    @Test
+    fun `saveAll test`() {
+        val rowsList = listOf(100, 200, 500, 1_000, 2_000, 5_000, 10_000)
+        val iterations = 5
+
+        rowsList.forEach { rows ->
+            var totalTimeMillis = 0.0
+            for (i in 1..iterations) {
+                val uniqueWriters = (1..rows).map {
+                    Writer(name = "name-$i-$it", email = "email-$i-$it")
+                }
+
+                val stopWatch = StopWatch()
+                stopWatch.start()
+                writerRepository.saveAll(uniqueWriters)
+                stopWatch.stop()
+
+                if (i > 1) { // 첫 회차 제외
+                    totalTimeMillis += stopWatch.totalTimeMillis
+                }
+            }
+            val averageTimeMillis = totalTimeMillis / (iterations - 1)
+            println("$rows 건 saveAll 평균 실행 시간: ${averageTimeMillis} ms")
+        }
+    }
+
+    @Test
+    fun `executeBulkInsertWritersWithSql test`() {
+        val rowsList = listOf(100, 200, 500, 1_000, 2_000, 5_000, 10_000)
+        val iterations = 5
+
+        rowsList.forEach { rows ->
+            var totalTimeMillis = 0.0
+            for (i in 1..iterations) {
+                val uniqueWriters = (1..rows).map {
+                    Writer(name = "name-$i-$it", email = "email-$i-$it")
+                }
+
+                val stopWatch = StopWatch()
+                stopWatch.start()
+                batchInsertService.executeBulkInsertWritersWithSql(uniqueWriters)
+                stopWatch.stop()
+
+                if (i > 1) { // 첫 회차 제외
+                    totalTimeMillis += stopWatch.totalTimeMillis
+                }
+            }
+            val averageTimeMillis = totalTimeMillis / (iterations - 1)
+            println("$rows 건 QueryDSL Batch Insert 평균 실행 시간: ${averageTimeMillis} ms")
+        }
+    }
+```
+
+**측정 방식 설명:**
+*   **반복 측정**: 각 데이터 구간(100건 ~ 10,000건)마다 총 **5회** 반복하여 측정했습니다.
+*   **Warm-up 고려**: 테스트 실행 시 **첫 번째 회차는 결과에서 제외**했습니다. 이는 데이터베이스 커넥션 풀(Connection Pool)에서 커넥션을 획득하는 초기 비용, JVM의 JIT 컴파일러 최적화, 클래스 로딩 등 초기화 작업에 소요되는 시간이 포함되어 결과가 왜곡되는 것을 방지하기 위함입니다.
+*   **평균값 산출**: 첫 회차를 제외한 나머지 **4회의 실행 시간**을 합산하여 평균값을 산출함으로써 보다 신뢰성 있는 성능 데이터를 얻었습니다.
+
+### 성능 측정 결과
 
 JPA `saveAll`과 QueryDSL `addBatch`를 사용했을 때의 성능 차이를 비교한 결과입니다. 데이터 개수가 늘어날수록 성능 차이가 확연하게 벌어지는 것을 확인할 수 있습니다.
 
