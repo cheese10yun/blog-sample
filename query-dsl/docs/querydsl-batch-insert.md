@@ -6,7 +6,11 @@ JPA를 사용하다 보면 대량의 데이터를 삽입해야 하는 상황에�
 
 ## 개요
 
-대량의 데이터를 데이터베이스에 저장해야 할 때, 일반적으로 JPA의 `saveAll` 메서드를 사용합니다. 하지만 데이터의 양이 늘어날수록 `saveAll`의 처리 속도는 급격히 느려질 수 있습니다. 특히 ID 생성 전략이 `IDENTITY`인 경우, JPA는 Batch Insert를 지원하지 않아 단건으로 Insert 쿼리가 실행되는 문제가 있습니다. 이를 해결하기 위해 JDBC의 `addBatch` 기능을 활용할 수 있는데, QueryDSL-SQL을 사용하면 이를 보다 편리하게 구현할 수 있습니다.
+대량의 데이터를 데이터베이스에 저장해야 할 때, 일반적으로 JPA의 `saveAll` 메서드를 사용합니다. 하지만 데이터의 양이 늘어날수록 `saveAll`의 처리 속도는 급격히 느려질 수 있습니다. 특히 ID 생성 전략이 `IDENTITY`인 경우, JPA는 Batch Insert를 지원하지 않아 단건으로 Insert 쿼리가 실행되는 문제가 있습니다.
+
+이전 포스팅([Spring Batch에서 Exposed를 이용한 Batch Insert](https://cheese10yun.github.io/spring-batch-batch-insert/))에서 Exposed를 활용한 성능 개선 방법을 소개한 적이 있습니다. 하지만 오직 Batch Insert만을 위해 JPA 환경에 Exposed라는 새로운 ORM을 도입하고 혼합해서 사용하는 것은 설정의 복잡함이나 학습 곡선 측면에서 비효율적일 수 있습니다.
+
+만약 이미 프로젝트에서 JPA와 QueryDSL을 사용하고 있다면, 추가적인 ORM 도입 없이 **QueryDSL-SQL** 모듈을 활용하여 Type-Safe하게 Batch Insert를 구현할 수 있습니다. 이번 포스팅에서는 그 방법을 소개합니다.
 
 ## JPA saveAll의 성능 이슈
 
@@ -82,6 +86,7 @@ class BatchInsertService(
 }
 ```
 
+**코드 설명**
 * **RelationalPathBase**: SQL 쿼리 작성을 위해 대상 테이블의 메타데이터를 정의합니다.
 * **addBatch()**: 루프를 돌며 데이터를 즉시 Insert 하지 않고, JDBC의 Batch 기능을 활용하기 위해 메모리에 쿼리 파라미터들을 쌓아둡니다.
 * **execute()**: 쌓여있는 Batch 쿼리를 데이터베이스로 한 번에 전송하여 실행합니다.
