@@ -1,0 +1,18 @@
+services:
+  mysql:
+    container_name: 'mysql-spring-batch'
+    image: 'mysql:8.0.34'
+    environment:
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: 'spring-batch'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      TZ: 'Asia/Seoul'
+    ports:
+      - '3306:3306'
+    volumes:
+      - './volumes/mysql/default:/var/lib/mysql'
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+volumes:
+  mysql-data:  # MySQL 데이터 볼륨

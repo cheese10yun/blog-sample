@@ -1,0 +1,33 @@
+spring:
+    datasource:
+        url: jdbc:mysql://localhost:3306/spring-batch?useSSL=false&serverTimezone=Asia/Seoul
+        username: root
+        password:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        hikari:
+            minimum-idle: 5         # 풀의 최소 유휴 커넥션 수
+            maximum-pool-size: 20   # 풀의 최대 커넥션 수
+            auto-commit: true       # (기본) 커넥션 자동 커밋 여부
+#            transaction-isolation: REPEATABLE_READ
+    batch:
+        jdbc:
+            # 메타데이터 테이블 스키마를 항상 초기화합니다. (기본값: embedded — 임베디드 DB일 때만 초기화) :contentReference[oaicite:0]{index=0}
+            initialize-schema: always
+            # 스크립트에 적용할 플랫폼 이름 (예: h2, mysql, postgresql) :contentReference[oaicite:1]{index=1}
+            platform: mysql
+            # 메타데이터 테이블 생성에 사용할 SQL 파일 위치 :contentReference[oaicite:2]{index=2}
+#            schema: classpath:org/springframework/batch/core/schema-mysql.sql
+#            # 배치 메타데이터 테이블 이름 앞에 붙일 접두사 :contentReference[oaicite:3]{index=3}
+#            table-prefix: BATCH_
+            # 메타데이터 생성 시 사용할 트랜잭션 격리 수준 (DEFAULT, READ_UNCOMMITTED, READ_COMMITTED, REPEATABLE_READ, SERIALIZABLE) :contentReference[oaicite:4]{index=4}
+            isolation-level-for-create: REPEATABLE_READ
+
+        job:
+            # 애플리케이션 시작 시 모든 Job을 자동 실행할지 여부 (true: 실행, false: 실행 안 함) :contentReference[oaicite:5]{index=5}
+            enabled: true
+            # 실행할 단일 Job 이름. (Job이 여러 개면 반드시 지정) :contentReference[oaicite:6]{index=6}
+            name: ${job.name:NONE}
+#            name: helloWorldJob
+logging:
+    level:
+        org.springframework.batch: INFO
