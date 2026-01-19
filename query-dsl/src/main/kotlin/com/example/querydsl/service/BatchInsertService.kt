@@ -71,17 +71,22 @@ class BatchInsertService(
 
     @Transactional
     fun executeBulkInsertWritersWithSql(writers: List<Writer>): Long {
+        // 1. 테이블 메타데이터 정의
         val writerTable = RelationalPathBase(Writer::class.java, "writer", null, "writer")
+        // 2. SQLQueryFactory 생성 (MySQL 템플릿 사용)
         val sqlQueryFactory = SQLQueryFactory(Configuration(MySQLTemplates()), dataSource)
         val insert = sqlQueryFactory.insert(writerTable)
+        // 3. 데이터를 Batch에 추가
         for (writer in writers) {
             insert.set(QWriter.writer.name, writer.name)
             insert.set(QWriter.writer.email, writer.email)
             insert.set(QWriter.writer.score, 1)
             insert.set(QWriter.writer.reputation, 1.toDouble())
             insert.set(QWriter.writer.active, true)
-            insert.addBatch()
+            insert.addBatch() // 메모리에 쿼리 적재
         }
+
+        // 4. 일괄 실행
         return insert.execute()
     }
 

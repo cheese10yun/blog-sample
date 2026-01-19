@@ -2,8 +2,6 @@
 
 JPA를 사용하다 보면 대량의 데이터를 삽입해야 하는 상황에서 `saveAll`의 성능 한계에 부딪히게 됩니다. 이번 포스팅에서는 JPA `saveAll`의 성능 이슈를 살펴보고, QueryDSL의 `SQLQueryFactory`를 활용한 Batch Insert로 성능을 획기적으로 개선하는 방법을 소개합니다.
 
----
-
 ## 개요
 
 대량의 데이터를 데이터베이스에 저장해야 할 때, 일반적으로 JPA의 `saveAll` 메서드를 사용합니다. 하지만 데이터의 양이 늘어날수록 `saveAll`의 처리 속도는 급격히 느려질 수 있습니다. 특히 ID 생성 전략이 `IDENTITY`인 경우, JPA는 Batch Insert를 지원하지 않아 단건으로 Insert 쿼리가 실행되는 문제가 있습니다.
@@ -58,25 +56,19 @@ class BatchInsertService(
     private val dataSource: DataSource
 ) {
     @Transactional
-    fun executeBulkInsertWithSql(members: List<Member>): Long {
-        // 1. 테이블 및 컬럼 메타데이터 정의
-        val memberTable = RelationalPathBase(Member::class.java, "member", null, "member")
-        val username = Expressions.stringPath(memberTable, "username")
-        val age = Expressions.numberPath(Int::class.java, memberTable, "age")
-        val status = Expressions.stringPath(memberTable, "status")
-        val teamId = Expressions.numberPath(Long::class.java, memberTable, "team_id")
-
+    fun executeBulkInsertWritersWithSql(writers: List<Writer>): Long {
+        // 1. 테이블 메타데이터 정의
+        val writerTable = RelationalPathBase(Writer::class.java, "writer", null, "writer")
         // 2. SQLQueryFactory 생성 (MySQL 템플릿 사용)
         val sqlQueryFactory = SQLQueryFactory(Configuration(MySQLTemplates()), dataSource)
-
-        val insert = sqlQueryFactory.insert(memberTable)
-
+        val insert = sqlQueryFactory.insert(writerTable)
         // 3. 데이터를 Batch에 추가
-        for (member in members) {
-            insert.set(username, member.username)
-            insert.set(age, member.age)
-            insert.set(status, member.status.name)
-            insert.set(teamId, member.team.id)
+        for (writer in writers) {
+            insert.set(QWriter.writer.name, writer.name)
+            insert.set(QWriter.writer.email, writer.email)
+            insert.set(QWriter.writer.score, 1)
+            insert.set(QWriter.writer.reputation, 1.toDouble())
+            insert.set(QWriter.writer.active, true)
             insert.addBatch() // 메모리에 쿼리 적재
         }
 
@@ -165,7 +157,7 @@ fun `executeBulkInsertWritersWithSql test`() {
 **측정 방식 설명**
 
 * **반복 측정**: 각 데이터 구간(100건 ~ 10,000건)마다 총 **5회** 반복하여 측정했습니다.
-* **Warm-up 고려**: 테스트 실행 시 **첫 번째 회차는 결과에서 제외**했습니다. 이는 데이터베이스 커넥션 풀(Connection Pool)에서 커넥션을 획득하는 초기 비용, JVM의 JIT 컴파일러 최적화, 클래스 로딩 등 초기화 작업에 소요되는 시간이 포함되어 결과가 왜곡되는 것을 방지하기 위함입니다.
+* **Warm-up 고려**: 테스트 실행 시 **첫 번째 회차는 결과에서 제외**했습니다. 이는 데이터베이스 커넥션 풀(Connection Pool)에서 커넥션을 처음 생성하는 초기 비용 등 초기화 작업에 소요되는 시간이 포함되어 결과가 왜곡되는 것을 방지하기 위함입니다.
 * **평균값 산출**: 첫 회차를 제외한 나머지 **4회의 실행 시간**을 합산하여 평균값을 산출함으로써 보다 신뢰성 있는 성능 데이터를 얻었습니다.
 
 ### 성능 측정 결과
@@ -187,11 +179,11 @@ JPA `saveAll`과 QueryDSL `addBatch`를 사용했을 때의 성능 차이를 비
 * **saveAll**: JPA Repository의 saveAll 메서드 사용
 * **add batch**: QueryDSL SQLQueryFactory의 addBatch 사용
 
-10,000건 기준으로 약 **96.5%**의 성능 개선 효과가 있었습니다. `saveAll`이 약 7.5초 걸리는 작업을 Batch Insert로는 0.26초 만에 처리할 수 있습니다.
+10,000건 기준으로 약 **96.5**%의 성능 개선 효과가 있었습니다. `saveAll`이 약 7.5초 걸리는 작업을 Batch Insert로는 0.26초 만에 처리할 수 있습니다.
 
 ## 결론
 
-대량의 데이터를 처리해야 하는 배치성 작업이나 초기 데이터 적재 시에는 JPA의 `saveAll`보다는 JDBC Batch Insert를 사용하는 것이 필수적입니다. 
+대량의 데이터를 처리해야 하는 배치성 작업이나 초기 데이터 적재 시에는 JPA의 `saveAll`보다는 JDBC Batch Insert를 사용하는 것이 필수적입니다.
 
 특히, 오직 Batch Insert 성능 개선만을 위해 Exposed와 같은 새로운 ORM을 도입하는 것은 프로젝트의 복잡도를 높일 수 있습니다. 이미 JPA와 QueryDSL을 사용 중인 환경이라면, **QueryDSL-SQL**을 활용하는 것이 추가적인 학습 곡선이나 설정의 번거로움 없이 Type-Safe하게 성능을 극대화할 수 있는 가장 효율적인 대안입니다.
 
