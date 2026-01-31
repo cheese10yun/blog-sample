@@ -16,9 +16,9 @@ class Post(
     var title: String,
     @Field(name = "content", targetType = FieldType.STRING)
     val content: String,
-//    @DBRef(lazy = true)
-//    val author: Author
-    val authorId: ObjectId
+    @DBRef(lazy = true)
+    val author: Author
+//    val authorId: ObjectId
 ) : Auditable()
 
 interface PostRepository : MongoRepository<Post, ObjectId>, PostCustomRepository

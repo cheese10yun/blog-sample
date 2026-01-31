@@ -1,0 +1,18 @@
+[
+  {
+    "product_id": "PROD001",
+    "product_name": "울트라 노트북",
+    "category": {
+      "main_category": "전자제품",
+      "sub_category": "컴퓨터"
+    }
+  },
+  {
+    "product_id": "PROD002",
+    "product_name": "울트라 노트북",
+    "category": {
+      "main_category": "전자제품",
+      "sub_category": "컴퓨터"
+    }
+  }
+]
