@@ -404,7 +404,18 @@ fun `calculateDifference - 중첩된 객체의 변경 사항을 감지한다`() 
 }
 ```
 
-**결과:** 중첩 객체의 필드도 `category/sub_category` 형태로 경로가 명확히 표시됩니다.
+**결과:**
+```json
+{
+  "category/sub_category": {
+    "origin": "컴퓨터",
+    "new": "노트북"
+  }
+}
+```
+
+중첩 객체의 필드는 `category/sub_category` 형태로 경로가 명확히 표시됩니다. 
+슬래시(`/`)를 구분자로 사용하여 객체의 계층 구조를 표현하므로, 어떤 깊이의 중첩 객체라도 경로만으로 정확한 위치를 파악할 수 있습니다.
 
 ### 3. 여러 필드 동시 변경 감지
 
@@ -438,13 +449,24 @@ fun `calculateDifference - 여러 필드의 변경 사항을 감지한다`() {
 ```
 
 **결과:**
-```
+```json
 {
-  "product/product_name": { "origin": "노트북", "new": "울트라 노트북" },
-  "quantity": { "origin": "2", "new": "3" },
-  "price": { "origin": "1500000", "new": "1400000" }
+  "product/product_name": {
+    "origin": "노트북",
+    "new": "울트라 노트북"
+  },
+  "quantity": {
+    "origin": "2",
+    "new": "3"
+  },
+  "price": {
+    "origin": "1500000",
+    "new": "1400000"
+  }
 }
 ```
+
+한 번의 비교로 여러 필드의 변경사항을 모두 추적할 수 있으며, 각 필드별로 이전 값과 새로운 값이 명확하게 구분됩니다.
 
 ### 4. 깊은 중첩 구조 변경 감지
 
@@ -493,7 +515,21 @@ fun `calculateDifference - 깊게 중첩된 객체의 변경 사항을 감지한
 }
 ```
 
-**결과:** 4단계 깊이의 중첩 구조(`customer/contact/address/street`)도 정확히 추적합니다.
+**결과:**
+```json
+{
+  "customer/contact/address/street": {
+    "origin": "서울특별시 종로구",
+    "new": "서울특별시 강남구"
+  },
+  "customer/contact/address/zip_code": {
+    "origin": "03001",
+    "new": "06001"
+  }
+}
+```
+
+4단계 깊이의 중첩 구조(`customer/contact/address/street`)도 정확히 추적합니다.
 
 ### 5. Null 처리
 
@@ -513,7 +549,21 @@ fun `calculateDifference - null에서 값으로 변경을 감지한다`() {
     then(result["description"]?.origin).isEmpty()
     then(result["description"]?.new).isEqualTo("설명 추가")
 }
+```
 
+**결과:**
+```json
+{
+  "description": {
+    "origin": "",
+    "new": "설명 추가"
+  }
+}
+```
+
+### 5-2. 값에서 null로 변경
+
+```kotlin
 @Test
 fun `calculateDifference - 값에서 null로 변경을 감지한다`() {
     // Given
@@ -530,6 +580,18 @@ fun `calculateDifference - 값에서 null로 변경을 감지한다`() {
     then(result["description"]?.new).isEmpty()
 }
 ```
+
+**결과:**
+```json
+{
+  "description": {
+    "origin": "기존 설명",
+    "new": ""
+  }
+}
+```
+
+null 값의 변경도 정확하게 추적되며, null은 빈 문자열로 표시됩니다.
 
 ### 6. 변경 없는 경우
 
@@ -550,6 +612,13 @@ fun `calculateDifference - 동일한 객체는 변경 사항이 없다`() {
     then(result).isEmpty()
 }
 ```
+
+**결과:**
+```json
+{}
+```
+
+동일한 객체를 비교하면 빈 Map이 반환되어, 불필요한 변경 이력이 저장되지 않습니다.
 
 ### 7. 실제 주문 데이터 변경 추적
 
@@ -580,6 +649,28 @@ fun `주문 데이터의 필드 변경을 확인한다`() {
     then(differences["payment/transaction_id"]?.new).isEqualTo("TXN987654322")
 }
 ```
+
+**결과:**
+```json
+{
+  "ORD123456": {
+    "customer/contact/address/street": {
+      "origin": "서울특별시 종로구",
+      "new": "서울특별시 강남구"
+    },
+    "items/0/price": {
+      "origin": "1500000",
+      "new": "1400000"
+    },
+    "payment/transaction_id": {
+      "origin": "TXN987654321",
+      "new": "TXN987654322"
+    }
+  }
+}
+```
+
+실제 JSON 파일에서 읽어온 복잡한 주문 데이터도 정확하게 변경사항을 추적합니다. `calculateDifferences` 함수는 여러 객체를 처리하고 그룹화된 결과를 반환합니다.
 
 ## 활용 방안
 
