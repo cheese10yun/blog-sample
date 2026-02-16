@@ -756,5 +756,3 @@ fun monitorCriticalChanges(changes: DiffValueTracker, entityType: String) {
 - 데이터 동기화 및 충돌 감지
 
 실제 프로덕션 환경에 적용할 때는 성능과 저장 공간, 민감 정보 처리 등을 충분히 고려하여 상황에 맞게 커스터마이징하시기 바랍니다.
-
-전체 코드는 [GitHub Repository](#)에서 확인하실 수 있습니다.
