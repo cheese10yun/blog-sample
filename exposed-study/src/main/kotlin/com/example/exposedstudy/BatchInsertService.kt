@@ -73,6 +73,17 @@ class BatchInsertService {
         }
     }
 
+    fun batchUpdateWriters(updates: List<Pair<Long, String>>) {
+        transaction {
+            BatchUpdateStatement(Writers).apply {
+                updates.forEach { (id, email) ->
+                    addBatch(EntityID(id, Writers))
+                    this[Writers.email] = email
+                }
+            }.execute(this)
+        }
+    }
+
     @Transactional
     fun batchUpdate(
         ids: List<Long>

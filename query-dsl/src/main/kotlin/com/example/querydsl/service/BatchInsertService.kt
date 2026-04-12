@@ -1,24 +1,16 @@
 package com.example.querydsl.service
 
-import com.example.querydsl.domain.Member
-import com.example.querydsl.domain.QMember
-import com.example.querydsl.domain.Writer
 import com.example.querydsl.domain.QWriter
-import com.example.querydsl.domain.SWriter
+import com.example.querydsl.domain.Writer
 import com.querydsl.jpa.impl.JPAQueryFactory
-import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
-import com.querydsl.sql.SQLQueryFactory
-import com.querydsl.sql.MySQLTemplates
-import com.querydsl.core.types.PathMetadataFactory
-import com.querydsl.sql.RelationalPathBase
-import com.querydsl.core.types.dsl.StringPath
-import com.querydsl.core.types.dsl.NumberPath
-import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.sql.Configuration
+import com.querydsl.sql.MySQLTemplates
+import com.querydsl.sql.RelationalPathBase
+import com.querydsl.sql.SQLQueryFactory
 import javax.sql.DataSource
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.util.StopWatch // StopWatch import 추가
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class BatchInsertService(
@@ -26,48 +18,6 @@ class BatchInsertService(
     private val jdbcTemplate: JdbcTemplate,
     private val dataSource: DataSource // Inject DataSource
 ) {
-
-//    @Transactional
-//    fun executeBulkInsert(members: List<Member>): Long {
-//        val qMember = QMember.member
-//
-//        var insertClause = jpaQueryFactory.insert(qMember)
-//
-//        for (member in members) {
-//            insertClause = insertClause.set(qMember.username, member.username)
-//                .set(qMember.age, member.age)
-//                .set(qMember.status, member.status)
-//                .set(qMember.team, member.team)
-//                .addBatch()
-//        }
-//
-//        return insertClause.execute()
-//    }
-
-    @Transactional
-    fun executeBulkInsertWithSql(members: List<Member>): Long {
-        // Define the table path dynamically for SQL operations
-        val memberTable = RelationalPathBase(Member::class.java, "member", null, "member")
-
-        val username = Expressions.stringPath(memberTable, "username")
-        val age = Expressions.numberPath(Int::class.java, memberTable, "age")
-        val status = Expressions.stringPath(memberTable, "status")
-        val teamId = Expressions.numberPath(Long::class.java, memberTable, "team_id") // Assuming team_id is a Long
-
-        val sqlQueryFactory = SQLQueryFactory(com.querydsl.sql.Configuration(MySQLTemplates()), dataSource)
-
-        val insert = sqlQueryFactory.insert(memberTable)
-
-        for (member in members) {
-            insert.set(username, member.username)
-            insert.set(age, member.age)
-            insert.set(status, member.status.name) // Assuming status is stored as String in DB
-            insert.set(teamId, member.team.id) // Assuming team has an 'id' property
-            insert.addBatch()
-        }
-        return insert.execute()
-    }
-
 
     @Transactional
     fun executeBulkInsertWritersWithSql(writers: List<Writer>): Long {
@@ -90,20 +40,27 @@ class BatchInsertService(
         return insert.execute()
     }
 
-//    fun bulkInsertWriters(writers: List<Writer>, ): Long {
-//        val sqlQueryFactory = SQLQueryFactory(
-//            Configuration(MySQLTemplates()),
-//            dataSource
-//        )
-//        val insert = sqlQueryFactory.insert(SWriter)
-//        writers.forEach {
-//            insert.set(SWriter.name, it.name)
-//                .set(SWriter.email, it.email)
-//                .set(SWriter.score, 1)
-//                .set(SWriter.reputation, 1.0)
-//                .set(SWriter.active, true)
-//                .addBatch()
-//        }
-//        return insert.execute()
-//    }
+    @Transactional
+    fun executeBulkUpdateWritersWithSql(writers: List<Writer>): Long {
+        // 1. 테이블 메타데이터 정의
+        val writerTable = RelationalPathBase<Any>(Any::class.java, "writer", null, "writer")
+        // 2. SQLQueryFactory 생성 (MySQL 템플릿 사용)
+        val sqlQueryFactory = SQLQueryFactory(Configuration(MySQLTemplates()), dataSource)
+        val update = sqlQueryFactory.update(writerTable)
+        // 3. 데이터를 Batch에 추가
+        for (writer in writers) {
+            val id = requireNotNull(writer.id) { "Writer id must not be null" }
+            update
+                .set(QWriter.writer.name, writer.name)
+                .set(QWriter.writer.email, writer.email)
+                .set(QWriter.writer.score, writer.score)
+                .set(QWriter.writer.reputation, writer.reputation)
+                .set(QWriter.writer.active, writer.active)
+                .where(QWriter.writer.id.eq(id))
+                .addBatch() // 메모리에 쿼리 적재
+        }
+
+        // 4. 일괄 실행
+        return update.execute()
+    }
 }

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo 목록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .done {
+            text-decoration: line-through;
+            color: #999;
+        }
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📝 Todo 목록</h1>
+        <a href="/todos/create" class="btn">새 Todo 추가</a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(todos)}" class="empty-message">
+        등록된 Todo가 없습니다. 새로운 Todo를 추가해보세요!
+    </div>
+
+    <table th:if="${not #lists.isEmpty(todos)}">
+        <thead>
+            <tr>
+                <th style="width: 50px;">완료</th>
+                <th>제목</th>
+                <th>설명</th>
+                <th style="width: 100px;">작업</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="todo : ${todos}">
+                <td>
+                    <form th:action="@{/todos/{id}/toggle(id=${todo.id})}" method="post" style="margin: 0;">
+                        <input type="checkbox" 
+                               class="checkbox"
+                               th:checked="${todo.isDone}" 
+                               onchange="this.form.submit()">
+                    </form>
+                </td>
+                <td>
+                    <span th:text="${todo.title}" th:class="${todo.isDone} ? 'done' : ''"></span>
+                </td>
+                <td>
+                    <span th:text="${todo.description} ?: '-'" th:class="${todo.isDone} ? 'done' : ''"></span>
+                </td>
+                <td>
+                    <div class="actions">
+                        <form th:action="@{/todos/{id}/delete(id=${todo.id})}" method="post" style="margin: 0;">
+                            <button type="submit" class="btn btn-delete" 
+                                    onclick="return confirm('정말 삭제하시겠습니까?')">
+                                삭제
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
