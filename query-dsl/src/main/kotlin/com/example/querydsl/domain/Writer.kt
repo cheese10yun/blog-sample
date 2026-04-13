@@ -8,15 +8,8 @@ import com.example.querydsl.repository.support.QuerydslCustomRepositorySupport
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
-import java.time.LocalDateTime
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
 import jakarta.persistence.Table
 import com.example.querydsl.domain.QWriter.writer as qWriter
 
@@ -94,53 +87,61 @@ class WriterService(
     @Transactional
     fun findAll(): List<Writer> = writerRepository.findAll()
 
-    @Transactional
-    fun update(writers: List<Writer>) {
-        for (writer in writers) {
-            writer.name = "update"
-        }
-    }
+//    @Transactional
+//    fun update(writers: List<Writer>) {
+//        for (writer in writers) {
+//            writer.name = "update"
+//        }
+//    }
 
     @Transactional
     fun nonPersistContestUpdate(ids: List<Long>) {
         writerRepository.update(ids)
     }
 
-}
-
-
-object SWriter : RelationalPathBase<Any>(Any::class.java, "writer", null, "writer") {
-    private fun readResolve(): Any = SWriter
-    val id: NumberPath<Long> = createNumber("id", Long::class.java)
-    val name: StringPath = createString("name")
-    val email: StringPath = createString("email")
-    val score: NumberPath<Int> = createNumber("score", Int::class.java)
-    val reputation: NumberPath<Double> = createNumber("reputation", Double::class.java)
-    val active: BooleanPath = createBoolean("active")
-
-    init {
-        addMetadata(id, ColumnMetadata.named("id"))
-        addMetadata(name, ColumnMetadata.named("name"))
-        addMetadata(email, ColumnMetadata.named("email"))
-        addMetadata(score, ColumnMetadata.named("score"))
-        addMetadata(reputation, ColumnMetadata.named("reputation"))
-        addMetadata(active, ColumnMetadata.named("active"))
+    @Transactional
+    fun updateWriters(writers: List<Writer>) {
+        for (writer in writers) {
+            writer.name = "updated"
+            writerRepository.save(writer)
+        }
     }
+
 }
 
-fun bulkInsertWriters(writers: List<Writer>, dataSource: javax.sql.DataSource): Long {
-    val sqlQueryFactory = com.querydsl.sql.SQLQueryFactory(
-        com.querydsl.sql.Configuration(com.querydsl.sql.MySQLTemplates()),
-        dataSource
-    )
-    val insert = sqlQueryFactory.insert(SWriter)
-    writers.forEach {
-        insert.set(SWriter.name, it.name)
-            .set(SWriter.email, it.email)
-            .set(SWriter.score, 1)
-            .set(SWriter.reputation, 1.0)
-            .set(SWriter.active, true)
-            .addBatch()
-    }
-    return insert.execute()
-}
+
+//object SWriter : RelationalPathBase<Any>(Any::class.java, "writer", null, "writer") {
+//    private fun readResolve(): Any = SWriter
+//    val id: NumberPath<Long> = createNumber("id", Long::class.java)
+//    val name: StringPath = createString("name")
+//    val email: StringPath = createString("email")
+//    val score: NumberPath<Int> = createNumber("score", Int::class.java)
+//    val reputation: NumberPath<Double> = createNumber("reputation", Double::class.java)
+//    val active: BooleanPath = createBoolean("active")
+//
+//    init {
+//        addMetadata(id, ColumnMetadata.named("id"))
+//        addMetadata(name, ColumnMetadata.named("name"))
+//        addMetadata(email, ColumnMetadata.named("email"))
+//        addMetadata(score, ColumnMetadata.named("score"))
+//        addMetadata(reputation, ColumnMetadata.named("reputation"))
+//        addMetadata(active, ColumnMetadata.named("active"))
+//    }
+//}
+
+//fun bulkInsertWriters(writers: List<Writer>, dataSource: javax.sql.DataSource): Long {
+//    val sqlQueryFactory = com.querydsl.sql.SQLQueryFactory(
+//        com.querydsl.sql.Configuration(com.querydsl.sql.MySQLTemplates()),
+//        dataSource
+//    )
+//    val insert = sqlQueryFactory.insert(SWriter)
+//    writers.forEach {
+//        insert.set(SWriter.name, it.name)
+//            .set(SWriter.email, it.email)
+//            .set(SWriter.score, 1)
+//            .set(SWriter.reputation, 1.0)
+//            .set(SWriter.active, true)
+//            .addBatch()
+//    }
+//    return insert.execute()
+//}

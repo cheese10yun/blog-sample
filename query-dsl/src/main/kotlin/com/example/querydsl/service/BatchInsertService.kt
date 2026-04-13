@@ -16,15 +16,18 @@ import org.springframework.transaction.annotation.Transactional
 class BatchInsertService(
     private val jpaQueryFactory: JPAQueryFactory,
     private val jdbcTemplate: JdbcTemplate,
-    private val dataSource: DataSource // Inject DataSource
+    private val dataSource: DataSource
 ) {
+
+    private val sqlQueryFactory: SQLQueryFactory by lazy {
+        SQLQueryFactory(Configuration(MySQLTemplates()), dataSource)
+    }
 
     @Transactional
     fun executeBulkInsertWritersWithSql(writers: List<Writer>): Long {
         // 1. 테이블 메타데이터 정의
         val writerTable = RelationalPathBase(Writer::class.java, "writer", null, "writer")
-        // 2. SQLQueryFactory 생성 (MySQL 템플릿 사용)
-        val sqlQueryFactory = SQLQueryFactory(Configuration(MySQLTemplates()), dataSource)
+        // 2. SQLQueryFactory (공유 인스턴스 사용)
         val insert = sqlQueryFactory.insert(writerTable)
         // 3. 데이터를 Batch에 추가
         for (writer in writers) {
@@ -43,19 +46,18 @@ class BatchInsertService(
     @Transactional
     fun executeBulkUpdateWritersWithSql(writers: List<Writer>): Long {
         // 1. 테이블 메타데이터 정의
-        val writerTable = RelationalPathBase<Any>(Any::class.java, "writer", null, "writer")
-        // 2. SQLQueryFactory 생성 (MySQL 템플릿 사용)
-        val sqlQueryFactory = SQLQueryFactory(Configuration(MySQLTemplates()), dataSource)
+        val writerTable = RelationalPathBase(Writer::class.java, "writer", null, "writer")
+        // 2. SQLQueryFactory (공유 인스턴스 사용)
         val update = sqlQueryFactory.update(writerTable)
         // 3. 데이터를 Batch에 추가
         for (writer in writers) {
             val id = requireNotNull(writer.id) { "Writer id must not be null" }
             update
                 .set(QWriter.writer.name, writer.name)
-                .set(QWriter.writer.email, writer.email)
-                .set(QWriter.writer.score, writer.score)
-                .set(QWriter.writer.reputation, writer.reputation)
-                .set(QWriter.writer.active, writer.active)
+//                .set(QWriter.writer.email, writer.email)
+//                .set(QWriter.writer.score, writer.score)
+//                .set(QWriter.writer.reputation, writer.reputation)
+//                .set(QWriter.writer.active, writer.active)
                 .where(QWriter.writer.id.eq(id))
                 .addBatch() // 메모리에 쿼리 적재
         }

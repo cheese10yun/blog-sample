@@ -2,19 +2,17 @@ package com.example.querydsl.service
 
 import com.example.querydsl.SpringBootTestSupport
 import com.example.querydsl.domain.Writer
-import com.example.querydsl.domain.WriterCustomRepository
 import com.example.querydsl.domain.WriterRepository
-import com.example.querydsl.domain.WriterType
-import jakarta.persistence.EntityManager
+import com.example.querydsl.domain.WriterService
 import org.junit.jupiter.api.Test
 import org.springframework.util.StopWatch
-import org.assertj.core.api.Assertions.assertThat
 
 
 //@Transactional
 class BatchInsertServiceTest(
     private val batchInsertService: BatchInsertService,
     private val writerRepository: WriterRepository,
+    private val writerService: WriterService,
 ) : SpringBootTestSupport() {
     /**
      *
@@ -123,6 +121,64 @@ class BatchInsertServiceTest(
 
             println("--- 측정 완료 ---")
             println("첫 회를 제외한 $rows 평균 실행 시간: ${averageTimeMillis} ms")
+        }
+    }
+
+    @Test
+    fun `dirty checking update test`() {
+        val rowsList = listOf(100, 200, 500, 1_000, 2_000, 5_000, 10_000)
+//        val rowsList = listOf(10)
+        val iterations = 5
+
+        rowsList.forEach { rows ->
+            // 테스트 데이터 사전 삽입 (id 확보)
+            val writers = writerRepository.saveAll(
+                (1..rows).map { Writer(name = "name-$it", email = "email-$it") }
+            ).toList()
+
+            var totalTimeMillis = 0.0
+            for (i in 1..iterations) {
+                val stopWatch = StopWatch()
+                stopWatch.start()
+                writerService.updateWriters(writers)
+                stopWatch.stop()
+
+                if (i > 1) { // 첫 회차 제외
+                    totalTimeMillis += stopWatch.totalTimeMillis
+                }
+            }
+            val averageTimeMillis = totalTimeMillis / (iterations - 1)
+            println("$rows 건 dirty checking 평균 실행 시간: ${averageTimeMillis} ms")
+        }
+    }
+
+    @Test
+    fun `executeBulkUpdateWritersWithSql test`() {
+        val rowsList = listOf(100, 200, 500, 1_000, 2_000, 5_000, 10_000)
+//        val rowsList = listOf(10)
+        val iterations = 5
+
+        rowsList.forEach { rows ->
+            // 테스트 데이터 사전 삽입
+            val savedWriters = writerRepository.saveAll(
+                (1..rows).map { Writer(name = "name-$it", email = "email-$it") }
+            )
+
+            var totalTimeMillis = 0.0
+            for (i in 1..iterations) {
+                savedWriters.forEach { it.name = "updated-$i" }
+
+                val stopWatch = StopWatch()
+                stopWatch.start()
+                batchInsertService.executeBulkUpdateWritersWithSql(savedWriters)
+                stopWatch.stop()
+
+                if (i > 1) { // 첫 회차 제외
+                    totalTimeMillis += stopWatch.totalTimeMillis
+                }
+            }
+            val averageTimeMillis = totalTimeMillis / (iterations - 1)
+            println("$rows 건 QueryDSL Batch Update 평균 실행 시간: ${averageTimeMillis} ms")
         }
     }
 }

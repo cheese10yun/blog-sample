@@ -15,12 +15,12 @@ abstract class EntityAuditing {
     var id: Long? = null
         internal set
 
-//    @CreationTimestamp
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     lateinit var createdAt: LocalDateTime
         internal set
 
-//    @UpdateTimestamp
+    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     lateinit var updatedAt: LocalDateTime
         internal set

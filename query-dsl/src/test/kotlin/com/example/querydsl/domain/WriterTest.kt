@@ -45,7 +45,7 @@ internal class WriterTest(
         val stopWatch = StopWatch()
         // 업데이트 속도 측정
         stopWatch.start()
-        writerService.update(writers)
+//        writerService.update(writers)
         stopWatch.stop()
 
         println("${map.size}, ${stopWatch.lastTaskTimeMillis}")
