@@ -92,15 +92,61 @@ Batch Insert와 Batch Update는 동일한 `addBatch` + `execute()` 패턴을 사
 
 또한 `EntityAuditing`을 통해 상속받는 `id` 필드는 `Long?` (nullable) 타입이므로, `requireNotNull`로 null을 방어한 뒤 사용해야 컴파일 타입 안전성이 보장됩니다.
 
-### MySQL 최적화 옵션: rewriteBatchedStatements
+### Batch 동작 검증 방법
 
-Insert 포스팅에서 소개한 `rewriteBatchedStatements=true` 옵션은 Batch Update에도 동일하게 적용됩니다.
+`addBatch`를 사용하면 SQL 내용 자체는 dirty checking과 동일하게 `UPDATE writer SET ... WHERE id = ?` 형태입니다. 쿼리 내용만으로는 실제로 batch가 동작하는지 구분하기 어렵습니다.
+
+실제 전송 방식의 차이는 JDBC URL에 `profileSQL=true`를 추가하면 로그로 확인할 수 있습니다.
 
 ```
-jdbc:mysql://localhost:3306/mydb?rewriteBatchedStatements=true
+jdbc:mysql://localhost:3306/mydb?rewriteBatchedStatements=true&logger=Slf4JLogger&profileSQL=true
 ```
 
-이 옵션이 없으면 `addBatch()`로 적재된 쿼리들이 개별적으로 전송됩니다. 이 옵션을 활성화하면 드라이버 레벨에서 여러 UPDATE 구문을 묶어 전송하여 네트워크 비용을 줄일 수 있습니다.
+**케이스 1 — dirty checking (N번 통신)**
+
+```
+[QUERY] update writer set active=1,email='email-2',name='updated'... where id=2
+        [at ProxyPreparedStatement.executeUpdate]
+[FETCH] [at ProxyPreparedStatement.executeUpdate]
+[QUERY] update writer set active=1,email='email-3',name='updated'... where id=3
+        [at ProxyPreparedStatement.executeUpdate]
+[FETCH] [at ProxyPreparedStatement.executeUpdate]
+[QUERY] update writer set active=1,email='email-4',name='updated'... where id=4
+        [at ProxyPreparedStatement.executeUpdate]
+[FETCH] [at ProxyPreparedStatement.executeUpdate]
+...
+```
+
+`executeUpdate`가 건마다 호출되어 `[QUERY] + [FETCH]` 쌍이 건수만큼 반복됩니다. 10건이면 DB 서버로 **10번 왕복**합니다.
+
+**케이스 2 — addBatch (1번 통신)**
+
+```
+[QUERY] update writer
+set name = 'new'
+where writer.id = 1;update writer
+set name = 'new'
+where writer.id = 2;update writer
+set name = 'new'
+where writer.id = 3;
+...
+update writer
+set name = 'new'
+where writer.id = 28;
+```
+
+`[QUERY]` 로그가 **1개**만 출력됩니다. 세미콜론으로 구분된 모든 쿼리가 하나의 패킷으로 전송되며, 28건이든 10,000건이든 DB 서버로 **1번만 왕복**합니다.
+
+**구분 포인트 요약**
+
+| 구분 기준 | dirty checking | addBatch |
+|:--------|:--------------|:---------|
+| 메서드명 | `executeUpdate` | `executeBatch` (`[QUERY]` 수로 판단) |
+| `[QUERY]` 로그 수 | N개 | **1개** |
+| `[FETCH]` 존재 | 건마다 존재 | 없음 |
+| 쿼리 형태 | 쿼리 1개씩 | `;`로 이어진 멀티 쿼리 |
+
+`profileSQL=true`만 붙이면 로그 줄 수와 메서드명만으로 의도한 대로 batch가 동작하고 있는지 즉시 확인할 수 있습니다.
 
 ## 성능 비교
 
@@ -205,7 +251,7 @@ fun `batchUpdate test`() {
 
 JPA Dirty Checking과 QueryDSL `addBatch`를 사용했을 때의 성능 차이를 비교한 결과입니다.
 
-![Update Performance](./images/Update_Performance.svg)
+![Update Performance](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/query-dsl/docs/images/Update_Performance.svg)
 
 
 | rows   | dirty checking (ms) | add batch (ms) | 성능 개선율 |

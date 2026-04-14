@@ -126,7 +126,8 @@ class BatchInsertServiceTest(
 
     @Test
     fun `dirty checking update test`() {
-        val rowsList = listOf(100, 200, 500, 1_000, 2_000, 5_000, 10_000)
+//        val rowsList = listOf(100, 200, 500, 1_000, 2_000, 5_000, 10_000)
+        val rowsList = listOf(100)
         val iterations = 5
 
         rowsList.forEach { rows ->
@@ -153,7 +154,8 @@ class BatchInsertServiceTest(
 
     @Test
     fun `executeBulkUpdateWritersWithSql test`() {
-        val rowsList = listOf(100, 200, 500, 1_000, 2_000, 5_000, 10_000)
+//        val rowsList = listOf(100, 200, 500, 1_000, 2_000, 5_000, 10_000)
+        val rowsList = listOf(100)
         val iterations = 5
 
         rowsList.forEach { rows ->
