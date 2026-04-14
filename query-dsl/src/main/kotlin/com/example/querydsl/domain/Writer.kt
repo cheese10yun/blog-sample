@@ -1,8 +1,5 @@
 package com.example.querydsl.domain
 // Kotlin
-import com.querydsl.sql.ColumnMetadata
-import com.querydsl.sql.RelationalPathBase
-import com.querydsl.core.types.dsl.*
 
 import com.example.querydsl.repository.support.QuerydslCustomRepositorySupport
 import org.springframework.data.jpa.repository.JpaRepository
@@ -59,7 +56,6 @@ enum class WriterType {
 interface WriterRepository : JpaRepository<Writer, Long>, WriterCustomRepository
 
 interface WriterCustomRepository {
-
     fun update(ids: List<Long>)
 }
 
@@ -95,7 +91,7 @@ class WriterService(
 //    }
 
     @Transactional
-    fun nonPersistContestUpdate(ids: List<Long>) {
+    fun batchUpdate(ids: List<Long>) {
         writerRepository.update(ids)
     }
 

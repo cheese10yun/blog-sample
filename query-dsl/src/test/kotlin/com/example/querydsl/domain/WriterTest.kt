@@ -3,7 +3,6 @@ package com.example.querydsl.domain
 import com.example.querydsl.SpringBootTestSupport
 import org.junit.jupiter.api.Test
 import org.springframework.test.annotation.Rollback
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.StopWatch
 import java.sql.Timestamp
 import java.time.LocalDateTime
@@ -78,7 +77,7 @@ internal class WriterTest(
         // 업데이트 속도 측정
         val stopWatch = StopWatch()
         stopWatch.start()
-        writerService.nonPersistContestUpdate(findAll.map { it.id!! })
+        writerService.batchUpdate(findAll.map { it.id!! })
         stopWatch.stop()
 
         println("${map.size}, ${stopWatch.lastTaskTimeMillis}")

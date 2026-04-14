@@ -127,7 +127,6 @@ class BatchInsertServiceTest(
     @Test
     fun `dirty checking update test`() {
         val rowsList = listOf(100, 200, 500, 1_000, 2_000, 5_000, 10_000)
-//        val rowsList = listOf(10)
         val iterations = 5
 
         rowsList.forEach { rows ->
@@ -155,7 +154,6 @@ class BatchInsertServiceTest(
     @Test
     fun `executeBulkUpdateWritersWithSql test`() {
         val rowsList = listOf(100, 200, 500, 1_000, 2_000, 5_000, 10_000)
-//        val rowsList = listOf(10)
         val iterations = 5
 
         rowsList.forEach { rows ->
@@ -164,13 +162,13 @@ class BatchInsertServiceTest(
                 (1..rows).map { Writer(name = "name-$it", email = "email-$it") }
             )
 
+            val updates = savedWriters.map { WriterUpdate(id = it.id!!, name = "new") }
+
             var totalTimeMillis = 0.0
             for (i in 1..iterations) {
-                savedWriters.forEach { it.name = "updated-$i" }
-
                 val stopWatch = StopWatch()
                 stopWatch.start()
-                batchInsertService.executeBulkUpdateWritersWithSql(savedWriters)
+                batchInsertService.executeBulkUpdateWritersWithSql(updates)
                 stopWatch.stop()
 
                 if (i > 1) { // 첫 회차 제외

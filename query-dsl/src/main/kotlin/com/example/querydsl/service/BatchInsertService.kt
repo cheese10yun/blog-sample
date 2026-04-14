@@ -2,6 +2,7 @@ package com.example.querydsl.service
 
 import com.example.querydsl.domain.QWriter
 import com.example.querydsl.domain.Writer
+import com.example.querydsl.domain.WriterRepository
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.querydsl.sql.Configuration
 import com.querydsl.sql.MySQLTemplates
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 class BatchInsertService(
     private val jpaQueryFactory: JPAQueryFactory,
     private val jdbcTemplate: JdbcTemplate,
+    private val writerRepository: WriterRepository,
     private val dataSource: DataSource
 ) {
 
@@ -44,7 +46,7 @@ class BatchInsertService(
     }
 
     @Transactional
-    fun executeBulkUpdateWritersWithSql(writers: List<Writer>): Long {
+    fun executeBulkUpdateWritersWithSql(writers: List<WriterUpdate>): Long {
         // 1. 테이블 메타데이터 정의
         val writerTable = RelationalPathBase(Writer::class.java, "writer", null, "writer")
         // 2. SQLQueryFactory (공유 인스턴스 사용)
@@ -54,10 +56,6 @@ class BatchInsertService(
             val id = requireNotNull(writer.id) { "Writer id must not be null" }
             update
                 .set(QWriter.writer.name, writer.name)
-//                .set(QWriter.writer.email, writer.email)
-//                .set(QWriter.writer.score, writer.score)
-//                .set(QWriter.writer.reputation, writer.reputation)
-//                .set(QWriter.writer.active, writer.active)
                 .where(QWriter.writer.id.eq(id))
                 .addBatch() // 메모리에 쿼리 적재
         }
@@ -65,4 +63,17 @@ class BatchInsertService(
         // 4. 일괄 실행
         return update.execute()
     }
+
+    @Transactional
+    fun updateWriters(writers: List<Writer>) {
+        for (writer in writers) {
+            writer.name = "updated"
+            writerRepository.save(writer)
+        }
+    }
 }
+
+data class WriterUpdate(
+    val id: Long,
+    val name: String,
+)
