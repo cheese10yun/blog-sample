@@ -7,6 +7,8 @@
 
 ## 2026
 
+* 04-14 [QueryDSL을 이용한 Batch Update 성능 개선](https://cheese10yun.github.io/querydsl-batch-update/)
+* 02-16 [필드 단위 변경 이력(History) 추적 시스템](https://cheese10yun.github.io/diff-history-part-1/)
 * 01-18 [QueryDSL을 이용한 Batch Insert 성능 개선](https://cheese10yun.github.io/querydsl-batch-insert/)
 
 ## 2025
