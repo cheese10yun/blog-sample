@@ -3,6 +3,9 @@ package com.example.querydsl.repository.payment
 
 import com.example.querydsl.domain.Payment
 
+import com.example.querydsl.repository.support.CursorDirection
+import com.example.querydsl.repository.support.CursorPageResponse
+import com.example.querydsl.repository.support.CursorRequest
 import com.example.querydsl.repository.support.QuerydslNewRepositorySupport
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -22,6 +25,15 @@ class PaymentNewRepositoryImpl : QuerydslNewRepositorySupport(Payment::class.jav
             countQuery = {
                 select(qPayment.count()).from(qPayment).where(qPayment.amount.gt(amount))
             }
+        )
+    }
+
+    fun findByCursor(cursorRequest: CursorRequest): CursorPageResponse<Payment> {
+        return applyCursorPagination(
+            cursorRequest = cursorRequest,
+            cursorPath = qPayment.id,
+            cursorSelector = { it.id.toString() },
+            contentQuery = { selectFrom(qPayment) }
         )
     }
 
