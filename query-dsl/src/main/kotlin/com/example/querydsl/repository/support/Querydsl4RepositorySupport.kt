@@ -22,6 +22,8 @@ import org.springframework.data.querydsl.SimpleEntityPathResolver
 import org.springframework.data.support.PageableExecutionUtils
 import org.springframework.stereotype.Repository
 import java.util.function.Function
+import kotlinx.coroutines.Dispatchers
+
 //import jakarta.persistence.EntityManager
 
 @Repository
@@ -58,21 +60,12 @@ abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
 
     protected fun <T> applyPagination(
         pageable: Pageable,
-        contentQuery: Function<JPAQueryFactory, JPAQuery<T>>
-    ): Page<T> {
-        val jpaQuery = contentQuery.apply(queryFactory)
-        val content: List<T> = querydsl.applyPagination(pageable, jpaQuery).fetch() as List<T>
-        return PageableExecutionUtils.getPage(content, pageable) { jpaQuery.fetchCount() }
-    }
-
-    protected fun <T> applyPagination(
-        pageable: Pageable,
         contentQuery: Function<JPAQueryFactory, JPAQuery<T>>,
         countQuery: Function<JPAQueryFactory, JPAQuery<Long>>
     ): Page<T> = runBlocking {
         val jpaContentQuery = contentQuery.apply(queryFactory)
-        val content = async { querydsl.applyPagination(pageable, jpaContentQuery).fetch() as List<T> }
-        val count = async { countQuery.apply(queryFactory).fetchFirst() }
+        val content = async(Dispatchers.IO) { querydsl.applyPagination(pageable, jpaContentQuery).fetch() as List<T> }
+        val count = async(Dispatchers.IO) { countQuery.apply(queryFactory).fetchFirst() }
 
         PageImpl(content.await(), pageable, count.await())
     }
@@ -80,7 +73,7 @@ abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
     protected fun <T> applySlicePagination(
         pageable: Pageable,
         query: Function<JPAQueryFactory, JPAQuery<T>>
-    ): Slice<T>  {
+    ): Slice<T> {
         val jpaContentQuery = query.apply(queryFactory)
         val content = querydsl.applyPagination(pageable, jpaContentQuery).fetch()
         val hasNext = content.size >= pageable.pageSize
