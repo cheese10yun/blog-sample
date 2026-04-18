@@ -1,50 +1,33 @@
 package com.example.querydsl.repository.support
 
-import com.example.querydsl.logger
 import com.querydsl.core.types.EntityPath
 import com.querydsl.core.types.Expression
-import com.querydsl.core.types.dsl.PathBuilder
 import com.querydsl.jpa.impl.JPAQuery
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 import kotlin.properties.Delegates.notNull
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
-import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport
-import org.springframework.data.jpa.repository.support.Querydsl
-import org.springframework.data.querydsl.SimpleEntityPathResolver
-import org.springframework.data.support.PageableExecutionUtils
-import org.springframework.stereotype.Repository
 import java.util.function.Function
 import kotlinx.coroutines.Dispatchers
+import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 
-//import jakarta.persistence.EntityManager
 
-@Repository
-abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
+abstract class QuerydslNewRepositorySupport(domainClass: Class<*>) : QuerydslRepositorySupport(domainClass) {
 
-    private val log by logger()
+    protected var queryFactory: JPAQueryFactory by notNull()
 
-    protected var querydsl: Querydsl by notNull()
-
-    private var queryFactory: JPAQueryFactory by notNull()
-
-    @Autowired
-    fun setEntityManager(entityManager: EntityManager) {
-        val entityInformation = JpaEntityInformationSupport.getEntityInformation(domainClass, entityManager)
-        val resolver = SimpleEntityPathResolver.INSTANCE
-        val path = resolver.createPath(entityInformation.javaType)
-
-        this.querydsl = Querydsl(entityManager, PathBuilder(path.type, path.metadata))
+    @PersistenceContext
+    override fun setEntityManager(entityManager: EntityManager) {
         this.queryFactory = JPAQueryFactory(entityManager)
+        super.setEntityManager(entityManager)
     }
-
 
     protected fun <T> select(expr: Expression<T>): JPAQuery<T> {
         return queryFactory.select(expr)
@@ -64,7 +47,7 @@ abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
         countQuery: Function<JPAQueryFactory, JPAQuery<Long>>
     ): Page<T> = runBlocking {
         val jpaContentQuery = contentQuery.apply(queryFactory)
-        val content = async(Dispatchers.IO) { querydsl.applyPagination(pageable, jpaContentQuery).fetch() as List<T> }
+        val content = async(Dispatchers.IO) { querydsl!!.applyPagination(pageable, jpaContentQuery).fetch() as List<T> }
         val count = async(Dispatchers.IO) { countQuery.apply(queryFactory).fetchFirst() }
 
         PageImpl(content.await(), pageable, count.await())
@@ -75,7 +58,7 @@ abstract class Querydsl4RepositorySupport(private val domainClass: Class<*>) {
         query: Function<JPAQueryFactory, JPAQuery<T>>
     ): Slice<T> {
         val jpaContentQuery = query.apply(queryFactory)
-        val content = querydsl.applyPagination(pageable, jpaContentQuery).fetch()
+        val content = querydsl!!.applyPagination(pageable, jpaContentQuery).fetch()
         val hasNext = content.size >= pageable.pageSize
         return SliceImpl(content, pageable, hasNext)
     }

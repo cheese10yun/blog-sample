@@ -4,14 +4,12 @@ package com.example.querydsl.repository.order
 import com.example.querydsl.domain.EntityAuditing
 import com.example.querydsl.logger
 import com.example.querydsl.repository.order.QOrder.order
-import com.example.querydsl.repository.support.Querydsl4RepositorySupport
 import com.example.querydsl.repository.support.QuerydslCustomRepositorySupport
 import com.example.querydsl.repository.user.QUser.user
 import com.example.querydsl.service.QCoupon.coupon
 import com.querydsl.jpa.impl.JPAQuery
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
