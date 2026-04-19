@@ -181,7 +181,6 @@ LIMIT 1000;
 
 ![](images/explain_3.png)
 
-
 **첫 번째 청크와 마지막 청크의 실행 계획이 동일합니다.** PK 인덱스(`PRIMARY`)를 기준으로 범위 조회하기 때문에 offset이 누적되어도 스캔 비용이 일정하게 유지됩니다.
 
 정리하면, **offset/limit 방식은 offset이 커질수록 그 위치까지 도달하기 위한 스캔 비용이 누적되어 결국 풀 스캔으로 전환되는 구조적 한계를 가집니다.** No Offset 방식은 이 문제를 커서 조건으로 원천 차단합니다.
@@ -229,7 +228,7 @@ LIMIT 3;
 - `actualContent`: [8, 7] (pageSize만큼 자름)
 - `hasNext`: true (3건 > pageSize 2)
 - `nextCursor`: "7" (마지막 항목 ID)
-- `hasPrev`: false, 
+- `hasPrev`: false,
 - `prevCursor`: null
 
 **NEXT** (cursor=7):
@@ -245,7 +244,7 @@ LIMIT 3;
 
 - `actualContent`: [6, 5]
 - `hasNext`: true
-- `nextCursor`: "5", 
+- `nextCursor`: "5",
 - `prevCursor`: "6"
 - `hasPrev`: true
 
@@ -263,7 +262,7 @@ LIMIT 3;
 - `actualContent`: [2, 1]
 - `hasNext`: false (2건 ≤ pageSize 2)
 - `nextCursor`: null
-- `hasPrev`: true, 
+- `hasPrev`: true,
 - `prevCursor`: "2"
 
 ### 구현
@@ -388,22 +387,129 @@ GROUP BY category;
 
 정리하면, 커서 기반 조회는 **시계열 데이터를 ID 기준으로 순차 탐색**하는 패턴에 가장 잘 맞습니다. 피드, 알림 목록, 거래 내역처럼 최신순으로 스크롤하는 화면이 대표적인 적합 사례입니다.
 
+## 성능 테스트 데이터 셋업
+
+성능 측정을 위해 payment 테이블에 100만 건 데이터를 셋업합니다. **Doubling 방식**(INSERT INTO ... SELECT)으로 초기 1행에서 20번 반복하면 2^20 = 1,048,576건을 빠르게 생성할 수 있습니다.
+
+`created_at`은 커서 페이지네이션의 핵심 조건이므로 2023-01-01 ~ 2024-12-31 범위로 랜덤 분산시킵니다.
+
+```sql
+-- 1. 기존 데이터 초기화
+TRUNCATE TABLE payment;
+
+-- 2. 기준 1행 삽입
+INSERT INTO payment (amount, created_at, updated_at)
+VALUES (500.00, '2023-01-01 00:00:00', NOW());
+
+-- 3. 아래 INSERT를 20번 반복 실행 (매 실행마다 행 수 2배 증가)
+-- 1회: 2건 / 5회: 32건 / 10회: 1,024건 / 15회: 32,768건 / 20회: 1,048,576건
+INSERT INTO payment (amount, created_at, updated_at)
+SELECT ROUND(RAND() * 1000, 2),
+       DATE_ADD('2023-01-01 00:00:00', INTERVAL FLOOR(RAND() * 730 * 24 * 3600) SECOND),
+       NOW()
+FROM payment;
+
+-- 4. 검증
+SELECT COUNT(*)
+FROM payment;
+
+SELECT DATE_FORMAT(created_at, '%Y-%m') AS month,
+       COUNT(*)                         AS cnt
+FROM payment
+GROUP BY month
+ORDER BY month;
+```
+
 ## 성능 비교
 
-> 아래 성능 측정 결과는 추후 업데이트 예정입니다.
+데이터 셋업(1,048,576건, created_at 2023~2024년 분산)을 기준으로 limit/offset 방식과 커서 방식의 SQL을 각각 첫 번째·중간·마지막 페이지로 비교합니다. limit size는 100으로 고정합니다.
 
-| 방식                    | rows | 소요 시간 |
-|-----------------------|------|-------|
-| applyPagination       |      |       |
-| applySlicePagination  |      |       |
-| applyCursorPagination |      |       |
+### limit / offset 방식
+
+```sql
+-- 첫 번째 페이지 (offset 0), 소요 597 ms
+SELECT *
+FROM payment
+ORDER BY id DESC
+LIMIT 100 OFFSET 0;
+
+-- 약 5,241 페이지 (offset ~524,000, 전체의 약 50% 지점), 소요 1,198 ms
+SELECT *
+FROM payment
+ORDER BY id DESC
+LIMIT 100 OFFSET 524000;
+
+-- 약 8,241 페이지 (offset ~824,000, 전체의 약 79% 지점), 소요 1,639 ms
+SELECT *
+FROM payment
+ORDER BY id DESC
+LIMIT 100 OFFSET 824000;
+
+-- 마지막 페이지 (offset ~1,048,476, 전체 끝 지점), 소요 1,995 ms
+SELECT *
+FROM payment
+ORDER BY id DESC
+LIMIT 100 OFFSET 1048476;
+```
+
+### 커서 방식
+
+```sql
+-- 첫 번째 페이지 (커서 없음, id 최댓값 1,310,693부터 시작), 소요 589 ms
+SELECT *
+FROM payment
+ORDER BY id DESC
+LIMIT 100;
+
+-- 약 50% 지점 (id 약 655,000 기준), 소요 596 ms
+SELECT *
+FROM payment
+WHERE id < 655000
+ORDER BY id DESC
+LIMIT 100;
+
+-- 약 79% 지점 (id 약 281,000 기준), 소요 577 ms
+SELECT *
+FROM payment
+WHERE id < 281000
+ORDER BY id DESC
+LIMIT 100;
+
+-- 마지막 페이지 (id 약 100 기준, 끝 지점), 소요 595 ms
+SELECT *
+FROM payment
+WHERE id < 100
+ORDER BY id DESC
+LIMIT 100;
+```
+
+### 성능 측정 결과
+
+![Update Performance](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/query-dsl/docs/images/page-Performance.svg)
+
+| 구간       | limit/offset | cursor | 차이      |
+|----------|-------------|--------|---------|
+| 첫 번째     | 597 ms      | 589 ms | +1.4%   |
+| 약 50% 지점 | 1,198 ms    | 596 ms | +101.0% |
+| 약 79% 지점 | 1,639 ms    | 577 ms | +184.1% |
+| 마지막      | 1,995 ms    | 595 ms | +235.3% |
+
+첫 번째 페이지에서는 두 방식의 차이가 거의 없습니다. 하지만 뒤로 갈수록 격차가 급격히 벌어져 마지막 지점에서는 limit/offset이 cursor보다 **3.4배** 느립니다.
+
+이 차이는 단발성 API 호출에서도 체감되지만, **전체 데이터를 순차적으로 읽어 리포트를 생성하는 배치 처리**에서 더욱 치명적입니다. 예를 들어 100만 건의 결제 데이터를 페이지 단위로 모두 읽어 월별 매출 집계를 산출하는 배치를 생각해보면, limit/offset 방식은 청크가 뒤로 넘어갈수록 쿼리 1건당 소요 시간이 계속 누적되어 증가합니다. 반면 cursor 방식은 청크 위치와 무관하게 매 쿼리가 일정한 비용으로 동작하기 때문에 전체 처리 시간이 선형에 가깝게 유지됩니다.
+
+결국 **"어느 위치를 조회하든 동일한 실행 계획"** 이라는 cursor의 특성이, 반복 호출이 누적되는 배치 환경에서 성능 격차를 더욱 크게 만드는 핵심 이유입니다.
 
 ## 마무리
 
-| 방식                    | 카운트 쿼리 | 성능 저하          | 임의 페이지 이동 | 적합한 화면        |
-|-----------------------|--------|----------------|-----------|---------------|
-| applyPagination       | O (병렬) | offset 증가 시 저하 | O         | 전체 페이지 네비게이션  |
-| applySlicePagination  | X      | offset 증가 시 저하 | X         | 무한 스크롤, 더보기   |
-| applyCursorPagination | X      | 없음             | X         | 피드, 알림, 거래 내역 |
+| 방식                    | 카운트 쿼리 | 후반부 성능 저하                  | 임의 페이지 이동 | 배치 처리 적합성 | 적합한 화면           |
+|-----------------------|--------|---------------------------|-----------|----------|-----------------|
+| applyPagination       | O (병렬) | offset 증가 시 최대 3.4배 이상 저하 | O         | X        | 전체 페이지 네비게이션    |
+| applySlicePagination  | X      | offset 증가 시 최대 3.4배 이상 저하 | X         | X        | 무한 스크롤, 더보기     |
+| applyCursorPagination | X      | 없음 (위치 무관 일정)             | X         | O        | 피드, 알림, 거래 내역, 배치 |
 
-세 가지 방식 모두 `Querydsl4RepositorySupport`를 통해 공통 함수로 제공됩니다. 화면 요구사항과 데이터 규모에 따라 적절한 방식을 선택하면 됩니다.
+`applyPagination`과 `applySlicePagination`은 offset 기반이므로 뒤로 갈수록 쿼리 비용이 선형 이상으로 증가합니다. 실측 기준으로 첫 페이지 대비 마지막 페이지에서 **3.4배** 이상 느려졌고, 이 차이는 배치처럼 전체 데이터를 반복 순회하는 환경에서 청크마다 누적되어 전체 처리 시간에 직접적인 영향을 줍니다.
+
+`applyCursorPagination`은 `WHERE id < :cursor` 조건으로 PK 인덱스를 직접 활용하기 때문에 조회 위치와 무관하게 실행 계획이 동일하게 유지됩니다. 단건 API뿐 아니라 전체 데이터를 순차적으로 읽어야 하는 배치 리포트에도 적합한 방식입니다.
+
+세 가지 방식 모두 `Querydsl4RepositorySupport`를 통해 공통 함수로 제공됩니다. 임의 페이지 이동이 필요하면 `applyPagination`, 다음/이전 탐색만 필요하면 `applySlicePagination`, 대용량 순차 조회라면 `applyCursorPagination`을 선택하면 됩니다.
