@@ -94,6 +94,57 @@ jdbc:mysql://localhost:3306/mydb?rewriteBatchedStatements=true
 **이 옵션이 필요한 이유:**
 기본적으로 MySQL JDBC 드라이버는 `addBatch()`로 들어온 쿼리들을 개별적인 Insert 구문으로 전송합니다. 하지만 이 옵션을 활성화하면 드라이버 레벨에서 여러 개의 Insert 구문을 하나의 `INSERT INTO ... VALUES (...), (...), (...)` 형태의 **Multi-Value Insert** 구문으로 재작성(Rewrite)하여 전송합니다. 이를 통해 네트워크 패킷 수를 획기적으로 줄이고 데이터베이스의 파싱 비용을 절감하여 성능을 극대화할 수 있습니다.
 
+**처리 흐름:**
+
+```
+addBatch() 호출 (여러 번)
+    ↓
+execute() 호출
+    ↓
+MySQL JDBC 드라이버가 rewriteBatchedStatements=true 감지
+    ↓
+개별 INSERT들을 Multi-Value INSERT로 재작성
+    ↓
+INSERT INTO writer (name, email) VALUES ('a','a@a.com'), ('b','b@b.com'), ('c','c@c.com')
+    ↓
+DB로 전송
+```
+
+**옵션 유무에 따른 차이:**
+
+| 상황 | DB로 전달되는 SQL |
+|:---|:---|
+| `addBatch()` 단독 | `INSERT ... VALUES (a)` × N번 |
+| `addBatch()` + `rewriteBatchedStatements=true` | `INSERT ... VALUES (a),(b),(c)` × 1번 |
+
+`rewriteBatchedStatements=true`는 애플리케이션 코드 변경 없이 JDBC 드라이버 레벨에서 자동으로 변환해주므로, 옵션 하나만으로 Multi-Value INSERT의 성능 이점을 얻을 수 있습니다.
+
+### 실제 전송 쿼리 확인: profileSQL=true
+
+실제로 DB에 어떤 쿼리가 전송되는지 확인하려면 JDBC URL에 `profileSQL=true` 옵션을 추가합니다.
+
+```
+jdbc:mysql://localhost:3306/mydb?rewriteBatchedStatements=true&profileSQL=true
+```
+
+**`rewriteBatchedStatements=true` 일 때** — 10건이 하나의 Multi-Value INSERT로 전송됩니다.
+
+```
+[QUERY] insert into writer (name, email, score, reputation, active)
+values ('name-5-1', 'email-5-1', 1, 1.0, 1),('name-5-2', 'email-5-2', 1, 1.0, 1), ... ,('name-5-10', 'email-5-10', 1, 1.0, 1)
+```
+
+**`rewriteBatchedStatements=false` 일 때** — 건별로 개별 INSERT가 반복 전송됩니다.
+
+```
+[QUERY] insert into writer (name, email, score, reputation, active) values ('name-5-6', 'email-5-6', 1, 1.0, 1)
+[QUERY] insert into writer (name, email, score, reputation, active) values ('name-5-7', 'email-5-7', 1, 1.0, 1)
+[QUERY] insert into writer (name, email, score, reputation, active) values ('name-5-8', 'email-5-8', 1, 1.0, 1)
+...
+```
+
+`profileSQL=true`는 개발/테스트 환경에서 실제 전송 쿼리를 눈으로 검증할 때 유용하며, 운영 환경에서는 로그 부하로 인해 비활성화하는 것을 권장합니다.
+
 ## 성능 비교
 
 ### 성능 측정 코드
