@@ -85,13 +85,11 @@ abstract class Querydsl4RepositorySupport(domainClass: Class<*>) : QuerydslRepos
      *
      * @param cursorRequest 방향(direction), 커서 키(cursorKey), 페이지 크기(pageSize)
      * @param cursorPath    커서 기준이 되는 엔티티의 ID 경로 (예: QPayment.payment.id)
-     * @param cursorSelector 조회 결과 항목 → 커서 문자열 변환 함수
      * @param contentQuery  기본 조회 쿼리 (where/orderBy/limit 제외)
      */
     fun <T> applyCursorPagination(
         cursorRequest: CursorRequest,
         cursorPath: NumberPath<Long>,
-        cursorSelector: (T) -> String,
         contentQuery: Function<JPAQueryFactory, JPAQuery<T>>,
     ): CursorPageResponse<T> {
         val direction = cursorRequest.direction
@@ -130,7 +128,6 @@ abstract class Querydsl4RepositorySupport(domainClass: Class<*>) : QuerydslRepos
             content = content,
             direction = direction,
             pageSize = pageSize,
-            encodeCursor = cursorSelector,
         )
     }
 }
@@ -155,9 +152,8 @@ data class CursorPageResponse<T> private constructor(
     val content: List<T>,
     val hasNext: Boolean,
     val hasPrev: Boolean,
-    val nextCursor: String?,
-    val prevCursor: String?,
-    val encodeCursor: (T) -> String,
+    val nextCursor: T?,
+    val prevCursor: T?,
 ) {
 
     companion object {
@@ -180,7 +176,6 @@ data class CursorPageResponse<T> private constructor(
             content: List<T>,
             direction: CursorDirection,
             pageSize: Int,
-            encodeCursor: (T) -> String,
         ): CursorPageResponse<T> {
             if (content.isEmpty()) {
                 return CursorPageResponse(
@@ -189,7 +184,6 @@ data class CursorPageResponse<T> private constructor(
                     hasPrev = false,
                     nextCursor = null,
                     prevCursor = null,
-                    encodeCursor = encodeCursor,
                 )
             }
 
@@ -201,9 +195,8 @@ data class CursorPageResponse<T> private constructor(
                     content = actualContent,
                     hasNext = hasNext,
                     hasPrev = hasPrev,
-                    nextCursor = if (hasNext) encodeCursor(actualContent.last()) else null,
-                    prevCursor = if (hasPrev) encodeCursor(actualContent.first()) else null,
-                    encodeCursor = encodeCursor,
+                    nextCursor = if (hasNext) actualContent.last() else null,
+                    prevCursor = if (hasPrev) actualContent.first() else null,
                 )
             } else {
                 val hasPrev = content.size > pageSize
@@ -213,9 +206,8 @@ data class CursorPageResponse<T> private constructor(
                     content = actualContent,
                     hasNext = hasNext,
                     hasPrev = hasPrev,
-                    nextCursor = if (hasNext) encodeCursor(actualContent.last()) else null,
-                    prevCursor = if (hasPrev) encodeCursor(actualContent.first()) else null,
-                    encodeCursor = encodeCursor,
+                    nextCursor = if (hasNext) actualContent.last() else null,
+                    prevCursor = if (hasPrev) actualContent.first() else null,
                 )
             }
         }

@@ -31,7 +31,6 @@ class Payment4RepositoryImpl : Querydsl4RepositorySupport(Payment::class.java) {
         return applyCursorPagination(
             cursorRequest = cursorRequest,
             cursorPath = qPayment.id,
-            cursorSelector = { it.id.toString() },
             contentQuery = { selectFrom(qPayment) }
         )
     }
