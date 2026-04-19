@@ -4,7 +4,7 @@
 
 - [Querydsl Repository Support 활용](https://cheese10yun.github.io/querydsl-support/)
 - [JPA 페이징 Performance](https://cheese10yun.github.io/page-performance/)
-- [Spring Batch QueryDsl Batch Insert](https://cheese10yun.github.io/querydsl-batch-insert/)
+- [Spring Batch Reader 성능 분석](https://cheese10yun.github.io/spring-batch-reader-performance/)
 
 ---
 
