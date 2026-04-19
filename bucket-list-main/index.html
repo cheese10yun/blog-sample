@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 버킷 리스트</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-50 min-h-screen py-8">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <!-- 헤더 -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">🎯 나의 버킷 리스트</h1>
+            <p class="text-gray-600">인생에서 꼭 이루고 싶은 것들을 기록하세요</p>
+        </header>
+
+        <!-- 통계 -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex justify-around text-center">
+                <div>
+                    <p class="text-3xl font-bold text-blue-600" id="totalCount">0</p>
+                    <p class="text-gray-600 text-sm">전체</p>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold text-green-600" id="completedCount">0</p>
+                    <p class="text-gray-600 text-sm">완료</p>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold text-orange-600" id="progressCount">0</p>
+                    <p class="text-gray-600 text-sm">진행중</p>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold text-purple-600" id="completionRate">0%</p>
+                    <p class="text-gray-600 text-sm">달성률</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 입력 폼 -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <form id="bucketForm" class="flex gap-2">
+                <input
+                    type="text"
+                    id="bucketInput"
+                    placeholder="새로운 버킷 리스트를 입력하세요..."
+                    class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                >
+                <button
+                    type="submit"
+                    class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                    추가
+                </button>
+            </form>
+        </div>
+
+        <!-- 필터 -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <div class="flex gap-2 justify-center">
+                <button
+                    class="filter-btn px-6 py-2 rounded-lg font-medium transition-colors active"
+                    data-filter="all"
+                >
+                    전체
+                </button>
+                <button
+                    class="filter-btn px-6 py-2 rounded-lg font-medium transition-colors"
+                    data-filter="active"
+                >
+                    진행중
+                </button>
+                <button
+                    class="filter-btn px-6 py-2 rounded-lg font-medium transition-colors"
+                    data-filter="completed"
+                >
+                    완료
+                </button>
+            </div>
+        </div>
+
+        <!-- 버킷 리스트 목록 -->
+        <div id="bucketListContainer" class="space-y-3">
+            <!-- 동적으로 생성됨 -->
+        </div>
+
+        <!-- 빈 상태 메시지 -->
+        <div id="emptyState" class="text-center py-12 hidden">
+            <p class="text-gray-400 text-lg">아직 버킷 리스트가 없습니다.</p>
+            <p class="text-gray-400">위에서 새로운 목표를 추가해보세요!</p>
+        </div>
+    </div>
+
+    <!-- 수정 모달 -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4">버킷 리스트 수정</h3>
+            <form id="editForm">
+                <input
+                    type="text"
+                    id="editInput"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                    required
+                >
+                <div class="flex gap-2 justify-end">
+                    <button
+                        type="button"
+                        id="cancelEdit"
+                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                    >
+                        취소
+                    </button>
+                    <button
+                        type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                        저장
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/storage.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
