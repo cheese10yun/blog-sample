@@ -99,7 +99,7 @@ fun findBy(amount: BigDecimal, pageable: Pageable): Page<Payment> {
 
 `JpaPagingItemReader` 기준으로 10만 건과 50만 건의 차이가 단순히 5배가 아니라 23배 이상 차이가 납니다. 반면 `QueryDslNoOffsetPagingReader`는 rows가 늘어나도 선형에 가까운 증가를 보입니다.
 
-![](images/reader-performance-1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/reader-performance-1.png)
 
 그래프를 보면 `JpaPagingItemReader`(파란색)의 수치가 너무 커서 `QueryDslNoOffsetPagingReader`(빨간색)의 선이 거의 보이지 않을 정도입니다. 두 리더의 성능 차이가 그만큼 크다는 것을 의미합니다. `JpaPagingItemReader`를 제외하고 두 리더만 비교한 그래프에서 `QueryDslNoOffsetPagingReader`가 얼마나 안정적인지 확인할 수 있습니다.
 
@@ -119,7 +119,7 @@ LIMIT 1000;
 |-------|----------------|-----------------------|
 | range | IDX_created_at | Using index condition |
 
-![](images/explain_1.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/explain_1.png)
 
 `type: range`로 인덱스가 정상적으로 동작합니다.
 
@@ -137,7 +137,7 @@ LIMIT 4999000, 1000;
 |------|------|-----------------------------|
 | ALL  | NULL | Using where; Using filesort |
 
-![](images/explan_2.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/explan_2.png)
 
 `type: ALL`, 즉 **풀 테이블 스캔**이 발생합니다. 인덱스도 사용하지 않습니다.
 
@@ -149,7 +149,7 @@ LIMIT 4999000, 1000;
 
 여기서 옵티마이저의 비용 판단이 개입합니다. **인덱스를 통해 레코드 1건을 읽는 것은 테이블에서 직접 1건을 읽는 것보다 4~5배 비용이 발생합니다.** 데이터 모수가 적을 때는 인덱스를 타는 것이 훨씬 효율적이지만, 읽어야 할 범위가 테이블 전체의 20~25%를 넘어서면 옵티마이저는 인덱스를 통해 한 건씩 찾아가는 것보다 테이블을 통째로 풀 스캔하는 것이 더 낫다고 판단합니다. 결과적으로 후반 청크에서는 인덱스가 사라지고 풀 스캔이 선택됩니다.
 
-![](images/limit_3.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/limit_3.png)
 
 #### QueryDslNoOffsetPagingReader - 첫 번째 / 마지막 청크 비교
 
@@ -179,7 +179,7 @@ LIMIT 1000;
 |-------|---------|-------------|
 | range | PRIMARY | Using where |
 
-![](images/explain_3.png)
+![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/explain_3.png)
 
 **첫 번째 청크와 마지막 청크의 실행 계획이 동일합니다.** PK 인덱스(`PRIMARY`)를 기준으로 범위 조회하기 때문에 offset이 누적되어도 스캔 비용이 일정하게 유지됩니다.
 
