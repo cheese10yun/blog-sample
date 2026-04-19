@@ -391,8 +391,6 @@ GROUP BY category;
 
 성능 측정을 위해 payment 테이블에 100만 건 데이터를 셋업합니다. **Doubling 방식**(INSERT INTO ... SELECT)으로 초기 1행에서 20번 반복하면 2^20 = 1,048,576건을 빠르게 생성할 수 있습니다.
 
-`created_at`은 커서 페이지네이션의 핵심 조건이므로 2023-01-01 ~ 2024-12-31 범위로 랜덤 분산시킵니다.
-
 ```sql
 -- 1. 기존 데이터 초기화
 TRUNCATE TABLE payment;
