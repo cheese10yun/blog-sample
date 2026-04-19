@@ -32,6 +32,63 @@ companion object {
 
 Kotlin에서 `companion object`에 `operator fun invoke`를 정의하면 마치 생성자처럼 `CursorPageResponse(...)` 형태로 호출할 수 있습니다. 외부에서 보면 생성자처럼 보이지만, 실제로는 `invoke` 팩토리 함수를 통해 생성됩니다.
 
+`invoke` 내부 로직은 다음과 같습니다.
+
+```kotlin
+operator fun <T> invoke(
+    content: List<T>,
+    direction: CursorDirection,
+    pageSize: Int,
+): CursorPageResponse<T> {
+    if (content.isEmpty()) {
+        return CursorPageResponse(
+            content = emptyList(),
+            hasNext = false,
+            hasPrev = false,
+            nextCursor = null,
+            prevCursor = null,
+        )
+    }
+
+    return if (direction.isForward) {
+        // forward(FIRST/NEXT): DB에서 DESC로 조회한 결과를 그대로 사용
+        val hasNext = content.size > pageSize
+        val actualContent = content.take(pageSize)
+        val hasPrev = direction == CursorDirection.NEXT
+        CursorPageResponse(
+            content = actualContent,
+            hasNext = hasNext,
+            hasPrev = hasPrev,
+            nextCursor = if (hasNext) actualContent.last() else null,
+            prevCursor = if (hasPrev) actualContent.first() else null,
+        )
+    } else {
+        // backward(LAST/PREV): DB에서 ASC로 조회한 결과를 reversed()해서 반환
+        val hasPrev = content.size > pageSize
+        val actualContent = content.take(pageSize).reversed()
+        val hasNext = direction == CursorDirection.PREV
+        CursorPageResponse(
+            content = actualContent,
+            hasNext = hasNext,
+            hasPrev = hasPrev,
+            nextCursor = if (hasNext) actualContent.last() else null,
+            prevCursor = if (hasPrev) actualContent.first() else null,
+        )
+    }
+}
+```
+
+direction별로 동작 방식이 다릅니다.
+
+| direction | content 처리 | hasNext | hasPrev |
+|:----------|:------------|:--------|:--------|
+| FIRST | 그대로 사용 | pageSize 초과 여부 | 항상 false |
+| NEXT  | 그대로 사용 | pageSize 초과 여부 | 항상 true  |
+| LAST  | reversed() | 항상 false | pageSize 초과 여부 |
+| PREV  | reversed() | 항상 true  | pageSize 초과 여부 |
+
+`applyCursorPagination`이 `pageSize + 1`개를 조회해서 넘기면, `invoke` 내부에서 초과분 유무로 다음/이전 페이지 존재를 판단하고 `take(pageSize)`로 실제 노출할 데이터를 잘라냅니다. 커서(`nextCursor`, `prevCursor`)는 별도의 인코딩 없이 잘라낸 결과의 첫 번째 또는 마지막 항목을 `T?` 그대로 저장합니다.
+
 ## 받는 파라미터와 저장되는 필드가 다르다
 
 이 설계의 핵심은 **`invoke`가 받는 파라미터**와 **data class에 저장되는 필드**가 다르다는 점입니다.
