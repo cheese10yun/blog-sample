@@ -13,7 +13,7 @@ import com.example.querydsl.domain.QTeam.team as qTeam
 @Transactional
 internal class MemberTestRepositoryTest(
     private val em: EntityManager,
-    private val memberTestRepository: MemberTestNewRepository
+    private val memberTestRepository: MemberTest4Repository
 ) : SpringBootTestSupport() {
 
     @BeforeEach

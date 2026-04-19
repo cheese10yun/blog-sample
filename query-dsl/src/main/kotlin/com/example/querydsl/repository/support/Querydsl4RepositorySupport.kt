@@ -20,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 
 
-abstract class QuerydslNewRepositorySupport(domainClass: Class<*>) : QuerydslRepositorySupport(domainClass) {
+abstract class Querydsl4RepositorySupport(domainClass: Class<*>) : QuerydslRepositorySupport(domainClass) {
 
     protected var queryFactory: JPAQueryFactory by notNull()
 
