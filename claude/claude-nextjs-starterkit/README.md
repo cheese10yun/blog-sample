@@ -27,14 +27,14 @@ pnpm dev
 
 ## 스크립트
 
-| 명령어 | 설명 |
-|---|---|
-| `pnpm dev` | 개발 서버 실행 (Turbopack) |
-| `pnpm build` | 프로덕션 빌드 |
-| `pnpm start` | 프로덕션 서버 실행 |
-| `pnpm lint` | ESLint 실행 |
-| `pnpm lint:fix` | ESLint 자동 수정 |
-| `pnpm format` | Prettier 포맷 |
+| 명령어             | 설명                   |
+|-----------------|----------------------|
+| `pnpm dev`      | 개발 서버 실행 (Turbopack) |
+| `pnpm build`    | 프로덕션 빌드              |
+| `pnpm start`    | 프로덕션 서버 실행           |
+| `pnpm lint`     | ESLint 실행            |
+| `pnpm lint:fix` | ESLint 자동 수정         |
+| `pnpm format`   | Prettier 포맷          |
 
 ## 디렉토리 구조
 
@@ -71,6 +71,6 @@ pnpm dlx shadcn@latest add table
 `@/*`는 `src/*`로 매핑됩니다.
 
 ```ts
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import {cn} from "@/lib/utils";
+import {Button} from "@/components/ui/button";
 ```
