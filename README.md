@@ -7,6 +7,7 @@
 
 ## 2026
 
+* 04-22 [테스트가 어렵다면 캡슐화를 의심하라](https://cheese10yun.github.io/test-feedback-encapsulation.md/)
 * 04-19 [Querydsl 커서 기반 페이지네이션 - offset의 구조적 한계와 커서 방식 전환](https://cheese10yun.github.io/querydsl-cursor-pagination/)
 * 04-14 [QueryDSL을 이용한 Batch Update 성능 개선](https://cheese10yun.github.io/querydsl-batch-update/)
 * 02-16 [필드 단위 변경 이력(History) 추적 시스템](https://cheese10yun.github.io/diff-history-part-1/)
