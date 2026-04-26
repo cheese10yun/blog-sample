@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude가 기다리는 중\" with title \"Claude Code\"'"
+          }
+        ]
+      }
+    ]
+  }
+}
