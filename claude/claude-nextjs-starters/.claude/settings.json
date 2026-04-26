@@ -1,4 +1,17 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Skill(update-config)",
+      "mcp__playwright",
+      "mcp__sequential-thinking",
+      "mcp__shadcn"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "playwright"
+  ],
   "hooks": {
     "Notification": [
       {
