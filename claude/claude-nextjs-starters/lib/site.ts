@@ -7,6 +7,7 @@ export const siteConfig = {
     { label: "홈", href: "/" },
     { label: "기능", href: "/features" },
     { label: "소개", href: "/about" },
+    { label: "가격", href: "/pricing" },
   ],
   links: {
     github: "https://github.com",
