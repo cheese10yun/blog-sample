@@ -7,6 +7,7 @@
 
 ## 2026
 
+* 06-14 [Claude Code Statusline 커스텀하기](https://cheese10yun.github.io/claude-code-statusline-custom/)
 * 04-22 [테스트가 어렵다면 캡슐화를 의심하라](https://cheese10yun.github.io/test-feedback-encapsulation.md/)
 * 04-19 [Querydsl 커서 기반 페이지네이션 - offset의 구조적 한계와 커서 방식 전환](https://cheese10yun.github.io/querydsl-cursor-pagination/)
 * 04-14 [QueryDSL을 이용한 Batch Update 성능 개선](https://cheese10yun.github.io/querydsl-batch-update/)

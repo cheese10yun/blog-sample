@@ -9,7 +9,7 @@ servers:
     description: 'Sandbox server'
 tags:
   -
-    name: EXTERNAL
+  name: EXTERNAL
     description: '외부 공개 API'
   -
     name: INTERNAL
