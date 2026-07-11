@@ -31,7 +31,7 @@ Spring Data MongoDB에서는 `@DBRef` 애노테이션을 사용하여 객체 간
 }
 ```
 
-이 방식은 객체 그래프를 통해 연관 데이터에 접근할 수 있어 직관적이며, MongoDB의 데이터 모델을 명확하게 정의하는 데 도움을 줍니다. 하지만 연관 문서를 로딩할 때 별도의 추가 조회 쿼리가 실행되는 단점이 있습니다. 즉, Post 문서를 조회한 후 해당 Author 문서에 접근하면 각 Post마다 추가 조회가 발생하여, **특히 대량의 데이터를 다룰 때 ORM에서 흔히 발생하는 N+1 문제가 그대로 발생할 위험이 있습니다.**
+이 방식은 객체 그래프를 통해 연관 데이터에 접근할 수 있어 직관적이며, MongoDB의 데이터 모델을 명확하게 정의하는 데 도움을 줍니다. 하지만 연관 문서를 로딩할 때 별도의 추가 조회 쿼리가 실행되는 단점이 있습니다. 즉, Post 문서를 조회한 후 해당 Author 문서에 접근하면 각 Post마다 추가 조회가 발생하여, **특히 대량의 데이터를 다룰 때 ORM/ODM에서 흔히 발생하는 N+1 문제가 그대로 발생할 위험이 있습니다.**
 
 ### 단순 ID 참조 방식
 
@@ -197,12 +197,14 @@ java.lang.IllegalArgumentException: Cannot subclass final class com.example.mong
     ...
 ```
 
-이를 해결하기 위해 Kotlin에서는 `all-open` 플러그인 또는 `kotlin-spring` 플러그인을 적용하여, 특정 애노테이션(예: `@Document`)이 붙은 클래스를 자동으로 open으로 변환할 수 있습니다. 아래 예시는 이러한 설정을 적용하는 방법을 보여줍니다.
+이를 해결하기 위해 Kotlin에서는 `all-open`(또는 그 상위 preset인 `kotlin-spring`) 플러그인을 적용하여, 특정 애노테이션이 붙은 클래스를 자동으로 open으로 변환할 수 있습니다. 다만 한 가지 주의할 점이 있습니다. `kotlin-spring` 플러그인이 기본으로 열어주는 애노테이션은 `@Component`, `@Async`, `@Transactional`, `@Cacheable`, `@SpringBootTest`와 이들을 메타 애노테이션으로 갖는 클래스(`@Service`, `@Repository`, `@Configuration` 등)로 한정되어 있어, **`@Document`는 여기에 포함되지 않습니다.** 따라서 도메인 클래스를 open으로 만들려면 아래처럼 `allOpen` 블록에 `@Document`를 직접 등록해 주어야 합니다.
 
 ```kotlin
 plugins {
     id("org.jetbrains.kotlin.plugin.spring") version "1.6.21"
-    // 또는 id("org.jetbrains.kotlin.plugin.allopen") ...
+    // kotlin-spring을 쓰더라도 @Document는 자동으로 열리지 않으므로
+    // allopen 플러그인으로 @Document를 명시적으로 등록해야 한다.
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.6.21"
 }
 
 allOpen {
@@ -210,7 +212,7 @@ allOpen {
 }
 ```
 
-이 설정을 적용하면, `@Document` 애노테이션이 붙은 클래스들은 자동으로 open으로 처리되어 프록시 객체 생성이 가능해집니다. 즉, Lazy 로딩이 원활하게 동작할 수 있습니다.
+이 설정을 적용하면, `@Document` 애노테이션이 붙은 클래스들이 open으로 처리되어 프록시 객체 생성이 가능해집니다. 즉, Lazy 로딩이 원활하게 동작할 수 있습니다.
 
 아래 이미지는 Lazy 로딩이 활성화된 상태에서 Author 필드를 지연 로딩하기 위해 생성된 LazyLoadingProxy 객체를 보여줍니다. 이 프록시 객체는 실제 Author 데이터에 접근할 때 필요한 시점에 데이터를 로딩하도록 구성되어 있습니다.
 
@@ -364,7 +366,7 @@ class Post(
 
 테스트 결과를 요약하면, 단일 문서 조회에서는 모든 방식이 거의 동일한 응답 속도를 보입니다. **그러나 조회 대상 문서 수가 증가할수록 각 방식 간의 성능 차이가 뚜렷하게 나타납니다.**
 
-특히, Author 필드에 접근하는 경우, **lazy 설정이 true든 false든 상관없이 각 Post마다 추가 쿼리가 실행되어 N+1 문제가 발생합니다.** 이로 인해, 예를 들어 1,000건의 Post를 조회하면 약 1,000ms 정도의 응답 속도가 소요되어, 실제 서비스에 적용하기에는 다소 부적합 수 있습니다.
+특히, Author 필드에 접근하는 경우, **lazy 설정이 true든 false든 상관없이 각 Post마다 추가 쿼리가 실행되어 N+1 문제가 발생합니다.** 이로 인해, 예를 들어 1,000건의 Post를 조회하면 약 1,000ms 정도의 응답 속도가 소요되어, 실제 서비스에 적용하기에는 다소 부적합할 수 있습니다.
 
 반면, lazy=true 설정에서 Author 필드에 접근하지 않는 경우에는 단순 find 쿼리만 실행되므로 가장 빠른 응답 속도를 기록합니다. 만약 Author 정보에 접근해야 하는 상황이라면, `$lookup` 연산자를 활용해 `db.post.aggregate` 쿼리를 통해 Post와 Author 데이터를 한 번에 조회함으로써 N+1 문제를 효과적으로 회피할 수 있습니다. 이러한 방식은 Author 접근이 필요한 경우에 가장 효율적인 대안으로 평가됩니다.
 
@@ -393,9 +395,9 @@ class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomReposit
 }
 ```
 
-이와 같이 구현하면, Post 객체에 내장된 도메인 로직을 그대로 활용할 수 있으며, 불필요한 상속 관계를 도입하지 않고도 `$lookup` 방식을 통해 연관 데이터를 한 번에 조회할 수 있습니다.
+이 방식이 동작하는 이유는 Spring Data MongoDB의 매핑 동작에 있습니다. `MappingMongoConverter`는 `@DBRef` 필드를 읽을 때 값이 DBRef(`{"$ref", "$id"}`) 형태이면 별도 조회로 참조를 해석하지만, `$lookup` + `$unwind`를 거쳐 이미 완성된 Author 도큐먼트가 채워져 있으면 추가 조회 없이 그 값을 그대로 매핑합니다. 덕분에 Post 객체에 내장된 도메인 로직을 그대로 활용할 수 있으며, 불필요한 상속 관계를 도입하지 않고도 `$lookup` 방식을 통해 연관 데이터를 한 번에 조회할 수 있습니다.
 
-**중요한 것은 포인트는 `Post` 클래스 내에서 author 필드를 다음과 같이 lazy로 설정하는 점입니다.**
+**중요한 포인트는 `Post` 클래스 내에서 author 필드를 다음과 같이 lazy로 설정하는 점입니다.**
 
 ```kotlin
 @Document(collection = "post")
@@ -478,7 +480,7 @@ JPA의 경우 객체 참조로 인한 N+1 위험이 동일하게 존재하지만
 
 ### 이미 @DBRef를 사용하고 있다면
 
-이미 @DBRef 기반으로 운영 중인 시스템이라면, 모델을 당장 ID 참조로 전환하기 어려울 수 있습니다. 이 경우에는 `MongoRepository`가 제공해주는 기본 메서드들을 override하여 `$lookup` 기반으로 직접 구현해 제공하는 것이 더 적절할 수 있습니다. 예를 들어, `findByIdOrNull` 메서드를 사용하면 Lazy 로딩 시 Author 데이터에 접근할 때 N+1 문제가 발생할 수 있으므로, 이를 `$lookup` 기반으로 재정의하여 한 번의 Aggregation 쿼리로 데이터를 조회하도록 구현하는 것도 좋은 선택입니다.
+이미 @DBRef 기반으로 운영 중인 시스템이라면, 모델을 당장 ID 참조로 전환하기 어려울 수 있습니다. 이 경우에는 커스텀 리포지토리 프래그먼트에 `MongoRepository`의 기본 메서드와 동일한 시그니처의 메서드를 정의하여, `$lookup` 기반 구현이 기본 구현보다 우선하도록 만드는 것이 더 적절할 수 있습니다. 예를 들어, `findByIdOrNull`(Spring Data Kotlin이 제공하는 `CrudRepository.findByIdOrNull` 확장 함수)로 조회하면 내부적으로 `findById`가 동작하고, 이후 Lazy 로딩된 Author 데이터에 접근할 때 추가 쿼리가 발생할 수 있습니다. 따라서 조회 로직 자체를 `$lookup` 기반으로 제공하여 한 번의 Aggregation 쿼리로 연관 데이터까지 가져오도록 구현하는 것도 좋은 선택입니다.
 
 ```kotlin
 class PostCustomRepositoryImpl(mongoTemplate: MongoTemplate) : PostCustomRepository, MongoCustomRepositorySupport<Post>(
