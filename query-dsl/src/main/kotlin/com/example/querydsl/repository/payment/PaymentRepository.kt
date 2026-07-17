@@ -1,7 +1,7 @@
 package com.example.querydsl.repository.payment
 
 import com.example.querydsl.domain.Payment
-import com.example.querydsl.repository.support.QuerydslCustomRepositorySupport
+import com.example.querydsl.repository.support.Querydsl4RepositorySupport
 import org.springframework.data.jpa.repository.JpaRepository
 import java.math.BigDecimal
 import com.example.querydsl.domain.QPayment.payment as qPayment
@@ -15,7 +15,7 @@ interface PaymentCustomRepository {
     fun findUseFrom(targetAmount: BigDecimal): List<Payment>
 }
 
-class PaymentCustomRepositoryImpl : QuerydslCustomRepositorySupport(Payment::class.java), PaymentCustomRepository {
+class PaymentCustomRepositoryImpl : Querydsl4RepositorySupport(Payment::class.java), PaymentCustomRepository {
 
     override fun findUseFrom(targetAmount: BigDecimal): List<Payment> {
         return from(qPayment)

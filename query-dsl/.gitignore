@@ -33,3 +33,7 @@ out/
 /volumes/mysql/
 /src/main/kotlin/com/example/querydsl/pay/
 /src/test/kotlin/com/example/querydsl/pay/
+
+### OMC (oh-my-claudecode) ###
+.omc/
+!.omc/skills/

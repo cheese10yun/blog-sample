@@ -1,7 +1,7 @@
 package com.example.querydsl.domain
 // Kotlin
 
-import com.example.querydsl.repository.support.QuerydslCustomRepositorySupport
+import com.example.querydsl.repository.support.Querydsl4RepositorySupport
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -59,7 +59,7 @@ interface WriterCustomRepository {
     fun update(ids: List<Long>)
 }
 
-class WriterCustomRepositoryImpl : QuerydslCustomRepositorySupport(Writer::class.java), WriterCustomRepository {
+class WriterCustomRepositoryImpl : Querydsl4RepositorySupport(Writer::class.java), WriterCustomRepository {
 
     @Transactional
     override fun update(ids: List<Long>) {

@@ -4,7 +4,7 @@ package com.example.querydsl.repository.order
 import com.example.querydsl.domain.EntityAuditing
 import com.example.querydsl.logger
 import com.example.querydsl.repository.order.QOrder.order
-import com.example.querydsl.repository.support.QuerydslCustomRepositorySupport
+import com.example.querydsl.repository.support.Querydsl4RepositorySupport
 import com.example.querydsl.repository.user.QUser.user
 import com.example.querydsl.service.QCoupon.coupon
 import com.querydsl.jpa.impl.JPAQuery
@@ -52,7 +52,7 @@ interface OrderCustomRepository {
     fun findPaging3By(pageable: Pageable, address: String): Page<Order>
 }
 
-class OrderCustomRepositoryImpl : QuerydslCustomRepositorySupport(Order::class.java), OrderCustomRepository {
+class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java), OrderCustomRepository {
     private val log by logger()
 
     override fun find(

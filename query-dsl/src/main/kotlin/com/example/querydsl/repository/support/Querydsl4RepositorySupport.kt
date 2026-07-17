@@ -59,9 +59,11 @@ abstract class Querydsl4RepositorySupport(domainClass: Class<*>) : QuerydslRepos
         query: Function<JPAQueryFactory, JPAQuery<T>>
     ): Slice<T> {
         val jpaContentQuery = query.apply(queryFactory)
-        val content = querydsl!!.applyPagination(pageable, jpaContentQuery).fetch()
-        val hasNext = content.size >= pageable.pageSize
-        return SliceImpl(content, pageable, hasNext)
+        val content = querydsl!!.applyPagination(pageable, jpaContentQuery)
+            .limit((pageable.pageSize + 1).toLong()) // applyPagination이 건 limit을 덮어씀
+            .fetch()
+        val hasNext = content.size > pageable.pageSize
+        return SliceImpl(content.take(pageable.pageSize), pageable, hasNext)
     }
 
     /**

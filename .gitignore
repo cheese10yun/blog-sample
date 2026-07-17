@@ -123,3 +123,7 @@ fabric.properties
 hs_err_pid*
 
 .DS_Store
+
+### OMC (oh-my-claudecode) ###
+.omc/
+!.omc/skills/
