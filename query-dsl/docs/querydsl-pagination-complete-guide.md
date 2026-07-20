@@ -506,7 +506,7 @@ class OrderCustomRepositoryImpl : Querydsl4RepositorySupport(Order::class.java),
 
 `JpaPagingItemReader`(offset 방식)와 `QueryDslNoOffsetPagingReader`(No Offset 방식)의 실측 성능을 비교하면 offset의 한계가 명확하게 드러납니다.
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/batch-study/docs/img/reader-performance-1.png)
+![](Spring%20Batch%20Reader%20Performance.svg)
 
 | rows | JpaPagingItemReader<br>소요 시간 | QueryDslNoOffsetPagingReader<br>소요 시간 |
 |---|---|---|
