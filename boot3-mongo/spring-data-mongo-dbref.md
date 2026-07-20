@@ -322,7 +322,8 @@ class Post(
 
 아래 이미지는 각 조건을 10회씩 테스트한 후 산출된 평균 응답 시간을 비교한 벤치마크 결과를 보여줍니다.
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/master/mongo-study/images/m-mong-5.png)
+![MongoDB N+1 Performance](docs/MongoDB%20N+1%20Performance.svg)
+
 
 | rows  | $lookup | DBRef lazy false | DBRef lazy true(author 접근) | DBRef lazy true(author 미접근) |
 |-------|---------|------------------|----------------------------|-----------------------------|
