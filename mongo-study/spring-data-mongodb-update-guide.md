@@ -368,7 +368,8 @@ fun updateBulk(
 
 `updateMulti`는 이번 벤치마크에서 의도적으로 제외했습니다. 첫째, `updateMulti`는 단일 쿼리 한 번으로 다수 문서를 처리하므로 N 값에 관계없이 사실상 상수에 가까운 처리 시간을 보여, "행 수에 따른 시간 변화"를 측정하는 다른 방식들과 같은 축에 놓으면 비교 자체가 의미를 잃습니다. 둘째, `updateMulti`는 모든 대상에 동일한 값을 적용하는 시나리오에만 사용 가능하므로, 각 문서마다 다른 값을 set하는 이번 워크로드와 동일한 조건으로 테스트를 재현할 수 없습니다.
 
-![](https://raw.githubusercontent.com/cheese10yun/blog-sample/5fc6127a0800ca9bce5de5a6c73931b2025b0791/mongo-study/images/performance-update.png)
+![](MongoDB%20Update%20Performance.svg)
+
 
 | rows   | saveAll    | updateFirst | bulkOps(UNORDERED) | bulkOps(ORDERED) |
 |--------|------------|-------------|--------------------|------------------|
